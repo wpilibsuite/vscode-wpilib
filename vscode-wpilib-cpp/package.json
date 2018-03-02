@@ -14,7 +14,7 @@
         "workspaceContains:build.gradle"
     ],
     "contributes": {
-        "commands":[
+        "commands": [
             {
                 "title": "Refresh C++ Properties",
                 "command": "wpilibcpp.refreshProperties",
