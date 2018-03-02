@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { IExternalAPI } from './externalapi';
+import { IExternalAPI } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './gradle';
 import * as path from 'path';
