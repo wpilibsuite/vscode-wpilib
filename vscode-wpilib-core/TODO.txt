@@ -1,0 +1,11 @@
+Exported API:
+  Start RioLog
+  Set Team Number (Store in preferences)
+  Get Team Number (From Preferences)
+  Resolve RoboRio IP
+  Start Tool
+  Deploy Code
+  Register Deployer (The deployers will hook into the base,
+    Thats the only way for the buttons to work well)
+  Debug Code
+  Register debugger (same as deployer)

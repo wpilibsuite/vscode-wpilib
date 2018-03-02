@@ -1,0 +1,99 @@
+{
+    "name": "vscode-wpilib-core",
+    "displayName": "vscode-wpilib-core",
+    "description": "Base extension for WPILib Team Use",
+    "version": "0.0.11",
+    "publisher": "wpifirst",
+    "engines": {
+        "vscode": "^1.20.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "workspaceContains:build.gradle"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "wpilibcore.startRioLog",
+                "title": "Start RioLog",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.setTeamNumber",
+                "title": "Set Team Number",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.startTool",
+                "title": "Start Tool",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.deployCode",
+                "title": "Deploy Robot Code",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.debugCode",
+                "title": "Debug Robot Code",
+                "category": "wpilib"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "wpilibcore.deployCode",
+                "key": "shift+F5"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "wpilibcore.deployCode",
+                    "group": "wpilib"
+                },
+                {
+                    "command": "wpilibcore.debugCode",
+                    "group": "wpilib"
+                },
+                {
+                    "command": "wpilibcore.startTool",
+                    "group": "wpilib"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "wpilibcore.deployCode",
+                    "group": "wpilib"
+                },
+                {
+                    "command": "wpilibcore.debugCode",
+                    "group": "wpilib"
+                },
+                {
+                    "command": "wpilibcore.startTool",
+                    "group": "wpilib"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.0",
+        "vscode": "^1.1.6",
+        "tslint": "^5.8.0",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "jsonc-parser": "^1.0.1"
+    }
+}
