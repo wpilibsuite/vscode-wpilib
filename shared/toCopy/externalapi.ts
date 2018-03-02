@@ -20,7 +20,6 @@ export interface IExternalAPI {
 
   getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
   addLanguageChoice(language: string): void;
-  requestLanguageChoice(): Promise<string>;
 
   getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
 }

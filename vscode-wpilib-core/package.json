@@ -40,6 +40,21 @@
                 "command": "wpilibcore.debugCode",
                 "title": "Debug Robot Code",
                 "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.setLanguage",
+                "title": "Set Language",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.setAutoSave",
+                "title": "Set Auto Save On Deploy",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.setStartRioLog",
+                "title": "Set Auto Start RioLog on Deploy",
+                "category": "wpilib"
             }
         ],
         "keybindings": [

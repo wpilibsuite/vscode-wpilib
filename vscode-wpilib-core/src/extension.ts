@@ -13,8 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
     let riolog = new RioLog();
     context.subscriptions.push(riolog);
 
+    // Array of preferences are used with Multi Workspace Folders
     let preferences: Preferences[] = [];
-
     let workspaces = vscode.workspace.workspaceFolders;
 
     if (workspaces === undefined) {
@@ -22,15 +22,19 @@ export function activate(context: vscode.ExtensionContext) {
         return;
     }
 
+    // Create new preferences for every workspace
     for (let w of workspaces) {
         preferences.push(new Preferences(w));
     }
 
+    // On a change in workspace folders, redo all preferences
     context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
-        // Nuke and restart
+        // Nuke and reset
+        // TODO: Remove existing preferences from the extension context
         for (let p of preferences) {
             p.dispose();
         }
+
         let wp = vscode.workspace.workspaceFolders;
 
         if (wp === undefined) {
@@ -40,12 +44,16 @@ export function activate(context: vscode.ExtensionContext) {
         for (let w of wp) {
             preferences.push(new Preferences(w));
         }
+
+        context.subscriptions.push(...preferences);
     }));
 
     context.subscriptions.push(...preferences);
 
+    // Resources folder will be used for RioLog
     let extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
+    // Storage for our registered language choices.
     let tools = new Array<IToolRunner>();
     let codeDeployers = new Array<ICodeDeployer>();
     let codeDebuggers = new Array<ICodeDeployer>();
@@ -211,29 +219,23 @@ export function activate(context: vscode.ExtensionContext) {
         addLanguageChoice(language: string): void {
             languageChoices.push(language);
         },
-        async requestLanguageChoice(): Promise<string> {
-            if (languageChoices.length <= 0) {
-                return '';
-            }
-            let result = await vscode.window.showQuickPick(languageChoices, { placeHolder: 'Pick a language' } );
-            if (result === undefined) {
-                return '';
-            }
-            return result;
-        },
         async getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined> {
             let wp = vscode.workspace.workspaceFolders;
             if (wp === undefined) {
-                return;
+                return undefined;
             }
-            let workspace = wp[0];
+
             if (wp.length > 1) {
                 let res = await vscode.window.showWorkspaceFolderPick();
                 if (res !== undefined) {
-                    workspace = res;
+                    return res;
                 }
+                return undefined;
+            } else if (wp.length === 1) {
+                return wp[0];
+            } else {
+                return undefined;
             }
-            return workspace;
         }
     };
 
@@ -275,6 +277,50 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
         await api.debugCode(workspace);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setLanguage', async () =>{
+        let workspace = await api.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+            return;
+        }
+
+        if (languageChoices.length <= 0) {
+            await vscode.window.showInformationMessage('No languages available to add');
+        }
+        let result = await vscode.window.showQuickPick(languageChoices, { placeHolder: 'Pick a language' } );
+        if (result === undefined) {
+            return;
+        }
+
+        let preferences = api.getPreferences(workspace);
+        preferences.setCurrentLanguage(result);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setAutoSave', async () =>{
+        let workspace = await api.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+            return;
+        }
+        let result = await vscode.window.showInformationMessage('Automatically save on deploy?', 'Yes', 'No');
+        if (result === undefined) {
+            return;
+        }
+        let preferences = api.getPreferences(workspace);
+        preferences.setAutoSaveOnDeploy(result === 'Yes');
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStartRioLog', async () =>{
+        let workspace = await api.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+            return;
+        }
+        let result = await vscode.window.showInformationMessage('Automatically start RioLog on deploy?', 'Yes', 'No');
+        if (result === undefined) {
+            return;
+        }
+        let preferences = api.getPreferences(workspace);
+        preferences.setAutoStartRioLog(result === 'Yes');
     }));
 
     return api;
