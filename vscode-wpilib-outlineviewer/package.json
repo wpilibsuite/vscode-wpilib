@@ -1,8 +1,8 @@
 {
-    "name": "vscode-wpilib-java",
-    "displayName": "vscode-wpilib-java",
-    "description": "Vscode for WPILib Java",
-    "version": "0.0.5",
+    "name": "vscode-wpilib-outlineviewer",
+    "displayName": "vscode-wpilib-outlineviewer",
+    "description": "Outline Viewer runner for wpilib",
+    "version": "0.0.1",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -11,9 +11,17 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:build.gradle"
+        "*"
     ],
     "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.sayHello",
+                "title": "Hello World"
+            }
+        ]
+    },
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",

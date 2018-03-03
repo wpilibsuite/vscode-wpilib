@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-let copyToProjects = ['vscode-wpilib-core', 'vscode-wpilib-cpp', 'vscode-wpilib-java'];
+let copyToProjects = ['vscode-wpilib-core', 'vscode-wpilib-cpp', 'vscode-wpilib-java', 'vscode-wpilib-outlineviewer'];
 
 const copyFromFolder = 'toCopy';
 
