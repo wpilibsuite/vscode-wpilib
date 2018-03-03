@@ -13,7 +13,8 @@ export async function startDebugging(commands: DebugCommands): Promise<void> {
     type: 'java',
     request: 'attach',
     hostName: commands.serverAddress,
-    port: commands.serverPort
+    port: commands.serverPort,
+    projectName: 'java'
   };
 
   await vscode.debug.startDebugging(commands.workspace, config);
