@@ -6,6 +6,8 @@ import { IExternalAPI } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './gradle';
 import * as path from 'path';
+import { WpiLibHeaders } from './header_search';
+import { CppGradleProperties } from './cpp_gradle_properties';
 
 interface DebuggerParse {
     libraryLocations: string[];
@@ -50,7 +52,7 @@ function parseGradleOutput(output: OutputPair): DebuggerParse {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activate(_: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
@@ -81,6 +83,55 @@ export async function activate(_: vscode.ExtensionContext) {
     if (promises.length > 0) {
         await Promise.all(promises);
     }
+
+    let headerFinders: WpiLibHeaders[] = [];
+    let workspaces = vscode.workspace.workspaceFolders;
+
+    if (workspaces === undefined) {
+        vscode.window.showErrorMessage('WPILib does not support single file');
+        return;
+    }
+
+    let gradleProps: CppGradleProperties[] = [];
+
+    // Create new header finders for every workspace
+    for (let w of workspaces) {
+        let gp = new CppGradleProperties(w);
+        let wh = new WpiLibHeaders(w, gp);
+        gradleProps.push(gp);
+        headerFinders.push(wh);
+    }
+
+    // On a change in workspace folders, redo all header finders
+    context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
+        // Nuke and reset
+        // TODO: Remove existing header finders from the extension context
+        for (let p of headerFinders) {
+            p.dispose();
+        }
+        for (let p of gradleProps) {
+            p.dispose();
+        }
+
+        let wp = vscode.workspace.workspaceFolders;
+
+        if (wp === undefined) {
+            return;
+        }
+
+        for (let w of wp) {
+            let gp = new CppGradleProperties(w);
+            let wh = new WpiLibHeaders(w, gp);
+            gradleProps.push(gp);
+            headerFinders.push(wh);
+        }
+
+        context.subscriptions.push(...headerFinders);
+        context.subscriptions.push(...gradleProps);
+    }));
+
+    context.subscriptions.push(...headerFinders);
+    context.subscriptions.push(...gradleProps);
 
     let coreExports: IExternalAPI = coreExtension.exports;
 
@@ -144,8 +195,18 @@ export async function activate(_: vscode.ExtensionContext) {
                     sysroot: parsed.sysroot,
                     executablePath: parsed.executablePath,
                     workspace: workspace,
-                    soLibPath: soPath
+                    soLibPath: soPath,
+                    additionalCommands: []
                 };
+
+                let properties = coreExports.getPreferences(workspace).getLanguageSpecific('cpp');
+
+                if (properties !== undefined) {
+                    if ('additionalDebugCommands' in properties.languageData
+                        && properties.languageData.additionalDebugCommands instanceof Array) {
+                        config.additionalCommands.push(...properties.languageData.additionalDebugCommands);
+                    }
+                }
 
                 await startDebugging(config);
 
