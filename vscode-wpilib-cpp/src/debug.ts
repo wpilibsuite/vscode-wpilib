@@ -9,6 +9,7 @@ export interface DebugCommands {
   executablePath: string;
   workspace: vscode.WorkspaceFolder;
   soLibPath: string;
+  additionalCommands: string[];
 }
 
 export async function startDebugging(commands: DebugCommands): Promise<void> {
@@ -30,10 +31,16 @@ export async function startDebugging(commands: DebugCommands): Promise<void> {
       },
       {
         text: 'set sysroot ' + commands.sysroot
-      }
+      },
     ],
     additionalSOLibSearchPath: commands.soLibPath,
   };
+
+  for(let a of commands.additionalCommands) {
+    config.setupCommands.push({
+      text: a
+    });
+  }
 
   let nodePlatform: NodeJS.Platform = process.platform;
   if (nodePlatform === 'win32') {
