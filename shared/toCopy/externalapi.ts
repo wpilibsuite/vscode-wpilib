@@ -4,6 +4,11 @@ import * as vscode from 'vscode';
 // This file is designed to be copied into an
 // external project to support the extension API
 
+export interface IPreferencesChangedPair {
+  workspace: vscode.WorkspaceFolder;
+  preference: IPreferences;
+}
+
 /**
  * The external interface supported by the core plugin
  */
@@ -19,6 +24,8 @@ export interface IExternalAPI {
 
 
   getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
+  onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+
   addLanguageChoice(language: string): void;
 
   getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;

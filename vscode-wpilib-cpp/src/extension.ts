@@ -8,6 +8,7 @@ import { gradleRun, OutputPair } from './gradle';
 import * as path from 'path';
 import { WpiLibHeaders } from './header_search';
 import { CppGradleProperties } from './cpp_gradle_properties';
+import { CppVsCodeProperties } from './cpp_vscode_properties';
 
 interface DebuggerParse {
     libraryLocations: string[];
@@ -84,7 +85,6 @@ export async function activate(context: vscode.ExtensionContext) {
         await Promise.all(promises);
     }
 
-    let headerFinders: WpiLibHeaders[] = [];
     let workspaces = vscode.workspace.workspaceFolders;
 
     if (workspaces === undefined) {
@@ -93,17 +93,26 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     let gradleProps: CppGradleProperties[] = [];
+    let headerFinders: WpiLibHeaders[] = [];
+    let cppProps: CppVsCodeProperties[] = [];
+
+    let coreExports: IExternalAPI = coreExtension.exports;
+
+    let gradleChannel = vscode.window.createOutputChannel('gradleCpp');
 
     // Create new header finders for every workspace
     for (let w of workspaces) {
-        let gp = new CppGradleProperties(w);
-        let wh = new WpiLibHeaders(w, gp);
+        let p = coreExports.getPreferences(w);
+        let gp = new CppGradleProperties(w, p, gradleChannel);
+        let wh = new WpiLibHeaders(gp);
+        let cp = new CppVsCodeProperties(w, gp, p);
         gradleProps.push(gp);
         headerFinders.push(wh);
+        cppProps.push(cp);
     }
 
     // On a change in workspace folders, redo all header finders
-    context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
+    coreExports.onDidPreferencesFolderChanged((changed) => {
         // Nuke and reset
         // TODO: Remove existing header finders from the extension context
         for (let p of headerFinders) {
@@ -113,29 +122,23 @@ export async function activate(context: vscode.ExtensionContext) {
             p.dispose();
         }
 
-        let wp = vscode.workspace.workspaceFolders;
-
-        if (wp === undefined) {
-            return;
-        }
-
-        for (let w of wp) {
-            let gp = new CppGradleProperties(w);
-            let wh = new WpiLibHeaders(w, gp);
+        for (let c of changed) {
+            let gp = new CppGradleProperties(c.workspace, c.preference, gradleChannel);
+            let wh = new WpiLibHeaders(gp);
+            let cp = new CppVsCodeProperties(c.workspace, gp, c.preference);
             gradleProps.push(gp);
             headerFinders.push(wh);
+            cppProps.push(cp);
         }
 
         context.subscriptions.push(...headerFinders);
         context.subscriptions.push(...gradleProps);
-    }));
+        context.subscriptions.push(...cppProps);
+    });
 
     context.subscriptions.push(...headerFinders);
     context.subscriptions.push(...gradleProps);
-
-    let coreExports: IExternalAPI = coreExtension.exports;
-
-    let gradleChannel = vscode.window.createOutputChannel('gradleCpp');
+    context.subscriptions.push(...cppProps);
 
     coreExports.addLanguageChoice('cpp');
 
@@ -218,6 +221,12 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
     }
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.refreshProperties', () =>{
+        for(let c of gradleProps) {
+            c.runGradleRefresh();
+        }
+    }));
 }
 
 // this method is called when your extension is deactivated

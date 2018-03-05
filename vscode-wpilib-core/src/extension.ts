@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { IExternalAPI, ICodeDeployer, IToolRunner, IPreferences } from './shared/externalapi';
+import { IExternalAPI, ICodeDeployer, IToolRunner, IPreferences, IPreferencesChangedPair } from './shared/externalapi';
 import { RioLog } from './riolog';
 import { Preferences, requestTeamNumber } from './preferences';
 import * as path from 'path';
@@ -9,12 +9,6 @@ import * as path from 'path';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-    let riolog = new RioLog();
-    context.subscriptions.push(riolog);
-
-    // Array of preferences are used with Multi Workspace Folders
-    let preferences: Preferences[] = [];
     let workspaces = vscode.workspace.workspaceFolders;
 
     if (workspaces === undefined) {
@@ -22,10 +16,19 @@ export function activate(context: vscode.ExtensionContext) {
         return;
     }
 
+    let riolog = new RioLog();
+    context.subscriptions.push(riolog);
+
+    // Array of preferences are used with Multi Workspace Folders
+    let preferences: Preferences[] = [];
+
     // Create new preferences for every workspace
     for (let w of workspaces) {
         preferences.push(new Preferences(w));
     }
+
+    let preferencesEmitter: vscode.EventEmitter<IPreferencesChangedPair[]> = new vscode.EventEmitter<IPreferencesChangedPair[]>();
+    context.subscriptions.push(preferencesEmitter);
 
     // On a change in workspace folders, redo all preferences
     context.subscriptions.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
@@ -41,9 +44,19 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
+        let pairArr: IPreferencesChangedPair[] = [];
+
         for (let w of wp) {
-            preferences.push(new Preferences(w));
+            let p = new Preferences(w);
+            preferences.push(p);
+            let pair: IPreferencesChangedPair = {
+                workspace: w,
+                preference: p
+            };
+            pairArr.push(pair);
         }
+
+        preferencesEmitter.fire(pairArr);
 
         context.subscriptions.push(...preferences);
     }));
@@ -216,6 +229,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
             return preferences[0];
         },
+        onDidPreferencesFolderChanged: preferencesEmitter.event,
         addLanguageChoice(language: string): void {
             languageChoices.push(language);
         },
