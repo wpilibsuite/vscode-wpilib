@@ -5,7 +5,7 @@ import { CppGradleProperties } from './cpp_gradle_properties';
 
 function getFilesInDirectory(root: string) : Promise<string[]> {
   return new Promise(function (resolve, _) {
-      glob('**/*.h', { nomount: true,  cwd: root},  (error: Error | null, result : string[]) => {
+      glob('**/*.{h, hpp, hh}', { nomount: true,  cwd: root},  (error: Error | null, result : string[]) => {
           if (error) {
               resolve([]);
           } else {
@@ -23,7 +23,7 @@ export class WpiLibHeaders {
   private currentlyLoadingLibrary: boolean = false;
   private currentlyLoadingLocal: boolean = false;
 
-  public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties) {
+  public constructor(gp: CppGradleProperties) {
     let currentThis = this;
     this.gradleProperties = gp;
 
@@ -33,7 +33,7 @@ export class WpiLibHeaders {
 
     this.gradleProperties.onDidChangeLocalHeaderDirectories((paths) => {
       this.loadLocalHeaders(paths);
-    })
+    });
 
     let completionProvider = vscode.languages.registerCompletionItemProvider(['cpp', 'c'], {
       async provideCompletionItems(document, position) {
