@@ -2,8 +2,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { IPreferences } from './shared/externalapi';
 import { CppGradleProperties } from './cpp_gradle_properties';
+import { CppPreferences } from './cpp_preferences';
 
 interface Browse {
   path?: string[];
@@ -54,14 +54,14 @@ const version = 3;
 
 export class CppVsCodeProperties {
   private gradleProps: CppGradleProperties;
-  private preferences: IPreferences;
+  private cppPreferences: CppPreferences;
 
   private readonly cppPropertiesFile: string;
   private readonly configFolder: string;
 
-  public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties,  prefs: IPreferences) {
+  public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties,  prefs: CppPreferences) {
     this.gradleProps = gp;
-    this.preferences = prefs;
+    this.cppPreferences = prefs;
 
     this.configFolder = path.join(wp.uri.fsPath, '.vscode');
     this.cppPropertiesFile = path.join(this.configFolder, 'c_cpp_properties.json');
@@ -77,26 +77,8 @@ export class CppVsCodeProperties {
   }
 
   private updateCppConfigurationFile() {
-    let langSpec = this.preferences.getLanguageSpecific('cpp');
-    let includes: string[] = [];
-    let defines: string[] = [];
-
-    if (langSpec !== undefined) {
-      if ('additionalIncludeDirectories' in langSpec.languageData) {
-        try {
-          includes.push(...langSpec.languageData.additionalIncludeDirectories);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      if ('additionalDefines' in langSpec.languageData) {
-        try {
-          defines.push(...langSpec.languageData.additionalDefines);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    }
+    let includes: string[] = this.cppPreferences.getAdditionalIncludeDirectories();
+    let defines: string[] = this.cppPreferences.getAdditionalDefines();
 
     let compiler = this.gradleProps.getCompiler();
     let sysroot = this.gradleProps.getSysRoot();

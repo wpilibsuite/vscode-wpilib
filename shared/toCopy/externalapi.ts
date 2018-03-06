@@ -82,11 +82,6 @@ export abstract class IExternalAPI implements IVersionable {
   }
 }
 
-export interface ILanguageSpecific {
-  languageName: string;
-  languageData: any;
-}
-
 export interface IPreferences {
   getTeamNumber(): Promise<number>;
   setTeamNumber(teamNumber: number, global: boolean): void;
@@ -96,8 +91,6 @@ export interface IPreferences {
   setAutoStartRioLog(autoStart: boolean, global: boolean): void;
   getAutoSaveOnDeploy(): boolean;
   setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void;
-  getLanguageSpecific(language: string): ILanguageSpecific | undefined;
-  setLanguageSpecific(data: ILanguageSpecific): void;
 }
 
 export interface ITemplateExampleCreator {

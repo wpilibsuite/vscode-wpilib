@@ -11,10 +11,16 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:build.gradle"
+        "*"
     ],
     "main": "./out/extension",
     "contributes": {
+        "jsonValidation": [
+            {
+                "fileMatch": "wpilib_preferences.json",
+                "url": "./resources/wpilibschema.json"
+            }
+        ],
         "configuration": {
             "type": "object",
             "title": "WPILib configuration",
