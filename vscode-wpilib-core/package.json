@@ -15,6 +15,32 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "WPILib configuration",
+            "properties": {
+                "wpilib.autoSaveOnDeploy": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically save all files on deploy"
+                },
+                "wpilib.autoStartRioLog": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically start RioLog on deploy"
+                },
+                "wpilib.alwaysAskForTeamNumber": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Always ask for a team number, even if set"
+                },
+                "wpilib.globalTeamNumber": {
+                    "type": "integer",
+                    "default": -1,
+                    "description": "Team number to use if not set in the project"
+                }
+            }
+        },
         "commands": [
             {
                 "command": "wpilibcore.startRioLog",

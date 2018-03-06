@@ -89,13 +89,13 @@ export interface ILanguageSpecific {
 
 export interface IPreferences {
   getTeamNumber(): Promise<number>;
-  setTeamNumber(teamNumber: number): void;
+  setTeamNumber(teamNumber: number, global: boolean): void;
   getCurrentLanguage(): string;
   setCurrentLanguage(language: string): void;
   getAutoStartRioLog(): boolean;
-  setAutoStartRioLog(autoStart: boolean): void;
+  setAutoStartRioLog(autoStart: boolean, global: boolean): void;
   getAutoSaveOnDeploy(): boolean;
-  setAutoSaveOnDeploy(autoSave: boolean): void;
+  setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void;
   getLanguageSpecific(language: string): ILanguageSpecific | undefined;
   setLanguageSpecific(data: ILanguageSpecific): void;
 }
