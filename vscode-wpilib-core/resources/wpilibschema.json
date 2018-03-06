@@ -1,0 +1,12 @@
+{
+  "title": "WPILibSettings",
+  "type": "object",
+  "properties": {
+    "teamNumber": {
+      "type": "integer"
+    },
+    "currentLanguage": {
+      "type": "string"
+    }
+  }
+}

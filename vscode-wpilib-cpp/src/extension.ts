@@ -9,6 +9,7 @@ import * as path from 'path';
 import { WpiLibHeaders } from './header_search';
 import { CppGradleProperties } from './cpp_gradle_properties';
 import { CppVsCodeProperties } from './cpp_vscode_properties';
+import { CppPreferences } from './cpp_preferences';
 
 interface DebuggerParse {
     libraryLocations: string[];
@@ -121,6 +122,7 @@ export async function activate(context: vscode.ExtensionContext) {
         let gradleProps: CppGradleProperties[] = [];
         let headerFinders: WpiLibHeaders[] = [];
         let cppProps: CppVsCodeProperties[] = [];
+        let cppPrefs: CppPreferences[] = [];
 
         let gradleChannel = vscode.window.createOutputChannel('gradleCpp');
 
@@ -132,9 +134,11 @@ export async function activate(context: vscode.ExtensionContext) {
                     console.log('Preferences without workspace?');
                     continue;
                 }
-                let gp = new CppGradleProperties(w, p, gradleChannel);
+                let cpr = new CppPreferences(w);
+                let gp = new CppGradleProperties(w, gradleChannel, cpr);
                 let wh = new WpiLibHeaders(gp);
-                let cp = new CppVsCodeProperties(w, gp, p);
+                let cp = new CppVsCodeProperties(w, gp, cpr);
+                cppPrefs.push(cpr);
                 gradleProps.push(gp);
                 headerFinders.push(wh);
                 cppProps.push(cp);
@@ -151,11 +155,19 @@ export async function activate(context: vscode.ExtensionContext) {
             for (let p of gradleProps) {
                 p.dispose();
             }
+            for (let p of cppPrefs) {
+                p.dispose();
+            }
+            for (let p of cppProps) {
+                p.dispose();
+            }
 
             for (let c of changed) {
-                let gp = new CppGradleProperties(c.workspace, c.preference, gradleChannel);
+                let cpr = new CppPreferences(c.workspace);
+                let gp = new CppGradleProperties(c.workspace, gradleChannel, cpr);
                 let wh = new WpiLibHeaders(gp);
-                let cp = new CppVsCodeProperties(c.workspace, gp, c.preference);
+                let cp = new CppVsCodeProperties(c.workspace, gp, cpr);
+                cppPrefs.push(cpr);
                 gradleProps.push(gp);
                 headerFinders.push(wh);
                 cppProps.push(cp);
@@ -164,11 +176,13 @@ export async function activate(context: vscode.ExtensionContext) {
             context.subscriptions.push(...headerFinders);
             context.subscriptions.push(...gradleProps);
             context.subscriptions.push(...cppProps);
+            context.subscriptions.push(...cppPrefs);
         });
 
         context.subscriptions.push(...headerFinders);
         context.subscriptions.push(...gradleProps);
         context.subscriptions.push(...cppProps);
+        context.subscriptions.push(...cppPrefs);
 
         debugDeploy!.addLanguageChoice('cpp');
 
@@ -243,19 +257,16 @@ export async function activate(context: vscode.ExtensionContext) {
                         additionalCommands: []
                     };
 
-                    let prefs = preferences!.getPreferences(workspace);
-                    if (prefs === undefined) {
-                        console.log('Preferences without workspace?');
-                        return false;
+                    let cppPref: CppPreferences | undefined = undefined;
+
+                    for (let c of cppPrefs) {
+                        if (c.workspace.uri === workspace.uri) {
+                            cppPref = c;
+                        }
                     }
 
-                    let properties = prefs.getLanguageSpecific('cpp');
-
-                    if (properties !== undefined) {
-                        if ('additionalDebugCommands' in properties.languageData
-                            && properties.languageData.additionalDebugCommands instanceof Array) {
-                            config.additionalCommands.push(...properties.languageData.additionalDebugCommands);
-                        }
+                    if (cppPref !== undefined) {
+                        config.additionalCommands = cppPref.getAdditionalDebugCommands();
                     }
 
                     await startDebugging(config);

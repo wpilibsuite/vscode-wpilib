@@ -3,8 +3,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
-import { IPreferences } from './shared/externalapi';
 import { gradleRun } from './gradle';
+import { CppPreferences } from './cpp_preferences';
 
 interface IComponent {
   launchFile: string;
@@ -15,7 +15,7 @@ interface IComponent {
 }
 
 interface IComponentMap {
-  [name:string]: IComponent;
+  [name: string]: IComponent;
 }
 
 interface ICompiler {
@@ -49,8 +49,6 @@ export class CppGradleProperties {
 
   private lastConfig: IEditorConfig = defaultConfig;
 
-  private preferences: IPreferences;
-
   private libraryHeaderDirsChanged: vscode.EventEmitter<string[]>;
   public readonly onDidChangeLibraryHeaderDirectories: vscode.Event<string[]>;
   private localHeaderDirsChanged: vscode.EventEmitter<string[]>;
@@ -58,15 +56,17 @@ export class CppGradleProperties {
   private propertiesChange: vscode.EventEmitter<void>;
   public readonly onDidPropertiesChange: vscode.Event<void>;
 
+  private cppPreferences: CppPreferences;
+
   private outputWriter: vscode.OutputChannel;
 
   private workspace: vscode.WorkspaceFolder;
   private readonly gradleJsonFileLoc: string = '**/.editcfg';
 
-  public constructor(wp: vscode.WorkspaceFolder, prefs: IPreferences, ow: vscode.OutputChannel) {
+  public constructor(wp: vscode.WorkspaceFolder, ow: vscode.OutputChannel, cppPrefs: CppPreferences) {
     this.workspace = wp;
-    this.preferences = prefs;
     this.outputWriter = ow;
+    this.cppPreferences = cppPrefs;
 
     let buildPropertiesRelativePattern = new vscode.RelativePattern(wp, this.gradleJsonFileLoc);
 
@@ -215,18 +215,13 @@ export class CppGradleProperties {
     if (componentKeys.length === 1) {
       currentKey = componentKeys[0];
     } else {
-      let langSpec = this.preferences.getLanguageSpecific('cpp');
-      if (langSpec === undefined) {
+      let component = this.cppPreferences.getSelectedComponent();
+      if (component === undefined) {
         console.log('No components found');
         return undefined;
       }
-      if ('selectedComponent' in langSpec.languageData) {
-        if (componentKeys.indexOf(langSpec.languageData.selectedComponent) >= 0) {
-          currentKey = langSpec.languageData.selectedComponent;
-        } else {
-          console.log('No components found');
-          return undefined;
-        }
+      if (componentKeys.indexOf(component) >= 0) {
+        currentKey = component;
       } else {
         console.log('No components found');
         return undefined;

@@ -3,19 +3,17 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
-import { IPreferences, ILanguageSpecific } from './shared/externalapi';
+import { IPreferences } from './shared/externalapi';
 import { ConfigurationTarget } from 'vscode';
 
 interface PreferencesJson {
   teamNumber: number;
   currentLanguage: string;
-  languageSpecific : ILanguageSpecific[];
 }
 
 const defaultPreferences: PreferencesJson = {
   teamNumber: -1,
   currentLanguage: 'none',
-  languageSpecific: []
 };
 
 export async function requestTeamNumber(): Promise<number> {
@@ -166,28 +164,6 @@ export class Preferences implements IPreferences {
       target = ConfigurationTarget.WorkspaceFolder;
     }
     this.configuration.update('autoStartRioLog', autoStart, target);
-  }
-
-  public getLanguageSpecific(language: string): ILanguageSpecific | undefined {
-    for (let l of this.preferencesJson.languageSpecific) {
-      if (l.languageName === language) {
-        return l;
-      }
-    }
-
-    return undefined;
-  }
-
-  public setLanguageSpecific(data: ILanguageSpecific): void {
-    for (let l of this.preferencesJson.languageSpecific) {
-      if (l.languageName === data.languageName) {
-        l.languageData = data.languageData;
-        this.writePreferences();
-        return;
-      }
-    }
-    this.preferencesJson.languageSpecific.push(data);
-    this.writePreferences();
   }
 
   public getAutoSaveOnDeploy(): boolean {
