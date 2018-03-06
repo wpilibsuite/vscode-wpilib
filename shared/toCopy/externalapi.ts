@@ -9,26 +9,77 @@ export interface IPreferencesChangedPair {
   preference: IPreferences;
 }
 
-/**
- * The external interface supported by the core plugin
- */
-export interface IExternalAPI {
-  startRioLog(teamNumber: number) : Promise<void>;
-  startTool(): Promise<void>;
-  addTool(tool: IToolRunner): void;
-  deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  registerCodeDeploy(deployer: ICodeDeployer): void;
-  debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  registerCodeDebug(deployer: ICodeDeployer): void;
-  getApiVersion(): number;
+export interface IVersionable {
+  getVersion(): number;
+}
 
+const toolAPIExpectedVersion = 1;
+export function getToolAPIExpectedVersion(): number {
+  return toolAPIExpectedVersion;
+}
+export abstract class IToolAPI implements IVersionable {
+  abstract startTool(): Promise<boolean>;
+  abstract addTool(tool: IToolRunner): void;
+  getVersion(): number {
+    return toolAPIExpectedVersion;
+  }
+}
 
-  getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
-  onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+const exampleTemplateAPIExpectedVersion = 1;
+export function getExampleTemplateAPIExpectedVersion(): number {
+  return exampleTemplateAPIExpectedVersion;
+}
+export abstract class IExampleTemplateAPI implements IVersionable {
+  abstract addTemplateProvider(provider: ITemplateExampleCreator): void;
+  abstract addExampleProvider(provider: ITemplateExampleCreator): void;
+  abstract createExample(): Promise<boolean>;
+  abstract createTemplate(): Promise<boolean>;
+  getVersion(): number {
+    return exampleTemplateAPIExpectedVersion;
+  }
+}
 
-  addLanguageChoice(language: string): void;
+const deployDebugAPIExpectedVersion = 1;
+export function getDeployDebugAPIExpectedVersion(): number {
+  return deployDebugAPIExpectedVersion;
+}
+export abstract class IDeployDebugAPI implements IVersionable {
+  abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
+  abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  abstract registerCodeDeploy(deployer: ICodeDeployer): void;
+  abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  abstract registerCodeDebug(deployer: ICodeDeployer): void;
+  abstract addLanguageChoice(language: string): void;
+  getVersion(): number {
+    return deployDebugAPIExpectedVersion;
+  }
+}
 
-  getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
+const preferencesAPIExpectedVersion = 1;
+export function getPreferencesAPIExpectedVersion(): number {
+  return preferencesAPIExpectedVersion;
+}
+export abstract class IPreferencesAPI implements IVersionable {
+  abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined;
+  abstract onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+  abstract getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
+  getVersion(): number {
+    return preferencesAPIExpectedVersion;
+  }
+}
+
+const externalAPIExpectedVersion = 1;
+export function getExternalAPIExpectedVersion(): number {
+  return externalAPIExpectedVersion;
+}
+export abstract class IExternalAPI implements IVersionable {
+  abstract getToolAPI(): IToolAPI | undefined;
+  abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
+  abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
+  abstract getPreferencesAPI(): IPreferencesAPI | undefined;
+  getVersion(): number {
+    return externalAPIExpectedVersion;
+  }
 }
 
 export interface ILanguageSpecific {
@@ -49,9 +100,17 @@ export interface IPreferences {
   setLanguageSpecific(data: ILanguageSpecific): void;
 }
 
-export interface IToolRunner {
-  runTool(): Promise<void>;
+export interface ITemplateExampleCreator {
+  getLanguage(): string;
   getDisplayName(): string;
+  getDescription(): string;
+  generate(): Promise<boolean>;
+}
+
+export interface IToolRunner {
+  runTool(): Promise<boolean>;
+  getDisplayName(): string;
+  getDescription(): string;
 }
 
 
@@ -76,4 +135,5 @@ export interface ICodeDeployer {
    * Get the display name to be used for selection
    */
   getDisplayName(): string;
+  getDescription(): string;
 }
