@@ -74,7 +74,11 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
         }
-        await preferences.setTeamNumber(await requestTeamNumber());
+        let request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+        if (request === undefined) {
+            return;
+        }
+        await preferences.setTeamNumber(await requestTeamNumber(), request === 'Globally');
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startTool', async () => {
@@ -140,7 +144,11 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
         }
-        preferences.setAutoSaveOnDeploy(result === 'Yes');
+        let request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+        if (request === undefined) {
+            return;
+        }
+        preferences.setAutoSaveOnDeploy(result === 'Yes', request === 'Globally');
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStartRioLog', async () => {
@@ -159,7 +167,11 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
         }
-        preferences.setAutoStartRioLog(result === 'Yes');
+        let request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+        if (request === undefined) {
+            return;
+        }
+        preferences.setAutoStartRioLog(result === 'Yes', request === 'Globally');
     }));
 
     return externalApi;

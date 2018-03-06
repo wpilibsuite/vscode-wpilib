@@ -4,20 +4,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import { IPreferences, ILanguageSpecific } from './shared/externalapi';
+import { ConfigurationTarget } from 'vscode';
 
 interface PreferencesJson {
   teamNumber: number;
   currentLanguage: string;
-  autoStartRioLog: boolean;
-  autoSaveOnDeploy: boolean;
   languageSpecific : ILanguageSpecific[];
 }
 
 const defaultPreferences: PreferencesJson = {
   teamNumber: -1,
   currentLanguage: 'none',
-  autoStartRioLog: false,
-  autoSaveOnDeploy: true,
   languageSpecific: []
 };
 
@@ -38,10 +35,13 @@ export class Preferences implements IPreferences {
   private readonly preferencesGlob: string = '**/' + this.preferenceFileName;
   private disposables: vscode.Disposable[] = [];
   public workspace: vscode.WorkspaceFolder;
+  public configuration: vscode.WorkspaceConfiguration;
 
   constructor(workspace: vscode.WorkspaceFolder) {
     this.workspace = workspace;
     this.configFolder = path.join(workspace.uri.fsPath, '.wpilib');
+
+    this.configuration = vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
 
     let configFilePath = path.join(this.configFolder, this.preferenceFileName);
 
@@ -96,31 +96,51 @@ export class Preferences implements IPreferences {
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    let teamRequest = await vscode.window.showInformationMessage('No team number, would you like to input one?', 'Yes', 'Yes and Save', 'No');
+    let teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes (Globally)', 'Yes (Project)', 'No');
     if (teamRequest === undefined) {
       return -1;
     }
-    if (teamRequest === 'No') {
-      return -1;
-    }
     let teamNumber = await requestTeamNumber();
-    if (teamNumber !== -1 && teamRequest === 'Yes and Save') {
-      await this.setTeamNumber(teamNumber);
+    if (teamRequest === 'No') {
+      return teamNumber;
+    }
+    if (teamNumber !== -1 && teamRequest === 'Yes (Globally)') {
+      await this.setTeamNumber(teamNumber, true);
+    } else if (teamNumber !== -1 && teamRequest === 'Yes (Project)') {
+      await this.setTeamNumber(teamNumber, false);
     }
     return teamNumber;
   }
 
   public async getTeamNumber(): Promise<number> {
+    // If always ask, get it.
+    let alwaysAsk = this.configuration.get<boolean>('alwaysAskForTeamNumber');
+    if (alwaysAsk !== undefined && alwaysAsk === true) {
+      let teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
+      if (teamNumber === undefined) {
+        return -1;
+      }
+      return parseInt(teamNumber);
+    }
     if (this.preferencesJson.teamNumber === -1) {
-      return await this.noTeamNumberLogic();
+      // Check global preferences
+      let res = this.configuration.get<number>('globalTeamNumber');
+      if (res === undefined || res < 0) {
+        return await this.noTeamNumberLogic();
+      }
+      return res;
     }
 
     return this.preferencesJson.teamNumber;
   }
 
-  public setTeamNumber(teamNumber: number): void {
-    this.preferencesJson.teamNumber = teamNumber;
-    this.writePreferences();
+  public setTeamNumber(teamNumber: number, global: boolean): void {
+    if (global) {
+      this.configuration.update('globalTeamNumber', teamNumber, ConfigurationTarget.Global);
+    } else {
+      this.preferencesJson.teamNumber = teamNumber;
+      this.writePreferences();
+    }
   }
 
   public getCurrentLanguage(): string {
@@ -133,12 +153,19 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoStartRioLog(): boolean {
-    return this.preferencesJson.autoStartRioLog;
+    let res = this.configuration.get<boolean>('autoStartRioLog');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
   }
 
-  public setAutoStartRioLog(autoStart: boolean): void {
-    this.preferencesJson.autoStartRioLog = autoStart;
-    this.writePreferences();
+  public setAutoStartRioLog(autoStart: boolean, global: boolean): void {
+    let target: vscode.ConfigurationTarget = ConfigurationTarget.Global;
+    if (!global) {
+      target = ConfigurationTarget.WorkspaceFolder;
+    }
+    this.configuration.update('autoStartRioLog', autoStart, target);
   }
 
   public getLanguageSpecific(language: string): ILanguageSpecific | undefined {
@@ -164,12 +191,19 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoSaveOnDeploy(): boolean {
-    return this.preferencesJson.autoSaveOnDeploy;
+    let res = this.configuration.get<boolean>('autoSaveOnDeploy');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
   }
 
-  public setAutoSaveOnDeploy(autoSave: boolean): void {
-    this.preferencesJson.autoSaveOnDeploy = autoSave;
-    this.writePreferences();
+  public setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void {
+    let target: vscode.ConfigurationTarget = ConfigurationTarget.Global;
+    if (!global) {
+      target = ConfigurationTarget.WorkspaceFolder;
+    }
+    this.configuration.update('autoSaveOnDeploy', autoSave, target);
   }
 
   dispose() {
