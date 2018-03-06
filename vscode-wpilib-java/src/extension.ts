@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { IExternalAPI } from './shared/externalapi';
+import { IExternalAPI, getPreferencesAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getExternalAPIExpectedVersion } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './gradle';
 
@@ -18,7 +18,7 @@ function parseGradleOutput(output: OutputPair): DebuggerParse {
     };
 
     let results = output.stdout.split('\n');
-    for(let r of results) {
+    for (let r of results) {
         if (r.indexOf('DEBUGGING ACTIVE ON PORT ') >= 0) {
             ret.port = r.substring(27, r.indexOf('!')).trim();
         }
@@ -66,63 +66,118 @@ export async function activate(_: vscode.ExtensionContext) {
 
     let coreExports: IExternalAPI = coreExtension.exports;
 
-    let gradleChannel = vscode.window.createOutputChannel('gradleJava');
+    let baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
 
-    coreExports.addLanguageChoice('java');
+    if (!baseValid) {
+        vscode.window.showErrorMessage('Extension out of date with core extension. Please update');
+        return;
+    }
 
-    coreExports.registerCodeDeploy({
-        async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-            let prefs = await coreExports.getPreferences(workspace);
-            let currentLanguage = prefs.getCurrentLanguage();
-            return currentLanguage === 'none' || currentLanguage === 'java';
-        },
-        async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-            let command = 'deploy --offline -PteamNumber=' + teamNumber;
-            gradleChannel.clear();
-            gradleChannel.show();
-            if (workspace === undefined) {
-                vscode.window.showInformationMessage('No workspace selected');
-                return false;
-            }
-            let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
-            console.log(result);
-            return true;
-        },
-        getDisplayName(): string {
-            return 'java';
-        }
-    });
+    let preferences = coreExports.getPreferencesAPI();
+    let debugDeploy = coreExports.getDeployDebugAPI();
+    let exampleTemplate = coreExports.getExampleTemplateAPI();
 
-    if (allowDebug) {
-        coreExports.registerCodeDebug({
+    let exampleTemplateValid = false;
+    let debugDeployValid = false;
+    let preferencesValid = false;
+
+    if (exampleTemplate !== undefined) {
+        exampleTemplateValid = exampleTemplate.getVersion() === getExampleTemplateAPIExpectedVersion();
+    }
+
+    if (debugDeploy !== undefined) {
+        debugDeployValid = debugDeploy.getVersion() === getDeployDebugAPIExpectedVersion();
+    }
+
+    if (preferences !== undefined) {
+        preferencesValid = preferences.getVersion() === getPreferencesAPIExpectedVersion();
+    }
+
+    if (debugDeployValid && preferencesValid) {
+        // Setup debug and deploy
+
+        let gradleChannel = vscode.window.createOutputChannel('gradleJava');
+
+        debugDeploy!.addLanguageChoice('java');
+
+        debugDeploy!.registerCodeDeploy({
             async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                let prefs = await coreExports.getPreferences(workspace);
+                let prefs = await preferences!.getPreferences(workspace);
+                if (prefs === undefined) {
+                    console.log('Preferences without workspace?');
+                    return false;
+                }
                 let currentLanguage = prefs.getCurrentLanguage();
                 return currentLanguage === 'none' || currentLanguage === 'java';
             },
             async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                let command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
+                let command = 'deploy --offline -PteamNumber=' + teamNumber;
                 gradleChannel.clear();
                 gradleChannel.show();
+                if (workspace === undefined) {
+                    vscode.window.showInformationMessage('No workspace selected');
+                    return false;
+                }
                 let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
-
-                let parsed = parseGradleOutput(result);
-
-                let config: DebugCommands = {
-                    serverAddress: parsed.ip,
-                    serverPort: parsed.port,
-                    workspace: workspace
-                };
-
-                await startDebugging(config);
-
                 console.log(result);
                 return true;
             },
             getDisplayName(): string {
                 return 'java';
+            },
+            getDescription(): string {
+                return 'Java Deploy';
             }
         });
+
+        if (allowDebug) {
+            debugDeploy!.registerCodeDebug({
+                async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+                    let prefs = await preferences!.getPreferences(workspace);
+                    if (prefs === undefined) {
+                        console.log('Preferences without workspace?');
+                        return false;
+                    }
+                    let currentLanguage = prefs.getCurrentLanguage();
+                    return currentLanguage === 'none' || currentLanguage === 'java';
+                },
+                async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
+                    let command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
+                    gradleChannel.clear();
+                    gradleChannel.show();
+                    let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+
+                    let parsed = parseGradleOutput(result);
+
+                    let config: DebugCommands = {
+                        serverAddress: parsed.ip,
+                        serverPort: parsed.port,
+                        workspace: workspace
+                    };
+
+                    await startDebugging(config);
+
+                    console.log(result);
+                    return true;
+                },
+                getDisplayName(): string {
+                    return 'java';
+                },
+                getDescription(): string {
+                    return 'Java Debugging';
+                }
+            });
+        }
+    } else {
+        vscode.window.showInformationMessage('Java does not match Core. Update');
+        console.log('Java debug/deploy extension out of date');
+    }
+
+    if (exampleTemplateValid) {
+        // Setup examples and template
+    } else {
+        vscode.window.showInformationMessage('Java examples and templates do not match Core. Update');
+        console.log('Java examples and templates extension out of date');
     }
 }
 

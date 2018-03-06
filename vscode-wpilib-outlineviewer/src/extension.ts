@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { IExternalAPI, IToolRunner } from './shared/externalapi';
+import { IExternalAPI, IToolRunner, getExternalAPIExpectedVersion, getToolAPIExpectedVersion } from './shared/externalapi';
 import * as path from 'path';
 //import * as process from 'process';
 import * as child_process from 'child_process';
@@ -27,33 +27,45 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let coreExports: IExternalAPI = coreExtension.exports;
 
+    let baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
+
+    if (!baseValid) {
+        vscode.window.showErrorMessage('Extension out of date with core extension. Please update');
+        return;
+    }
+
+    let tools = coreExports.getToolAPI();
+    let toolsValid = false;
+
+    if (tools !== undefined) {
+        toolsValid = tools.getVersion() === getToolAPIExpectedVersion();
+    }
+
+    if (!toolsValid) {
+        vscode.window.showInformationMessage('Tools do not match core. Update');
+        console.log('Tools do not match core');
+        return;
+    }
+
     let outlineViewerLocation = path.join(context.extensionPath, 'resources', 'OutlineViewer.jar');
 
 
 
     let toolRunner: IToolRunner = {
-        async runTool(): Promise<void> {
+        async runTool(): Promise<boolean> {
             let command = 'java -jar ' + outlineViewerLocation;
             child_process.exec(command);
+            return true;
         },
         getDisplayName(): string {
             return 'Outline Viewer';
+        },
+        getDescription(): string {
+            return 'The NetworkTables debug tool';
         }
     };
 
-    coreExports.addTool(toolRunner);
-
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
-        // The code you place here will be executed every time your command is executed
-
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World!');
-    });
-
-    context.subscriptions.push(disposable);
+    tools!.addTool(toolRunner);
 }
 
 // this method is called when your extension is deactivated

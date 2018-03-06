@@ -7,7 +7,7 @@ export class RioLog {
 
   private terminal : vscode.Terminal | undefined;
 
-  public connect(teamNumber : number, pathToRioLogFolder: string) {
+  public connect(teamNumber : number, pathToRioLogFolder: string, show: boolean) {
 
     if (this.terminal !== undefined) {
       this.terminal.dispose();
@@ -21,7 +21,7 @@ export class RioLog {
 
     this.terminal = vscode.window.createTerminal('RioLog', scriptPath, [teamNumber.toString()]);
 
-    this.terminal.show();
+    this.terminal.show(!show);
   }
 
   dispose() {
