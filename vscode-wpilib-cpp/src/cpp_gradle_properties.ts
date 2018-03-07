@@ -6,6 +6,18 @@ import * as path from 'path';
 import { gradleRun } from './gradle';
 import { CppPreferences } from './cpp_preferences';
 
+function readFileAsync(file: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, 'utf8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
 interface IComponent {
   launchFile: string;
   srcDirs: string[];
@@ -56,21 +68,23 @@ export class CppGradleProperties {
   private propertiesChange: vscode.EventEmitter<void>;
   public readonly onDidPropertiesChange: vscode.Event<void>;
 
+  private buildPropertiesRelativePattern: vscode.RelativePattern;
+
   private cppPreferences: CppPreferences;
 
   private outputWriter: vscode.OutputChannel;
 
   private workspace: vscode.WorkspaceFolder;
-  private readonly gradleJsonFileLoc: string = '**/.editcfg';
+  private readonly gradleJsonFileGlob: string = '**/.editcfg';
 
   public constructor(wp: vscode.WorkspaceFolder, ow: vscode.OutputChannel, cppPrefs: CppPreferences) {
     this.workspace = wp;
     this.outputWriter = ow;
     this.cppPreferences = cppPrefs;
 
-    let buildPropertiesRelativePattern = new vscode.RelativePattern(wp, this.gradleJsonFileLoc);
+    this.buildPropertiesRelativePattern = new vscode.RelativePattern(wp, this.gradleJsonFileGlob);
 
-    let buildPropertiesListener = vscode.workspace.createFileSystemWatcher(buildPropertiesRelativePattern);
+    let buildPropertiesListener = vscode.workspace.createFileSystemWatcher(this.buildPropertiesRelativePattern);
 
     this.disposables.push(buildPropertiesListener);
 
@@ -132,8 +146,6 @@ export class CppGradleProperties {
       let parsed: IEditorConfig = jsonc.parse(current);
       this.checkForChanges(parsed);
     });
-
-    this.forceReparse();
   }
 
   private checkForChanges(newContents: IEditorConfig) {
@@ -234,15 +246,19 @@ export class CppGradleProperties {
     this.outputWriter.clear();
     this.outputWriter.show();
     await gradleRun('editorConfig', this.workspace.uri.fsPath, this.outputWriter);
-    this.forceReparse();
+    await this.forceReparse();
   }
 
-  public forceReparse() {
+  public async forceReparse(): Promise<void> {
     let current: string | undefined;
 
+    let files = await vscode.workspace.findFiles(this.buildPropertiesRelativePattern);
+
+    if (files.length <= 0) {
+      return;
+    }
     try {
-      let fPath = path.join(this.workspace.uri.fsPath, this.gradleJsonFileLoc);
-      current = fs.readFileSync(fPath, 'utf8');
+      current = await readFileAsync(files[0].fsPath);
     } catch (error) {
 
     }

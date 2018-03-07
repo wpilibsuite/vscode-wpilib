@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-core",
     "displayName": "vscode-wpilib-core",
     "description": "Base extension for WPILib Team Use",
-    "version": "0.0.16",
+    "version": "0.0.17",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -28,22 +28,26 @@
                 "wpilib.autoSaveOnDeploy": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically save all files on deploy"
+                    "description": "Automatically save all files on deploy",
+                    "scope": "resource"
                 },
                 "wpilib.autoStartRioLog": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically start RioLog on deploy"
+                    "description": "Automatically start RioLog on deploy",
+                    "scope": "resource"
                 },
                 "wpilib.alwaysAskForTeamNumber": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Always ask for a team number, even if set"
+                    "description": "Always ask for a team number, even if set",
+                    "scope": "resource"
                 },
                 "wpilib.globalTeamNumber": {
                     "type": "integer",
                     "default": -1,
-                    "description": "Team number to use if not set in the project"
+                    "description": "Team number to use if not set in the project",
+                    "scope": "resource"
                 }
             }
         },
