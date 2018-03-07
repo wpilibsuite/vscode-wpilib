@@ -136,6 +136,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 }
                 let cpr = new CppPreferences(w);
                 let gp = new CppGradleProperties(w, gradleChannel, cpr);
+                await gp.forceReparse();
                 let wh = new WpiLibHeaders(gp);
                 let cp = new CppVsCodeProperties(w, gp, cpr);
                 cppPrefs.push(cpr);
@@ -146,7 +147,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // On a change in workspace folders, redo all header finders
-        preferences!.onDidPreferencesFolderChanged((changed) => {
+        preferences!.onDidPreferencesFolderChanged(async (changed) => {
             // Nuke and reset
             // TODO: Remove existing header finders from the extension context
             for (let p of headerFinders) {
@@ -165,6 +166,7 @@ export async function activate(context: vscode.ExtensionContext) {
             for (let c of changed) {
                 let cpr = new CppPreferences(c.workspace);
                 let gp = new CppGradleProperties(c.workspace, gradleChannel, cpr);
+                await gp.forceReparse();
                 let wh = new WpiLibHeaders(gp);
                 let cp = new CppVsCodeProperties(c.workspace, gp, cpr);
                 cppPrefs.push(cpr);

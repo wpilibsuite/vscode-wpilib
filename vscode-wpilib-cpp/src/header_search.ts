@@ -35,6 +35,9 @@ export class WpiLibHeaders {
       this.loadLocalHeaders(paths);
     });
 
+    this.loadLibraryHeaders(gp.getLibraryHeaders());
+    this.loadLocalHeaders(gp.getLocalHeaders());
+
     let completionProvider = vscode.languages.registerCompletionItemProvider(['cpp', 'c'], {
       async provideCompletionItems(document, position) {
         if (document.lineAt(position.line).text.indexOf('#include') === -1) {
@@ -69,11 +72,15 @@ export class WpiLibHeaders {
     }
 
     for (let p of headers) {
-      locs.push(new vscode.CompletionItem(p));
+      let ci = new vscode.CompletionItem(p);
+      ci.documentation = p;
+      locs.push(ci);
     }
 
     for (let p of this.libraryHeaderFiles) {
-        locs.push(new vscode.CompletionItem(p));
+      let ci = new vscode.CompletionItem(p);
+      ci.documentation = p;
+      locs.push(ci);
     }
     return locs;
   }
