@@ -10,6 +10,8 @@ import { WpiLibHeaders } from './header_search';
 import { CppGradleProperties } from './cpp_gradle_properties';
 import { CppVsCodeProperties } from './cpp_vscode_properties';
 import { CppPreferences } from './cpp_preferences';
+import { Examples } from './examples';
+import { Templates } from './templates';
 
 interface DebuggerParse {
     libraryLocations: string[];
@@ -59,6 +61,8 @@ export async function activate(context: vscode.ExtensionContext) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib-cpp" is now active!');
+
+    let extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
     let coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
     if (coreExtension === undefined) {
@@ -300,6 +304,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
     if (exampleTemplateValid) {
         // Setup examples and template
+        let examples: Examples = new Examples(extensionResourceLocation, exampleTemplate!);
+        context.subscriptions.push(examples);
+        let templates: Templates = new Templates(extensionResourceLocation, exampleTemplate!);
+        context.subscriptions.push(templates);
+
     } else {
         vscode.window.showInformationMessage('Cpp examples and templates do not match Core. Update');
         console.log('Cpp examples and templates extension out of date');

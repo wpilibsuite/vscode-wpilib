@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Iterative Robot",
+    "description": "Iterative style",
+    "tags": [
+      "Iterative"
+    ]
+  },
+  {
+    "name": "Timed Robot",
+    "description": "Timed style",
+    "tags": [
+      "Timed"
+    ]
+  },
+  {
+    "name": "Command Robot",
+    "description": "Command style",
+    "tags": [
+      "Command"
+    ]
+  },
+  {
+    "name": "Sample Robot",
+    "description": "Sample style",
+    "tags": [
+      "Sample"
+    ]
+  }
+]

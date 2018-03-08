@@ -5,6 +5,9 @@ import * as vscode from 'vscode';
 import { IExternalAPI, getPreferencesAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getExternalAPIExpectedVersion } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './gradle';
+import * as path from 'path';
+import { Examples } from './examples';
+import { Templates } from './templates';
 
 interface DebuggerParse {
     port: string;
@@ -32,11 +35,13 @@ function parseGradleOutput(output: OutputPair): DebuggerParse {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activate(_: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib-java" is now active!');
+
+    let extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
     let coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
     if (coreExtension === undefined) {
@@ -175,6 +180,10 @@ export async function activate(_: vscode.ExtensionContext) {
 
     if (exampleTemplateValid) {
         // Setup examples and template
+        let examples: Examples = new Examples(extensionResourceLocation, exampleTemplate!);
+        context.subscriptions.push(examples);
+        let templates: Templates = new Templates(extensionResourceLocation, exampleTemplate!);
+        context.subscriptions.push(templates);
     } else {
         vscode.window.showInformationMessage('Java examples and templates do not match Core. Update');
         console.log('Java examples and templates extension out of date');
