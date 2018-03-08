@@ -2,7 +2,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
-import * as path from 'path';
 import { gradleRun } from './gradle';
 import { CppPreferences } from './cpp_preferences';
 

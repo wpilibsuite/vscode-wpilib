@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-core",
     "displayName": "vscode-wpilib-core",
     "description": "Base extension for WPILib Team Use",
-    "version": "0.0.17",
+    "version": "0.0.20",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -90,6 +90,16 @@
             {
                 "command": "wpilibcore.setStartRioLog",
                 "title": "Set Auto Start RioLog on Deploy",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.createExample",
+                "title": "Create new project from an example",
+                "category": "wpilib"
+            },
+            {
+                "command": "wpilibcore.createTemplate",
+                "title": "Create new project from a template",
                 "category": "wpilib"
             }
         ],

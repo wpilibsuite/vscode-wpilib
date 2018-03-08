@@ -1,9 +1,9 @@
 'use scrict';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI, ITemplateExampleCreator } from './shared/externalapi';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from './shared/externalapi';
 
 interface ICreatorQuickPick extends vscode.QuickPickItem {
-  creator: ITemplateExampleCreator;
+  creator: IExampleTemplateCreator;
 }
 
 interface ILanguageQuickPick extends vscode.QuickPickItem {
@@ -15,7 +15,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
   private templates: ILanguageQuickPick[] = [];
   private examples: ILanguageQuickPick[] = [];
 
-  addTemplateProvider(provider: ITemplateExampleCreator): void {
+  addTemplateProvider(provider: IExampleTemplateCreator): void {
     let lp: ILanguageQuickPick | undefined = undefined;
     for (let p of this.templates) {
       if (p.label === provider.getLanguage()) {
@@ -40,7 +40,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       description: provider.getDescription()
     });
   }
-  addExampleProvider(provider: ITemplateExampleCreator): void {
+  addExampleProvider(provider: IExampleTemplateCreator): void {
     let lp: ILanguageQuickPick | undefined = undefined;
     for (let p of this.examples) {
       if (p.label === provider.getLanguage()) {
@@ -94,7 +94,39 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       await vscode.window.showInformationMessage('Invalid selection');
       return false;
     }
-    return await selection.creator.generate();
+    // Ask user for a folder
+    let open: vscode.OpenDialogOptions = {
+      canSelectFiles: false,
+      canSelectFolders: true,
+      canSelectMany: false,
+      openLabel: 'Select Folder'
+    };
+    let result = await vscode.window.showOpenDialog(open);
+    if (result === undefined) {
+      await vscode.window.showInformationMessage('cancelled');
+      return false;
+    }
+    // TODO: Check if folder is empty
+
+    if (result.length !== 1) {
+      console.log('weird');
+      return false;
+    }
+
+    let success = await selection.creator.generate(result[0]);
+    if (success) {
+      let selection = await vscode.window.showInformationMessage('Would you like to open the folder?', 'Yes (Current Window)', 'Yes (New Window)', 'No');
+      if (selection === undefined) {
+        return true;
+      } else if (selection === 'Yes (Current Window)') {
+        await vscode.commands.executeCommand('vscode.openFolder', result[0], false);
+      } else if (selection === 'Yes (New Window)') {
+        await vscode.commands.executeCommand('vscode.openFolder', result[0], true);
+      } else {
+        return true;
+      }
+    }
+    return true;
   }
 
   dispose() {

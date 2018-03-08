@@ -11,21 +11,21 @@ interface JsonLayout {
   tags: string[];
 }
 
-export class Templates {
-  private readonly exampleResourceName = 'cpptemplates.json';
+export class Examples {
+  private readonly exampleResourceName = 'javaexamples.json';
 
   constructor(resourceRoot: string, core: IExampleTemplateAPI) {
-    let resourceFile = path.join(resourceRoot, 'templates', this.exampleResourceName);
+    let resourceFile = path.join(resourceRoot, 'examples', this.exampleResourceName);
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         console.log(err);
         return;
       }
-      let templates: JsonLayout[] = jsonc.parse(data);
-      for (let e of templates) {
+      let examples: JsonLayout[] = jsonc.parse(data);
+      for (let e of examples) {
         let provider: IExampleTemplateCreator = {
           getLanguage(): string {
-            return 'cpp';
+            return 'java';
           },
           getDescription(): string {
             return e.description;
@@ -38,7 +38,7 @@ export class Templates {
             return true;
           }
         };
-        core.addTemplateProvider(provider);
+        core.addExampleProvider(provider);
       }
     });
   }

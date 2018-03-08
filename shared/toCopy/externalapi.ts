@@ -30,8 +30,8 @@ export function getExampleTemplateAPIExpectedVersion(): number {
   return exampleTemplateAPIExpectedVersion;
 }
 export abstract class IExampleTemplateAPI implements IVersionable {
-  abstract addTemplateProvider(provider: ITemplateExampleCreator): void;
-  abstract addExampleProvider(provider: ITemplateExampleCreator): void;
+  abstract addTemplateProvider(provider: IExampleTemplateCreator): void;
+  abstract addExampleProvider(provider: IExampleTemplateCreator): void;
   abstract createExample(): Promise<boolean>;
   abstract createTemplate(): Promise<boolean>;
   getVersion(): number {
@@ -93,11 +93,11 @@ export interface IPreferences {
   setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void;
 }
 
-export interface ITemplateExampleCreator {
+export interface IExampleTemplateCreator {
   getLanguage(): string;
   getDisplayName(): string;
   getDescription(): string;
-  generate(): Promise<boolean>;
+  generate(folderInto: vscode.Uri): Promise<boolean>;
 }
 
 export interface IToolRunner {

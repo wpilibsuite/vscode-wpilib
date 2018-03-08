@@ -12,7 +12,7 @@ interface JsonLayout {
 }
 
 export class Templates {
-  private readonly exampleResourceName = 'cpptemplates.json';
+  private readonly exampleResourceName = 'javatemplates.json';
 
   constructor(resourceRoot: string, core: IExampleTemplateAPI) {
     let resourceFile = path.join(resourceRoot, 'templates', this.exampleResourceName);
@@ -25,7 +25,7 @@ export class Templates {
       for (let e of templates) {
         let provider: IExampleTemplateCreator = {
           getLanguage(): string {
-            return 'cpp';
+            return 'java';
           },
           getDescription(): string {
             return e.description;
