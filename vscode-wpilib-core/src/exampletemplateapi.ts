@@ -79,7 +79,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
     } else if (langs.length === 1) {
       return await this.runSelection(langs[0], type);
     } else {
-      let selection = await vscode.window.showQuickPick(langs, { placeHolder: 'Pick a language'});
+      let selection = await vscode.window.showQuickPick(langs, { placeHolder: 'Pick a language' });
       if (selection === undefined) {
         await vscode.window.showInformationMessage('Langauge not picked, cancelling.');
         return false;
@@ -89,7 +89,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
   }
 
   private async runSelection(lang: ILanguageQuickPick, type: string): Promise<boolean> {
-    let selection = await vscode.window.showQuickPick(lang.creators, { placeHolder: `Pick an ${type.toLowerCase()}`});
+    let selection = await vscode.window.showQuickPick(lang.creators, { placeHolder: `Pick an ${type.toLowerCase()}` });
     if (selection === undefined) {
       await vscode.window.showInformationMessage('Invalid selection');
       return false;
@@ -115,6 +115,15 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
 
     let success = await selection.creator.generate(result[0]);
     if (success) {
+      // Search workspaces
+      let workspaces = vscode.workspace.workspaceFolders;
+      if (workspaces !== undefined && workspaces.length > 0) {
+        for (let w of workspaces) {
+          if (w.uri === result[0]) {
+            return true;
+          }
+        }
+      }
       let selection = await vscode.window.showInformationMessage('Would you like to open the folder?', 'Yes (Current Window)', 'Yes (New Window)', 'No');
       if (selection === undefined) {
         return true;

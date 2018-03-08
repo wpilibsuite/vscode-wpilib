@@ -234,7 +234,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     return currentLanguage === 'none' || currentLanguage === 'cpp';
                 },
                 async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                    let command = 'deploy getLibraries getCompiler getExecutable --offline -PdebugMode -PteamNumber=' + teamNumber;
+                    let command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
                     gradleChannel.clear();
                     gradleChannel.show();
                     if (workspace === undefined) {
