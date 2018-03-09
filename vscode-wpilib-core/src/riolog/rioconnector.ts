@@ -49,6 +49,8 @@ class DSSocketPromisePair implements ISocketPromisePair {
     this.socket.destroy();
     this.dsSocket.end();
     this.dsSocket.destroy();
+    this.dsSocket.removeAllListeners();
+    this.socket.removeAllListeners();
   }
 }
 
@@ -60,7 +62,9 @@ function getSocketFromDS(port: number): ISocketPromisePair {
     ds.on('data', (data) => {
       let parsed: IDriverStationData = jsonc.parse(data.toString());
       if (parsed.robotIP === 0) {
+        ds.end();
         ds.destroy();
+        ds.removeAllListeners();
         return;
       }
       let ipAddr = '';
@@ -73,17 +77,21 @@ function getSocketFromDS(port: number): ISocketPromisePair {
         console.log('failed connection to ' + ip + ' at ' + port);
         s.end();
         s.destroy();
+        s.removeAllListeners();
       });
       s.on('timeout', () => {
         console.log('failed connection to ' + ip + ' at ' + port);
         s.end();
         s.destroy();
+        s.removeAllListeners();
       });
       s.connect(port, ipAddr, () => {
+        s.removeAllListeners();
         resolve(s);
       });
       ds.end();
       ds.destroy();
+      ds.removeAllListeners();
     });
     ds.connect(1742, '127.0.0.1');
   }));
@@ -100,19 +108,23 @@ function getSocketFromIP(port: number, ip: string): ISocketPromisePair {
         console.log('failed connection to ' + ip + ' at ' + port);
         s.end();
         s.destroy();
+        s.removeAllListeners();
       });
       s.on('timeout', () => {
         console.log('failed connection to ' + ip + ' at ' + port);
         s.end();
         s.destroy();
+        s.removeAllListeners();
       });
       s.connect(port, ip, () => {
+        s.removeAllListeners();
         resolve(s);
       });
     }),
     dispose() {
       this.socket.end();
       this.socket.destroy();
+      this.socket.removeAllListeners();
     }
   };
 }
