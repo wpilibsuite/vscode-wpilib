@@ -160,8 +160,12 @@ export class RioConsole {
       socket!.on('close', () => {
         socket!.removeAllListeners();
         resolve();
-        console.log('closed remotely');
-
+        console.log('closed remotely (close)');
+      });
+      socket!.on('end', () => {
+        socket!.removeAllListeners();
+        resolve();
+        console.log('closed remotely (end)');
       });
     });
   }
@@ -172,7 +176,7 @@ export class RioConsole {
         let oldR = this.doReconnect;
         this.doReconnect = false;
         if (oldR) {
-          while (!this.autoReconnect) {
+          while(!this.autoReconnect) {
             if (this.cleanup) {
               return;
             }

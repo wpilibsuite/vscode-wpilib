@@ -38,21 +38,21 @@ window.parent.postMessage({
         if (event.data.type === 'print') {
             var ul = document.getElementById("list");
             var li = document.createElement("li");
-            li.innerHTML = event.data.text;
+            li.innerHTML = event.data.message.line;
             ul.appendChild(li);
             document.body.scrollTop = document.body.scrollHeight
         } else if (event.data.type === 'warning') {
             var ul = document.getElementById("list");
             var li = document.createElement("li");
             li.setAttribute("style", "color:Yellow;")
-            li.innerHTML = event.data.text;
+            li.innerHTML = event.data.message.details;
             ul.appendChild(li);
             document.body.scrollTop = document.body.scrollHeight
         } else if (event.data.type === 'error') {
             var ul = document.getElementById("list");
             var li = document.createElement("li");
             li.setAttribute("style", "color:Red;")
-            li.innerHTML = event.data.text;
+            li.innerHTML = event.data.message.details;
             ul.appendChild(li);
             document.body.scrollTop = document.body.scrollHeight
         } else if (event.data.type === 'clear') {
@@ -115,18 +115,18 @@ window.parent.postMessage({
       if (m instanceof PrintMessage) {
         this.webview.postMessage({
               type: 'print',
-              text: m.line
+              message: m
           });
       } else if (m instanceof ErrorMessage) {
           if (m.isError()) {
             this.webview.postMessage({
                   type: 'error',
-                  text: m.details
+                  message: m
               });
           } else {
             this.webview.postMessage({
                   type: 'warning',
-                  text: m.details
+                  message: m
               });
           }
       }
