@@ -8,6 +8,8 @@ import { ToolAPI } from './toolapi';
 import { DeployDebugAPI } from './deploydebugapi';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
+import * as timers from 'timers';
+import { connectToRobot } from './riolog/rioconnector';
 
 class ExternalAPI extends IExternalAPI {
     private toolApi: ToolAPI;
@@ -44,6 +46,29 @@ export function activate(context: vscode.ExtensionContext) {
     let extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
     let externalApi = new ExternalAPI(extensionResourceLocation);
+
+    let delay = (ms: number) => {
+        return new Promise((resolve, _) => {
+            timers.setTimeout(() => {
+                resolve();
+            }, ms);
+        });
+    };
+
+    let bgfunc = async () => {
+        while (true) {
+            let connSock = await connectToRobot(1741, 9999, 2000);
+            if (connSock === undefined) {
+                console.log('failed to connect');
+            } else {
+                console.log('connected. ip: ' + connSock.remoteAddress);
+                connSock.destroy();
+            }
+            await delay(2000);
+        }
+    };
+
+    bgfunc();
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
