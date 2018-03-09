@@ -85,7 +85,6 @@ export class ErrorMessage implements IMessage {
     let size = data.readUInt16BE(start);
     start += 2;
     let count = size + 2;
-    //let slice = data.slice(start, start + size);
     return {
       byteLength: count,
       data: data.toString('utf8', start, start + count - 2)

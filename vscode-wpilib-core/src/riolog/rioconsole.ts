@@ -139,22 +139,29 @@ export class RioConsole {
       console.log('bad socket');
       return;
     }
+    console.log('succesfully connected');
     socket.on('data', (data) => {
       this.handleData(data);
     });
     if (this.cleanup) {
       socket.end();
       socket.destroy();
+      socket.removeAllListeners();
       return;
     }
     await new Promise((resolve, _) => {
       this.closeFunc = () => {
         socket!.end();
         socket!.destroy();
+        socket!.removeAllListeners();
         resolve();
+        console.log('closed locally');
       };
       socket!.on('close', () => {
+        socket!.removeAllListeners();
         resolve();
+        console.log('closed remotely');
+
       });
     });
   }
@@ -165,7 +172,7 @@ export class RioConsole {
         let oldR = this.doReconnect;
         this.doReconnect = false;
         if (oldR) {
-          while(!this.autoReconnect) {
+          while (!this.autoReconnect) {
             if (this.cleanup) {
               return;
             }
@@ -174,6 +181,7 @@ export class RioConsole {
         }
         await this.runFunction(teamNumber);
       }
+      console.log('finished loop');
     };
     this.promise = asyncFunction();
   }
@@ -186,6 +194,7 @@ export class RioConsole {
 
   async dispose() {
     this.stop();
+    this.clearListener();
     await this.promise;
   }
 }

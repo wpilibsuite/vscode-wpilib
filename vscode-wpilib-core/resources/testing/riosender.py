@@ -46,7 +46,7 @@ class ConsoleHandler(socketserver.StreamRequestHandler):
             time.sleep(0.25)
             self.wfile.write(self.makePrintMsg(timestamp, sequence, "console line 1"))
             time.sleep(0.1)
-            self.wfile.write(self.makePrintMsg(timestamp, sequence, "console line 2"))
+            self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 0, "this is a warning", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
             self.wfile.write(self.makePrintMsg(timestamp, sequence, "console line 3"))
             time.sleep(1)
 
