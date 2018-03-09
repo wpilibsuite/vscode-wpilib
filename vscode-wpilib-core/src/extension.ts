@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(rioCon);
     rioCon.startListening(9999);
 
-    rioCon.addListener((m) => {
+    rioCon.addListener((_) => {
         console.log('got message');
     });
 

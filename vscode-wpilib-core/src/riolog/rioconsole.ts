@@ -2,26 +2,80 @@
 import * as net from 'net';
 import * as timers from 'timers';
 import { connectToRobot } from './rioconnector';
-import { PrintMessage, ErrorMessage } from './message';
+import { PrintMessage, ErrorMessage, IMessage, MessageType } from './message';
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve, _) => {
+    timers.setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
 
 export class RioConsole {
-  private _cleanup: boolean = false;
-  private _reconnect: boolean = false;
-  private _discard: boolean = false;
-  private callback: ((message: PrintMessage | ErrorMessage) => void) | undefined;
-  private promise: Promise<void> | undefined;
+  private autoReconnect: boolean = true;
+  private cleanup: boolean = false;
+  private doReconnect: boolean = false;
+  private discard: boolean = false;
+  private paused: boolean = false;
+  private showWarning: boolean = true;
+  private showPrint: boolean = true;
+  private callback: ((message: IMessage) => void) | undefined;
+  promise: Promise<void> | undefined;
+  private closeFunc: (() => void) | undefined;
 
   stop(): void {
-    this._cleanup = true;
+    this.cleanup = true;
     this.closeSocket();
   }
 
   reconnect(): void {
-    this._reconnect = true;
+    this.doReconnect = true;
     this.closeSocket();
   }
 
-  addListener(callback: (message: PrintMessage | ErrorMessage) => void) {
+  getAutoReconnect(): boolean {
+    return this.autoReconnect;
+  }
+
+  setAutoReconnect(value: boolean): void {
+    this.autoReconnect = value;
+    // TODO. Ping wakeup
+  }
+
+  getPaused(): boolean {
+    return this.paused;
+  }
+
+  setPaused(value: boolean): void {
+    this.paused = value;
+  }
+
+  getDiscard(): boolean {
+    return this.discard;
+  }
+
+  setDiscard(value: boolean): void {
+    this.discard = value;
+  }
+
+  getShowWarning(): boolean {
+    return this.showWarning;
+  }
+
+  setShowWarning(value: boolean): void {
+    this.showWarning = value;
+  }
+
+  getShowPrint(): boolean {
+    return this.showPrint;
+  }
+
+  setShowPrint(value: boolean): void {
+    this.showPrint = value;
+  }
+
+  addListener(callback: (message: IMessage) => void) {
     this.callback = callback;
   }
 
@@ -39,7 +93,7 @@ export class RioConsole {
   }
 
   private handleData(data: Buffer) {
-    if (this._discard) {
+    if (this.discard) {
       return;
     }
 
@@ -60,10 +114,14 @@ export class RioConsole {
     if (tag === 11) {
       // error or warning.
       let m = new ErrorMessage(outputBuffer);
+
       if (this.callback !== undefined) {
-        this.callback(m);
+        let mType = m.getMessageType();
+        if (mType === MessageType.Error || (mType === MessageType.Warning && this.showWarning)) {
+          this.callback(m);
+        }
       }
-    } else if (tag === 12) {
+    } else if (tag === 12 && this.showPrint) {
       let m = new PrintMessage(outputBuffer);
       if (this.callback !== undefined) {
         this.callback(m);
@@ -84,7 +142,17 @@ export class RioConsole {
     socket.on('data', (data) => {
       this.handleData(data);
     });
+    if (this.cleanup) {
+      socket.end();
+      socket.destroy();
+      return;
+    }
     await new Promise((resolve, _) => {
+      this.closeFunc = () => {
+        socket!.end();
+        socket!.destroy();
+        resolve();
+      };
       socket!.on('close', () => {
         resolve();
       });
@@ -92,8 +160,18 @@ export class RioConsole {
   }
 
   startListening(teamNumber: number): void {
-    let asyncFunction = async() => {
-      while(!this._cleanup) {
+    let asyncFunction = async () => {
+      while (!this.cleanup) {
+        let oldR = this.doReconnect;
+        this.doReconnect = false;
+        if (oldR) {
+          while(!this.autoReconnect) {
+            if (this.cleanup) {
+              return;
+            }
+            await delay(1000);
+          }
+        }
         await this.runFunction(teamNumber);
       }
     };
@@ -101,10 +179,13 @@ export class RioConsole {
   }
 
   private closeSocket() {
-
+    if (this.closeFunc !== undefined) {
+      this.closeFunc();
+    }
   }
 
-  dispose() {
+  async dispose() {
     this.stop();
+    await this.promise;
   }
 }

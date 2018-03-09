@@ -1,6 +1,27 @@
 'use strict';
 
-export class PrintMessage {
+export enum MessageType {
+  Dummy,
+  Error,
+  Warning,
+  Print
+}
+
+export class MessageRenderOptions {
+  showTimestamp: boolean = false;
+  timestampDecimals: number = 3;
+  showErrorCode: boolean = true;
+  showErrorLocation: boolean = true;
+  showErrorCallstack: boolean = true;
+  showWarningLocation: boolean = true;
+  showWarningCallstack: boolean = false;
+}
+
+export interface IMessage {
+  getMessageType(): MessageType;
+}
+
+export class PrintMessage implements IMessage {
   public readonly timestamp: number;
   public readonly seqNumber: number;
   public readonly line: string;
@@ -14,6 +35,12 @@ export class PrintMessage {
     let slice = data.slice(count);
     this.line = slice.toString('utf8');
   }
+
+  getMessageType(): MessageType {
+    return MessageType.Print;
+  }
+
+
 }
 
 interface StringNumberPair {
@@ -21,7 +48,7 @@ interface StringNumberPair {
   data: string;
 }
 
-export class ErrorMessage {
+export class ErrorMessage implements IMessage {
   public readonly timestamp: number;
   public readonly seqNumber: number;
   public readonly numOccur: number;
@@ -63,5 +90,21 @@ export class ErrorMessage {
       byteLength: count,
       data: data.toString('utf8', start, start + count - 2)
     };
+  }
+
+  getMessageType(): MessageType {
+    if ((this.flags & 1) !== 0) {
+      return MessageType.Error;
+    } else {
+      return MessageType.Warning;
+    }
+  }
+
+  isError(): boolean {
+    return (this.flags & 1) !== 0;
+  }
+
+  isWarning(): boolean {
+    return (this.flags & 1) === 0;
   }
 }
