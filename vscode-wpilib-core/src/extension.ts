@@ -8,8 +8,7 @@ import { ToolAPI } from './toolapi';
 import { DeployDebugAPI } from './deploydebugapi';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
-import * as timers from 'timers';
-import { connectToRobot } from './riolog/rioconnector';
+import { RioConsole } from './riolog/rioconsole';
 
 class ExternalAPI extends IExternalAPI {
     private toolApi: ToolAPI;
@@ -47,28 +46,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     let externalApi = new ExternalAPI(extensionResourceLocation);
 
-    let delay = (ms: number) => {
-        return new Promise((resolve, _) => {
-            timers.setTimeout(() => {
-                resolve();
-            }, ms);
-        });
-    };
+    let rioCon = new RioConsole();
+    context.subscriptions.push(rioCon);
+    rioCon.startListening(9999);
 
-    let bgfunc = async () => {
-        while (true) {
-            let connSock = await connectToRobot(1741, 9999, 2000);
-            if (connSock === undefined) {
-                console.log('failed to connect');
-            } else {
-                console.log('connected. ip: ' + connSock.remoteAddress);
-                connSock.destroy();
-            }
-            await delay(2000);
-        }
-    };
-
-    bgfunc();
+    rioCon.addListener((m) => {
+        console.log('got message');
+    });
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
