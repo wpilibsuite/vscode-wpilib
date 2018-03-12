@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-core",
     "displayName": "vscode-wpilib-core",
     "description": "Base extension for WPILib Team Use",
-    "version": "0.0.20",
+    "version": "0.0.21",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -15,6 +15,12 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "debuggers": [
+            {
+                "type": "wpilib",
+                "label": "WPILib Debug"
+            }
+        ],
         "jsonValidation": [
             {
                 "fileMatch": "wpilib_preferences.json",

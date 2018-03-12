@@ -8,7 +8,6 @@ import { ToolAPI } from './toolapi';
 import { DeployDebugAPI } from './deploydebugapi';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
-import { RioConsole } from './riolog/rioconsole';
 
 class ExternalAPI extends IExternalAPI {
     private toolApi: ToolAPI;
@@ -46,13 +45,30 @@ export function activate(context: vscode.ExtensionContext) {
 
     let externalApi = new ExternalAPI(extensionResourceLocation);
 
-    let rioCon = new RioConsole();
-    context.subscriptions.push(rioCon);
-    rioCon.startListening(9999);
+    let debugProvider: vscode.DebugConfigurationProvider = {
+        resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined, __: vscode.DebugConfiguration, ___?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration> {
+            return new Promise<undefined>(async (resolve, _) => {
+                let preferencesApi = externalApi.getPreferencesAPI();
+                let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+                if (workspace === undefined) {
+                    return;
+                }
+                await externalApi.getDeployDebugAPI().debugCode(workspace);
+                resolve();
+            });
+        },
+        provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
+            console.log('configuration creation');
+            let configuration: vscode.DebugConfiguration = {
+                type: 'wpilib',
+                name: 'WPILib Debugging',
+                request: 'launch'
+            };
+            return [configuration];
+        }
+    };
 
-    rioCon.addListener((_) => {
-        console.log('got message');
-    });
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('wpilib', debugProvider));
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
