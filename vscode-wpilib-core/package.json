@@ -62,52 +62,57 @@
             {
                 "command": "wpilibcore.startRioLog",
                 "title": "Start RioLog",
-                "category": "wpilib"
+                "category": "WPILIB"
+            },
+            {
+                "command": "wpilibcore.startRioLogViewer",
+                "title": "View a saved RioLog",
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.setTeamNumber",
                 "title": "Set Team Number",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.startTool",
                 "title": "Start Tool",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.deployCode",
                 "title": "Deploy Robot Code",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.debugCode",
                 "title": "Debug Robot Code",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.setLanguage",
                 "title": "Set Language",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.setAutoSave",
                 "title": "Set Auto Save On Deploy",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.setStartRioLog",
                 "title": "Set Auto Start RioLog on Deploy",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.createExample",
                 "title": "Create new project from an example",
-                "category": "wpilib"
+                "category": "WPILIB"
             },
             {
                 "command": "wpilibcore.createTemplate",
                 "title": "Create new project from a template",
-                "category": "wpilib"
+                "category": "WPILIB"
             }
         ],
         "keybindings": [
