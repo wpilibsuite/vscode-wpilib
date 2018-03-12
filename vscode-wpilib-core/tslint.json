@@ -3,12 +3,15 @@
 		"no-string-throw": true,
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
+		"no-any": true,
 		"curly": true,
 		"class-name": true,
 		"semicolon": [
 			true,
 			"always"
 		],
+		"switch-default": true,
+		"no-switch-case-fall-through": true,
 		"await-promise": true,
 		"no-floating-promises": true,
 		"quotemark": [true, "single"],

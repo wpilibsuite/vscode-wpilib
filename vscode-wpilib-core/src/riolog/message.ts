@@ -1,30 +1,35 @@
 'use strict';
 
 export enum MessageType {
-  Dummy,
   Error,
   Warning,
   Print
 }
 
-export class MessageRenderOptions {
-  showTimestamp: boolean = false;
-  timestampDecimals: number = 3;
-  showErrorCode: boolean = true;
-  showErrorLocation: boolean = true;
-  showErrorCallstack: boolean = true;
-  showWarningLocation: boolean = true;
-  showWarningCallstack: boolean = false;
-}
-
 export interface IMessage {
-  getMessageType(): MessageType;
+  readonly timestamp: number;
+  readonly seqNumber: number;
+  readonly messageType: MessageType;
 }
 
-export class PrintMessage implements IMessage {
+export interface IPrintMessage extends IMessage {
+  readonly line: string;
+}
+
+export interface IErrorMessage extends IMessage {
+  readonly numOccur: number;
+  readonly errorCode: number;
+  readonly flags: number;
+  readonly details: string;
+  readonly location: string;
+  readonly callStack: string;
+}
+
+export class PrintMessage implements IPrintMessage {
   public readonly timestamp: number;
   public readonly seqNumber: number;
   public readonly line: string;
+  public readonly messageType: MessageType = MessageType.Print;
 
   constructor(data: Buffer) {
     let count = 0;
@@ -35,12 +40,6 @@ export class PrintMessage implements IMessage {
     let slice = data.slice(count);
     this.line = slice.toString('utf8');
   }
-
-  getMessageType(): MessageType {
-    return MessageType.Print;
-  }
-
-
 }
 
 interface StringNumberPair {
@@ -57,6 +56,7 @@ export class ErrorMessage implements IMessage {
   public readonly details: string;
   public readonly location: string;
   public readonly callStack: string;
+  public readonly messageType: MessageType;
 
   constructor(data: Buffer) {
     let count = 0;
@@ -79,6 +79,11 @@ export class ErrorMessage implements IMessage {
     tmp = this.getSizedString(data, count);
     this.callStack = tmp.data;
     count += tmp.byteLength;
+    if ((this.flags & 1) !== 0) {
+      this.messageType = MessageType.Error;
+    } else {
+      this.messageType = MessageType.Warning;
+    }
   }
 
   private getSizedString(data: Buffer, start: number): StringNumberPair {
@@ -89,21 +94,5 @@ export class ErrorMessage implements IMessage {
       byteLength: count,
       data: data.toString('utf8', start, start + count - 2)
     };
-  }
-
-  getMessageType(): MessageType {
-    if ((this.flags & 1) !== 0) {
-      return MessageType.Error;
-    } else {
-      return MessageType.Warning;
-    }
-  }
-
-  isError(): boolean {
-    return (this.flags & 1) !== 0;
-  }
-
-  isWarning(): boolean {
-    return (this.flags & 1) === 0;
   }
 }
