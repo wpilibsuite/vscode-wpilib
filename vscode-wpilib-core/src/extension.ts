@@ -88,6 +88,10 @@ export function activate(context: vscode.ExtensionContext) {
         await externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLog', async () => {
+        await externalApi.getDeployDebugAPI().startRioLogViewer();
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
         let preferencesApi = externalApi.getPreferencesAPI();
         let workspace = await preferencesApi.getFirstOrSelectedWorkspace();

@@ -2,8 +2,9 @@
 import * as vscode from 'vscode';
 import { IDeployDebugAPI, ICodeDeployer } from './shared/externalapi';
 import { RioLog } from './riolog';
-import * as path from 'path';
 import { PreferencesAPI } from './preferencesapi';
+import { RioLogWebviewProvider, LiveRioConsoleProvider, RioLogViewerWebviewProvider, ViewerRioConsoleProvider } from './riolog/vscodeimpl';
+import { RioLogWindow } from './riolog/riologwindow';
 
 interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
   deployer: ICodeDeployer;
@@ -14,21 +15,36 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   private deployers: ICodeDeployerQuickPick[] = [];
   private debuggers: ICodeDeployerQuickPick[] = [];
   private riolog: RioLog;
-  private resourcesFolder: string;
   private disposables: vscode.Disposable[] = [];
   private preferences: PreferencesAPI;
+  private rioLogWebViewProvider: RioLogWebviewProvider;
+  private rioLogConsoleProvider: LiveRioConsoleProvider;
+  private rioLogViewerWebViewProvider: RioLogViewerWebviewProvider;
+  private rioLogViewerProvider: ViewerRioConsoleProvider;
+  private liveWindow: RioLogWindow;
+
 
   constructor(resourcesFolder: string, preferences: PreferencesAPI) {
     super();
-    this.resourcesFolder = resourcesFolder;
     this.riolog = new RioLog();
     this.disposables.push(this.riolog);
     this.preferences = preferences;
+    this.rioLogWebViewProvider = new RioLogWebviewProvider(resourcesFolder);
+    this.rioLogConsoleProvider = new LiveRioConsoleProvider();
+    this.liveWindow = new RioLogWindow(this.rioLogWebViewProvider, this.rioLogConsoleProvider);
+    this.rioLogViewerWebViewProvider = new RioLogViewerWebviewProvider(resourcesFolder);
+    this.rioLogViewerProvider = new ViewerRioConsoleProvider;
+    this.disposables.push(this.liveWindow);
   }
 
-  startRioLog(teamNumber: number, show: boolean): Promise<boolean> {
+  async startRioLogViewer(): Promise<boolean> {
+    this.disposables.push(new RioLogWindow(this.rioLogViewerWebViewProvider, this.rioLogViewerProvider));
+    return true;
+  }
+
+  startRioLog(teamNumber: number, _: boolean): Promise<boolean> {
     return new Promise((resolve) => {
-      this.riolog.connect(teamNumber, path.join(this.resourcesFolder, 'riolog'), show);
+      this.liveWindow.start(teamNumber);
       resolve(true);
     });
   }
