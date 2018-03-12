@@ -39,16 +39,21 @@ class ConsoleHandler(socketserver.StreamRequestHandler):
     def handle(self):
         startTime = time.time()
         sequence = 0
+        count = 0
         while 1:
             timestamp = time.time() - startTime
             sequence = (sequence + 1) & 0xffff
-            self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 1, "this is an error", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
+            self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 1, "this is an </br>errorwitha\r\nong text", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
+            self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
+            count = count + 1
             time.sleep(0.25)
-            self.wfile.write(self.makePrintMsg(timestamp, sequence, "console line 1"))
+            self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
+            count = count + 1
             time.sleep(0.1)
             self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 0, "this is a warning", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
-            self.wfile.write(self.makePrintMsg(timestamp, sequence, "console line 3"))
-            time.sleep(1)
+            self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
+            count = count + 1
+            #time.sleep(1)
 
 if __name__ == "__main__":
     server = socketserver.TCPServer(("localhost", 1741), ConsoleHandler)
