@@ -15,6 +15,22 @@ function getFilesInDirectory(root: string) : Promise<string[]> {
   });
 }
 
+class WPILibCompletionItemProvider implements vscode.CompletionItemProvider {
+  private headers: WpiLibHeaders;
+
+  constructor(headers: WpiLibHeaders) {
+    this.headers = headers;
+  }
+
+
+  public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _: vscode.CancellationToken, __: vscode.CompletionContext): Promise<vscode.CompletionItem[]> | undefined {
+    if (document.lineAt(position.line).text.indexOf('#include') === -1) {
+      return undefined;
+  }
+  return this.headers.getHeaders(document);
+  }
+}
+
 export class WpiLibHeaders {
   private libraryHeaderFiles: string[] = [];
   private gradleProperties: CppGradleProperties;
@@ -24,7 +40,6 @@ export class WpiLibHeaders {
   private currentlyLoadingLocal: boolean = false;
 
   public constructor(gp: CppGradleProperties) {
-    let currentThis = this;
     this.gradleProperties = gp;
 
     this.gradleProperties.onDidChangeLibraryHeaderDirectories((paths) => {
@@ -38,47 +53,42 @@ export class WpiLibHeaders {
     this.loadLibraryHeaders(gp.getLibraryHeaders());
     this.loadLocalHeaders(gp.getLocalHeaders());
 
-    let completionProvider = vscode.languages.registerCompletionItemProvider(['cpp', 'c'], {
-      async provideCompletionItems(document, position) {
-        if (document.lineAt(position.line).text.indexOf('#include') === -1) {
-            return null;
-        }
-        return await currentThis.getHeaders(document);
-      }
-    }, '<', '\"');
+    const completionItemProvider = new WPILibCompletionItemProvider(this);
+
+    const completionProvider = vscode.languages.registerCompletionItemProvider(['cpp', 'c'], completionItemProvider, '<', '\"');
 
     this.disposables.push(completionProvider);
   }
 
   public async getHeaders(document: vscode.TextDocument): Promise<vscode.CompletionItem[]> {
-    let locs = new Array<vscode.CompletionItem>();
-    let srcRoot = path.dirname(document.uri.fsPath);
-    let headerPattern = new vscode.RelativePattern(srcRoot, '**/*.{h, hpp, hh}');
-    let findHeaders = await vscode.workspace.findFiles(headerPattern);
-    let headers: Set<string> = new Set<string>();
-    for (let f of findHeaders) {
+    const locs = new Array<vscode.CompletionItem>();
+    const srcRoot = path.dirname(document.uri.fsPath);
+    const headerPattern = new vscode.RelativePattern(srcRoot, '**/*.{h, hpp, hh}');
+    const findHeaders = await vscode.workspace.findFiles(headerPattern);
+    const headers: Set<string> = new Set<string>();
+    for (const f of findHeaders) {
       if (f.fsPath === document.uri.fsPath) {
         continue;
       }
-      let normalizedSrc = path.normalize(srcRoot);
-      let normalizedHeader = path.normalize(f.fsPath);
+      const normalizedSrc = path.normalize(srcRoot);
+      const normalizedHeader = path.normalize(f.fsPath);
 
-      let headerLoc = normalizedHeader.replace(normalizedSrc, '').replace(/\\/g, '/');
+      const headerLoc = normalizedHeader.replace(normalizedSrc, '').replace(/\\/g, '/');
       headers.add(headerLoc.substring(1));
     }
 
-    for (let p of this.localHeaderFiles) {
+    for (const p of this.localHeaderFiles) {
       headers.add(p);
     }
 
-    for (let p of headers) {
-      let ci = new vscode.CompletionItem(p);
+    for (const p of headers) {
+      const ci = new vscode.CompletionItem(p);
       ci.documentation = p;
       locs.push(ci);
     }
 
-    for (let p of this.libraryHeaderFiles) {
-      let ci = new vscode.CompletionItem(p);
+    for (const p of this.libraryHeaderFiles) {
+      const ci = new vscode.CompletionItem(p);
       ci.documentation = p;
       locs.push(ci);
     }
@@ -91,7 +101,7 @@ export class WpiLibHeaders {
     }
     this.currentlyLoadingLocal = true;
 
-    let awaiters: Array<Promise<string[]>> = [];
+    const awaiters: Array<Promise<string[]>> = [];
 
     for (let p of paths) {
       p = path.normalize(p);
@@ -99,7 +109,7 @@ export class WpiLibHeaders {
     }
 
     Promise.all(awaiters).then((files) => {
-      var allFiles: string[] = [].concat.apply([], files);
+      const allFiles: string[] = [].concat.apply([], files);
       this.localHeaderFiles = allFiles;
       this.currentlyLoadingLocal = false;
     });
@@ -111,7 +121,7 @@ export class WpiLibHeaders {
     }
     this.currentlyLoadingLibrary = true;
 
-    let awaiters: Array<Promise<string[]>> = [];
+    const awaiters: Array<Promise<string[]>> = [];
 
     for (let p of paths) {
       p = path.normalize(p);
@@ -119,14 +129,14 @@ export class WpiLibHeaders {
     }
 
     Promise.all(awaiters).then((files) => {
-      var allFiles: string[] = [].concat.apply([], files);
+      const allFiles: string[] = [].concat.apply([], files);
       this.libraryHeaderFiles = allFiles;
       this.currentlyLoadingLibrary = false;
     });
   }
 
-  dispose() {
-    for (let d of this.disposables) {
+  public dispose() {
+    for (const d of this.disposables) {
       d.dispose();
     }
   }

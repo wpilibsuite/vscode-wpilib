@@ -77,13 +77,13 @@ export class CppVsCodeProperties {
   }
 
   private updateCppConfigurationFile() {
-    let includes: string[] = this.cppPreferences.getAdditionalIncludeDirectories();
-    let defines: string[] = this.cppPreferences.getAdditionalDefines();
+    const includes: string[] = this.cppPreferences.getAdditionalIncludeDirectories();
+    const defines: string[] = this.cppPreferences.getAdditionalDefines();
 
-    let compiler = this.gradleProps.getCompiler();
-    let sysroot = this.gradleProps.getSysRoot();
+    const compiler = this.gradleProps.getCompiler();
+    const sysroot = this.gradleProps.getSysRoot();
 
-    for (let s of systemHeaders) {
+    for (const s of systemHeaders) {
       includes.push(path.join(sysroot, s));
     }
 
@@ -92,7 +92,7 @@ export class CppVsCodeProperties {
 
     defines.push(...defaultDefines);
 
-    let configuration: ConfigurationJson = {
+    const configuration: ConfigurationJson = {
       version: version,
       configurations: [
         {
@@ -107,11 +107,11 @@ export class CppVsCodeProperties {
       ]
     };
 
-    let serialized = JSON.stringify(configuration, null, 4);
+    const serialized = JSON.stringify(configuration, null, 4);
     fs.writeFileSync(this.cppPropertiesFile, serialized);
   }
 
-  dispose() {
+  public dispose() {
 
   }
 }

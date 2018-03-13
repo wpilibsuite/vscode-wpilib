@@ -13,7 +13,7 @@ export interface DebugCommands {
 }
 
 export async function startDebugging(commands: DebugCommands): Promise<void> {
-  let config: vscode.DebugConfiguration = {
+  const config: vscode.DebugConfiguration = {
     name: 'wpilibCppDebug',
     type: 'cppdbg',
     request: 'launch',
@@ -36,13 +36,13 @@ export async function startDebugging(commands: DebugCommands): Promise<void> {
     additionalSOLibSearchPath: commands.soLibPath,
   };
 
-  for(let a of commands.additionalCommands) {
+  for(const a of commands.additionalCommands) {
     config.setupCommands.push({
       text: a
     });
   }
 
-  let nodePlatform: NodeJS.Platform = process.platform;
+  const nodePlatform: NodeJS.Platform = process.platform;
   if (nodePlatform === 'win32') {
     config.miDebuggerPath += '.exe';
   }

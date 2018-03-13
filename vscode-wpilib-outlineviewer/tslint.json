@@ -3,13 +3,34 @@
 		"no-string-throw": true,
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
+		"no-any": true,
 		"curly": true,
 		"class-name": true,
+		"no-non-null-assertion": true,
 		"semicolon": [
 			true,
 			"always"
 		],
-		"triple-equals": true
+		"switch-default": true,
+		"no-switch-case-fall-through": true,
+		"await-promise": true,
+		"no-floating-promises": true,
+		"quotemark": [true, "single"],
+		"triple-equals": true,
+		"no-unnecessary-type-assertion": true,
+		"prefer-for-of": true,
+		"prefer-const": true,
+		"member-access": true,
+		"forin": true,
+		"no-for-in-array": true,
+		"no-use-before-declare": true,
+		"no-invalid-this": true,
+		"no-shadowed-variable": true,
+		"no-this-assignment": true,
+		"no-unsafe-any": true,
+		"no-unbound-method": true,
+		"no-var-keyword": true,
+		"eofline": true
 	},
 	"defaultSeverity": "warning"
 }

@@ -17,7 +17,7 @@ const defaultPreferences: PreferencesJson = {
 };
 
 export async function requestTeamNumber(): Promise<number> {
-  let teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
+  const teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
   if (teamNumber === undefined) {
     return -1;
   }
@@ -41,7 +41,7 @@ export class Preferences implements IPreferences {
 
     this.configuration = vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
 
-    let configFilePath = path.join(this.configFolder, this.preferenceFileName);
+    const configFilePath = path.join(this.configFolder, this.preferenceFileName);
 
     if (fs.existsSync(configFilePath)) {
       this.preferencesFile = vscode.Uri.file(configFilePath);
@@ -52,7 +52,7 @@ export class Preferences implements IPreferences {
       this.preferencesJson = defaultPreferences;
     }
 
-    let rp = new vscode.RelativePattern(workspace, this.preferencesGlob);
+    const rp = new vscode.RelativePattern(workspace, this.preferencesGlob);
 
     this.configFileWatcher = vscode.workspace.createFileSystemWatcher(rp);
     this.disposables.push(this.configFileWatcher);
@@ -79,13 +79,13 @@ export class Preferences implements IPreferences {
       return;
     }
 
-    let results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
+    const results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
     this.preferencesJson = jsonc.parse(results);
   }
 
   private writePreferences() {
     if (this.preferencesFile === undefined) {
-      let configFilePath = path.join(this.configFolder, this.preferenceFileName);
+      const configFilePath = path.join(this.configFolder, this.preferenceFileName);
       this.preferencesFile = vscode.Uri.file(configFilePath);
       fs.mkdirSync(path.dirname(this.preferencesFile.fsPath));
     }
@@ -94,11 +94,11 @@ export class Preferences implements IPreferences {
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    let teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes (Globally)', 'Yes (Project)', 'No');
+    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes (Globally)', 'Yes (Project)', 'No');
     if (teamRequest === undefined) {
       return -1;
     }
-    let teamNumber = await requestTeamNumber();
+    const teamNumber = await requestTeamNumber();
     if (teamRequest === 'No') {
       return teamNumber;
     }
@@ -112,9 +112,9 @@ export class Preferences implements IPreferences {
 
   public async getTeamNumber(): Promise<number> {
     // If always ask, get it.
-    let alwaysAsk = this.configuration.get<boolean>('alwaysAskForTeamNumber');
+    const alwaysAsk = this.configuration.get<boolean>('alwaysAskForTeamNumber');
     if (alwaysAsk !== undefined && alwaysAsk === true) {
-      let teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
+      const teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
       if (teamNumber === undefined) {
         return -1;
       }
@@ -122,7 +122,7 @@ export class Preferences implements IPreferences {
     }
     if (this.preferencesJson.teamNumber === -1) {
       // Check global preferences
-      let res = this.configuration.get<number>('globalTeamNumber');
+      const res = this.configuration.get<number>('globalTeamNumber');
       if (res === undefined || res < 0) {
         return await this.noTeamNumberLogic();
       }
@@ -151,7 +151,7 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoStartRioLog(): boolean {
-    let res = this.configuration.get<boolean>('autoStartRioLog');
+    const res = this.configuration.get<boolean>('autoStartRioLog');
     if (res === undefined) {
       return false;
     }
@@ -167,7 +167,7 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoSaveOnDeploy(): boolean {
-    let res = this.configuration.get<boolean>('autoSaveOnDeploy');
+    const res = this.configuration.get<boolean>('autoSaveOnDeploy');
     if (res === undefined) {
       return false;
     }
@@ -182,8 +182,8 @@ export class Preferences implements IPreferences {
     this.configuration.update('autoSaveOnDeploy', autoSave, target);
   }
 
-  dispose() {
-    for (let d of this.disposables) {
+  public dispose() {
+    for (const d of this.disposables) {
       d.dispose();
     }
   }

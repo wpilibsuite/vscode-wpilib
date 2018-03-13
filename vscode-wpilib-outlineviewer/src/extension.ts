@@ -15,7 +15,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib-outlineviewer" is now active!');
 
-    let coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
+    const coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
     if (coreExtension === undefined) {
         vscode.window.showErrorMessage('Could not find core library');
         return;
@@ -25,16 +25,16 @@ export async function activate(context: vscode.ExtensionContext) {
         await coreExtension.activate();
     }
 
-    let coreExports: IExternalAPI = coreExtension.exports;
+    const coreExports: IExternalAPI = coreExtension.exports;
 
-    let baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
+    const baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
 
     if (!baseValid) {
         vscode.window.showErrorMessage('Extension out of date with core extension. Please update');
         return;
     }
 
-    let tools = coreExports.getToolAPI();
+    const tools = coreExports.getToolAPI();
     let toolsValid = false;
 
     if (tools !== undefined) {
@@ -47,13 +47,13 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
     }
 
-    let outlineViewerLocation = path.join(context.extensionPath, 'resources', 'OutlineViewer.jar');
+    const outlineViewerLocation = path.join(context.extensionPath, 'resources', 'OutlineViewer.jar');
 
 
 
-    let toolRunner: IToolRunner = {
+    const toolRunner: IToolRunner = {
         async runTool(): Promise<boolean> {
-            let command = 'java -jar ' + outlineViewerLocation;
+            const command = 'java -jar ' + outlineViewerLocation;
             child_process.exec(command);
             return true;
         },
@@ -65,7 +65,11 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     };
 
-    tools!.addTool(toolRunner);
+    if (tools === undefined) {
+        return;
+    }
+
+    tools.addTool(toolRunner);
 }
 
 // this method is called when your extension is deactivated

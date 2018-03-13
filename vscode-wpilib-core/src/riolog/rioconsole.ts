@@ -33,7 +33,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
   }
 
   private async connect(teamNumber: number): Promise<net.Socket | undefined> {
-    let socket = await connectToRobot(1741, teamNumber, 2000);
+    const socket = await connectToRobot(1741, teamNumber, 2000);
     if (socket === undefined) {
       return undefined;
     }
@@ -53,19 +53,19 @@ export class RioConsole extends EventEmitter implements IRioConsole {
       count += 2;
     } while (len === 0);
 
-    let tag = data.readUInt8(count);
+    const tag = data.readUInt8(count);
     count++;
 
-    let outputBuffer = data.slice(3, len + 2);
+    const outputBuffer = data.slice(3, len + 2);
 
-    let extendedBuf = data.slice(2 + len);
+    const extendedBuf = data.slice(2 + len);
 
     if (tag === 11) {
       // error or warning.
-      let m = new ErrorMessage(outputBuffer);
+      const m = new ErrorMessage(outputBuffer);
       this.emit('message', m);
     } else if (tag === 12) {
-      let m = new PrintMessage(outputBuffer);
+      const m = new PrintMessage(outputBuffer);
       this.emit('message', m);
     }
 
@@ -75,7 +75,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
   }
 
   private async runFunction(teamNumber: number): Promise<void> {
-    let socket = await this.connect(teamNumber);
+    const socket = await this.connect(teamNumber);
     if (socket === undefined) {
       console.log('bad socket');
       return;
@@ -94,19 +94,19 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     }
     await new Promise((resolve, _) => {
       this.closeFunc = () => {
-        socket!.end();
-        socket!.destroy();
-        socket!.removeAllListeners();
+        socket.end();
+        socket.destroy();
+        socket.removeAllListeners();
         resolve();
         console.log('closed locally');
       };
-      socket!.on('close', () => {
-        socket!.removeAllListeners();
+      socket.on('close', () => {
+        socket.removeAllListeners();
         resolve();
         console.log('closed remotely (close)');
       });
-      socket!.on('end', () => {
-        socket!.removeAllListeners();
+      socket.on('end', () => {
+        socket.removeAllListeners();
         resolve();
         console.log('closed remotely (end)');
       });
@@ -116,7 +116,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
   }
 
   public startListening(teamNumber: number): void {
-    let asyncFunction = async () => {
+    const asyncFunction = async () => {
       while (!this.cleanup) {
         while (!this.autoReconnect) {
           if (this.cleanup) {

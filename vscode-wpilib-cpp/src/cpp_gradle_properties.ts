@@ -83,7 +83,7 @@ export class CppGradleProperties {
 
     this.buildPropertiesRelativePattern = new vscode.RelativePattern(wp, this.gradleJsonFileGlob);
 
-    let buildPropertiesListener = vscode.workspace.createFileSystemWatcher(this.buildPropertiesRelativePattern);
+    const buildPropertiesListener = vscode.workspace.createFileSystemWatcher(this.buildPropertiesRelativePattern);
 
     this.disposables.push(buildPropertiesListener);
 
@@ -114,7 +114,7 @@ export class CppGradleProperties {
         return;
       }
 
-      let parsed: IEditorConfig = jsonc.parse(current);
+      const parsed: IEditorConfig = jsonc.parse(current);
       this.loadNewFile(parsed);
     });
 
@@ -142,14 +142,14 @@ export class CppGradleProperties {
         return;
       }
 
-      let parsed: IEditorConfig = jsonc.parse(current);
+      const parsed: IEditorConfig = jsonc.parse(current);
       this.checkForChanges(parsed);
     });
   }
 
   private checkForChanges(newContents: IEditorConfig) {
-    let newKey = this.getSelectedComponent(newContents.components);
-    let oldKey = this.getSelectedComponent(this.lastConfig.components);
+    const newKey = this.getSelectedComponent(newContents.components);
+    const oldKey = this.getSelectedComponent(this.lastConfig.components);
     if (newKey === undefined) {
       // Empty, return default
       this.lastConfig = defaultConfig;
@@ -163,19 +163,19 @@ export class CppGradleProperties {
       return;
     }
 
-    let component = newContents.components[newKey];
-    let oldComponent = this.lastConfig.components[oldKey];
+    const component = newContents.components[newKey];
+    const oldComponent = this.lastConfig.components[oldKey];
 
-    let newLibraryHeaders = component.libHeaderDirs;
-    let oldLibraryHeaders = oldComponent.libHeaderDirs;
+    const newLibraryHeaders = component.libHeaderDirs;
+    const oldLibraryHeaders = oldComponent.libHeaderDirs;
 
     if (newLibraryHeaders.length !== oldLibraryHeaders.length) {
       this.libraryHeaderDirs = newLibraryHeaders;
       this.libraryHeaderDirsChanged.fire(this.libraryHeaderDirs);
     } else {
-      for (let n of newLibraryHeaders) {
+      for (const n of newLibraryHeaders) {
         let found = false;
-        for (let o of oldLibraryHeaders) {
+        for (const o of oldLibraryHeaders) {
           if (o === n) {
             found = true;
             break;
@@ -189,16 +189,16 @@ export class CppGradleProperties {
       }
     }
 
-    let newLocalHeaders = component.libHeaderDirs;
-    let oldLocalHeaders = oldComponent.libHeaderDirs;
+    const newLocalHeaders = component.libHeaderDirs;
+    const oldLocalHeaders = oldComponent.libHeaderDirs;
 
     if (newLocalHeaders.length !== oldLocalHeaders.length) {
       this.localHeaderDirs = newLocalHeaders;
       this.localHeaderDirsChanged.fire(this.localHeaderDirs);
     } else {
-      for (let n of newLocalHeaders) {
+      for (const n of newLocalHeaders) {
         let found = false;
-        for (let o of oldLocalHeaders) {
+        for (const o of oldLocalHeaders) {
           if (o === n) {
             found = true;
             break;
@@ -217,7 +217,7 @@ export class CppGradleProperties {
   }
 
   private getSelectedComponent(components: IComponentMap): string | undefined {
-    let componentKeys = Object.keys(components);
+    const componentKeys = Object.keys(components);
     let currentKey: string = '';
     if (componentKeys.length === 0) {
       console.log('No components found');
@@ -226,7 +226,7 @@ export class CppGradleProperties {
     if (componentKeys.length === 1) {
       currentKey = componentKeys[0];
     } else {
-      let component = this.cppPreferences.getSelectedComponent();
+      const component = this.cppPreferences.getSelectedComponent();
       if (component === undefined) {
         console.log('No components found');
         return undefined;
@@ -251,7 +251,7 @@ export class CppGradleProperties {
   public async forceReparse(): Promise<void> {
     let current: string | undefined;
 
-    let files = await vscode.workspace.findFiles(this.buildPropertiesRelativePattern);
+    const files = await vscode.workspace.findFiles(this.buildPropertiesRelativePattern);
 
     if (files.length <= 0) {
       return;
@@ -264,13 +264,13 @@ export class CppGradleProperties {
 
     if (current !== undefined) {
       // Load and parse file
-      let parsed: IEditorConfig = jsonc.parse(current);
+      const parsed: IEditorConfig = jsonc.parse(current);
       this.loadNewFile(parsed);
     }
   }
 
   private loadNewFile(contents: IEditorConfig) {
-    let currentKey = this.getSelectedComponent(contents.components);
+    const currentKey = this.getSelectedComponent(contents.components);
     if (currentKey === undefined) {
       return;
     }
@@ -283,7 +283,7 @@ export class CppGradleProperties {
   }
 
   public getSysRoot(): string {
-    let sysroot = this.lastConfig.compiler.sysroot;
+    const sysroot = this.lastConfig.compiler.sysroot;
     if (sysroot === null) {
       return '';
     }
@@ -302,8 +302,8 @@ export class CppGradleProperties {
     return this.libraryHeaderDirs;
   }
 
-  dispose() {
-    for (let d of this.disposables) {
+  public dispose() {
+    for (const d of this.disposables) {
       d.dispose();
     }
   }

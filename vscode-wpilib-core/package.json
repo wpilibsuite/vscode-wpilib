@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-core",
     "displayName": "vscode-wpilib-core",
     "description": "Base extension for WPILib Team Use",
-    "version": "0.0.21",
+    "version": "0.0.23",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -10,7 +10,6 @@
     "categories": [
         "Other"
     ],
-    "enableProposedApi": true,
     "activationEvents": [
         "*"
     ],

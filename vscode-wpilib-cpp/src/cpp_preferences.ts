@@ -28,7 +28,7 @@ export class CppPreferences {
 
     this.configFolder = path.join(workspace.uri.fsPath, '.wpilib');
 
-    let configFilePath = path.join(this.configFolder, this.preferenceFileName);
+    const configFilePath = path.join(this.configFolder, this.preferenceFileName);
 
     if (fs.existsSync(configFilePath)) {
       this.preferencesFile = vscode.Uri.file(configFilePath);
@@ -39,7 +39,7 @@ export class CppPreferences {
       this.preferencesJson = defaultPreferences;
     }
 
-    let rp = new vscode.RelativePattern(workspace, this.preferencesGlob);
+    const rp = new vscode.RelativePattern(workspace, this.preferencesGlob);
 
     this.configFileWatcher = vscode.workspace.createFileSystemWatcher(rp);
     this.disposables.push(this.configFileWatcher);
@@ -65,7 +65,7 @@ export class CppPreferences {
       return;
     }
 
-    let results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
+    const results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
     this.preferencesJson = jsonc.parse(results);
   }
 
@@ -74,7 +74,7 @@ export class CppPreferences {
   }
 
   public getAdditionalIncludeDirectories(): string[] {
-    let res = this.preferencesJson.additionalIncludeDirectories;
+    const res = this.preferencesJson.additionalIncludeDirectories;
     if (res === undefined) {
       return [];
     }
@@ -82,7 +82,7 @@ export class CppPreferences {
   }
 
   public getAdditionalDefines(): string[] {
-    let res = this.preferencesJson.additionalDefines;
+    const res = this.preferencesJson.additionalDefines;
     if (res === undefined) {
       return [];
     }
@@ -90,15 +90,15 @@ export class CppPreferences {
   }
 
   public getAdditionalDebugCommands(): string[] {
-    let res = this.preferencesJson.additionalDebugCommands;
+    const res = this.preferencesJson.additionalDebugCommands;
     if (res === undefined) {
       return [];
     }
     return res;
   }
 
-  dispose() {
-    for (let d of this.disposables) {
+  public dispose() {
+    for (const d of this.disposables) {
       d.dispose();
     }
   }

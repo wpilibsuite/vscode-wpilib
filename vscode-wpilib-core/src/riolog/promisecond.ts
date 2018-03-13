@@ -4,7 +4,7 @@ export class PromiseCondition {
     private hasBeenSet: boolean = false;
     private condSet: (() => void) | undefined = undefined;
 
-    wait(): Promise<void> {
+    public wait(): Promise<void> {
         return new Promise((resolve, _) => {
             this.condSet = () => {
                 resolve();
@@ -15,14 +15,14 @@ export class PromiseCondition {
         });
     }
 
-    set() {
+    public set() {
         this.hasBeenSet = true;
         if (this.condSet !== undefined) {
             this.condSet();
         }
     }
 
-    reset() {
+    public reset() {
         this.condSet = undefined;
         this.hasBeenSet = false;
     }

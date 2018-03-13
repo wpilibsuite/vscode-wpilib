@@ -37,7 +37,7 @@ export class PrintMessage implements IPrintMessage {
     count += 4;
     this.seqNumber = data.readInt16BE(count);
     count += 2;
-    let slice = data.slice(count);
+    const slice = data.slice(count);
     this.line = slice.toString('utf8');
   }
 }
@@ -87,9 +87,9 @@ export class ErrorMessage implements IMessage {
   }
 
   private getSizedString(data: Buffer, start: number): StringNumberPair {
-    let size = data.readUInt16BE(start);
+    const size = data.readUInt16BE(start);
     start += 2;
-    let count = size + 2;
+    const count = size + 2;
     return {
       byteLength: count,
       data: data.toString('utf8', start, start + count - 2)

@@ -15,13 +15,13 @@ interface DebuggerParse {
 }
 
 function parseGradleOutput(output: OutputPair): DebuggerParse {
-    let ret: DebuggerParse = {
+    const ret: DebuggerParse = {
         port: '',
         ip: ''
     };
 
-    let results = output.stdout.split('\n');
-    for (let r of results) {
+    const results = output.stdout.split('\n');
+    for (const r of results) {
         if (r.indexOf('DEBUGGING ACTIVE ON PORT ') >= 0) {
             ret.port = r.substring(27, r.indexOf('!')).trim();
         }
@@ -41,9 +41,9 @@ export async function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib-java" is now active!');
 
-    let extensionResourceLocation = path.join(context.extensionPath, 'resources');
+    const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
-    let coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
+    const coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
     if (coreExtension === undefined) {
         vscode.window.showErrorMessage('Could not find core library');
         return;
@@ -51,9 +51,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let allowDebug = true;
 
-    let promises = new Array<Thenable<any>>();
+    const promises = [];
 
-    let javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
+    const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
     if (javaExtension === undefined) {
         vscode.window.showInformationMessage('Could not find java extension. Debugging is disabled.');
         allowDebug = false;
@@ -69,18 +69,18 @@ export async function activate(context: vscode.ExtensionContext) {
         await Promise.all(promises);
     }
 
-    let coreExports: IExternalAPI = coreExtension.exports;
+    const coreExports: IExternalAPI = coreExtension.exports;
 
-    let baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
+    const baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
 
     if (!baseValid) {
         vscode.window.showErrorMessage('Extension out of date with core extension. Please update');
         return;
     }
 
-    let preferences = coreExports.getPreferencesAPI();
-    let debugDeploy = coreExports.getDeployDebugAPI();
-    let exampleTemplate = coreExports.getExampleTemplateAPI();
+    const preferences = coreExports.getPreferencesAPI();
+    const debugDeploy = coreExports.getDeployDebugAPI();
+    const exampleTemplate = coreExports.getExampleTemplateAPI();
 
     let exampleTemplateValid = false;
     let debugDeployValid = false;
@@ -98,32 +98,32 @@ export async function activate(context: vscode.ExtensionContext) {
         preferencesValid = preferences.getVersion() === getPreferencesAPIExpectedVersion();
     }
 
-    if (debugDeployValid && preferencesValid) {
+    if (debugDeployValid === true && preferencesValid === true && debugDeploy !== undefined && preferences !== undefined) {
         // Setup debug and deploy
 
-        let gradleChannel = vscode.window.createOutputChannel('gradleJava');
+        const gradleChannel = vscode.window.createOutputChannel('gradleJava');
 
-        debugDeploy!.addLanguageChoice('java');
+        debugDeploy.addLanguageChoice('java');
 
-        debugDeploy!.registerCodeDeploy({
+        debugDeploy.registerCodeDeploy({
             async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                let prefs = await preferences!.getPreferences(workspace);
+                const prefs = await preferences.getPreferences(workspace);
                 if (prefs === undefined) {
                     console.log('Preferences without workspace?');
                     return false;
                 }
-                let currentLanguage = prefs.getCurrentLanguage();
+                const currentLanguage = prefs.getCurrentLanguage();
                 return currentLanguage === 'none' || currentLanguage === 'java';
             },
             async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                let command = 'deploy --offline -PteamNumber=' + teamNumber;
+                const command = 'deploy --offline -PteamNumber=' + teamNumber;
                 gradleChannel.clear();
                 gradleChannel.show();
                 if (workspace === undefined) {
                     vscode.window.showInformationMessage('No workspace selected');
                     return false;
                 }
-                let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+                const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
                 console.log(result);
                 return true;
             },
@@ -135,26 +135,26 @@ export async function activate(context: vscode.ExtensionContext) {
             }
         });
 
-        if (allowDebug) {
-            debugDeploy!.registerCodeDebug({
+        if (allowDebug === true) {
+            debugDeploy.registerCodeDebug({
                 async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                    let prefs = await preferences!.getPreferences(workspace);
+                    const prefs = await preferences.getPreferences(workspace);
                     if (prefs === undefined) {
                         console.log('Preferences without workspace?');
                         return false;
                     }
-                    let currentLanguage = prefs.getCurrentLanguage();
+                    const currentLanguage = prefs.getCurrentLanguage();
                     return currentLanguage === 'none' || currentLanguage === 'java';
                 },
                 async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                    let command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
+                    const command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
                     gradleChannel.clear();
                     gradleChannel.show();
-                    let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+                    const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
 
-                    let parsed = parseGradleOutput(result);
+                    const parsed = parseGradleOutput(result);
 
-                    let config: DebugCommands = {
+                    const config: DebugCommands = {
                         serverAddress: parsed.ip,
                         serverPort: parsed.port,
                         workspace: workspace
@@ -178,11 +178,11 @@ export async function activate(context: vscode.ExtensionContext) {
         console.log('Java debug/deploy extension out of date');
     }
 
-    if (exampleTemplateValid) {
+    if (exampleTemplateValid === true && exampleTemplate !== undefined) {
         // Setup examples and template
-        let examples: Examples = new Examples(extensionResourceLocation, exampleTemplate!);
+        const examples: Examples = new Examples(extensionResourceLocation, exampleTemplate);
         context.subscriptions.push(examples);
-        let templates: Templates = new Templates(extensionResourceLocation, exampleTemplate!);
+        const templates: Templates = new Templates(extensionResourceLocation, exampleTemplate);
         context.subscriptions.push(templates);
     } else {
         vscode.window.showInformationMessage('Java examples and templates do not match Core. Update');

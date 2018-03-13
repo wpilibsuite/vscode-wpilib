@@ -7,16 +7,16 @@ export class PreferencesAPI extends IPreferencesAPI {
   private preferences: Preferences[] = [];
   private preferencesEmitter: vscode.EventEmitter<IPreferencesChangedPair[]> = new vscode.EventEmitter<IPreferencesChangedPair[]>();
   private disposables: vscode.Disposable[] = [];
-  onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+  public onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
 
 
   constructor() {
     super();
     this.onDidPreferencesFolderChanged = this.preferencesEmitter.event;
 
-    let workspaces = vscode.workspace.workspaceFolders;
+    const workspaces = vscode.workspace.workspaceFolders;
     if (workspaces !== undefined) {
-      for (let w of workspaces) {
+      for (const w of workspaces) {
         this.preferences.push(new Preferences(w));
       }
     }
@@ -25,23 +25,23 @@ export class PreferencesAPI extends IPreferencesAPI {
     this.disposables.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
       // Nuke and reset
       // TODO: Remove existing preferences from the extension context
-      for (let p of this.preferences) {
+      for (const p of this.preferences) {
         p.dispose();
       }
 
-      let wp = vscode.workspace.workspaceFolders;
+      const wp = vscode.workspace.workspaceFolders;
 
       if (wp === undefined) {
         return;
       }
 
-      let pairArr: IPreferencesChangedPair[] = [];
+      const pairArr: IPreferencesChangedPair[] = [];
       this.preferences = [];
 
-      for (let w of wp) {
-        let p = new Preferences(w);
+      for (const w of wp) {
+        const p = new Preferences(w);
         this.preferences.push(p);
-        let pair: IPreferencesChangedPair = {
+        const pair: IPreferencesChangedPair = {
           workspace: w,
           preference: p
         };
@@ -56,8 +56,8 @@ export class PreferencesAPI extends IPreferencesAPI {
 
   }
 
-  getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined {
-    for (let p of this.preferences) {
+  public getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined {
+    for (const p of this.preferences) {
       if (p.workspace.uri === workspace.uri) {
           return p;
       }
@@ -65,14 +65,14 @@ export class PreferencesAPI extends IPreferencesAPI {
   return undefined;
   }
 
-  async getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined> {
-    let wp = vscode.workspace.workspaceFolders;
+  public async getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined> {
+    const wp = vscode.workspace.workspaceFolders;
     if (wp === undefined) {
       return undefined;
     }
 
     if (wp.length > 1) {
-      let res = await vscode.window.showWorkspaceFolderPick();
+      const res = await vscode.window.showWorkspaceFolderPick();
       if (res !== undefined) {
         return res;
       }
@@ -84,8 +84,8 @@ export class PreferencesAPI extends IPreferencesAPI {
     }
   }
 
-  dispose() {
-    for (let d of this.disposables) {
+  public dispose() {
+    for (const d of this.disposables) {
       d.dispose();
     }
   }
