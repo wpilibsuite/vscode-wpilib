@@ -22,7 +22,7 @@ interface DebuggerParse {
 }
 
 function parseGradleOutput(output: OutputPair): DebuggerParse {
-    let ret: DebuggerParse = {
+    const ret: DebuggerParse = {
         libraryLocations: new Array<string>(),
         sysroot: '',
         executablePath: '',
@@ -30,8 +30,8 @@ function parseGradleOutput(output: OutputPair): DebuggerParse {
         ip: ''
     };
 
-    let results = output.stdout.split('\n');
-    for (let r of results) {
+    const results = output.stdout.split('\n');
+    for (const r of results) {
         if (r.indexOf('WPILIBRARY: ') >= 0) {
             ret.libraryLocations.push(r.substring(12).trim());
         }
@@ -62,9 +62,9 @@ export async function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib-cpp" is now active!');
 
-    let extensionResourceLocation = path.join(context.extensionPath, 'resources');
+    const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
-    let coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
+    const coreExtension = vscode.extensions.getExtension<IExternalAPI>('wpifirst.vscode-wpilib-core');
     if (coreExtension === undefined) {
         vscode.window.showErrorMessage('Could not find core library');
         return;
@@ -72,9 +72,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let allowDebug = true;
 
-    let promises = new Array<Thenable<any>>();
+    const promises = [];
 
-    let cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
+    const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
     if (cppExtension === undefined) {
         vscode.window.showInformationMessage('Could not find cpptools C++ extension. Debugging is disabled.');
         allowDebug = false;
@@ -90,18 +90,18 @@ export async function activate(context: vscode.ExtensionContext) {
         await Promise.all(promises);
     }
 
-    let coreExports: IExternalAPI = coreExtension.exports;
+    const coreExports: IExternalAPI = coreExtension.exports;
 
-    let baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
+    const baseValid = coreExports.getVersion() === getExternalAPIExpectedVersion();
 
     if (!baseValid) {
         vscode.window.showErrorMessage('Extension out of date with core extension. Please update');
         return;
     }
 
-    let preferences = coreExports.getPreferencesAPI();
-    let debugDeploy = coreExports.getDeployDebugAPI();
-    let exampleTemplate = coreExports.getExampleTemplateAPI();
+    const preferences = coreExports.getPreferencesAPI();
+    const debugDeploy = coreExports.getDeployDebugAPI();
+    const exampleTemplate = coreExports.getExampleTemplateAPI();
 
     let exampleTemplateValid = false;
     let debugDeployValid = false;
@@ -119,30 +119,30 @@ export async function activate(context: vscode.ExtensionContext) {
         preferencesValid = preferences.getVersion() === getPreferencesAPIExpectedVersion();
     }
 
-    if (debugDeployValid && preferencesValid) {
+    if (debugDeployValid === true && preferencesValid === true && preferences !== undefined && debugDeploy !== undefined) {
         // Setup debug and deploy
-        let workspaces = vscode.workspace.workspaceFolders;
+        const workspaces = vscode.workspace.workspaceFolders;
 
-        let gradleProps: CppGradleProperties[] = [];
-        let headerFinders: WpiLibHeaders[] = [];
-        let cppProps: CppVsCodeProperties[] = [];
-        let cppPrefs: CppPreferences[] = [];
+        const gradleProps: CppGradleProperties[] = [];
+        const headerFinders: WpiLibHeaders[] = [];
+        const cppProps: CppVsCodeProperties[] = [];
+        const cppPrefs: CppPreferences[] = [];
 
-        let gradleChannel = vscode.window.createOutputChannel('gradleCpp');
+        const gradleChannel = vscode.window.createOutputChannel('gradleCpp');
 
         if (workspaces !== undefined) {
             // Create new header finders for every workspace
-            for (let w of workspaces) {
-                let p = preferences!.getPreferences(w);
+            for (const w of workspaces) {
+                const p = preferences.getPreferences(w);
                 if (p === undefined) {
                     console.log('Preferences without workspace?');
                     continue;
                 }
-                let cpr = new CppPreferences(w);
-                let gp = new CppGradleProperties(w, gradleChannel, cpr);
+                const cpr = new CppPreferences(w);
+                const gp = new CppGradleProperties(w, gradleChannel, cpr);
                 await gp.forceReparse();
-                let wh = new WpiLibHeaders(gp);
-                let cp = new CppVsCodeProperties(w, gp, cpr);
+                const wh = new WpiLibHeaders(gp);
+                const cp = new CppVsCodeProperties(w, gp, cpr);
                 cppPrefs.push(cpr);
                 gradleProps.push(gp);
                 headerFinders.push(wh);
@@ -151,28 +151,28 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         // On a change in workspace folders, redo all header finders
-        preferences!.onDidPreferencesFolderChanged(async (changed) => {
+        preferences.onDidPreferencesFolderChanged(async (changed) => {
             // Nuke and reset
             // TODO: Remove existing header finders from the extension context
-            for (let p of headerFinders) {
+            for (const p of headerFinders) {
                 p.dispose();
             }
-            for (let p of gradleProps) {
+            for (const p of gradleProps) {
                 p.dispose();
             }
-            for (let p of cppPrefs) {
+            for (const p of cppPrefs) {
                 p.dispose();
             }
-            for (let p of cppProps) {
+            for (const p of cppProps) {
                 p.dispose();
             }
 
-            for (let c of changed) {
-                let cpr = new CppPreferences(c.workspace);
-                let gp = new CppGradleProperties(c.workspace, gradleChannel, cpr);
+            for (const c of changed) {
+                const cpr = new CppPreferences(c.workspace);
+                const gp = new CppGradleProperties(c.workspace, gradleChannel, cpr);
                 await gp.forceReparse();
-                let wh = new WpiLibHeaders(gp);
-                let cp = new CppVsCodeProperties(c.workspace, gp, cpr);
+                const wh = new WpiLibHeaders(gp);
+                const cp = new CppVsCodeProperties(c.workspace, gp, cpr);
                 cppPrefs.push(cpr);
                 gradleProps.push(gp);
                 headerFinders.push(wh);
@@ -190,27 +190,27 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(...cppProps);
         context.subscriptions.push(...cppPrefs);
 
-        debugDeploy!.addLanguageChoice('cpp');
+        debugDeploy.addLanguageChoice('cpp');
 
-        debugDeploy!.registerCodeDeploy({
+        debugDeploy.registerCodeDeploy({
             async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                let prefs = await preferences!.getPreferences(workspace);
+                const prefs = await preferences.getPreferences(workspace);
                 if (prefs === undefined) {
                     console.log('Preferences without workspace?');
                     return false;
                 }
-                let currentLanguage = prefs.getCurrentLanguage();
+                const currentLanguage = prefs.getCurrentLanguage();
                 return currentLanguage === 'none' || currentLanguage === 'cpp';
             },
             async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                let command = 'deploy --offline -PteamNumber=' + teamNumber;
+                const command = 'deploy --offline -PteamNumber=' + teamNumber;
                 gradleChannel.clear();
                 gradleChannel.show();
                 if (workspace === undefined) {
                     vscode.window.showInformationMessage('No workspace selected');
                     return false;
                 }
-                let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+                const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
                 console.log(result);
                 return true;
             },
@@ -223,37 +223,37 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         if (allowDebug) {
-            debugDeploy!.registerCodeDebug({
+            debugDeploy.registerCodeDebug({
                 async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                    let prefs = await preferences!.getPreferences(workspace);
+                    const prefs = await preferences.getPreferences(workspace);
                     if (prefs === undefined) {
                         console.log('Preferences without workspace?');
                         return false;
                     }
-                    let currentLanguage = prefs.getCurrentLanguage();
+                    const currentLanguage = prefs.getCurrentLanguage();
                     return currentLanguage === 'none' || currentLanguage === 'cpp';
                 },
                 async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-                    let command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
+                    const command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
                     gradleChannel.clear();
                     gradleChannel.show();
                     if (workspace === undefined) {
                         vscode.window.showInformationMessage('No workspace selected');
                         return false;
                     }
-                    let result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+                    const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
 
-                    let parsed = parseGradleOutput(result);
+                    const parsed = parseGradleOutput(result);
 
                     let soPath = '';
 
-                    for (let p of parsed.libraryLocations) {
+                    for (const p of parsed.libraryLocations) {
                         soPath += path.dirname(p) + ';';
                     }
 
                     soPath = soPath.substring(0, soPath.length - 1);
 
-                    let config: DebugCommands = {
+                    const config: DebugCommands = {
                         serverAddress: parsed.ip,
                         serverPort: parsed.port,
                         sysroot: parsed.sysroot,
@@ -265,7 +265,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
                     let cppPref: CppPreferences | undefined = undefined;
 
-                    for (let c of cppPrefs) {
+                    for (const c of cppPrefs) {
                         if (c.workspace.uri === workspace.uri) {
                             cppPref = c;
                         }
@@ -290,7 +290,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.refreshProperties', () => {
-            for (let c of gradleProps) {
+            for (const c of gradleProps) {
                 c.runGradleRefresh();
             }
         }));
@@ -302,11 +302,11 @@ export async function activate(context: vscode.ExtensionContext) {
         }));
     }
 
-    if (exampleTemplateValid) {
+    if (exampleTemplateValid === true && exampleTemplate !== undefined) {
         // Setup examples and template
-        let examples: Examples = new Examples(extensionResourceLocation, exampleTemplate!);
+        const examples: Examples = new Examples(extensionResourceLocation, exampleTemplate);
         context.subscriptions.push(examples);
-        let templates: Templates = new Templates(extensionResourceLocation, exampleTemplate!);
+        const templates: Templates = new Templates(extensionResourceLocation, exampleTemplate);
         context.subscriptions.push(templates);
 
     } else {

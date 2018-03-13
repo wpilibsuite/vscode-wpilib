@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-cpp",
     "displayName": "vscode-wpilib-cpp",
     "description": "Vscode extension for WPILib Cpp",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -24,7 +24,7 @@
             {
                 "title": "Refresh C++ Properties",
                 "command": "wpilibcpp.refreshProperties",
-                "category": "wpilib-cpp"
+                "category": "WPILIB"
             }
         ]
     },

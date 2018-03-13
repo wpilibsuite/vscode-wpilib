@@ -1,3 +1,7 @@
+/*
+
+// add     `"enableProposedApi": true, ` to package.json
+
 'use strict';
 
 import * as vscode from 'vscode';
@@ -43,20 +47,20 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
         }, null, this.disposables);
     }
 
-    setHTML(html: string): void {
+    public setHTML(html: string): void {
         this.webview.html = html;
     }
-    async postMessage(message: IIPCSendMessage): Promise<boolean> {
+    public async postMessage(message: IIPCSendMessage): Promise<boolean> {
         return await this.webview.postMessage(message);
     }
-    dispose() {
-        for (let d of this.disposables) {
+    public dispose() {
+        for (const d of this.disposables) {
             d.dispose();
         }
     }
 
-    async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
-        let d = await vscode.workspace.openTextDocument({
+    public async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
+        const d = await vscode.workspace.openTextDocument({
             language: 'json',
             content: JSON.stringify(saveData, null, 4)
         });
@@ -72,8 +76,8 @@ export class RioLogWebviewProvider implements IWindowProvider {
         this.htmlProvider = new RioLogHTMLProvider(resourceRoot);
     }
 
-    createWindowView(): IWindowView {
-        let wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
+    public createWindowView(): IWindowView {
+        const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
         wv.setHTML(this.htmlProvider.getHTML());
         return wv;
     }
@@ -86,8 +90,8 @@ export class RioLogViewerWebviewProvider implements IWindowProvider {
         this.htmlProvider = new RioLogViewerHTMLProvider(resourceRoot);
     }
 
-    createWindowView(): IWindowView {
-        let wv = new RioLogWindowView('wpilib:riologviewer', 'RioLogViewer', vscode.ViewColumn.Three);
+    public createWindowView(): IWindowView {
+        const wv = new RioLogWindowView('wpilib:riologviewer', 'RioLogViewer', vscode.ViewColumn.Three);
         wv.setHTML(this.htmlProvider.getHTML());
         return wv;
     }
@@ -95,10 +99,10 @@ export class RioLogViewerWebviewProvider implements IWindowProvider {
 
 export class RioLogHTMLProvider implements IHTMLProvider {
     private html: string | undefined;
-    
+
     constructor(resourceRoot: string) {
-        let htmlFile = path.join(resourceRoot, 'live.html');
-        let scriptFile = path.join(resourceRoot, 'bundle.js');
+        const htmlFile = path.join(resourceRoot, 'live.html');
+        const scriptFile = path.join(resourceRoot, 'bundle.js');
 
         this.html = fs.readFileSync(htmlFile, 'utf8');
         this.html += '\r\n<script>\r\n';
@@ -106,7 +110,7 @@ export class RioLogHTMLProvider implements IHTMLProvider {
         this.html += '\r\n</script>\r\n';
     }
 
-    getHTML(): string {
+    public getHTML(): string {
         if (this.html === undefined) {
             return '';
         }
@@ -115,24 +119,24 @@ export class RioLogHTMLProvider implements IHTMLProvider {
 }
 
 export class LiveRioConsoleProvider implements IRioConsoleProvider {
-    getRioConsole(): IRioConsole {
+    public getRioConsole(): IRioConsole {
         return new RioConsole();
     }
 }
 
 export class ViewerRioConsoleProvider implements IRioConsoleProvider {
-    getRioConsole(): IRioConsole {
+    public getRioConsole(): IRioConsole {
         return new RioLogViewer();
     }
 }
 
 class RioLogViewer extends EventEmitter implements IRioConsole {
-    connected: boolean = true;
-    discard: boolean = false;
-    stop(): void {
-        
+    public connected: boolean = true;
+    public discard: boolean = false;
+    public stop(): void {
+
     }
-    startListening(_: number): void {
+    public startListening(_: number): void {
         // Send everything
         vscode.window.showOpenDialog({
             canSelectFiles: true,
@@ -148,22 +152,22 @@ class RioLogViewer extends EventEmitter implements IRioConsole {
                 if (err) {
                     console.log(err);
                 } else {
-                    let obj: (IPrintMessage | IErrorMessage)[] = JSON.parse(data);
-                    for (let o of obj) {
+                    const obj: (IPrintMessage | IErrorMessage)[] = JSON.parse(data);
+                    for (const o of obj) {
                         this.emit('message', o);
                     }
                 }
             });
         });
     }
-    setAutoReconnect(_: boolean): void {
+    public setAutoReconnect(_: boolean): void {
     }
-    getAutoReconnect(): boolean {
+    public getAutoReconnect(): boolean {
         return true;
     }
-    disconnect(): void {
+    public disconnect(): void {
     }
-    dispose() {
+    public dispose() {
     }
 }
 
@@ -171,8 +175,8 @@ class RioLogViewerHTMLProvider implements IHTMLProvider {
     private html: string;
 
     constructor(resourceRoot: string) {
-        let htmlFile = path.join(resourceRoot,'viewer.html');
-        let scriptFile = path.join(resourceRoot, 'bundle.js');
+        const htmlFile = path.join(resourceRoot,'viewer.html');
+        const scriptFile = path.join(resourceRoot, 'bundle.js');
 
         this.html = fs.readFileSync(htmlFile, 'utf8');
         this.html += '\r\n<script>\r\n';
@@ -180,10 +184,12 @@ class RioLogViewerHTMLProvider implements IHTMLProvider {
         this.html += '\r\n</script>\r\n';
     }
 
-    getHTML(): string {
+    public getHTML(): string {
         if (this.html === undefined) {
             return '';
         }
         return this.html;
     }
 }
+
+*/

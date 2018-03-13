@@ -6,16 +6,20 @@ import { ReceiveTypes } from '../interfaces';
 
 let paused = false;
 export function onPause() {
+    const pauseElement = document.getElementById('pause');
+    if (pauseElement === null) {
+        return;
+    }
     if (paused === true) {
         paused = false;
-        document.getElementById('pause')!.innerHTML = 'Pause';
+        pauseElement.innerHTML = 'Pause';
         sendMessage({
             type: ReceiveTypes.Pause,
             message: false
         });
     } else {
         paused = true;
-        document.getElementById('pause')!.innerHTML = 'Paused: 0';
+        pauseElement.innerHTML = 'Paused: 0';
         sendMessage({
             type: ReceiveTypes.Pause,
             message: true
@@ -25,16 +29,20 @@ export function onPause() {
 
 let discard = false;
 export function onDiscard() {
+    const dButton = document.getElementById('discard');
+    if (dButton === null) {
+        return;
+    }
     if (discard === true) {
         discard = false;
-        document.getElementById('discard')!.innerHTML = 'Discard';
+        dButton.innerHTML = 'Discard';
         sendMessage({
             type: ReceiveTypes.Discard,
             message: false
         });
     } else {
         discard = true;
-        document.getElementById('discard')!.innerHTML = 'Resume';
+        dButton.innerHTML = 'Resume';
         sendMessage({
             type: ReceiveTypes.Discard,
             message: true
@@ -43,20 +51,32 @@ export function onDiscard() {
 }
 
 export function onClear() {
-    document.getElementById('list')!.innerHTML = '';
+    const list = document.getElementById('list');
+    if (list === null) {
+        return;
+    }
+    list.innerHTML = '';
 }
 
 let showWarnings = true;
 export function onShowWarnings() {
+    const warningsButton = document.getElementById('showwarnings');
+    if (warningsButton === null) {
+        return;
+    }
     if (showWarnings === true) {
         showWarnings = false;
-        document.getElementById('showwarnings')!.innerHTML = 'Show Warnings';
+        warningsButton.innerHTML = 'Show Warnings';
     } else {
         showWarnings = true;
-        document.getElementById('showwarnings')!.innerHTML = 'Don\'t Show Warnings';
+        warningsButton.innerHTML = 'Don\'t Show Warnings';
     }
-    let ul = document.getElementById('list');
-    let items = ul!.getElementsByTagName('li');
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const items = ul.getElementsByTagName('li');
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < items.length; ++i) {
         if (items[i].dataset.type === 'warning') {
             if (showWarnings === true) {
@@ -71,15 +91,23 @@ export function onShowWarnings() {
 
 let showPrints = true;
 export function onShowPrints() {
+    const printButton = document.getElementById('showprints');
+    if (printButton === null) {
+        return;
+    }
     if (showPrints === true) {
         showPrints = false;
-        document.getElementById('showprints')!.innerHTML = 'Show Prints';
+        printButton.innerHTML = 'Show Prints';
     } else {
         showPrints = true;
-        document.getElementById('showprints')!.innerHTML = 'Don\'t Show Prints';
+        printButton.innerHTML = 'Don\'t Show Prints';
     }
-    let ul = document.getElementById('list');
-    let items = ul!.getElementsByTagName('li');
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const items = ul.getElementsByTagName('li');
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < items.length; ++i) {
         if (items[i].dataset.type === 'print') {
             if (showPrints === true) {
@@ -94,9 +122,13 @@ export function onShowPrints() {
 
 let autoReconnect = true;
 export function onAutoReconnect() {
+    const arButton = document.getElementById('autoreconnect');
+    if (arButton === null) {
+        return;
+    }
     if (autoReconnect === true) {
         autoReconnect = false;
-        document.getElementById('autoreconnect')!.innerHTML = 'Reconnect';
+        arButton.innerHTML = 'Reconnect';
         // send a disconnect
         sendMessage({
             type: ReceiveTypes.Reconnect,
@@ -104,7 +136,7 @@ export function onAutoReconnect() {
         });
     } else {
         autoReconnect = true;
-        document.getElementById('autoreconnect')!.innerHTML = 'Disconnect';
+        arButton.innerHTML = 'Disconnect';
         sendMessage({
             type: ReceiveTypes.Reconnect,
             message: true
@@ -114,22 +146,31 @@ export function onAutoReconnect() {
 
 let showTimestamps = false;
 export function onShowTimestamps() {
+    const tsButton = document.getElementById('timestamps');
+    if (tsButton === null) {
+        return;
+    }
     if (showTimestamps === true) {
         showTimestamps = false;
-        document.getElementById('timestamps')!.innerHTML = 'Show Timestamps';
+        tsButton.innerHTML = 'Show Timestamps';
     } else {
         showTimestamps = true;
-        document.getElementById('timestamps')!.innerHTML = 'Don\'t Show Timestamps';
+        tsButton.innerHTML = 'Don\'t Show Timestamps';
     }
-    let ul = document.getElementById('list');
-    let items = ul!.getElementsByTagName('li');
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const items = ul.getElementsByTagName('li');
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < items.length; ++i) {
-        let spans = items[i].getElementsByTagName('span');
+        const spans = items[i].getElementsByTagName('span');
         if (spans === undefined) {
             continue;
         }
+        // tslint:disable-next-line:prefer-for-of
         for (let j = 0; j < spans.length; j++) {
-            let span = spans[j];
+            const span = spans[j];
             if (span.hasAttribute('data-timestamp')) {
                 if (showTimestamps === true) {
                     span.style.display = 'inline';
@@ -143,12 +184,20 @@ export function onShowTimestamps() {
 }
 
 export function onSaveLog() {
-    let ul = document.getElementById('list');
-    let items = ul!.getElementsByTagName('li');
-    let logs: string[] = [];
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const items = ul.getElementsByTagName('li');
+    const logs: string[] = [];
 
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < items.length; ++i) {
-        logs.push(items[i].dataset.message!);
+        const m = items[i].dataset.message;
+        if (m === undefined) {
+            return;
+        }
+        logs.push(m);
     }
 
     sendMessage({
@@ -158,18 +207,24 @@ export function onSaveLog() {
 }
 
 export function onConnect() {
-    let button = document.getElementById('autoreconnect');
-    button!.style.backgroundColor = 'Green';
+    const button = document.getElementById('autoreconnect');
+    if (button === null) {
+        return;
+    }
+    button.style.backgroundColor = 'Green';
 }
 
 export function onDisconnect() {
-    let button = document.getElementById('autoreconnect');
-    button!.style.backgroundColor = 'Red';
+    const button = document.getElementById('autoreconnect');
+    if (button === null) {
+        return;
+    }
+    button.style.backgroundColor = 'Red';
 }
 
 function insertMessage(ts: number, line: string, li: HTMLLIElement, color?: string) {
-    let div = document.createElement('div');
-    let tsSpan = document.createElement('span');
+    const div = document.createElement('div');
+    const tsSpan = document.createElement('span');
     tsSpan.appendChild(document.createTextNode(ts.toFixed(3) + ': '));
     tsSpan.dataset.timestamp = 'true';
     if (showTimestamps === true) {
@@ -178,10 +233,10 @@ function insertMessage(ts: number, line: string, li: HTMLLIElement, color?: stri
         tsSpan.style.display = 'none';
     }
     div.appendChild(tsSpan);
-    let span = document.createElement('span');
-    let split = line.split('\n');
+    const span = document.createElement('span');
+    const split = line.split('\n');
     let first = true;
-    for (let item of split) {
+    for (const item of split) {
         if (item.trim() === '') {
             continue;
         }
@@ -189,7 +244,7 @@ function insertMessage(ts: number, line: string, li: HTMLLIElement, color?: stri
             span.appendChild(document.createElement('br'));
         }
         first = false;
-        let tNode = document.createTextNode(item);
+        const tNode = document.createTextNode(item);
         span.appendChild(tNode);
     }
     if (color !== undefined) {
@@ -200,10 +255,10 @@ function insertMessage(ts: number, line: string, li: HTMLLIElement, color?: stri
 }
 
 function insertStackTrace(st: string, li: HTMLLIElement, color?: string) {
-    let div = document.createElement('div');
-    let split = st.split('\n');
+    const div = document.createElement('div');
+    const split = st.split('\n');
     let first = true;
-    for (let item of split) {
+    for (const item of split) {
         if (item.trim() === '') {
             continue;
         }
@@ -211,7 +266,7 @@ function insertStackTrace(st: string, li: HTMLLIElement, color?: string) {
             div.appendChild(document.createElement('br'));
         }
         first = false;
-        let tNode = document.createTextNode('\u00a0\u00a0\u00a0\u00a0 at: ' + item);
+        const tNode = document.createTextNode('\u00a0\u00a0\u00a0\u00a0 at: ' + item);
         div.appendChild(tNode);
     }
     if (color !== undefined) {
@@ -221,10 +276,10 @@ function insertStackTrace(st: string, li: HTMLLIElement, color?: string) {
 }
 
 function insertLocation(loc: string, li: HTMLLIElement, color?: string) {
-    let div = document.createElement('div');
-    let split = loc.split('\n');
+    const div = document.createElement('div');
+    const split = loc.split('\n');
     let first = true;
-    for (let item of split) {
+    for (const item of split) {
         if (item.trim() === '') {
             continue;
         }
@@ -232,7 +287,7 @@ function insertLocation(loc: string, li: HTMLLIElement, color?: string) {
             li.appendChild(document.createElement('br'));
         }
         first = false;
-        let tNode = document.createTextNode('\u00a0\u00a0 from: ' + item);
+        const tNode = document.createTextNode('\u00a0\u00a0 from: ' + item);
         li.appendChild(tNode);
     }
     if (color !== undefined) {
@@ -250,11 +305,14 @@ export function addMessage(message: IPrintMessage | IErrorMessage) {
 }
 
 export function addPrint(message: IPrintMessage) {
-    let ul = document.getElementById('list');
-    let li = document.createElement('li');
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const li = document.createElement('li');
     li.style.fontFamily = '"Courier New", Courier, monospace';
     insertMessage(message.timestamp, message.line, li);
-    let str = JSON.stringify(message);
+    const str = JSON.stringify(message);
     li.dataset.message = str;
     li.dataset.type = 'print';
     if (showPrints === true) {
@@ -262,7 +320,7 @@ export function addPrint(message: IPrintMessage) {
     } else {
         li.style.display = 'none';
     }
-    ul!.appendChild(li);
+    ul.appendChild(li);
 }
 
 export function expandError(message: IErrorMessage, li: HTMLLIElement, color?: string) {
@@ -276,10 +334,13 @@ export function expandError(message: IErrorMessage, li: HTMLLIElement, color?: s
 }
 
 export function addError(message: IErrorMessage) {
-    let ul = document.getElementById('list');
-    let li = document.createElement('li');
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const li = document.createElement('li');
     li.style.fontFamily = '"Courier New", Courier, monospace';
-    let str = JSON.stringify(message);
+    const str = JSON.stringify(message);
     li.dataset.expanded = 'false';
     li.dataset.message = str;
     if (message.messageType === MessageType.Warning) {
@@ -298,7 +359,10 @@ export function addError(message: IErrorMessage) {
         if (li.dataset.expanded === 'true') {
             // shrink
             li.dataset.expanded = 'false';
-            let parsed = JSON.parse(li.dataset.message!);
+            if (li.dataset.message === undefined) {
+                return;
+            }
+            const parsed = JSON.parse(li.dataset.message);
             li.innerHTML = '';
             if (li.dataset.type === 'warning') {
                 insertMessage(parsed.timestamp, parsed.details, li, 'Yellow');
@@ -308,7 +372,10 @@ export function addError(message: IErrorMessage) {
         } else {
             // expand
             li.dataset.expanded = 'true';
-            let parsed = JSON.parse(li.dataset.message!);
+            if (li.dataset.message === undefined) {
+                return;
+            }
+            const parsed = JSON.parse(li.dataset.message);
             li.innerHTML = '';
             if (li.dataset.type === 'warning') {
                 expandError(parsed, li, 'Yellow');
@@ -318,42 +385,62 @@ export function addError(message: IErrorMessage) {
         }
         checkResize();
     };
-    ul!.appendChild(li);
+    ul.appendChild(li);
 }
 
 window.addEventListener('resize', () => {
     checkResize();
 });
 
-let pauseButton = document.getElementById('pause');
+// tslint:disable-next-line:no-any
+function handleFileSelect(evt: any) {
+    const files: FileList = evt.target.files; // filelist
+    const firstFile = files[0];
+    const reader = new FileReader();
+    reader.onload = (loaded: Event) => {
+        const target: FileReader = <FileReader>loaded.target;
+        const parsed = JSON.parse(target.result);
+        for (const p of parsed) {
+            addMessage(p);
+        }
+    };
+    reader.readAsText(firstFile);
+}
+
+const openFileButton = document.getElementById('open');
+if (openFileButton !== null) {
+    openFileButton.addEventListener('change', handleFileSelect, false);
+}
+
+const pauseButton = document.getElementById('pause');
 if (pauseButton !== null) {
     pauseButton.addEventListener('click', () => {
         onPause();
     });
 }
 
-let discardButton = document.getElementById('discard');
+const discardButton = document.getElementById('discard');
 if (discardButton !== null) {
     discardButton.addEventListener('click', () => {
         onDiscard();
     });
 }
 
-let clearButton = document.getElementById('clear');
+const clearButton = document.getElementById('clear');
 if (clearButton !== null) {
     clearButton.addEventListener('click', () => {
         onClear();
     });
 }
 
-let showPrintsButton = document.getElementById('showprints');
+const showPrintsButton = document.getElementById('showprints');
 if (showPrintsButton !== null) {
     showPrintsButton.addEventListener('click', () => {
         onShowPrints();
     });
 }
 
-let showWarningsButton = document.getElementById('showwarnings');
+const showWarningsButton = document.getElementById('showwarnings');
 if (showWarningsButton !== null) {
     showWarningsButton.addEventListener('click', () => {
         onShowWarnings();
@@ -361,21 +448,21 @@ if (showWarningsButton !== null) {
 }
 
 
-let autoReconnectButton = document.getElementById('autoreconnect');
+const autoReconnectButton = document.getElementById('autoreconnect');
 if (autoReconnectButton !== null) {
     autoReconnectButton.addEventListener('click', () => {
         onAutoReconnect();
     });
 }
 
-let timestampsButton = document.getElementById('timestamps');
+const timestampsButton = document.getElementById('timestamps');
 if (timestampsButton !== null) {
     timestampsButton.addEventListener('click', () => {
         onShowTimestamps();
     });
 }
 
-let saveLogButton = document.getElementById('savelog');
+const saveLogButton = document.getElementById('savelog');
 if (saveLogButton !== null) {
     saveLogButton.addEventListener('click', () => {
         onSaveLog();

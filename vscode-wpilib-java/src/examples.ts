@@ -15,15 +15,15 @@ export class Examples {
   private readonly exampleResourceName = 'javaexamples.json';
 
   constructor(resourceRoot: string, core: IExampleTemplateAPI) {
-    let resourceFile = path.join(resourceRoot, 'examples', this.exampleResourceName);
+    const resourceFile = path.join(resourceRoot, 'examples', this.exampleResourceName);
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         console.log(err);
         return;
       }
-      let examples: JsonLayout[] = jsonc.parse(data);
-      for (let e of examples) {
-        let provider: IExampleTemplateCreator = {
+      const examples: JsonLayout[] = jsonc.parse(data);
+      for (const e of examples) {
+        const provider: IExampleTemplateCreator = {
           getLanguage(): string {
             return 'java';
           },
@@ -43,7 +43,7 @@ export class Examples {
     });
   }
 
-  dispose() {
+  public dispose() {
 
   }
 }

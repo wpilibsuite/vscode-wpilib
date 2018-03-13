@@ -18,9 +18,9 @@ export function getToolAPIExpectedVersion(): number {
   return toolAPIExpectedVersion;
 }
 export abstract class IToolAPI implements IVersionable {
-  abstract startTool(): Promise<boolean>;
-  abstract addTool(tool: IToolRunner): void;
-  getVersion(): number {
+  public abstract startTool(): Promise<boolean>;
+  public abstract addTool(tool: IToolRunner): void;
+  public getVersion(): number {
     return toolAPIExpectedVersion;
   }
 }
@@ -30,11 +30,11 @@ export function getExampleTemplateAPIExpectedVersion(): number {
   return exampleTemplateAPIExpectedVersion;
 }
 export abstract class IExampleTemplateAPI implements IVersionable {
-  abstract addTemplateProvider(provider: IExampleTemplateCreator): void;
-  abstract addExampleProvider(provider: IExampleTemplateCreator): void;
-  abstract createExample(): Promise<boolean>;
-  abstract createTemplate(): Promise<boolean>;
-  getVersion(): number {
+  public abstract addTemplateProvider(provider: IExampleTemplateCreator): void;
+  public abstract addExampleProvider(provider: IExampleTemplateCreator): void;
+  public abstract createExample(): Promise<boolean>;
+  public abstract createTemplate(): Promise<boolean>;
+  public getVersion(): number {
     return exampleTemplateAPIExpectedVersion;
   }
 }
@@ -44,13 +44,14 @@ export function getDeployDebugAPIExpectedVersion(): number {
   return deployDebugAPIExpectedVersion;
 }
 export abstract class IDeployDebugAPI implements IVersionable {
-  abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  abstract registerCodeDeploy(deployer: ICodeDeployer): void;
-  abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  abstract registerCodeDebug(deployer: ICodeDeployer): void;
-  abstract addLanguageChoice(language: string): void;
-  getVersion(): number {
+  public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
+  public abstract startRioLogViewer(): Promise<boolean>;
+  public abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
+  public abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeDebug(deployer: ICodeDeployer): void;
+  public abstract addLanguageChoice(language: string): void;
+  public getVersion(): number {
     return deployDebugAPIExpectedVersion;
   }
 }
@@ -60,10 +61,10 @@ export function getPreferencesAPIExpectedVersion(): number {
   return preferencesAPIExpectedVersion;
 }
 export abstract class IPreferencesAPI implements IVersionable {
-  abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined;
-  abstract onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
-  abstract getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
-  getVersion(): number {
+  public abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined;
+  public abstract onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+  public abstract getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
+  public getVersion(): number {
     return preferencesAPIExpectedVersion;
   }
 }
@@ -73,11 +74,11 @@ export function getExternalAPIExpectedVersion(): number {
   return externalAPIExpectedVersion;
 }
 export abstract class IExternalAPI implements IVersionable {
-  abstract getToolAPI(): IToolAPI | undefined;
-  abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
-  abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
-  abstract getPreferencesAPI(): IPreferencesAPI | undefined;
-  getVersion(): number {
+  public abstract getToolAPI(): IToolAPI | undefined;
+  public abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
+  public abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
+  public abstract getPreferencesAPI(): IPreferencesAPI | undefined;
+  public getVersion(): number {
     return externalAPIExpectedVersion;
   }
 }

@@ -8,7 +8,7 @@ export interface DebugCommands {
 }
 
 export async function startDebugging(commands: DebugCommands): Promise<void> {
-  let config: vscode.DebugConfiguration = {
+  const config: vscode.DebugConfiguration = {
     name: 'wpilibJavaDebug',
     type: 'java',
     request: 'attach',

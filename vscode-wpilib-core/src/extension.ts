@@ -22,16 +22,16 @@ class ExternalAPI extends IExternalAPI {
         this.exampleTemplateApi = new ExampleTemplateAPI();
     }
 
-    getToolAPI(): ToolAPI {
+    public getToolAPI(): ToolAPI {
         return this.toolApi;
     }
-    getExampleTemplateAPI(): ExampleTemplateAPI {
+    public getExampleTemplateAPI(): ExampleTemplateAPI {
         return this.exampleTemplateApi;
     }
-    getDeployDebugAPI(): DeployDebugAPI {
+    public getDeployDebugAPI(): DeployDebugAPI {
         return this.debugDeployApi;
     }
-    getPreferencesAPI(): PreferencesAPI {
+    public getPreferencesAPI(): PreferencesAPI {
         return this.preferencesApi;
     }
 }
@@ -41,15 +41,15 @@ class ExternalAPI extends IExternalAPI {
 export function activate(context: vscode.ExtensionContext) {
 
     // Resources folder will be used for RioLog
-    let extensionResourceLocation = path.join(context.extensionPath, 'resources');
+    const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
-    let externalApi = new ExternalAPI(extensionResourceLocation);
+    const externalApi = new ExternalAPI(extensionResourceLocation);
 
-    let debugProvider: vscode.DebugConfigurationProvider = {
+    const debugProvider: vscode.DebugConfigurationProvider = {
         resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined, __: vscode.DebugConfiguration, ___?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration> {
-            return new Promise<undefined>(async (resolve, _) => {
-                let preferencesApi = externalApi.getPreferencesAPI();
-                let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+            return new Promise<undefined>(async (resolve) => {
+                const preferencesApi = externalApi.getPreferencesAPI();
+                const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
                 if (workspace === undefined) {
                     return;
                 }
@@ -59,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
         },
         provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
             console.log('configuration creation');
-            let configuration: vscode.DebugConfiguration = {
+            const configuration: vscode.DebugConfiguration = {
                 type: 'wpilib',
                 name: 'WPILib Debugging',
                 request: 'launch'
@@ -75,12 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "vscode-wpilib-core" is now active!');
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLog', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
-        let preferences = preferencesApi.getPreferences(workspace);
+        const preferences = preferencesApi.getPreferences(workspace);
         if (preferences === undefined) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
@@ -88,22 +88,22 @@ export function activate(context: vscode.ExtensionContext) {
         await externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLog', async () => {
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLogViewer', async () => {
         await externalApi.getDeployDebugAPI().startRioLogViewer();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
-        let preferences = preferencesApi.getPreferences(workspace);
+        const preferences = preferencesApi.getPreferences(workspace);
         if (preferences === undefined) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
         }
-        let request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+        const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
         if (request === undefined) {
             return;
         }
@@ -115,8 +115,8 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.deployCode', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
@@ -124,8 +124,8 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.debugCode', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
@@ -133,23 +133,23 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setLanguage', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
 
-        let debugDeployApi = externalApi.getDeployDebugAPI();
+        const debugDeployApi = externalApi.getDeployDebugAPI();
 
         if (debugDeployApi.languageChoices.length <= 0) {
             await vscode.window.showInformationMessage('No languages available to add');
         }
-        let result = await vscode.window.showQuickPick(debugDeployApi.languageChoices, { placeHolder: 'Pick a language' });
+        const result = await vscode.window.showQuickPick(debugDeployApi.languageChoices, { placeHolder: 'Pick a language' });
         if (result === undefined) {
             return;
         }
 
-        let preferences = preferencesApi.getPreferences(workspace);
+        const preferences = preferencesApi.getPreferences(workspace);
         if (preferences === undefined) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
@@ -158,22 +158,22 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setAutoSave', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
 
-        let result = await vscode.window.showInformationMessage('Automatically save on deploy?', 'Yes', 'No');
+        const result = await vscode.window.showInformationMessage('Automatically save on deploy?', 'Yes', 'No');
         if (result === undefined) {
             return;
         }
-        let preferences = preferencesApi.getPreferences(workspace);
+        const preferences = preferencesApi.getPreferences(workspace);
         if (preferences === undefined) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
         }
-        let request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+        const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
         if (request === undefined) {
             return;
         }
@@ -181,22 +181,22 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStartRioLog', async () => {
-        let preferencesApi = externalApi.getPreferencesAPI();
-        let workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
             return;
         }
 
-        let result = await vscode.window.showInformationMessage('Automatically start RioLog on deploy?', 'Yes', 'No');
+        const result = await vscode.window.showInformationMessage('Automatically start RioLog on deploy?', 'Yes', 'No');
         if (result === undefined) {
             return;
         }
-        let preferences = preferencesApi.getPreferences(workspace);
+        const preferences = preferencesApi.getPreferences(workspace);
         if (preferences === undefined) {
             vscode.window.showInformationMessage('Could not find a workspace');
             return;
         }
-        let request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+        const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
         if (request === undefined) {
             return;
         }

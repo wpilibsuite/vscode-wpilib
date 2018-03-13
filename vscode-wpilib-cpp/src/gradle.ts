@@ -9,8 +9,8 @@ export interface OutputPair {
 
 export function executeCommandAsync(command: string, rootDir: string, ow?: vscode.OutputChannel) : Promise<OutputPair> {
   return new Promise(function (resolve, reject) {
-      let exec = child_process.exec;
-      let child = exec(command, {
+      const exec = child_process.exec;
+      const child = exec(command, {
           cwd: rootDir
       }, (err, stdout, stderr) => {
           if (err) {
@@ -35,6 +35,6 @@ export function executeCommandAsync(command: string, rootDir: string, ow?: vscod
 }
 
 export async function gradleRun(args: string, rootDir: string, ow?: vscode.OutputChannel): Promise<OutputPair> {
-  let command = 'gradlew ' + args;
+  const command = 'gradlew ' + args;
   return await executeCommandAsync(command, rootDir, ow);
 }

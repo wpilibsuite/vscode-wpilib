@@ -54,7 +54,7 @@ export class RioLogWindow {
     if (this.webview === undefined) {
       return;
     }
-    let success = await this.webview.postMessage({
+    const success = await this.webview.postMessage({
       type: SendTypes.Batch,
       message: this.pausedArray
     });
@@ -64,14 +64,17 @@ export class RioLogWindow {
     this.pausedArray = [];
   }
 
-  start(teamNumber: number) {
+  public start(teamNumber: number) {
     if (this.running) {
-      return;    
+      return;
     }
     this.running = true;
     this.createWebView();
     this.createRioConsole();
-    this.webview!.on('didDispose', () => {
+    if (this.webview === undefined || this.rioConsole === undefined) {
+      return;
+    }
+    this.webview.on('didDispose', () => {
       if (this.rioConsole !== undefined) {
         this.rioConsole.stop();
         this.rioConsole.removeAllListeners();
@@ -81,19 +84,19 @@ export class RioLogWindow {
       this.running = false;
     });
 
-    this.webview!.on('didReceiveMessage', async (data: IIPCReceiveMessage) => {
+    this.webview.on('didReceiveMessage', async (data: IIPCReceiveMessage) => {
       this.onMessageReceived(data);
     });
 
-    this.rioConsole!.on('connectionChanged', async (c: boolean) => {
+    this.rioConsole.on('connectionChanged', async (c: boolean) => {
       this.onConnectionChanged(c);
     });
 
-    this.rioConsole!.on('message', (message: IPrintMessage | IErrorMessage) => {
+    this.rioConsole.on('message', (message: IPrintMessage | IErrorMessage) => {
       this.onNewMessageToSend(message);
     });
 
-    this.rioConsole!.startListening(teamNumber);
+    this.rioConsole.startListening(teamNumber);
   }
 
   private async onConnectionChanged(connected: boolean) {
@@ -124,7 +127,7 @@ export class RioLogWindow {
         message: this.pausedArray.length
       });
     } else {
-      let success = await this.webview.postMessage({
+      const success = await this.webview.postMessage({
         type: SendTypes.New,
         message: message
       });
@@ -145,7 +148,7 @@ export class RioLogWindow {
         this.rioConsole.discard = true;
       }
     } else if (data.type === ReceiveTypes.Pause) {
-      let old = this.paused;
+      const old = this.paused;
       this.paused = <boolean>data.message;
       if (old === true && this.paused === false) {
         await this.sendPaused();
@@ -154,14 +157,14 @@ export class RioLogWindow {
       if (this.webview === undefined) {
         return;
       }
-      let deserializedLogs: (IPrintMessage | IErrorMessage)[] = [];
-      for (let d of <string[]>data.message) {
-        let parsed = JSON.parse(d);
+      const deserializedLogs: (IPrintMessage | IErrorMessage)[] = [];
+      for (const d of <string[]>data.message) {
+        const parsed = JSON.parse(d);
         deserializedLogs.push(parsed);
       }
       await this.webview.handleSave(deserializedLogs);
     } else if (data.type === ReceiveTypes.Reconnect) {
-      let newValue = <boolean>data.message;
+      const newValue = <boolean>data.message;
       this.rioConsole.setAutoReconnect(newValue);
       if (newValue === false) {
         this.rioConsole.disconnect();
@@ -169,15 +172,15 @@ export class RioLogWindow {
     }
   }
 
-  stop() {
+  public stop() {
     if (this.webview !== undefined) {
       this.webview.dispose();
     }
   }
 
-  dispose() {
+  public dispose() {
     this.stop();
-    for (let d of this.disposables) {
+    for (const d of this.disposables) {
       d.dispose();
     }
   }

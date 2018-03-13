@@ -11,14 +11,14 @@ async function properRace<T>(promises: Promise<T>[]): Promise<T> {
 
   // There is no way to know which promise is rejected.
   // So we map it to a new promise to return the index when it fails
-  let indexPromises = promises.map((p, index) => p.catch(() => { throw index; }));
+  const indexPromises = promises.map((p, index) => p.catch(() => { throw index; }));
 
   try {
     return await Promise.race(indexPromises);
   } catch (index) {
     // The promise has rejected, remove it from the list of promises and just continue the race.
     console.log('reject promise');
-    let p = promises.splice(index, 1)[0];
+    const p = promises.splice(index, 1)[0];
     p.catch((e) => console.log('A promise has been rejected, but awaiting others', e));
     return await properRace(promises);
   }
@@ -71,8 +71,8 @@ function timerPromise(ms: number): ICancellableTimer {
 }
 
 class DSSocketPromisePair implements ISocketPromisePair {
-  socket: net.Socket;
-  promise: Promise<net.Socket>;
+  public socket: net.Socket;
+  public promise: Promise<net.Socket>;
   private dsSocket: net.Socket;
 
   constructor(rs: net.Socket, ds: net.Socket, p: Promise<net.Socket>) {
@@ -81,19 +81,19 @@ class DSSocketPromisePair implements ISocketPromisePair {
     this.dsSocket = ds;
   }
 
-  dispose(): void {
+  public dispose(): void {
     this.socket.emit('dispose');
     this.dsSocket.emit('dispose');
   }
 }
 
 function getSocketFromDS(port: number): ISocketPromisePair {
-  let s = new net.Socket();
-  let ds = new net.Socket();
-  let retVal = new DSSocketPromisePair(s, ds, new Promise((resolve, reject) => {
+  const s = new net.Socket();
+  const ds = new net.Socket();
+  const retVal = new DSSocketPromisePair(s, ds, new Promise((resolve, reject) => {
     // First connect to ds, and wait for data
     ds.on('data', (data) => {
-      let parsed: IDriverStationData = jsonc.parse(data.toString());
+      const parsed: IDriverStationData = jsonc.parse(data.toString());
       if (parsed.robotIP === 0) {
         ds.end();
         ds.destroy();
@@ -102,7 +102,7 @@ function getSocketFromDS(port: number): ISocketPromisePair {
         return;
       }
       let ipAddr = '';
-      let ip = parsed.robotIP;
+      const ip = parsed.robotIP;
       ipAddr += ((ip >> 24) & 0xff) + '.';
       ipAddr += ((ip >> 16) & 0xff) + '.';
       ipAddr += ((ip >> 8) & 0xff) + '.';
@@ -158,71 +158,79 @@ function getSocketFromDS(port: number): ISocketPromisePair {
   return retVal;
 }
 
+class RawSocketPromisePair implements ISocketPromisePair {
+  public socket: net.Socket;
+  public promise: Promise<net.Socket>;
+
+  constructor(rs: net.Socket, p: Promise<net.Socket>) {
+    this.socket = rs;
+    this.promise = p;
+  }
+
+  public dispose(): void {
+    this.socket.emit('dispose');
+  }
+}
+
 function getSocketFromIP(port: number, ip: string): ISocketPromisePair {
-  let s = new net.Socket();
-  return {
-    socket: s,
-    promise: new Promise((resolve, reject) => {
-      s.on('error', (_) => {
-        console.log('failed connection to ' + ip + ' at ' + port);
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-        reject();
-      });
-      s.on('timeout', () => {
-        console.log('failed connection to ' + ip + ' at ' + port);
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-        reject();
-      });
-      s.on('close', () => {
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-        reject();
-      });
-      s.on('dispose', () => {
-        console.log('disposed', ip);
-        reject();
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-      });
-      s.connect(port, ip, () => {
-        s.removeAllListeners();
-        resolve(s);
-      });
-    }),
-    dispose() {
-      this.socket.emit('dispose');
-    }
-  };
+  const s = new net.Socket();
+  return new RawSocketPromisePair(s, new Promise((resolve, reject) => {
+    s.on('error', (_) => {
+      console.log('failed connection to ' + ip + ' at ' + port);
+      s.end();
+      s.destroy();
+      s.removeAllListeners();
+      reject();
+    });
+    s.on('timeout', () => {
+      console.log('failed connection to ' + ip + ' at ' + port);
+      s.end();
+      s.destroy();
+      s.removeAllListeners();
+      reject();
+    });
+    s.on('close', () => {
+      s.end();
+      s.destroy();
+      s.removeAllListeners();
+      reject();
+    });
+    s.on('dispose', () => {
+      console.log('disposed', ip);
+      reject();
+      s.end();
+      s.destroy();
+      s.removeAllListeners();
+    });
+    s.connect(port, ip, () => {
+      s.removeAllListeners();
+      resolve(s);
+    });
+  }));
 }
 
 export async function connectToRobot(port: number, teamNumber: number, timeout: number): Promise<net.Socket | undefined> {
-  let pairs: ISocketPromisePair[] = [];
+  const pairs: ISocketPromisePair[] = [];
   teamNumber = Math.trunc(teamNumber);
 
-  for (let c of constantIps) {
+  for (const c of constantIps) {
     pairs.push(getSocketFromIP(port, c));
   }
-  for (let c of teamIps) {
+  for (const c of teamIps) {
     pairs.push(getSocketFromIP(port, c.replace('TEAM', teamNumber.toString())));
   }
   pairs.push(getSocketFromIP(port, `10.${Math.trunc(teamNumber / 100)}.${teamNumber % 100}.2`));
   pairs.push(getSocketFromDS(port));
-  let connectors: Promise<net.Socket | undefined>[] = [];
-  for (let p of pairs) {
+  const connectors: Promise<net.Socket | undefined>[] = [];
+  for (const p of pairs) {
     connectors.push(p.promise);
   }
-  let timer = timerPromise(timeout);
+  const timer = timerPromise(timeout);
   connectors.push(timer.promise);
-  let firstDone: net.Socket | undefined = await properRace(connectors);
+  const firstDone: net.Socket | undefined = await properRace(connectors);
   if (firstDone === undefined) {
     // Kill all
-    for (let p of pairs) {
+    for (const p of pairs) {
       p.dispose();
       try {
         await p.promise;
@@ -233,7 +241,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
   } else {
     // Kill all but me
     timer.cancel();
-    for (let p of pairs) {
+    for (const p of pairs) {
       if (firstDone !== p.socket) {
         p.dispose();
         try {

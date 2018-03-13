@@ -17,17 +17,17 @@ export class Templates {
   private readonly exampleResourceName = 'cpptemplates.json';
 
   constructor(resourceRoot: string, core: IExampleTemplateAPI) {
-    let resourceFile = path.join(resourceRoot, 'templates', this.exampleResourceName);
-    let templatesFolder = path.join(resourceRoot, 'templates');
-    let gradleFolder = path.join(resourceRoot, 'gradlebase');
+    const resourceFile = path.join(resourceRoot, 'templates', this.exampleResourceName);
+    const templatesFolder = path.join(resourceRoot, 'templates');
+    const gradleFolder = path.join(resourceRoot, 'gradlebase');
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         console.log(err);
         return;
       }
-      let templates: JsonLayout[] = jsonc.parse(data);
-      for (let e of templates) {
-        let provider: IExampleTemplateCreator = {
+      const templates: JsonLayout[] = jsonc.parse(data);
+      for (const e of templates) {
+        const provider: IExampleTemplateCreator = {
           getLanguage(): string {
             return 'cpp';
           },
@@ -53,7 +53,7 @@ export class Templates {
     });
   }
 
-  dispose() {
+  public dispose() {
 
   }
 }
