@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-core",
     "displayName": "vscode-wpilib-core",
     "description": "Base extension for WPILib Team Use",
-    "version": "0.0.23",
+    "version": "0.0.24",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -18,7 +18,18 @@
         "debuggers": [
             {
                 "type": "wpilib",
-                "label": "WPILib Debug"
+                "label": "WPILib Deploy and Debug",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [ "debug" ],
+                        "properties": {
+                            "debug": {
+                                "type": "boolean",
+                                "description": "True for debug, false for deploy"
+                            }
+                        }
+                    }
+                }
             }
         ],
         "jsonValidation": [
@@ -47,6 +58,12 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Always ask for a team number, even if set",
+                    "scope": "resource"
+                },
+                "wpilib.globalTeamNumberOverride": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Always resolve the vscode team number over the project team number.",
                     "scope": "resource"
                 },
                 "wpilib.globalTeamNumber": {
@@ -127,10 +144,6 @@
                     "group": "wpilib"
                 },
                 {
-                    "command": "wpilibcore.debugCode",
-                    "group": "wpilib"
-                },
-                {
                     "command": "wpilibcore.startTool",
                     "group": "wpilib"
                 }
@@ -138,10 +151,6 @@
             "explorer/context": [
                 {
                     "command": "wpilibcore.deployCode",
-                    "group": "wpilib"
-                },
-                {
-                    "command": "wpilibcore.debugCode",
                     "group": "wpilib"
                 },
                 {
