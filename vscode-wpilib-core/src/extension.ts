@@ -46,25 +46,42 @@ export function activate(context: vscode.ExtensionContext) {
     const externalApi = new ExternalAPI(extensionResourceLocation);
 
     const debugProvider: vscode.DebugConfigurationProvider = {
-        resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined, __: vscode.DebugConfiguration, ___?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration> {
+        resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration> {
+            let debug = false;
+            if (('debug' in config)) {
+                debug = config.debug;
+            } else {
+                console.log('debugger has no debug argument. Assuming deploy');
+            }
             return new Promise<undefined>(async (resolve) => {
                 const preferencesApi = externalApi.getPreferencesAPI();
                 const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
                 if (workspace === undefined) {
                     return;
                 }
-                await externalApi.getDeployDebugAPI().debugCode(workspace);
+                if (debug) {
+                    await externalApi.getDeployDebugAPI().debugCode(workspace);
+                } else {
+                    await externalApi.getDeployDebugAPI().deployCode(workspace);
+                }
                 resolve();
             });
         },
         provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
             console.log('configuration creation');
-            const configuration: vscode.DebugConfiguration = {
+            const configurationDeploy: vscode.DebugConfiguration = {
                 type: 'wpilib',
-                name: 'WPILib Debugging',
-                request: 'launch'
+                name: 'WPILib Deploy',
+                request: 'launch',
+                debug: false
             };
-            return [configuration];
+            const configurationDebug: vscode.DebugConfiguration = {
+                type: 'wpilib',
+                name: 'WPILib Debug',
+                request: 'launch',
+                debug: true
+            };
+            return [configurationDeploy, configurationDebug];
         }
     };
 

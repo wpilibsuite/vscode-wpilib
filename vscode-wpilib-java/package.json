@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-java",
     "displayName": "vscode-wpilib-java",
     "description": "Vscode for WPILib Java",
-    "version": "0.0.5",
+    "version": "0.0.10",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -11,7 +11,7 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:build.gradle"
+        "*"
     ],
     "main": "./out/extension",
     "scripts": {
@@ -29,6 +29,8 @@
         "@types/mocha": "^2.2.42"
     },
     "dependencies": {
-        "jsonc-parser": "^1.0.3"
+        "@types/ncp": "^2.0.1",
+        "jsonc-parser": "^1.0.3",
+        "ncp": "^2.0.0"
     }
 }

@@ -1,6 +1,7 @@
 /*
 
 // add     `"enableProposedApi": true, ` to package.json
+// Also find the latest vscode.proposed.d.ts, and add it to the code base to be compiled.
 
 'use strict';
 
