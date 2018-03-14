@@ -310,7 +310,7 @@ export function addPrint(message: IPrintMessage) {
         return;
     }
     const li = document.createElement('li');
-    li.style.fontFamily = '"Courier New", Courier, monospace';
+    li.style.fontFamily = 'Consolas, "Courier New", monospace';
     insertMessage(message.timestamp, message.line, li);
     const str = JSON.stringify(message);
     li.dataset.message = str;
@@ -339,7 +339,7 @@ export function addError(message: IErrorMessage) {
         return;
     }
     const li = document.createElement('li');
-    li.style.fontFamily = '"Courier New", Courier, monospace';
+    li.style.fontFamily = 'Consolas, "Courier New", monospace';
     const str = JSON.stringify(message);
     li.dataset.expanded = 'false';
     li.dataset.message = str;
