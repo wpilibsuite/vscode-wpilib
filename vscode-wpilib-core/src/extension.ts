@@ -45,48 +45,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     const externalApi = new ExternalAPI(extensionResourceLocation);
 
-    const debugProvider: vscode.DebugConfigurationProvider = {
-        resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration> {
-            let debug = false;
-            if (('debug' in config)) {
-                debug = config.debug;
-            } else {
-                console.log('debugger has no debug argument. Assuming deploy');
-            }
-            return new Promise<undefined>(async (resolve) => {
-                const preferencesApi = externalApi.getPreferencesAPI();
-                const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-                if (workspace === undefined) {
-                    return;
-                }
-                if (debug) {
-                    await externalApi.getDeployDebugAPI().debugCode(workspace);
-                } else {
-                    await externalApi.getDeployDebugAPI().deployCode(workspace);
-                }
-                resolve();
-            });
-        },
-        provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined, __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
-            console.log('configuration creation');
-            const configurationDeploy: vscode.DebugConfiguration = {
-                type: 'wpilib',
-                name: 'WPILib Deploy',
-                request: 'launch',
-                debug: false
-            };
-            const configurationDebug: vscode.DebugConfiguration = {
-                type: 'wpilib',
-                name: 'WPILib Debug',
-                request: 'launch',
-                debug: true
-            };
-            return [configurationDeploy, configurationDebug];
-        }
-    };
-
-    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('wpilib', debugProvider));
-
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib-core" is now active!');

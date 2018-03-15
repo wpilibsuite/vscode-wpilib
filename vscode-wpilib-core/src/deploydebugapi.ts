@@ -9,12 +9,73 @@ interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
   deployer: ICodeDeployer;
 }
 
+class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
+  private disposables: vscode.Disposable[] = [];
+  private preferences: PreferencesAPI;
+  private debugDeployAPI: DeployDebugAPI;
+
+  constructor(preferences: PreferencesAPI, ddApi: DeployDebugAPI) {
+    this.preferences = preferences;
+    this.debugDeployAPI = ddApi;
+    const regProv = vscode.debug.registerDebugConfigurationProvider('wpilib', this);
+    this.disposables.push(regProv);
+  }
+
+  public resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined,
+    config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
+    vscode.ProviderResult<vscode.DebugConfiguration> {
+    let debug = false;
+    if ('debug' in config) {
+      debug = config.debug;
+    } else {
+      console.log('debugger has no debug argument. Assuming deploy');
+    }
+    return new Promise<undefined>(async (resolve) => {
+      const workspace = await this.preferences.getFirstOrSelectedWorkspace();
+      if (workspace === undefined) {
+        return;
+      }
+      if (debug) {
+        await this.debugDeployAPI.debugCode(workspace);
+      } else {
+        await this.debugDeployAPI.deployCode(workspace);
+      }
+      resolve();
+    });
+  }
+
+  public provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined,
+    __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
+    const configurationDeploy: vscode.DebugConfiguration = {
+      type: 'wpilib',
+      name: 'WPILib Deploy',
+      request: 'launch',
+      debug: false
+    };
+    const configurationDebug: vscode.DebugConfiguration = {
+      type: 'wpilib',
+      name: 'WPILib Debug',
+      request: 'launch',
+      debug: true
+    };
+    return [configurationDeploy, configurationDebug];
+  }
+
+  public dispose() {
+    for (const d of this.disposables) {
+      d.dispose();
+    }
+  }
+}
+
 export class DeployDebugAPI extends IDeployDebugAPI {
   public languageChoices: string[] = [];
   private deployers: ICodeDeployerQuickPick[] = [];
   private debuggers: ICodeDeployerQuickPick[] = [];
   private disposables: vscode.Disposable[] = [];
   private preferences: PreferencesAPI;
+  private debugConfigurationProvider: WPILibDebugConfigurationProvider;
+
   /*
   private rioLogWebViewProvider: RioLogWebviewProvider;
   private rioLogConsoleProvider: LiveRioConsoleProvider;
@@ -35,6 +96,8 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     this.rioLogViewerProvider = new ViewerRioConsoleProvider;
     this.disposables.push(this.liveWindow);
     */
+    this.debugConfigurationProvider = new WPILibDebugConfigurationProvider(this.preferences, this);
+    this.disposables.push(this.debugConfigurationProvider);
   }
 
   public async startRioLogViewer(): Promise<boolean> {
