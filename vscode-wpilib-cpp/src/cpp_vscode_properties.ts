@@ -66,11 +66,6 @@ export class CppVsCodeProperties {
     this.configFolder = path.join(wp.uri.fsPath, '.vscode');
     this.cppPropertiesFile = path.join(this.configFolder, 'c_cpp_properties.json');
 
-    try {
-      fs.mkdirSync(this.configFolder);
-    } catch (error) {
-    }
-
     gp.onDidPropertiesChange(() => {
       this.updateCppConfigurationFile();
     });
@@ -108,6 +103,10 @@ export class CppVsCodeProperties {
     };
 
     const serialized = JSON.stringify(configuration, null, 4);
+    try {
+      fs.mkdirSync(this.configFolder);
+    } catch (error) {
+    }
     fs.writeFileSync(this.cppPropertiesFile, serialized);
   }
 
