@@ -17,8 +17,8 @@ export class Templates {
   private readonly exampleResourceName = 'javatemplates.json';
 
   constructor(resourceRoot: string, core: IExampleTemplateAPI) {
-    const resourceFile = path.join(resourceRoot, 'templates', this.exampleResourceName);
-    const templatesFolder = path.join(resourceRoot, 'templates');
+    const templatesFolder = path.join(resourceRoot, 'src', 'main', 'java', 'edu', 'wpi', 'first', 'wpilibj', 'templates');
+    const resourceFile = path.join(templatesFolder, this.exampleResourceName);
     const gradleFolder = path.join(resourceRoot, 'gradlebase');
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {

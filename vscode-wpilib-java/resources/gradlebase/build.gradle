@@ -6,7 +6,7 @@ plugins {
 }
 
 def TEAM = 5333
-def ROBOT_CLASS = "frc.robot.Robot"
+def ROBOT_CLASS = "Robot"
 
 if (project.hasProperty('teamNumber')) {
     TEAM = teamNumber.toInteger()

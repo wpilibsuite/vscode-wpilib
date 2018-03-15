@@ -29,8 +29,13 @@
         "@types/mocha": "^2.2.42"
     },
     "dependencies": {
+        "@types/glob": "^5.0.35",
+        "@types/mkdirp": "^0.5.2",
         "@types/ncp": "^2.0.1",
+        "glob": "^7.1.2",
         "jsonc-parser": "^1.0.3",
-        "ncp": "^2.0.0"
+        "mkdirp": "^0.5.1",
+        "ncp": "^2.0.0",
+        "stream-replace": "^1.0.0"
     }
 }
