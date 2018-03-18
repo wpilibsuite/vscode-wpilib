@@ -17,19 +17,19 @@ function readFileAsync(file: string): Promise<string> {
   });
 }
 
-interface IComponent {
-  launchFile: string;
+export interface IComponent {
+  launchfile: string;
   srcDirs: string[];
   exportedHeaders: string[];
   libHeaderDirs: string[];
   libSharedFilePaths: string[];
 }
 
-interface IComponentMap {
+export interface IComponentMap {
   [name: string]: IComponent;
 }
 
-interface ICompiler {
+export interface ICompiler {
   toolchainDir: string;
   gdbPath: string;
   compilerPath: string;
@@ -39,6 +39,11 @@ interface ICompiler {
 interface IEditorConfig {
   compiler: ICompiler;
   components: IComponentMap;
+}
+
+export interface ExternalEditorConfig {
+  compiler: ICompiler;
+  component: IComponent;
 }
 
 const defaultConfig: IEditorConfig = {
@@ -73,7 +78,7 @@ export class CppGradleProperties {
 
   private outputWriter: vscode.OutputChannel;
 
-  private workspace: vscode.WorkspaceFolder;
+  public workspace: vscode.WorkspaceFolder;
   private readonly gradleJsonFileGlob: string = '**/.editcfg';
 
   public constructor(wp: vscode.WorkspaceFolder, ow: vscode.OutputChannel, cppPrefs: CppPreferences) {
@@ -300,6 +305,17 @@ export class CppGradleProperties {
 
   public getLibraryHeaders(): string[] {
     return this.libraryHeaderDirs;
+  }
+
+  public getLastConfig(): ExternalEditorConfig | undefined {
+    const component = this.getSelectedComponent(this.lastConfig.components);
+    if (component === undefined) {
+      return undefined;
+    }
+    return {
+      compiler: this.lastConfig.compiler,
+      component: this.lastConfig.components[component]
+    };
   }
 
   public dispose() {

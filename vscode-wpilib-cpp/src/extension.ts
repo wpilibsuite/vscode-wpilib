@@ -7,45 +7,31 @@ import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './gradle';
 import * as path from 'path';
 import { WpiLibHeaders } from './header_search';
-import { CppGradleProperties } from './cpp_gradle_properties';
+import { CppGradleProperties, ExternalEditorConfig } from './cpp_gradle_properties';
 import { CppVsCodeProperties } from './cpp_vscode_properties';
 import { CppPreferences } from './cpp_preferences';
 import { Examples } from './examples';
 import { Templates } from './templates';
 
 interface DebuggerParse {
-    libraryLocations: string[];
-    sysroot: string;
-    executablePath: string;
     port: string;
     ip: string;
 }
 
 function parseGradleOutput(output: OutputPair): DebuggerParse {
     const ret: DebuggerParse = {
-        libraryLocations: new Array<string>(),
-        sysroot: '',
-        executablePath: '',
         port: '',
         ip: ''
     };
 
     const results = output.stdout.split('\n');
     for (const r of results) {
-        if (r.indexOf('WPILIBRARY: ') >= 0) {
-            ret.libraryLocations.push(r.substring(12).trim());
-        }
-        if (r.indexOf('WPICOMPILER: ') >= 0) {
-            ret.sysroot = r.substring(12).trim();
-        }
-        if (r.indexOf('WPIEXECUTABLE: ') >= 0) {
-            ret.executablePath = r.substring(15).trim();
-        }
         if (r.indexOf('DEBUGGING ACTIVE ON PORT ') >= 0) {
             ret.port = r.substring(27, r.indexOf('!')).trim();
         }
         if (r.indexOf('Using address ') >= 0) {
             ret.ip = r.substring(14, r.indexOf(' for')).trim();
+            ret.ip = ret.ip.split(':')[0];
         }
     }
 
@@ -245,19 +231,41 @@ export async function activate(context: vscode.ExtensionContext) {
 
                     const parsed = parseGradleOutput(result);
 
+                    let cfg: ExternalEditorConfig | undefined = undefined;
+
+                    for (const p of gradleProps) {
+                        if (p.workspace.uri === workspace.uri) {
+                            await p.forceReparse();
+                            cfg = p.getLastConfig();
+                        }
+                    }
+
+                    if (cfg === undefined) {
+                        console.log('debugging failed');
+                        vscode.window.showInformationMessage('Debugging failed');
+                        return false;
+                    }
+
+
                     let soPath = '';
 
-                    for (const p of parsed.libraryLocations) {
+                    for (const p of cfg.component.libSharedFilePaths) {
                         soPath += path.dirname(p) + ';';
                     }
 
                     soPath = soPath.substring(0, soPath.length - 1);
 
+                    let sysroot = '';
+
+                    if (cfg.compiler.sysroot !== null) {
+                        sysroot = cfg.compiler.sysroot;
+                    }
+
                     const config: DebugCommands = {
                         serverAddress: parsed.ip,
                         serverPort: parsed.port,
-                        sysroot: parsed.sysroot,
-                        executablePath: parsed.executablePath,
+                        sysroot: sysroot,
+                        executablePath: cfg.component.launchfile,
                         workspace: workspace,
                         soLibPath: soPath,
                         additionalCommands: []

@@ -74,7 +74,7 @@ export async function generateCopy(fromTemplateFolder: vscode.Uri, fromGradleFol
   const ncpPromise = promisifyNcp(fromGradleFolder.fsPath, toFolder.fsPath, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder.fsPath, cf);
-      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
+      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0 || rooted.indexOf('build.gradletemplate') >= 0) {
         return false;
       }
       return true;
