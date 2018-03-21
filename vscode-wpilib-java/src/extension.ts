@@ -51,22 +51,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let allowDebug = true;
 
-    const promises = [];
-
     const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
     if (javaExtension === undefined) {
         vscode.window.showInformationMessage('Could not find java extension. Debugging is disabled.');
         allowDebug = false;
-    } else if (!javaExtension.isActive) {
-        promises.push(javaExtension.activate());
     }
 
     if (!coreExtension.isActive) {
-        promises.push(coreExtension.activate());
-    }
-
-    if (promises.length > 0) {
-        await Promise.all(promises);
+        await coreExtension.activate();
     }
 
     const coreExports: IExternalAPI = coreExtension.exports;
