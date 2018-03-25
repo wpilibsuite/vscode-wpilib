@@ -4,14 +4,14 @@
 import * as vscode from 'vscode';
 import { IExternalAPI, getExternalAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getPreferencesAPIExpectedVersion } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
-import { gradleRun, OutputPair } from './gradle';
+import { gradleRun, OutputPair } from './shared/gradle';
 import * as path from 'path';
 import { WpiLibHeaders } from './header_search';
 import { CppGradleProperties, ExternalEditorConfig } from './cpp_gradle_properties';
 import { CppVsCodeProperties } from './cpp_vscode_properties';
 import { CppPreferences } from './cpp_preferences';
-import { Examples } from './examples';
-import { Templates } from './templates';
+import { Examples } from './shared/examples';
+import { Templates } from './shared/templates';
 
 interface DebuggerParse {
     port: string;
@@ -312,9 +312,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     if (exampleTemplateValid === true && exampleTemplate !== undefined) {
         // Setup examples and template
-        const examples: Examples = new Examples(extensionResourceLocation, exampleTemplate);
+        const examples: Examples = new Examples(extensionResourceLocation, 'cpp', exampleTemplate);
         context.subscriptions.push(examples);
-        const templates: Templates = new Templates(extensionResourceLocation, exampleTemplate);
+        const templates: Templates = new Templates(extensionResourceLocation, 'cpp', exampleTemplate);
         context.subscriptions.push(templates);
 
     } else {
