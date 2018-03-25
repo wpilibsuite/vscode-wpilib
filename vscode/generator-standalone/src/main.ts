@@ -24,7 +24,7 @@ function createWindow() {
   mainWindow.setMenu(null);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   //mainWindow.webContents.send('messageFromMain', 'hello');
 
