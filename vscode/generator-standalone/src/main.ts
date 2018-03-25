@@ -1,12 +1,9 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-import { RioLogWindow } from './riolog/shared/riologwindow';
-import { RioLogWebviewProvider, LiveRioConsoleProvider } from './riolog/electronimpl';
 
 let mainWindow: Electron.BrowserWindow | undefined;
 
-let rioLog: RioLogWindow | undefined;
 
 function createWindow() {
   // Create the browser window.
@@ -38,16 +35,10 @@ function createWindow() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    if (rioLog !== undefined) {
-      rioLog.dispose();
-      rioLog = undefined;
-    }
     mainWindow = undefined;
   });
 
-  rioLog = new RioLogWindow(new RioLogWebviewProvider(mainWindow), new LiveRioConsoleProvider());
 
-  rioLog.start(9999);
 }
 
 // This method will be called when Electron has finished
