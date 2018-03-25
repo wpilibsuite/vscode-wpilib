@@ -167,9 +167,14 @@ function displayItems(toDisplay: IDisplayJSON[]) {
     const bdiv = document.createElement('div');
     const b = document.createElement('button');
     b.appendChild(document.createTextNode('Create'));
-    li.appendChild(document.createTextNode(d.name));
+    const header = document.createElement('h3');
+    header.style.margin = '0px';
+    header.appendChild(document.createTextNode(d.name));
+    li.appendChild(header);
     bdiv.appendChild(b);
+    li.appendChild(document.createTextNode(d.description));
     li.appendChild(bdiv);
+    li.appendChild(document.createElement('hr'));
     ul.appendChild(li);
   }
   itemsDiv.appendChild(ul);
