@@ -1,8 +1,8 @@
 'use strict';
 
-import { sendMessage, checkResize } from './implscript';
-import { IPrintMessage, IErrorMessage, MessageType } from '../message';
-import { ReceiveTypes } from '../interfaces';
+import { sendMessage, checkResize } from '../script/implscript';
+import { IPrintMessage, IErrorMessage, MessageType } from './message';
+import { ReceiveTypes, IIPCSendMessage, SendTypes } from './interfaces';
 
 let paused = false;
 export function onPause() {
@@ -122,13 +122,8 @@ export function onShowPrints() {
 
 let autoReconnect = true;
 export function onAutoReconnect() {
-    const arButton = document.getElementById('autoreconnect');
-    if (arButton === null) {
-        return;
-    }
     if (autoReconnect === true) {
         autoReconnect = false;
-        arButton.innerHTML = 'Reconnect';
         // send a disconnect
         sendMessage({
             type: ReceiveTypes.Reconnect,
@@ -136,12 +131,21 @@ export function onAutoReconnect() {
         });
     } else {
         autoReconnect = true;
-        arButton.innerHTML = 'Disconnect';
         sendMessage({
             type: ReceiveTypes.Reconnect,
             message: true
         });
     }
+    const arButton = document.getElementById('autoreconnect');
+    if (arButton === null) {
+        return;
+    }
+    if (autoReconnect === true) {
+        arButton.innerHTML = 'Reconnect';
+    } else {
+        arButton.innerHTML = 'Disconnect';
+    }
+
 }
 
 let showTimestamps = false;
@@ -403,92 +407,197 @@ function handleFileSelect(evt: any) {
         for (const p of parsed) {
             addMessage(p);
         }
+        checkResize();
     };
     reader.readAsText(firstFile);
 }
 
-const openFileButton = document.getElementById('open');
-if (openFileButton !== null) {
-    openFileButton.addEventListener('change', handleFileSelect, false);
+let currentScreenHeight = 100;
+
+export function checkResizeImpl(element: HTMLElement) {
+    const allowedHeight = element.clientHeight - currentScreenHeight;
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    const listHeight = ul.clientHeight;
+    if (listHeight < allowedHeight) {
+        ul.style.position = 'fixed';
+        ul.style.bottom = currentScreenHeight + 'px';
+    } else {
+        ul.style.position = 'static';
+        ul.style.bottom = 'auto';
+    }
 }
 
-const pauseButton = document.getElementById('pause');
-if (pauseButton !== null) {
-    pauseButton.addEventListener('click', () => {
-        onPause();
+export function handleMessage(data: IIPCSendMessage): void {
+    switch (data.type) {
+        case SendTypes.New:
+            addMessage(<IPrintMessage | IErrorMessage>data.message);
+            document.body.scrollTop = document.body.scrollHeight;
+            break;
+        case SendTypes.Batch:
+            for (const message of <(IPrintMessage | IErrorMessage)[]>data.message) {
+                addMessage(message);
+            }
+            document.body.scrollTop = document.body.scrollHeight;
+            break;
+        case SendTypes.PauseUpdate:
+            const pause = document.getElementById('pause');
+            if (pause !== null) {
+                pause.innerHTML = 'Paused: ' + <number>data.message;
+            }
+            break;
+        case SendTypes.ConnectionChanged:
+            const bMessage: boolean = <boolean>data.message;
+            if (bMessage === true) {
+                onConnect();
+            } else {
+                onDisconnect();
+            }
+            break;
+        default:
+            break;
+    }
+    checkResize();
+}
+//position:fixed;bottom: 0px;left:0px;list-style-type:none;padding-bottom:0;padding-left:0;padding-top:0;padding-right:0;width: 49.8%; margin-bottom: 1px"
+//position:fixed;bottom: 0px;right:0px;list-style-type:none;padding-bottom:0;padding-left:0;padding-top:0;padding-right:0;width: 49.8%;margin-bottom: 1px"
+function createSplitUl(left: boolean): HTMLUListElement {
+    const splitDiv = document.createElement('ul');
+    splitDiv.style.position = 'fixed';
+    splitDiv.style.bottom = '0px';
+    if (left) {
+        splitDiv.style.left = '0px';
+    } else {
+        splitDiv.style.right = '0px';
+    }
+    splitDiv.style.listStyleType = 'none';
+    splitDiv.style.padding = '0';
+    splitDiv.style.width = '49.8%';
+    splitDiv.style.marginBottom = '1px';
+    return splitDiv;
+}
+
+function createButton(id: string, text: string, callback: () => void): HTMLLIElement {
+    const li = document.createElement('li');
+    const button = document.createElement('button');
+    button.id = id;
+    button.style.width = '100%';
+    button.appendChild(document.createTextNode(text));
+    button.addEventListener('click', callback);
+    li.appendChild(button);
+    return li;
+}
+
+function onChangeTeamNumber() {
+    const newNumber = document.getElementById('teamNumber');
+    console.log('finding team number');
+    if (newNumber === null) {
+        return;
+    }
+    console.log('sending message');
+    sendMessage({
+        type: ReceiveTypes.ChangeNumber,
+        message: parseInt((<HTMLInputElement>newNumber).value)
     });
+    console.log('sent message');
 }
 
-const discardButton = document.getElementById('discard');
-if (discardButton !== null) {
-    discardButton.addEventListener('click', () => {
-        onDiscard();
-    });
-}
+function setLivePage() {
+    const mdv = document.getElementById('mainDiv');
+    if (mdv === undefined) {
+        return;
+    }
+    const mainDiv: HTMLDivElement = <HTMLDivElement>mdv;
+    currentScreenHeight = 100;
+    mainDiv.innerHTML = '';
+    const ul = document.createElement('ul');
+    ul.id = 'list';
+    ul.style.listStyleType = 'none';
+    ul.style.padding = '0';
+    mainDiv.appendChild(ul);
+    const splitDiv = document.createElement('div');
+    splitDiv.style.height = '100px';
+    mainDiv.appendChild(splitDiv);
+    const leftList = createSplitUl(true);
+    leftList.appendChild(createButton('pause', 'Pause', onPause));
+    leftList.appendChild(createButton('discard', 'Discard', onDiscard));
+    leftList.appendChild(createButton('clear', 'Clear', onClear));
+    leftList.appendChild(createButton('showprints', 'Don\'t Show Prints', onShowPrints));
+    leftList.appendChild(createButton('switchPage', 'Switch to Viewer', () => {
+        setViewerPage();
+    }));
+    mainDiv.appendChild(leftList);
 
-const clearButton = document.getElementById('clear');
-if (clearButton !== null) {
-    clearButton.addEventListener('click', () => {
-        onClear();
-    });
-}
-
-const showPrintsButton = document.getElementById('showprints');
-if (showPrintsButton !== null) {
-    showPrintsButton.addEventListener('click', () => {
-        onShowPrints();
-    });
-}
-
-const showWarningsButton = document.getElementById('showwarnings');
-if (showWarningsButton !== null) {
-    showWarningsButton.addEventListener('click', () => {
-        onShowWarnings();
-    });
-}
-
-
-const autoReconnectButton = document.getElementById('autoreconnect');
-if (autoReconnectButton !== null) {
-    autoReconnectButton.addEventListener('click', () => {
+    const rightList = createSplitUl(false);
+    rightList.appendChild(createButton('showwarnings', 'Don\'t Show Warnings', onShowWarnings));
+    rightList.appendChild(createButton('autoreconnect', 'Disconnect', onAutoReconnect));
+    rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
+    rightList.appendChild(createButton('savelot', 'Save Log', onSaveLog));
+    const teamNumberUl = document.createElement('li');
+    const teamNumberI = document.createElement('input');
+    teamNumberI.id = 'teamNumber';
+    teamNumberI.type = 'number';
+    teamNumberI.style.width = '50%';
+    const teamNumberB = document.createElement('button');
+    teamNumberB.id = 'changeTeamNumber';
+    teamNumberB.style.width = '24.9%';
+    teamNumberB.style.right = '0';
+    teamNumberB.style.position = 'fixed';
+    teamNumberB.addEventListener('click', onChangeTeamNumber);
+    teamNumberB.appendChild(document.createTextNode('Set Team Number'));
+    teamNumberUl.appendChild(teamNumberI);
+    teamNumberUl.appendChild(teamNumberB);
+    rightList.appendChild(teamNumberUl);
+    mainDiv.appendChild(rightList);
+    if (autoReconnect !== true) {
         onAutoReconnect();
-    });
+    }
 }
 
-const timestampsButton = document.getElementById('timestamps');
-if (timestampsButton !== null) {
-    timestampsButton.addEventListener('click', () => {
-        onShowTimestamps();
-    });
+export function setViewerPage() {
+    const mdv = document.getElementById('mainDiv');
+    if (mdv === undefined) {
+        return;
+    }
+    if (autoReconnect === true) {
+        onAutoReconnect();
+    }
+    const mainDiv: HTMLDivElement = <HTMLDivElement>mdv;
+    currentScreenHeight = 60;
+    mainDiv.innerHTML = '';
+    const ul = document.createElement('ul');
+    ul.id = 'list';
+    ul.style.listStyleType = 'none';
+    ul.style.padding = '0';
+    mainDiv.appendChild(ul);
+    const splitDiv = document.createElement('div');
+    splitDiv.style.height = '60px';
+    mainDiv.appendChild(splitDiv);
+
+    const leftList = createSplitUl(true);
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'openFile';
+    fileInput.name = 'files[]';
+    fileInput.style.width = '100%';
+    fileInput.addEventListener('change', handleFileSelect, false);
+    leftList.appendChild(fileInput);
+    leftList.appendChild(createButton('showprints', 'Don\'t Show Prints', onShowPrints));
+    leftList.appendChild(createButton('switchPage', 'Switch to Live', () => {
+        setLivePage();
+    }));
+    mainDiv.appendChild(leftList);
+
+
+    const rightList = createSplitUl(false);
+    rightList.appendChild(createButton('showwarnings', 'Don\'t Show Warnings', onShowWarnings));
+    rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
+
+    mainDiv.appendChild(rightList);
 }
 
-const saveLogButton = document.getElementById('savelog');
-if (saveLogButton !== null) {
-    saveLogButton.addEventListener('click', () => {
-        onSaveLog();
-    });
-}
-
-const switchPageButton = document.getElementById('switchPage');
-if (switchPageButton !== null) {
-    switchPageButton.addEventListener('click', () => {
-        console.log("Switch pages");
-    });
-}
-
-const changeTeamNumberButton = document.getElementById('changeTeamNumber');
-if (changeTeamNumberButton !== null) {
-    changeTeamNumberButton.addEventListener('click', () => {
-        const newNumber = document.getElementById('teamNumber');
-        console.log('finding team number');
-        if (newNumber === null) {
-            return;
-        }
-        console.log('sending message');
-        sendMessage({
-            type: ReceiveTypes.ChangeNumber,
-            message: parseInt((<HTMLInputElement>newNumber).value)
-        })
-        console.log('sent message');
-    });
-}
+window.addEventListener('load', (_: Event) => {
+    setLivePage();
+});

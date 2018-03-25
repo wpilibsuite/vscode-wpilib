@@ -1,9 +1,12 @@
 'use strict';
-import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole } from './interfaces';
+import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole } from './shared/interfaces';
 import { EventEmitter } from 'events';
-import { RioConsole } from './rioconsole';
+import { RioConsole } from './shared/rioconsole';
+import * as fs from 'fs';
+import { IPrintMessage, IErrorMessage } from './shared/message';
 
 const ipcMain = require('electron').ipcMain;
+const dialog = require('electron').dialog;
 
 export class RioLogWindowView extends EventEmitter implements IWindowView {
   private window: Electron.BrowserWindow;
@@ -22,7 +25,22 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     return true;
   }
 
-  async handleSave(_: any): Promise<boolean> {
+  async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
+    const file = await new Promise<string>((resolve, _) => {
+      dialog.showSaveDialog({
+        title: 'Select a file to save to'
+      }, (f) => {
+        resolve(f);
+      });
+    });
+    console.log(file);
+
+    await new Promise((resolve, _) => {
+      fs.writeFile(file, JSON.stringify(saveData, null, 4), 'utf8', () => {
+        resolve();
+      });
+    });
+
     return true;
   }
 
