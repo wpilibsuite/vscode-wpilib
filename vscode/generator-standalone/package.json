@@ -1,0 +1,33 @@
+{
+  "name": "generator",
+  "version": "1.0.0",
+  "description": "A minimal Electron application written with Typescript",
+  "scripts": {
+    "copyshared": "copyfiles -u 6 \"../../wpilibcExamples/src/main/cpp/**/*\" resources/src/cpp && copyfiles -u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src/java",
+    "compile": "npm run copyshared tsc",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run compile && electron ./out/main.js",
+    "packageAll": "npm run compile && electron-packager . riolog --all --overwrite --out release",
+    "package": "npm run compile && electron-packager . riolog --overwrite --out release"
+  },
+  "main": "out/main.js",
+  "repository": "https://github.com/electron/electron-quick-start-typescript",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo",
+    "typescript"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "copyfiles": "^2.0.0",
+    "electron": "^1.8.4",
+    "electron-installer-zip": "^0.1.2",
+    "electron-packager": "^11.2.0",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.2"
+  }
+}
