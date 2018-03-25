@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "A minimal Electron application written with Typescript",
   "scripts": {
-    "build": "tsc",
+    "copyshared": "copyfiles -f ../shared/riolog/**.* src/riolog/shared",
+    "compile": "npm run copyshared tsc",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "npm run build && electron ./out/main.js",
-    "packageAll": "npm run build && electron-packager . riolog --all --overwrite --out release",
-    "package": "npm run build && electron-packager . riolog --overwrite --out release"
+    "start": "npm run compile && electron ./out/main.js",
+    "packageAll": "npm run compile && electron-packager . riolog --all --overwrite --out release",
+    "package": "npm run compile && electron-packager . riolog --overwrite --out release"
   },
   "main": "out/main.js",
   "repository": "https://github.com/electron/electron-quick-start-typescript",
@@ -22,6 +23,7 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
+    "copyfiles": "^2.0.0",
     "electron": "^1.8.4",
     "electron-installer-zip": "^0.1.2",
     "electron-packager": "^11.2.0",

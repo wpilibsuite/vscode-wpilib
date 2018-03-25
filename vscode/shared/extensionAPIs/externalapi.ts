@@ -45,7 +45,6 @@ export function getDeployDebugAPIExpectedVersion(): number {
 }
 export abstract class IDeployDebugAPI implements IVersionable {
   public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  public abstract startRioLogViewer(): Promise<boolean>;
   public abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
   public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
   public abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
