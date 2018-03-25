@@ -38,7 +38,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     if (socket === undefined) {
       return undefined;
     }
-    socket.setNoDelay(true)
+    socket.setNoDelay(true);
     socket.setKeepAlive(true, 500);
     return socket;
   }
