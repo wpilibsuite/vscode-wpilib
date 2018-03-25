@@ -15,6 +15,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
   private promise: Promise<void> | undefined;
   private condition: PromiseCondition = new PromiseCondition();
   private closeFunc: (() => void) | undefined;
+  private teamNumber: number = 0;
 
   public stop(): void {
     this.cleanup = true;
@@ -37,7 +38,8 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     if (socket === undefined) {
       return undefined;
     }
-    socket.setNoDelay(true).setKeepAlive(true, 500);
+    socket.setNoDelay(true);
+    socket.setKeepAlive(true, 500);
     return socket;
   }
 
@@ -115,7 +117,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     this.emit('connectionChanged', false);
   }
 
-  public startListening(teamNumber: number): void {
+  public startListening(): void {
     const asyncFunction = async () => {
       while (!this.cleanup) {
         while (!this.autoReconnect) {
@@ -125,7 +127,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
           await this.condition.wait();
           this.condition.reset();
         }
-        await this.runFunction(teamNumber);
+        await this.runFunction(this.teamNumber);
       }
       console.log('finished loop');
     };
@@ -140,6 +142,10 @@ export class RioConsole extends EventEmitter implements IRioConsole {
 
   public disconnect(): void {
     this.closeSocket();
+  }
+
+  public setTeamNumber(teamNumber: number): void {
+    this.teamNumber = teamNumber;
   }
 
   public async dispose() {

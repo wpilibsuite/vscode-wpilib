@@ -1,4 +1,4 @@
-/*
+
 
 // add     `"enableProposedApi": true, ` to package.json
 // Also find the latest vscode.proposed.d.ts, and add it to the code base to be compiled.
@@ -7,11 +7,11 @@
 
 import * as vscode from 'vscode';
 import { EventEmitter } from 'events';
-import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole, IIPCSendMessage, IIPCReceiveMessage } from './interfaces';
+import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole, IIPCSendMessage, IIPCReceiveMessage } from './shared/interfaces';
 import * as path from 'path';
 import * as fs from 'fs';
-import { RioConsole } from './rioconsole';
-import { IPrintMessage, IErrorMessage } from './message';
+import { RioConsole } from './shared/rioconsole';
+import { IPrintMessage, IErrorMessage } from './shared/message';
 
 
 interface IHTMLProvider {
@@ -24,7 +24,7 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 
     constructor(resourceName: string, windowName: string, viewColumn: vscode.ViewColumn) {
         super();
-        this.webview = vscode.window.createWebview(vscode.Uri.parse(resourceName),
+        this.webview = vscode.window.createWebview(resourceName,
             windowName, viewColumn, {
                 enableScripts: true,
                 enableCommandUris: true,
@@ -33,8 +33,8 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 
         this.disposables.push(this.webview);
 
-        vscode.window.onDidChangeActiveEditor(async (e) => {
-            if (e === this.webview) {
+        this.webview.onDidChangeViewState((s) => {
+            if (s.active === true) {
                 this.emit('windowActive');
             }
         }, null, this.disposables);
@@ -84,19 +84,6 @@ export class RioLogWebviewProvider implements IWindowProvider {
     }
 }
 
-export class RioLogViewerWebviewProvider implements IWindowProvider {
-    private htmlProvider: RioLogViewerHTMLProvider;
-
-    constructor(resourceRoot: string){
-        this.htmlProvider = new RioLogViewerHTMLProvider(resourceRoot);
-    }
-
-    public createWindowView(): IWindowView {
-        const wv = new RioLogWindowView('wpilib:riologviewer', 'RioLogViewer', vscode.ViewColumn.Three);
-        wv.setHTML(this.htmlProvider.getHTML());
-        return wv;
-    }
-}
 
 export class RioLogHTMLProvider implements IHTMLProvider {
     private html: string | undefined;
@@ -125,72 +112,5 @@ export class LiveRioConsoleProvider implements IRioConsoleProvider {
     }
 }
 
-export class ViewerRioConsoleProvider implements IRioConsoleProvider {
-    public getRioConsole(): IRioConsole {
-        return new RioLogViewer();
-    }
-}
 
-class RioLogViewer extends EventEmitter implements IRioConsole {
-    public connected: boolean = true;
-    public discard: boolean = false;
-    public stop(): void {
 
-    }
-    public startListening(_: number): void {
-        // Send everything
-        vscode.window.showOpenDialog({
-            canSelectFiles: true,
-            canSelectMany: false
-        }).then((v) => {
-            if (v === undefined) {
-                return;
-            }
-            if (v.length !== 1) {
-                return;
-            }
-            fs.readFile(v[0].fsPath, 'utf8', (err, data) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    const obj: (IPrintMessage | IErrorMessage)[] = JSON.parse(data);
-                    for (const o of obj) {
-                        this.emit('message', o);
-                    }
-                }
-            });
-        });
-    }
-    public setAutoReconnect(_: boolean): void {
-    }
-    public getAutoReconnect(): boolean {
-        return true;
-    }
-    public disconnect(): void {
-    }
-    public dispose() {
-    }
-}
-
-class RioLogViewerHTMLProvider implements IHTMLProvider {
-    private html: string;
-
-    constructor(resourceRoot: string) {
-        const htmlFile = path.join(resourceRoot,'viewer.html');
-        const scriptFile = path.join(resourceRoot, 'bundle.js');
-
-        this.html = fs.readFileSync(htmlFile, 'utf8');
-        this.html += '\r\n<script>\r\n';
-        this.html += fs.readFileSync(scriptFile, 'utf8');
-        this.html += '\r\n</script>\r\n';
-    }
-
-    public getHTML(): string {
-        if (this.html === undefined) {
-            return '';
-        }
-        return this.html;
-    }
-}
-
-*/

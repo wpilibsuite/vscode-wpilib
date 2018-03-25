@@ -96,7 +96,8 @@ export class RioLogWindow {
       this.onNewMessageToSend(message);
     });
 
-    this.rioConsole.startListening(teamNumber);
+    this.rioConsole.setTeamNumber(teamNumber);
+    this.rioConsole.startListening();
   }
 
   private async onConnectionChanged(connected: boolean) {
@@ -169,6 +170,10 @@ export class RioLogWindow {
       if (newValue === false) {
         this.rioConsole.disconnect();
       }
+    } else if (data.type === ReceiveTypes.ChangeNumber) {
+      const number = <number>data.message;
+      console.log('setting team number');
+      this.rioConsole.setTeamNumber(number);
     }
   }
 

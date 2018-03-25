@@ -19,12 +19,13 @@ export enum ReceiveTypes {
     Discard,
     Pause,
     Save,
-    Reconnect
+    Reconnect,
+    ChangeNumber
 }
 
 export interface IIPCReceiveMessage {
     type: ReceiveTypes;
-    message: boolean | string[];
+    message: boolean | string[] | number;
 }
 
 export interface IWindowProvider {
@@ -61,9 +62,10 @@ export interface IRioConsole extends EventEmitter, IDisposable {
     connected: boolean;
     discard: boolean;
     stop(): void;
-    startListening(teamNumber: number): void;
+    startListening(): void;
     setAutoReconnect(autoReconnect: boolean): void;
     getAutoReconnect(): boolean;
+    setTeamNumber(teamNumber: number): void;
 
     addListener(event: string, listener: Function): this;
     addListener(event: 'message', listener: (message: IIPCSendMessage) => void): this;
