@@ -1,13 +1,17 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-const remote = require('remote'),
-      app = remote.require('app');
-
+const remote = require('electron').remote;
+const app = remote.app;
 const basepath = app.getAppPath();
 
+console.log(basepath);
 
-const resourceRoot = path.join(basepath, 'resources');
+
+let resourceRoot = path.join(basepath, 'resources');
+if (basepath.indexOf('default_app.asar') >= 0) {
+  resourceRoot = 'resources';
+}
 const examplesFileName = 'examples.json';
 const templatesFileName = 'templates.json';
 const resourceSrcRoot = path.join(resourceRoot, 'src');
