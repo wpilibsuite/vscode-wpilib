@@ -2,7 +2,6 @@
 
 import * as net from 'net';
 import * as timers from 'timers';
-import * as jsonc from 'jsonc-parser';
 
 async function properRace<T>(promises: Promise<T>[]): Promise<T> {
   if (promises.length < 1) {
@@ -93,7 +92,7 @@ function getSocketFromDS(port: number): ISocketPromisePair {
   const retVal = new DSSocketPromisePair(s, ds, new Promise((resolve, reject) => {
     // First connect to ds, and wait for data
     ds.on('data', (data) => {
-      const parsed: IDriverStationData = jsonc.parse(data.toString());
+      const parsed: IDriverStationData = JSON.parse(data.toString());
       if (parsed.robotIP === 0) {
         ds.end();
         ds.destroy();
