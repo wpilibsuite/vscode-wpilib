@@ -11,7 +11,7 @@ function createWindow() {
     height: 600,
     width: 800,
     backgroundColor: '#2e2c29',
-    title: 'RioLog'
+    title: 'Generator'
   });
 
   // and load the index.html of the app.
