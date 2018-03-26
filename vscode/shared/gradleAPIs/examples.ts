@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from './externalapi';
-import { generateCopy } from '../generator';
+import { generateCopyJava, generateCopyCpp } from './generator';
 
 interface JsonLayout {
   name: string;
@@ -16,7 +16,7 @@ interface JsonLayout {
 export class Examples {
   private readonly exampleResourceName = 'examples.json';
 
-  constructor(resourceRoot: string, language: string, core: IExampleTemplateAPI) {
+  constructor(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
     const examplesFolder = path.join(resourceRoot, 'src', 'examples');
     const resourceFile = path.join(examplesFolder, this.exampleResourceName);
     const gradleFolder = path.join(resourceRoot, 'gradlebase');
@@ -29,7 +29,7 @@ export class Examples {
       for (const e of examples) {
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {
-            return language;
+            return java ? 'java' : 'cpp';
           },
           getDescription(): string {
             return e.description;
@@ -39,8 +39,14 @@ export class Examples {
           },
           async generate(folderInto: vscode.Uri): Promise<boolean> {
             try {
-              await generateCopy(vscode.Uri.file(path.join(examplesFolder, e.foldername)),
-                vscode.Uri.file(gradleFolder), folderInto);
+              if (java) {
+                await generateCopyJava(path.join(examplesFolder, e.foldername),
+                  gradleFolder, folderInto.fsPath);
+              } else {
+                await generateCopyCpp(path.join(examplesFolder, e.foldername),
+                  gradleFolder, folderInto.fsPath);
+              }
+
             } catch (err) {
               console.log(err);
               return false;

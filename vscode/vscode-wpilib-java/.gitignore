@@ -4,3 +4,4 @@ node_modules
 *.vsix
 src/shared
 resources/src
+resources/gradlebase

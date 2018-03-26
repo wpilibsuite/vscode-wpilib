@@ -35,6 +35,10 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     });
     console.log(file);
 
+    if (file === undefined) {
+      return false;
+    }
+
     await new Promise((resolve, _) => {
       fs.writeFile(file, JSON.stringify(saveData, null, 4), 'utf8', () => {
         resolve();

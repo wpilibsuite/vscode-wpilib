@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import * as ncp from 'ncp';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
@@ -26,10 +25,26 @@ function promisifyNcp(source: string, dest: string, options: ncp.Options = {}): 
   });
 }
 
-export async function generateCopy(fromTemplateFolder: vscode.Uri, fromGradleFolder: vscode.Uri, toFolder: vscode.Uri): Promise<void> {
-  const rootCodePath = path.join(toFolder.fsPath, 'src', 'main', 'java');
+export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string): Promise<void> {
+  const codePath = path.join(toFolder, 'src');
+  const src = promisifyNcp(fromTemplateFolder, codePath);
+  const gradle = promisifyNcp(fromGradleFolder, toFolder, {
+    filter: (cf): boolean => {
+      const rooted = path.relative(fromGradleFolder, cf);
+      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
+        return false;
+      }
+      return true;
+    }
+  });
+
+  await Promise.all([src, gradle]);
+}
+
+export async function generateCopyJava(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string): Promise<void> {
+  const rootCodePath = path.join(toFolder, 'src', 'main', 'java');
   const codePath = path.join(rootCodePath, 'frc', 'robot');
-  await promisifyNcp(fromTemplateFolder.fsPath, codePath);
+  await promisifyNcp(fromTemplateFolder, codePath);
 
   const files = await new Promise<string[]>((resolve, reject) => {
     glob('**/*', {
@@ -71,10 +86,10 @@ export async function generateCopy(fromTemplateFolder: vscode.Uri, fromGradleFol
     }));
   }
 
-  const ncpPromise = promisifyNcp(fromGradleFolder.fsPath, toFolder.fsPath, {
+  const ncpPromise = promisifyNcp(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
-      const rooted = path.relative(fromGradleFolder.fsPath, cf);
-      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0 || rooted.indexOf('build.gradletemplate') >= 0) {
+      const rooted = path.relative(fromGradleFolder, cf);
+      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
         return false;
       }
       return true;

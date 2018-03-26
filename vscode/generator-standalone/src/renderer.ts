@@ -1,7 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import { generateCopyCpp, generateCopyJava} from './shared/generator';
 
 const remote = require('electron').remote;
+const dialog = remote.dialog;
 const app = remote.app;
 const basepath = app.getAppPath();
 
@@ -16,13 +18,13 @@ const examplesFileName = 'examples.json';
 const templatesFileName = 'templates.json';
 const resourceSrcRoot = path.join(resourceRoot, 'src');
 const cppRoot = path.join(resourceSrcRoot, 'cpp');
-//const cppGradleRoot = path.join(cppRoot, 'gradlebase');
+const cppGradleRoot = path.join(cppRoot, 'gradlebase');
 const cppTemplatesRoot = path.join(cppRoot, 'templates');
 const cppExamplesRoot = path.join(cppRoot, 'examples');
 const cppTemplatesFile = path.join(cppTemplatesRoot, templatesFileName);
 const cppExamplesFile = path.join(cppExamplesRoot, examplesFileName);
 const javaRoot = path.join(resourceSrcRoot, 'java');
-//const javaGradleRoot = path.join(javaRoot, 'gradlebase');
+const javaGradleRoot = path.join(javaRoot, 'gradlebase');
 const javaTemplatesRoot = path.join(javaRoot, 'templates');
 const javaExamplesRoot = path.join(javaRoot, 'examples');
 const javaTemplatesFile = path.join(javaTemplatesRoot, templatesFileName);
@@ -131,28 +133,28 @@ function loadFile(fName: string): Promise<string> {
 async function handleJavaTemplates() {
   const contents = await loadFile(javaTemplatesFile);
   const parsed: IDisplayJSON[] = JSON.parse(contents);
-  displayItems(parsed);
+  displayItems(parsed, javaTemplatesRoot, true);
 }
 
 async function handleJavaExamples() {
   const contents = await loadFile(javaExamplesFile);
   const parsed: IDisplayJSON[] = JSON.parse(contents);
-  displayItems(parsed);
+  displayItems(parsed, javaExamplesRoot, true);
 }
 
 async function handleCppTemplates() {
   const contents = await loadFile(cppTemplatesFile);
   const parsed: IDisplayJSON[] = JSON.parse(contents);
-  displayItems(parsed);
+  displayItems(parsed, cppTemplatesRoot, false);
 }
 
 async function handleCppExamples() {
   const contents = await loadFile(cppExamplesFile);
   const parsed: IDisplayJSON[] = JSON.parse(contents);
-  displayItems(parsed);
+  displayItems(parsed, cppTemplatesRoot, false);
 }
 
-function displayItems(toDisplay: IDisplayJSON[]) {
+function displayItems(toDisplay: IDisplayJSON[], rootFolder: string, java: boolean) {
   const itemsDiv = document.getElementById('shownItems');
   if (itemsDiv === null) {
     return;
@@ -166,6 +168,15 @@ function displayItems(toDisplay: IDisplayJSON[]) {
     const li = document.createElement('li');
     const bdiv = document.createElement('div');
     const b = document.createElement('button');
+    if (java) {
+      b.addEventListener('click', async () => {
+        await handleJavaCreate(d, rootFolder);
+      });
+    } else {
+      b.addEventListener('click', async () => {
+        await handleCppCreate(d, rootFolder);
+      });
+    }
     b.appendChild(document.createTextNode('Create'));
     const header = document.createElement('h3');
     header.style.margin = '0px';
@@ -187,3 +198,40 @@ document.addEventListener('keydown', function (e) {
     location.reload();
   }
 });
+
+
+
+
+function askForFolder(): Promise<string[]> {
+  return new Promise<string[]>((resolve) => {
+    dialog.showOpenDialog({
+      properties: ['openDirectory']
+    }, (paths) => {
+      resolve(paths);
+    });
+  });
+}
+
+async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<void> {
+  const dirArr = await askForFolder();
+  if (dirArr === undefined) {
+    return;
+  }
+  //console.log(dirArr);
+  const toFolder = dirArr[0];
+
+  const templateFolder = path.join(_srcRoot, _item.foldername);
+  await generateCopyCpp(templateFolder, cppGradleRoot, toFolder);
+}
+
+async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<void> {
+  const dirArr = await askForFolder();
+  if (dirArr === undefined) {
+    return;
+  }
+  //console.log(dirArr);
+  const toFolder = dirArr[0];
+
+  const templateFolder = path.join(_srcRoot, _item.foldername);
+  await generateCopyJava(templateFolder, javaGradleRoot, toFolder);
+}

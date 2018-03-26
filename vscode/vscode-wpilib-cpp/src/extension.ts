@@ -312,9 +312,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     if (exampleTemplateValid === true && exampleTemplate !== undefined) {
         // Setup examples and template
-        const examples: Examples = new Examples(extensionResourceLocation, 'cpp', exampleTemplate);
+        const examples: Examples = new Examples(extensionResourceLocation, false, exampleTemplate);
         context.subscriptions.push(examples);
-        const templates: Templates = new Templates(extensionResourceLocation, 'cpp', exampleTemplate);
+        const templates: Templates = new Templates(extensionResourceLocation, false, exampleTemplate);
         context.subscriptions.push(templates);
 
     } else {
