@@ -172,9 +172,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
     if (exampleTemplateValid === true && exampleTemplate !== undefined) {
         // Setup examples and template
-        const examples: Examples = new Examples(extensionResourceLocation, 'java', exampleTemplate);
+        const examples: Examples = new Examples(extensionResourceLocation, true, exampleTemplate);
         context.subscriptions.push(examples);
-        const templates: Templates = new Templates(extensionResourceLocation, 'java', exampleTemplate);
+        const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
         context.subscriptions.push(templates);
     } else {
         vscode.window.showInformationMessage('Java examples and templates do not match Core. Update');
