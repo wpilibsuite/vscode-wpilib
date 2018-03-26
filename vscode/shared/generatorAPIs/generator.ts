@@ -13,7 +13,7 @@ export function promisifyMkdirp(dest: string): Promise<void> {
         resolve();
       }
     });
-  })
+  });
 }
 
 export function promisifyNcp(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
