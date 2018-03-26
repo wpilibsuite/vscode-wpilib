@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import * as fs from 'fs';
 
-function promisifyNcp(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
+export function promisifyMkdirp(dest: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     mkdirp(dest, (err) => {
       if (err) {
@@ -13,7 +13,11 @@ function promisifyNcp(source: string, dest: string, options: ncp.Options = {}): 
         resolve();
       }
     });
-  }).then(() => {
+  })
+}
+
+export function promisifyNcp(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
+  return promisifyMkdirp(dest).then(() => {
     return new Promise<void>((resolve, reject) => {
       ncp.ncp(source, dest, options, (err) => {
         if (err) {

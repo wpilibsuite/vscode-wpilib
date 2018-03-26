@@ -1,10 +1,11 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { generateCopyCpp, generateCopyJava} from './shared/generator';
+import { generateCopyCpp, generateCopyJava } from './shared/generator';
 
 const remote = require('electron').remote;
 const dialog = remote.dialog;
 const app = remote.app;
+const shell = require('electron').shell;
 const basepath = app.getAppPath();
 
 console.log(basepath);
@@ -29,6 +30,11 @@ const javaTemplatesRoot = path.join(javaRoot, 'templates');
 const javaExamplesRoot = path.join(javaRoot, 'examples');
 const javaTemplatesFile = path.join(javaTemplatesRoot, templatesFileName);
 const javaExamplesFile = path.join(javaExamplesRoot, examplesFileName);
+
+let projectRootPath = app.getPath('home');
+if (process.platform === 'win32') {
+  projectRootPath = app.getPath('documents');
+}
 
 interface IDisplayJSON {
   name: string;
@@ -199,13 +205,11 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-
-
-
 function askForFolder(): Promise<string[]> {
   return new Promise<string[]>((resolve) => {
     dialog.showOpenDialog({
-      properties: ['openDirectory']
+      properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
+      defaultPath: projectRootPath
     }, (paths) => {
       resolve(paths);
     });
@@ -234,4 +238,15 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
   await generateCopyJava(templateFolder, javaGradleRoot, toFolder);
+
+  dialog.showMessageBox({
+    message: 'Creation of project complete',
+    buttons: ['Open Folder', 'OK'],
+    noLink: true
+  }, (r) => {
+    if (r === 1) {
+      shell.showItemInFolder(path.join(toFolder, 'build.gradle'));
+    }
+    console.log(r);
+  });
 }
