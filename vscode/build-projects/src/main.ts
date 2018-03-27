@@ -2,7 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as npm from 'npm';
 import * as vsce from 'vsce';
+import * as jsonc from 'jsonc-parser';
 import { exec } from './execution';
+import { resolveAllPromises } from './util';
 
 function promisityReaddir(dir: string): Promise<string[]> {
   return new Promise<string[]>((resolve, reject) => {
@@ -12,8 +14,8 @@ function promisityReaddir(dir: string): Promise<string[]> {
       } else {
         resolve(dirs);
       }
-    })
-  })
+    });
+  });
 }
 
 async function getProjectDirectories(): Promise<string[]> {
@@ -37,37 +39,60 @@ async function getProjectDirectories(): Promise<string[]> {
 }
 
 async function main(): Promise<void> {
-  const projectDirectories = await getProjectDirectories();
-  const searchPath = path.join(process.cwd(), '..');
-  const fullProjectDirectories = [];
-  let promiseArray: Promise<{ stdout: string; stderr: string; }>[] = [];
-  for (const p of projectDirectories) {
-    const fullP = path.join(searchPath, p);
-    fullProjectDirectories.push(fullP);
-    promiseArray.push(exec('npm install', {
-      cwd: fullP
-    }));
-  }
+  const packageJsons: { loc: string, orig: string, new: string | undefined }[] = [];
   try {
-    const finishedPromises = await Promise.all(promiseArray);
-  } catch (err) {
-    console.log(err);
-    return;
+    const projectDirectories = await getProjectDirectories();
+    const searchPath = path.join(process.cwd(), '..');
+    const fullProjectDirectories = [];
+    let promiseArray: Promise<{ stdout: string; stderr: string; }>[] = [];
+    for (const p of projectDirectories) {
+      const fullP = path.join(searchPath, p);
+      fullProjectDirectories.push(fullP);
+      const pjson = path.join(fullP, 'package.json');
+      packageJsons.push({ loc: pjson, orig: fs.readFileSync(pjson, 'utf8'), new: undefined });
+      promiseArray.push(exec('npm install', {
+        cwd: fullP
+      }));
+    }
+
+    const finishedInstalls = await resolveAllPromises(promiseArray);
+
+
+
+    const args = process.argv;
+
+    if (args.length > 2) {
+      for (const j of packageJsons) {
+        const edits = jsonc.modify(j.orig, ['version'], args[2], {
+          formattingOptions: {
+
+          }
+        });
+        j.new = jsonc.applyEdits(j.orig, edits);
+        fs.writeFileSync(j.loc, j.new);
+      }
+    }
+
+
+    const packageResults: {stdout: string, stderr:string}[] = [];
+
+    for (const p of fullProjectDirectories) {
+      const r = await exec('npm run package', {
+        cwd: p
+      });
+      console.log(r.stdout);
+      packageResults.push(r);
+    }
+
+    for (const r of packageResults) {
+
+    }
   }
 
-
-  promiseArray = [];
-  for (const p of fullProjectDirectories) {
-    promiseArray.push(exec('npm run package', {
-      cwd: p
-    }));
-  }
-
-  try {
-    const finishedPromises = await Promise.all(promiseArray);
-  } catch (err) {
-    console.log(err);
-    return;
+  finally {
+    for (const j of packageJsons) {
+      fs.writeFileSync(j.loc, j.orig);
+    }
   }
 }
 
@@ -75,5 +100,5 @@ main().then(() => {
   console.log('finished');
 }).catch((err) => {
   console.log(err);
-})
+});
 

@@ -37,7 +37,8 @@
         "watch": "npm run copyshared && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "package": "npm run compile && vsce package"
+        "package": "npm run compile && vsce package -o ../build/vscode-wpilib-cpp.vsix",
+        "packageAll": "npm run package"
     },
     "devDependencies": {
         "typescript": "^2.7.2",
