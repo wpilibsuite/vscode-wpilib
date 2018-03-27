@@ -1,0 +1,10 @@
+{
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.metadata/**",
+    "**/archetype-resources/**",
+    "**/META-INF/maven/**",
+    "**/resources/**"
+  ],
+  "java.configuration.updateBuildConfiguration": "disabled"
+}
