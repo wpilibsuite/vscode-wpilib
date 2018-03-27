@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
-import { gradleRun } from './gradle';
+import { gradleRun } from './shared/gradle';
 import { CppPreferences } from './cpp_preferences';
 
 function readFileAsync(file: string): Promise<string> {

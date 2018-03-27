@@ -14,13 +14,15 @@
         "*"
     ],
     "main": "./out/extension",
+    "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "copyshared": "copyfiles -a-u 4 \"../../gradleBase/java/**/*\" resources/gradlebase && copyfiles -a-u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src && copyfiles -a-f ../shared/extensionAPIs/**.* src/shared && copyfiles -a-f ../shared/gradleAPIs/**.* src/shared && copyfiles -a-f ../shared/generatorAPIs/**.* src/shared",
+        "copyshared": "copyfiles -a -u 4 \"../../gradleBase/java/**/*\" resources/gradlebase && copyfiles -a -u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src && copyfiles -a -f ../shared/extensionAPIs/**.* src/shared && copyfiles -a -f ../shared/gradleAPIs/**.* src/shared && copyfiles -a -f ../shared/generatorAPIs/**.* src/shared",
         "compile": "npm run copyshared && tsc -p ./",
         "watch": "npm run copyshared && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "package": "npm run compile && vsce package"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
@@ -28,7 +30,8 @@
         "copyfiles": "^2.0.0",
         "tslint": "^5.9.1",
         "typescript": "^2.7.2",
-        "vscode": "^1.1.13"
+        "vscode": "^1.1.13",
+        "vsce": "^1.37.6"
     },
     "dependencies": {
         "@types/glob": "^5.0.35",
