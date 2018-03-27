@@ -160,7 +160,7 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "copyshared": "copyfiles -f ../shared/riolog/**.* src/riolog/shared && copyfiles -f ../shared/extensionAPIs/**.* src/shared",
+        "copyshared": "copyfiles -a-f ../shared/riolog/**.* src/riolog/shared && copyfiles -a-f ../shared/extensionAPIs/**.* src/shared",
         "compile": "npm run copyshared && tsc -p ./",
         "compileBundle": "npm run copyshared && tsc -p ./ && browserify ./out/riolog/shared/sharedscript.js > ./resources/bundle.js",
         "watch": "npm run copyshared && tsc -watch -p ./",
