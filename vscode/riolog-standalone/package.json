@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A minimal Electron application written with Typescript",
   "scripts": {
-    "copyshared": "copyfiles -f ../shared/riolog/**.* src/riolog/shared",
+    "copyshared": "copyfiles -a-f ../shared/riolog/**.* src/riolog/shared",
     "compile": "npm run copyshared tsc",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run compile && electron ./out/main.js",

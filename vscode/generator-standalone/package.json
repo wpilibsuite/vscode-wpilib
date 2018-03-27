@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A minimal Electron application written with Typescript",
   "scripts": {
-    "copyshared": "copyfiles -u 4 \"../../gradleBase/java/**/*\" resources/src/java/gradlebase && copyfiles -u 4 \"../../gradleBase/cpp/**/*\" resources/src/cpp/gradlebase && copyfiles -u 6 \"../../wpilibcExamples/src/main/cpp/**/*\" resources/src/cpp && copyfiles -u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src/java && copyfiles -f ../shared/generatorAPIs/**.* src/shared",
+    "copyshared": "copyfiles -a-u 4 \"../../gradleBase/java/**/*\" resources/src/java/gradlebase && copyfiles -a-u 4 \"../../gradleBase/cpp/**/*\" resources/src/cpp/gradlebase && copyfiles -a-u 6 \"../../wpilibcExamples/src/main/cpp/**/*\" resources/src/cpp && copyfiles -a-u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src/java && copyfiles -a-f ../shared/generatorAPIs/**.* src/shared",
     "compile": "npm run copyshared && tsc",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run compile && electron ./out/main.js",
