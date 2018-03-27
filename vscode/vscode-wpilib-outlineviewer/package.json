@@ -27,13 +27,15 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "package": "npm run compile && npm run vsce package"
     },
     "devDependencies": {
         "typescript": "^2.7.2",
         "vscode": "^1.1.13",
         "tslint": "^5.9.1",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "@types/mocha": "^2.2.42",
+        "vsce": "^1.37.6"
     }
 }

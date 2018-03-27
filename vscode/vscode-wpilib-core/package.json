@@ -158,14 +158,16 @@
             ]
         }
     },
+    "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "copyshared": "copyfiles -a-f ../shared/riolog/**.* src/riolog/shared && copyfiles -a-f ../shared/extensionAPIs/**.* src/shared",
+        "copyshared": "copyfiles -a -f ../shared/riolog/**.* src/riolog/shared && copyfiles -a -f ../shared/extensionAPIs/**.* src/shared",
         "compile": "npm run copyshared && tsc -p ./",
         "compileBundle": "npm run copyshared && tsc -p ./ && browserify ./out/riolog/shared/sharedscript.js > ./resources/bundle.js",
         "watch": "npm run copyshared && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "package": "npm run compile && vsce package"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
@@ -174,7 +176,8 @@
         "copyfiles": "^2.0.0",
         "tslint": "^5.9.1",
         "typescript": "^2.7.2",
-        "vscode": "^1.1.13"
+        "vscode": "^1.1.13",
+        "vsce": "^1.37.6"
     },
     "dependencies": {
         "jsonc-parser": "^1.0.1"
