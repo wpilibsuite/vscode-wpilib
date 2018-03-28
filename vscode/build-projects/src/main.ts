@@ -41,7 +41,14 @@ async function getProjectDirectories(): Promise<string[]> {
 async function main(): Promise<void> {
   const packageJsons: { loc: string, orig: string, new: string | undefined }[] = [];
   try {
-    const projectDirectories = await getProjectDirectories();
+    let projectDirectories = await getProjectDirectories();
+    const vscodeProjectDirectories = projectDirectories.filter((v) => {
+      return v.indexOf('vscode-') >= 0;
+    });
+    const standaloneProjectDirectories = projectDirectories.filter((v) => {
+      return v.indexOf('-standalone') >= 0;
+    });
+    projectDirectories = vscodeProjectDirectories;
     const searchPath = path.join(process.cwd(), '..');
     const fullProjectDirectories = [];
     let promiseArray: Promise<{ stdout: string; stderr: string; }>[] = [];

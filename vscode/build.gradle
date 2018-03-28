@@ -1,0 +1,25 @@
+task buildPlugins() {
+  doLast {
+    println 'plugins'
+  }
+}
+
+task buildStandalone() {
+  doLast {
+    println 'standalone'
+  }
+}
+
+task buildAllStandalone() {
+  doLast {
+    println 'standaloneAll'
+  }
+}
+
+task build {}
+
+task clean(type: Delete) {
+    delete buildDir
+}
+
+build.dependsOn buildPlugins

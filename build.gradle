@@ -1,0 +1,5 @@
+task build() {}
+
+task clean(type: Delete) {
+    delete buildDir
+}
