@@ -42,3 +42,11 @@ export function resolveAllPromises<T>(promises: Promise<T>[]) {
   return Promise.all(promises.map(mapPromise));
 
 }
+
+export interface IRunResult {
+  command: string;
+  stdout: string | undefined;
+  stderr: string | undefined;
+  success: boolean;
+  err: any;
+}
