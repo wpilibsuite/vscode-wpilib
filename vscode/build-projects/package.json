@@ -5,6 +5,9 @@
   "scripts": {
     "compile": "tsc",
     "lint": "tslint -c tslint.json -p tsconfig.json",
+    "installProjects": "node ./out/main.js -i",
+    "compileProjects": "node ./out/main.js -c",
+    "packageProjects": "node ./out/main.js -p",
     "start": "npm run compile && node ./out/main.js"
   },
   "main": "out/main.js",
@@ -28,6 +31,7 @@
     "@types/mkdirp": "^0.5.2",
     "@types/ncp": "^2.0.1",
     "@types/npm": "^2.0.29",
+    "@types/yargs": "^11.0.0",
     "glob": "^7.1.2",
     "jsonc-parser": "^1.0.3",
     "mkdirp": "^0.5.1",

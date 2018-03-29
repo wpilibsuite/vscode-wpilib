@@ -1,8 +1,7 @@
-import { exec } from './execution';
-import { resolveAllPromises, IRunResult } from './util';
+import { IRunResult } from './util';
 import { runBase } from './run';
 
-export async function runInstall(directories: string[], windows: boolean, mac: boolean, linux: boolean): Promise<IRunResult[]> {
+export async function runPackageUtility(directories: string[], windows: boolean, mac: boolean, linux: boolean): Promise<IRunResult[]> {
   let windowsArr: IRunResult[] = [];
   let macArr: IRunResult[] = [];
   let linuxArr: IRunResult[] = [];

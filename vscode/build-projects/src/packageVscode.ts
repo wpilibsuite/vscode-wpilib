@@ -1,5 +1,4 @@
-import { exec } from './execution';
-import { resolveAllPromises, IRunResult } from './util';
+import { IRunResult } from './util';
 import { runBase } from './run';
 
 export function runPackageVsCode(directories: string[]): Promise<IRunResult[]> {
