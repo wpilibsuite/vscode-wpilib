@@ -1,14 +1,16 @@
 {
-  "name": "riolog",
+  "name": "wpilib-utilities",
   "version": "1.0.0",
   "description": "A minimal Electron application written with Typescript",
   "scripts": {
     "copyshared": "copyfiles -a -f -u 3 ../shared/riolog/**.* src/riolog/shared",
-    "compile": "npm run copyshared && tsc",
+    "copyshared2": "copyfiles -a -u 4 \"../../gradleBase/java/**/*\" resources/src/java/gradlebase && copyfiles -a -u 4 \"../../gradleBase/cpp/**/*\" resources/src/cpp/gradlebase && copyfiles -a -u 6 \"../../wpilibcExamples/src/main/cpp/**/*\" resources/src/cpp && copyfiles -a -u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src/java && copyfiles -a -f ../shared/generatorAPIs/**.* src/shared",
+    "compile": "npm run copyshared && npm run copyshared2 && tsc",
+    "clean": "",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run compile && electron ./out/main.js",
-    "packageAll": "npm run compile && electron-packager . riolog --all --overwrite --out ../build",
-    "package": "npm run compile && electron-packager . riolog --overwrite --out ../build"
+    "packageAll": "npm run compile && electron-packager . wpilibutility --all --overwrite --out ../build",
+    "package": "npm run compile && electron-packager . wpilibutility --overwrite --out ../build"
   },
   "main": "out/main.js",
   "repository": "https://github.com/electron/electron-quick-start-typescript",
@@ -29,5 +31,14 @@
     "electron-packager": "^11.2.0",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2"
+  },
+  "dependencies": {
+    "@types/glob": "^5.0.35",
+    "@types/mkdirp": "^0.5.2",
+    "@types/ncp": "^2.0.1",
+    "glob": "^7.1.2",
+    "jsonc-parser": "^1.0.3",
+    "mkdirp": "^0.5.1",
+    "ncp": "^2.0.0"
   }
 }

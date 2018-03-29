@@ -1,27 +1,26 @@
 'use strict';
-import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole } from './shared/interfaces';
+import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole, IIPCReceiveMessage, IIPCSendMessage } from './shared/interfaces';
 import { EventEmitter } from 'events';
 import { RioConsole } from './shared/rioconsole';
 import * as fs from 'fs';
 import { IPrintMessage, IErrorMessage } from './shared/message';
 
-const ipcMain = require('electron').ipcMain;
-const dialog = require('electron').dialog;
+const dialog = require('electron').remote.dialog;
 
 export class RioLogWindowView extends EventEmitter implements IWindowView {
-  private window: Electron.BrowserWindow;
+  private fromMain: (data: IIPCSendMessage) => Promise<void>;
 
-  constructor(window: Electron.BrowserWindow) {
+  constructor(fromMain: (data: IIPCSendMessage) => Promise<void>) {
     super();
-    this.window = window;
-
-    ipcMain.on('messageToMain', (_:any, data:any) => {
-      this.emit('didReceiveMessage', data);
-    });
+    this.fromMain = fromMain;
   }
 
-  async postMessage(message: any): Promise<boolean> {
-    this.window.webContents.send('messageFromMain', message);
+  public messageToMain(data: IIPCReceiveMessage) {
+    this.emit('didReceiveMessage', data);
+  }
+
+  async postMessage(message: IIPCSendMessage): Promise<boolean> {
+    await this.fromMain(message);
     return true;
   }
 
@@ -54,14 +53,14 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 }
 
 export class RioLogWebviewProvider implements IWindowProvider {
-  private window: Electron.BrowserWindow;
+  private view: IWindowView;
 
-  constructor(window: Electron.BrowserWindow) {
-    this.window = window;
+  constructor(view: IWindowView) {
+    this.view = view;
   }
 
   createWindowView(): IWindowView {
-    return new RioLogWindowView(this.window);
+    return this.view;
   }
 }
 
