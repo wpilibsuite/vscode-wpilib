@@ -3,6 +3,7 @@ plugins {
 }
 
 task installBuilder(type: NpmTask) {
+  doFirst { mkdir "${buildDir}" }
   workingDir = file("${projectDir}/build-projects")
 
   args = ['install']
@@ -33,13 +34,28 @@ task compileProjects(type: NpmTask) {
   args = ['run', 'compileProjects']
 }
 
-
-task packageProjects(type: NpmTask) {
+task packageVsCode(type: NpmTask) {
   workingDir = file("${projectDir}/build-projects")
 
   dependsOn compileProjects
 
-  args = ['run', 'packageProjects']
+  args = ['run', 'packageVsCode']
+}
+
+task packageStandalone(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  dependsOn compileProjects
+
+  args = ['run', 'packageStandalone']
+}
+
+task packageStandaloneAll(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  dependsOn compileProjects
+
+  args = ['run', 'packageStandaloneAll']
 }
 
 task build {}
@@ -48,4 +64,4 @@ task clean(type: Delete) {
     delete buildDir
 }
 
-build.dependsOn compileProjects
+build.dependsOn packageVsCode
