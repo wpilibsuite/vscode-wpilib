@@ -6,7 +6,7 @@
     "copyshared": "copyfiles -a -f -u 3 ../shared/riolog/**.* src/riolog/shared",
     "copyshared2": "copyfiles -a -u 4 \"../../gradleBase/java/**/*\" resources/src/java/gradlebase && copyfiles -a -u 4 \"../../gradleBase/cpp/**/*\" resources/src/cpp/gradlebase && copyfiles -a -u 6 \"../../wpilibcExamples/src/main/cpp/**/*\" resources/src/cpp && copyfiles -a -u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/src/java && copyfiles -a -f ../shared/generatorAPIs/**.* src/shared",
     "compile": "npm run copyshared && npm run copyshared2 && tsc",
-    "clean": "",
+    "clean": "rmdir-cli resources/src && rmdir-cli src/shared && rmdir-cli src/riolog/shared && rmdir-cli out",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run compile && electron ./out/main.js",
     "packageAll": "npm run compile && electron-packager . wpilibutility --all --overwrite --out ../build",
@@ -27,8 +27,8 @@
   "devDependencies": {
     "copyfiles": "^2.0.0",
     "electron": "^1.8.4",
-    "electron-installer-zip": "^0.1.2",
     "electron-packager": "^11.2.0",
+    "rmdir-cli": "^2.0.6",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2"
   },
