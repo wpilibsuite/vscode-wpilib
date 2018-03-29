@@ -1,5 +1,5 @@
 import { exec } from './execution';
-import { resolveAllPromises, IRunResult } from './util';
+import { IRunResult } from './util';
 
 export async function runBase(command: string, directories: string[]): Promise<IRunResult[]> {
   const finishedArray: IRunResult[] = [];

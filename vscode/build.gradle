@@ -1,19 +1,45 @@
-task buildPlugins() {
-  doLast {
-    println 'plugins'
-  }
+plugins {
+  id "com.moowork.node" version "1.2.0"
 }
 
-task buildStandalone() {
-  doLast {
-    println 'standalone'
-  }
+task installBuilder(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  args = ['install']
 }
 
-task buildAllStandalone() {
-  doLast {
-    println 'standaloneAll'
-  }
+task compileBuilder(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  dependsOn installBuilder
+
+  args = ['run', 'compile']
+}
+
+task installProjects(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  dependsOn compileBuilder
+
+  args = ['run', 'installProjects']
+}
+
+
+task compileProjects(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  dependsOn installProjects
+
+  args = ['run', 'compileProjects']
+}
+
+
+task packageProjects(type: NpmTask) {
+  workingDir = file("${projectDir}/build-projects")
+
+  dependsOn compileProjects
+
+  args = ['run', 'packageProjects']
 }
 
 task build {}
@@ -22,4 +48,4 @@ task clean(type: Delete) {
     delete buildDir
 }
 
-build.dependsOn buildPlugins
+build.dependsOn compileProjects
