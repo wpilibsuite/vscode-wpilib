@@ -2,8 +2,8 @@
 import * as vscode from 'vscode';
 import { IDeployDebugAPI, ICodeDeployer } from './shared/externalapi';
 import { PreferencesAPI } from './preferencesapi';
-import { RioLogWebviewProvider, LiveRioConsoleProvider } from './riolog/vscodeimpl';
-import { RioLogWindow } from './riolog/shared/riologwindow';
+//import { RioLogWebviewProvider, LiveRioConsoleProvider } from './riolog/vscodeimpl';
+//import { RioLogWindow } from './riolog/shared/riologwindow';
 
 interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
   deployer: ICodeDeployer;
@@ -76,29 +76,29 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   private preferences: PreferencesAPI;
   private debugConfigurationProvider: WPILibDebugConfigurationProvider;
 
-  
-  private rioLogWebViewProvider: RioLogWebviewProvider;
-  private rioLogConsoleProvider: LiveRioConsoleProvider;
-  private liveWindow: RioLogWindow;
-  
+
+  //private rioLogWebViewProvider: RioLogWebviewProvider;
+  //private rioLogConsoleProvider: LiveRioConsoleProvider;
+  //private liveWindow: RioLogWindow;
 
 
-  constructor(resourcesFolder: string, preferences: PreferencesAPI) {
+
+  constructor(_resourcesFolder: string, preferences: PreferencesAPI) {
     super();
     this.preferences = preferences;
-    
-    this.rioLogWebViewProvider = new RioLogWebviewProvider(resourcesFolder);
-    this.rioLogConsoleProvider = new LiveRioConsoleProvider();
-    this.liveWindow = new RioLogWindow(this.rioLogWebViewProvider, this.rioLogConsoleProvider);
-    this.disposables.push(this.liveWindow);
-    
+
+    //this.rioLogWebViewProvider = new RioLogWebviewProvider(resourcesFolder);
+    //this.rioLogConsoleProvider = new LiveRioConsoleProvider();
+    //this.liveWindow = new RioLogWindow(this.rioLogWebViewProvider, this.rioLogConsoleProvider);
+    //this.disposables.push(this.liveWindow);
+
     this.debugConfigurationProvider = new WPILibDebugConfigurationProvider(this.preferences, this);
     this.disposables.push(this.debugConfigurationProvider);
   }
 
-  public async startRioLog(teamNumber: number, _: boolean): Promise<boolean> {
+  public async startRioLog(_teamNumber: number, _: boolean): Promise<boolean> {
     console.log('riolog requires insider');
-    this.liveWindow.start(teamNumber);
+    //this.liveWindow.start(teamNumber);
     return true;
   }
   public registerCodeDeploy(deployer: ICodeDeployer): void {
