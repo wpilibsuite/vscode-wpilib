@@ -7,7 +7,8 @@
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "installProjects": "node ./out/main.js -i",
     "compileProjects": "node ./out/main.js -c",
-    "packageProjects": "node ./out/main.js -p",
+    "packageVsCode": "node ./out/main.js -v",
+    "packageStandalone": "node ./out/main.js -s",
     "start": "npm run compile && node ./out/main.js"
   },
   "main": "out/main.js",

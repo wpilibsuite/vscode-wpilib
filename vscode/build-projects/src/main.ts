@@ -37,25 +37,24 @@ async function main(args: args.Arguments): Promise<void> {
     }
   }
 
-  if (args.p) {
-    console.log('running publish');
+  const vscodeProjects = projects.filter((v) => {
+    if (v.indexOf('vscode-wpilib-') >= 0) {
+      return true;
+    }
+    return false;
+  });
 
-    const vscodeProjects = projects.filter((v) => {
-      if (v.indexOf('vscode-wpilib') >= 0) {
-        return true;
-      }
-      return false;
-    });
+  const standaloneProjects = projects.filter((v) => {
+    if (v.indexOf('utility-standalone') >= 0) {
+      return true;
+    }
+    return false;
+  });
 
-    const standaloneProjects = projects.filter((v) => {
-      if (v.indexOf('utility-standalone') >= 0) {
-        return true;
-      }
-      return false;
-    });
+  if (args.v) {
+    console.log('running vscode publish');
 
     const vscodePublishResults = await runPackageVsCode(vscodeProjects);
-    const standalonePublishResults = await runPackageUtility(standaloneProjects, true, true, true);
 
     for (const c of vscodePublishResults) {
       if (!c.success) {
@@ -64,6 +63,38 @@ async function main(args: args.Arguments): Promise<void> {
       console.log(c.command);
       console.log(c.stdout);
     }
+  }
+
+  if (args.s) {
+    console.log('running standalone publish');
+    let windows = false;
+    let linux = false;
+    let mac = false;
+    switch (process.platform) {
+      case 'win32':
+        windows = true;
+        break;
+      case 'linux':
+        linux = true;
+        break;
+      case 'darwin':
+        mac = true;
+        break;
+    }
+    const standalonePublishResults = await runPackageUtility(standaloneProjects, windows, mac, linux);
+
+    for (const c of standalonePublishResults) {
+      if (!c.success) {
+        throw c.err;
+      }
+      console.log(c.command);
+      console.log(c.stdout);
+    }
+  }
+
+  if (args.sa) {
+    console.log('running standalone all publish');
+    const standalonePublishResults = await runPackageUtility(standaloneProjects, true, true, true);
 
     for (const c of standalonePublishResults) {
       if (!c.success) {
@@ -77,7 +108,9 @@ async function main(args: args.Arguments): Promise<void> {
 
 args.alias('i', 'install').describe('i', 'run npm install on all projects').boolean('i');
 args.alias('c', 'compile').describe('c', 'compile all projects').boolean('c');
-args.alias('p', 'publish').describe('p', 'create packages for publishing').boolean('p');
+args.alias('s', 'standalone').describe('s', 'create current standalone package for publishing').boolean('s');
+args.alias('sa', 'standaloneall').describe('sa', 'create all standalone packages for publishing').boolean('sa');
+args.alias('v', 'vscode').describe('v', 'create vscode packages for publishing').boolean('v');
 
 main(args.argv).then(() => {
   console.log('finished');
