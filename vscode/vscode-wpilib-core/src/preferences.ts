@@ -112,11 +112,7 @@ export class Preferences implements IPreferences {
     // If always ask, get it.
     const alwaysAsk = this.configuration.get<boolean>('alwaysAskForTeamNumber');
     if (alwaysAsk !== undefined && alwaysAsk === true) {
-      const teamNumber = await vscode.window.showInputBox({ prompt: 'Enter your team number' });
-      if (teamNumber === undefined) {
-        return -1;
-      }
-      return parseInt(teamNumber);
+      return await requestTeamNumber();
     }
     const res = this.configuration.get<number>('teamNumber');
     if (res === undefined || res < 0) {
