@@ -25,19 +25,10 @@ task installProjects(type: NpmTask) {
   args = ['run', 'installProjects']
 }
 
-
-task compileProjects(type: NpmTask) {
-  workingDir = file("${projectDir}/build-projects")
-
-  dependsOn installProjects
-
-  args = ['run', 'compileProjects']
-}
-
 task packageVsCode(type: NpmTask) {
   workingDir = file("${projectDir}/build-projects")
 
-  dependsOn compileProjects
+  dependsOn installProjects
 
   args = ['run', 'packageVsCode']
 }
@@ -45,7 +36,7 @@ task packageVsCode(type: NpmTask) {
 task packageStandalone(type: NpmTask) {
   workingDir = file("${projectDir}/build-projects")
 
-  dependsOn compileProjects
+  dependsOn installProjects
 
   args = ['run', 'packageStandalone']
 }
@@ -53,7 +44,7 @@ task packageStandalone(type: NpmTask) {
 task packageStandaloneAll(type: NpmTask) {
   workingDir = file("${projectDir}/build-projects")
 
-  dependsOn compileProjects
+  dependsOn installProjects
 
   args = ['run', 'packageStandaloneAll']
 }
