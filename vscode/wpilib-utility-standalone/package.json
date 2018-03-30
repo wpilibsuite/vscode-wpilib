@@ -9,8 +9,9 @@
     "clean": "rmdir-cli resources/src && rmdir-cli src/shared && rmdir-cli src/riolog/shared && rmdir-cli out",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run compile && electron ./out/main.js",
-    "packageAll": "npm run compile && electron-packager . wpilibutility --all --overwrite --out ../build",
-    "package": "npm run compile && electron-packager . wpilibutility --overwrite --out ../build"
+    "packageWindows": "npm run clean && npm run compile && electron-packager . wpilibutility --platform=win32 --arch=ia32 --overwrite --out ../build",
+    "packageLinux": "npm run clean && npm run compile && electron-packager . wpilibutility --platform=darwin --overwrite --out ../build",
+    "packageMac": "npm run clean && npm run compile && electron-packager . wpilibutility --platform=linux --overwrite --out ../build"
   },
   "main": "out/main.js",
   "repository": "https://github.com/electron/electron-quick-start-typescript",

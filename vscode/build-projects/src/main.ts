@@ -114,7 +114,5 @@ args.alias('v', 'vscode').describe('v', 'create vscode packages for publishing')
 
 main(args.argv).then(() => {
   console.log('finished');
-}).catch((err) => {
-  console.log(err);
 });
 
