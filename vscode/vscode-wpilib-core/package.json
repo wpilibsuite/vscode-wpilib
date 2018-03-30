@@ -62,16 +62,10 @@
                     "description": "Always ask for a team number, even if set",
                     "scope": "resource"
                 },
-                "wpilib.globalTeamNumberOverride": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Always resolve the vscode team number over the project team number.",
-                    "scope": "resource"
-                },
-                "wpilib.globalTeamNumber": {
+                "wpilib.teamNumber": {
                     "type": "integer",
                     "default": -1,
-                    "description": "Team number to use if not set in the project",
+                    "description": "Team number to use",
                     "scope": "resource"
                 }
             }

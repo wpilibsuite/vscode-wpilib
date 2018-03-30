@@ -7,17 +7,15 @@ import { IPreferences } from './shared/externalapi';
 import { ConfigurationTarget } from 'vscode';
 
 interface PreferencesJson {
-  teamNumber: number;
   currentLanguage: string;
 }
 
 const defaultPreferences: PreferencesJson = {
-  teamNumber: -1,
   currentLanguage: 'none',
 };
 
 export async function requestTeamNumber(): Promise<number> {
-  const teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
+  const teamNumber = await vscode.window.showInputBox({ prompt: 'Enter your team number' });
   if (teamNumber === undefined) {
     return -1;
   }
@@ -94,7 +92,7 @@ export class Preferences implements IPreferences {
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes (Globally)', 'Yes (Project)', 'No');
+    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes (Globally)', 'Yes (Workspace)', 'No');
     if (teamRequest === undefined) {
       return -1;
     }
@@ -104,7 +102,7 @@ export class Preferences implements IPreferences {
     }
     if (teamNumber !== -1 && teamRequest === 'Yes (Globally)') {
       await this.setTeamNumber(teamNumber, true);
-    } else if (teamNumber !== -1 && teamRequest === 'Yes (Project)') {
+    } else if (teamNumber !== -1 && teamRequest === 'Yes (Workspace)') {
       await this.setTeamNumber(teamNumber, false);
     }
     return teamNumber;
@@ -114,30 +112,28 @@ export class Preferences implements IPreferences {
     // If always ask, get it.
     const alwaysAsk = this.configuration.get<boolean>('alwaysAskForTeamNumber');
     if (alwaysAsk !== undefined && alwaysAsk === true) {
-      const teamNumber = await vscode.window.showInputBox( { prompt: 'Enter your team number'});
+      const teamNumber = await vscode.window.showInputBox({ prompt: 'Enter your team number' });
       if (teamNumber === undefined) {
         return -1;
       }
       return parseInt(teamNumber);
     }
-    if (this.preferencesJson.teamNumber === -1) {
-      // Check global preferences
-      const res = this.configuration.get<number>('globalTeamNumber');
-      if (res === undefined || res < 0) {
-        return await this.noTeamNumberLogic();
-      }
-      return res;
+    const res = this.configuration.get<number>('teamNumber');
+    if (res === undefined || res < 0) {
+      return await this.noTeamNumberLogic();
     }
-
-    return this.preferencesJson.teamNumber;
+    return res;
   }
 
-  public setTeamNumber(teamNumber: number, global: boolean): void {
-    if (global) {
-      this.configuration.update('globalTeamNumber', teamNumber, ConfigurationTarget.Global);
-    } else {
-      this.preferencesJson.teamNumber = teamNumber;
-      this.writePreferences();
+  public async setTeamNumber(teamNumber: number, global: boolean): Promise<void> {
+    try {
+      if (global) {
+        await this.configuration.update('teamNumber', teamNumber, ConfigurationTarget.Global);
+      } else {
+        await this.configuration.update('teamNumber', teamNumber, ConfigurationTarget.WorkspaceFolder);
+      }
+    } catch (err) {
+      console.log('error setting team number', err);
     }
   }
 
