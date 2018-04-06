@@ -62,11 +62,12 @@ export function activate(context: vscode.ExtensionContext) {
         }
         await externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
     }));
-    
+
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
             return;
         }
         const preferences = preferencesApi.getPreferences(workspace);
@@ -89,6 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
             return;
         }
         await externalApi.getDeployDebugAPI().deployCode(workspace);
@@ -98,6 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
             return;
         }
         await externalApi.getDeployDebugAPI().debugCode(workspace);
@@ -107,6 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
             return;
         }
 
@@ -132,11 +136,13 @@ export function activate(context: vscode.ExtensionContext) {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
             return;
         }
 
         const result = await vscode.window.showInformationMessage('Automatically save on deploy?', 'Yes', 'No');
         if (result === undefined) {
+            console.log('failed to set automatically save on deploy');
             return;
         }
         const preferences = preferencesApi.getPreferences(workspace);
@@ -155,11 +161,13 @@ export function activate(context: vscode.ExtensionContext) {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
             return;
         }
 
         const result = await vscode.window.showInformationMessage('Automatically start RioLog on deploy?', 'Yes', 'No');
         if (result === undefined) {
+            console.log('Invalid selection for riolog on deploy');
             return;
         }
         const preferences = preferencesApi.getPreferences(workspace);
