@@ -31,13 +31,10 @@ export class Preferences implements IPreferences {
   private readonly preferencesGlob: string = '**/' + this.preferenceFileName;
   private disposables: vscode.Disposable[] = [];
   public workspace: vscode.WorkspaceFolder;
-  public configuration: vscode.WorkspaceConfiguration;
 
   constructor(workspace: vscode.WorkspaceFolder) {
     this.workspace = workspace;
     this.configFolder = path.join(workspace.uri.fsPath, '.wpilib');
-
-    this.configuration = vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
 
     const configFilePath = path.join(this.configFolder, this.preferenceFileName);
 
@@ -69,6 +66,10 @@ export class Preferences implements IPreferences {
       this.updatePreferences();
     });
 
+  }
+
+  private getConfiguration(): vscode.WorkspaceConfiguration {
+    return vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
   }
 
   private updatePreferences() {
@@ -110,11 +111,11 @@ export class Preferences implements IPreferences {
 
   public async getTeamNumber(): Promise<number> {
     // If always ask, get it.
-    const alwaysAsk = this.configuration.get<boolean>('alwaysAskForTeamNumber');
+    const alwaysAsk = this.getConfiguration().get<boolean>('alwaysAskForTeamNumber');
     if (alwaysAsk !== undefined && alwaysAsk === true) {
       return await requestTeamNumber();
     }
-    const res = this.configuration.get<number>('teamNumber');
+    const res = this.getConfiguration().get<number>('teamNumber');
     if (res === undefined || res < 0) {
       return await this.noTeamNumberLogic();
     }
@@ -124,9 +125,9 @@ export class Preferences implements IPreferences {
   public async setTeamNumber(teamNumber: number, global: boolean): Promise<void> {
     try {
       if (global) {
-        await this.configuration.update('teamNumber', teamNumber, ConfigurationTarget.Global);
+        await this.getConfiguration().update('teamNumber', teamNumber, ConfigurationTarget.Global);
       } else {
-        await this.configuration.update('teamNumber', teamNumber, ConfigurationTarget.WorkspaceFolder);
+        await this.getConfiguration().update('teamNumber', teamNumber, ConfigurationTarget.WorkspaceFolder);
       }
     } catch (err) {
       console.log('error setting team number', err);
@@ -143,7 +144,7 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoStartRioLog(): boolean {
-    const res = this.configuration.get<boolean>('autoStartRioLog');
+    const res = this.getConfiguration().get<boolean>('autoStartRioLog');
     if (res === undefined) {
       return false;
     }
@@ -155,11 +156,11 @@ export class Preferences implements IPreferences {
     if (!global) {
       target = ConfigurationTarget.WorkspaceFolder;
     }
-    this.configuration.update('autoStartRioLog', autoStart, target);
+    this.getConfiguration().update('autoStartRioLog', autoStart, target);
   }
 
   public getAutoSaveOnDeploy(): boolean {
-    const res = this.configuration.get<boolean>('autoSaveOnDeploy');
+    const res = this.getConfiguration().get<boolean>('autoSaveOnDeploy');
     if (res === undefined) {
       return false;
     }
@@ -171,7 +172,7 @@ export class Preferences implements IPreferences {
     if (!global) {
       target = ConfigurationTarget.WorkspaceFolder;
     }
-    this.configuration.update('autoSaveOnDeploy', autoSave, target);
+    this.getConfiguration().update('autoSaveOnDeploy', autoSave, target);
   }
 
   public dispose() {
