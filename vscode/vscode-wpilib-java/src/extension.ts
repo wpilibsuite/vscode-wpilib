@@ -2,12 +2,13 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { IExternalAPI, getPreferencesAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getExternalAPIExpectedVersion } from './shared/externalapi';
+import { IExternalAPI, getPreferencesAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getExternalAPIExpectedVersion, getCommandAPIExpectedVersion } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './shared/gradle';
 import * as path from 'path';
 import { Examples } from './shared/examples';
 import { Templates } from './shared/templates';
+import { Commands } from './commands';
 
 interface DebuggerParse {
     port: string;
@@ -73,13 +74,19 @@ export async function activate(context: vscode.ExtensionContext) {
     const preferences = coreExports.getPreferencesAPI();
     const debugDeploy = coreExports.getDeployDebugAPI();
     const exampleTemplate = coreExports.getExampleTemplateAPI();
+    const commandApi = coreExports.getCommandAPI();
 
     let exampleTemplateValid = false;
     let debugDeployValid = false;
     let preferencesValid = false;
+    let commandValid = false;
 
     if (exampleTemplate !== undefined) {
         exampleTemplateValid = exampleTemplate.getVersion() === getExampleTemplateAPIExpectedVersion();
+    }
+
+    if (commandApi !== undefined) {
+        commandValid = commandApi.getVersion() === getCommandAPIExpectedVersion();
     }
 
     if (debugDeploy !== undefined) {
@@ -168,6 +175,12 @@ export async function activate(context: vscode.ExtensionContext) {
     } else {
         vscode.window.showInformationMessage('Java does not match Core. Update');
         console.log('Java debug/deploy extension out of date');
+    }
+
+    if (commandValid === true && commandApi !== undefined && preferencesValid === true && preferences !== undefined) {
+        // Setup commands
+        const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
+        context.subscriptions.push(commands);
     }
 
     if (exampleTemplateValid === true && exampleTemplate !== undefined) {

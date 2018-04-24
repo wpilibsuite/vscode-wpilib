@@ -8,18 +8,21 @@ import { ToolAPI } from './toolapi';
 import { DeployDebugAPI } from './deploydebugapi';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
+import { CommandAPI } from './commandapi';
 
 class ExternalAPI extends IExternalAPI {
     private toolApi: ToolAPI;
     private debugDeployApi: DeployDebugAPI;
     private preferencesApi: PreferencesAPI;
     private exampleTemplateApi: ExampleTemplateAPI;
+    private commandApi: CommandAPI;
     constructor(resourcesLocation: string) {
         super();
         this.toolApi = new ToolAPI();
         this.preferencesApi = new PreferencesAPI();
         this.debugDeployApi = new DeployDebugAPI(resourcesLocation, this.preferencesApi);
         this.exampleTemplateApi = new ExampleTemplateAPI();
+        this.commandApi = new CommandAPI(this.preferencesApi);
     }
 
     public getToolAPI(): ToolAPI {
@@ -33,6 +36,10 @@ class ExternalAPI extends IExternalAPI {
     }
     public getPreferencesAPI(): PreferencesAPI {
         return this.preferencesApi;
+    }
+
+    public getCommandAPI(): CommandAPI {
+        return this.commandApi;
     }
 }
 
@@ -104,6 +111,20 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
         await externalApi.getDeployDebugAPI().debugCode(workspace);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {
+        if (arg === undefined) {
+            await vscode.window.showInformationMessage('Must select a folder to create a command');
+            return;
+        }
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot create command in an empty workspace');
+            return;
+        }
+        await externalApi.getCommandAPI().createCommand(workspace, arg);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setLanguage', async () => {

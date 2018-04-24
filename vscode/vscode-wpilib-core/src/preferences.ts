@@ -39,6 +39,7 @@ export class Preferences implements IPreferences {
     const configFilePath = path.join(this.configFolder, this.preferenceFileName);
 
     if (fs.existsSync(configFilePath)) {
+      vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
       this.preferencesFile = vscode.Uri.file(configFilePath);
       this.preferencesJson = defaultPreferences;
       this.updatePreferences();
@@ -53,11 +54,13 @@ export class Preferences implements IPreferences {
     this.disposables.push(this.configFileWatcher);
 
     this.configFileWatcher.onDidCreate((uri) => {
+      vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
       this.preferencesFile = uri;
       this.updatePreferences();
     });
 
     this.configFileWatcher.onDidDelete(() => {
+      vscode.commands.executeCommand('setContext', 'isWPILibProject', false);
       this.preferencesFile = undefined;
       this.updatePreferences();
     });

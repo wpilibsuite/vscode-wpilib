@@ -2,7 +2,7 @@
     "name": "vscode-wpilib-core",
     "displayName": "vscode-wpilib-core",
     "description": "Base extension for WPILib Team Use",
-    "version": "0.0.31",
+    "version": "0.0.33",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -120,6 +120,11 @@
                 "command": "wpilibcore.createTemplate",
                 "title": "Create new project from a template",
                 "category": "WPILIB"
+            },
+            {
+                "command": "wpilibcore.createCommand",
+                "title": "Create a new command",
+                "category": "WPILIB"
             }
         ],
         "keybindings": [
@@ -131,6 +136,7 @@
         "menus": {
             "editor/title": [
                 {
+                    "when": "isWPILibProject",
                     "command": "wpilibcore.deployCode",
                     "group": "wpilib"
                 },
@@ -141,11 +147,13 @@
             ],
             "explorer/context": [
                 {
+                    "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.deployCode",
                     "group": "wpilib"
                 },
                 {
-                    "command": "wpilibcore.startTool",
+                    "when": "explorerResourceIsFolder",
+                    "command": "wpilibcore.createCommand",
                     "group": "wpilib"
                 }
             ]

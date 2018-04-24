@@ -39,6 +39,18 @@ export abstract class IExampleTemplateAPI implements IVersionable {
   }
 }
 
+const commandAPIExpectedVersion = 1;
+export function getCommandAPIExpectedVersion(): number {
+  return exampleTemplateAPIExpectedVersion;
+}
+export abstract class ICommandAPI implements IVersionable {
+  public abstract addCommandProvider(provider: ICommandCreator): void;
+  public abstract createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean>;
+  public getVersion(): number {
+    return commandAPIExpectedVersion;
+  }
+}
+
 const deployDebugAPIExpectedVersion = 1;
 export function getDeployDebugAPIExpectedVersion(): number {
   return deployDebugAPIExpectedVersion;
@@ -77,6 +89,7 @@ export abstract class IExternalAPI implements IVersionable {
   public abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
   public abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
   public abstract getPreferencesAPI(): IPreferencesAPI | undefined;
+  public abstract getCommandAPI(): ICommandAPI | undefined;
   public getVersion(): number {
     return externalAPIExpectedVersion;
   }
@@ -98,6 +111,14 @@ export interface IExampleTemplateCreator {
   getDisplayName(): string;
   getDescription(): string;
   generate(folderInto: vscode.Uri): Promise<boolean>;
+}
+
+export interface ICommandCreator {
+  getLanguage(): string;
+  getDisplayName(): string;
+  getDescription(): string;
+  getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  generate(folder: vscode.Uri): Promise<boolean>;
 }
 
 export interface IToolRunner {
