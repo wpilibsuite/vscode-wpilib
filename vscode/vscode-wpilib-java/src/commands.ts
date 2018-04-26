@@ -116,7 +116,7 @@ export class Commands {
           async generate(folder: vscode.Uri): Promise<boolean> {
             // root is src/main/java
             const folderpath = folder.path;
-            const searchString = 'src/main/java';
+            const searchString = '/src/main/java';
             const rootIndex = folderpath.lastIndexOf(searchString);
 
             let javaPackage = '';

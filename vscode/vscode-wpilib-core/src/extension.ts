@@ -114,6 +114,7 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {
+        console.log('Create Command Called');
         if (arg === undefined) {
             await vscode.window.showInformationMessage('Must select a folder to create a command');
             return;

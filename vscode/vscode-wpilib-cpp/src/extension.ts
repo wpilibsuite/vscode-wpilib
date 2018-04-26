@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { IExternalAPI, getExternalAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getPreferencesAPIExpectedVersion } from './shared/externalapi';
+import { IExternalAPI, getExternalAPIExpectedVersion, getExampleTemplateAPIExpectedVersion, getDeployDebugAPIExpectedVersion, getPreferencesAPIExpectedVersion, getCommandAPIExpectedVersion } from './shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from './shared/gradle';
 import * as path from 'path';
@@ -12,6 +12,7 @@ import { CppVsCodeProperties } from './cpp_vscode_properties';
 import { CppPreferences } from './cpp_preferences';
 import { Examples } from './shared/examples';
 import { Templates } from './shared/templates';
+import { Commands } from './commands';
 
 interface DebuggerParse {
     port: string;
@@ -88,13 +89,19 @@ export async function activate(context: vscode.ExtensionContext) {
     const preferences = coreExports.getPreferencesAPI();
     const debugDeploy = coreExports.getDeployDebugAPI();
     const exampleTemplate = coreExports.getExampleTemplateAPI();
+    const commandApi = coreExports.getCommandAPI();
 
     let exampleTemplateValid = false;
     let debugDeployValid = false;
     let preferencesValid = false;
+    let commandValid = false;
 
     if (exampleTemplate !== undefined) {
         exampleTemplateValid = exampleTemplate.getVersion() === getExampleTemplateAPIExpectedVersion();
+    }
+
+    if (commandApi !== undefined) {
+        commandValid = commandApi.getVersion() === getCommandAPIExpectedVersion();
     }
 
     if (debugDeploy !== undefined) {
@@ -308,6 +315,12 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.refreshProperties', () => {
             vscode.window.showInformationMessage('Refresh not currently valid');
         }));
+    }
+
+    if (commandValid === true && commandApi !== undefined && preferencesValid === true && preferences !== undefined) {
+        // Setup commands
+        const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
+        context.subscriptions.push(commands);
     }
 
     if (exampleTemplateValid === true && exampleTemplate !== undefined) {

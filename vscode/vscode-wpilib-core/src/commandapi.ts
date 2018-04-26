@@ -78,7 +78,7 @@ export class CommandAPI extends ICommandAPI {
             label: language,
             description: 'Choice of language'
           };
-          this.creators.push(lp);
+          validLanguages.push(lp);
         }
 
         lp.creators.push(d);
@@ -107,7 +107,7 @@ export class CommandAPI extends ICommandAPI {
       return false;
     }
 
-    return await selection.creator.generate(folder);
+    return await selection.creator.generate(folder, workspace);
   }
 
   public dispose() {

@@ -118,7 +118,7 @@ export interface ICommandCreator {
   getDisplayName(): string;
   getDescription(): string;
   getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  generate(folder: vscode.Uri): Promise<boolean>;
+  generate(folder: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<boolean>;
 }
 
 export interface IToolRunner {
