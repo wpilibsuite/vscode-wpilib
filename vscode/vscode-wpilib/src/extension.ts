@@ -58,6 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vscode-wpilib" is now active!');
 
+    activateCpp(context, externalApi);
+    activateJava(context, externalApi);
+
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLog', async () => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
@@ -213,9 +216,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createTemplate', async () => {
         await externalApi.getExampleTemplateAPI().createTemplate();
     }));
-
-    activateCpp(context, externalApi);
-    activateJava(context, externalApi);
 
     return externalApi;
 }

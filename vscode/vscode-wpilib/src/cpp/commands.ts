@@ -16,7 +16,7 @@ interface JsonLayout {
   replacename: string;
 }
 
-async function performCopy(commandRoot: string, command: JsonLayout, folderSrc: vscode.Uri, folderHeader: vscode.Uri, replaceName: string): Promise<boolean> {
+async function performCopy(commandRoot: string, command: JsonLayout, folderSrc: vscode.Uri, folderHeader: vscode.Uri, includeRoot: vscode.Uri, replaceName: string): Promise<boolean> {
   const commandFolder = path.join(commandRoot, command.foldername);
   const copiedSrcFiles: string[] = [];
   const copiedHeaderFiles: string[] = [];
@@ -83,7 +83,11 @@ async function performCopy(commandRoot: string, command: JsonLayout, folderSrc: 
         if (err) {
           reject(err);
         } else {
-          const dataOut = dataIn.replace(new RegExp(command.replacename, 'g'), replaceName);
+          const dataOut = dataIn.replace(new RegExp(`#include "${command.replacename}.h"`, 'g'), `#include "${path.join(path.relative(includeRoot.path, folderHeader.path), replaceName)}.h"`)
+                                .replace(new RegExp(command.replacename, 'g'), replaceName);
+
+
+
           fs.writeFile(file, dataOut, 'utf8', (err1) => {
             if (err1) {
               reject(err);
@@ -203,24 +207,28 @@ export class Commands {
 
             let srcFolder = vscode.Uri.file('');
             let headerFolder = vscode.Uri.file('');
+            let includeRoot = vscode.Uri.file('');
 
             if (rootInclude === rootSrc) {
               // Weird folder, put both in same directory
               srcFolder = folder;
               headerFolder = folder;
+              includeRoot = folder;
             } else if (rootSrc === 0) {
               const filePath = path.relative('src', workspaceRooted);
               srcFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', filePath));
               headerFolder = vscode.Uri.file(path.join(workspace.uri.path, 'include', filePath));
+              includeRoot = vscode.Uri.file(path.join(workspace.uri.path, 'include'));
               // Current folder is src
 
             } else {
               const filePath = path.relative('include', workspaceRooted);
               srcFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', filePath));
               headerFolder = vscode.Uri.file(path.join(workspace.uri.path, 'include', filePath));
+              includeRoot = vscode.Uri.file(path.join(workspace.uri.path, 'include'));
               // current folder is include
             }
-            return await performCopy(commandFolder, c, srcFolder, headerFolder, className);
+            return await performCopy(commandFolder, c, srcFolder, headerFolder, includeRoot, className);
           }
         };
         core.addCommandProvider(provider);

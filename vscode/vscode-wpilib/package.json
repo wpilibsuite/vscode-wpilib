@@ -2,7 +2,7 @@
     "name": "vscode-wpilib",
     "displayName": "vscode-wpilib",
     "description": "VSCode extension for WPILib Team Use",
-    "version": "0.0.37",
+    "version": "0.0.38",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.20.0"
@@ -198,6 +198,9 @@
         "@types/glob": "^5.0.35",
         "@types/mkdirp": "^0.5.2",
         "@types/ncp": "^2.0.1",
-        "jsonc-parser": "^1.0.1"
+        "glob": "^7.1.2",
+        "jsonc-parser": "^1.0.3",
+        "mkdirp": "^0.5.1",
+        "ncp": "^2.0.0"
     }
 }
