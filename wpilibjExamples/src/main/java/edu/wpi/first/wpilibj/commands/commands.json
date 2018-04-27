@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Command",
+    "description": "Create a base command",
+    "tags": [
+      "command"
+    ],
+    "foldername": "command",
+    "replacename": "ReplaceMeCommand"
+  },
+  {
+    "name": "Command Group",
+    "description": "Create a command group",
+    "tags": [
+      "commandgroup"
+    ],
+    "foldername": "commandgroup",
+    "replacename": "ReplaceMeCommandGroup"
+  }
+]
