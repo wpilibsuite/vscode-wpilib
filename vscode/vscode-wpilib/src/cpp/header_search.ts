@@ -5,7 +5,7 @@ import { CppGradleProperties } from './cpp_gradle_properties';
 
 function getFilesInDirectory(root: string) : Promise<string[]> {
   return new Promise(function (resolve, _) {
-      glob('**/*.{h, hpp, hh}', { nomount: true,  cwd: root},  (error: Error | null, result : string[]) => {
+      glob('**/*.{h,hpp,hh}', { nomount: true,  cwd: root},  (error: Error | null, result : string[]) => {
           if (error) {
               resolve([]);
           } else {
