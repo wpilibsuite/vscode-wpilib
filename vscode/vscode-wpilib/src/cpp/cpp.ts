@@ -56,7 +56,8 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
     const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
     if (cppExtension === undefined) {
-        vscode.window.showInformationMessage('Could not find cpptools C++ extension. Debugging is disabled.');
+        //TODO: Make this a visible warning message when project detected is cpp
+        console.log('Could not find cpptools C++ extension. Debugging is disabled.');
         allowDebug = false;
     } else if (!cppExtension.isActive) {
         promises.push(cppExtension.activate());

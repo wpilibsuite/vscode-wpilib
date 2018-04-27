@@ -44,7 +44,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
     const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
     if (javaExtension === undefined) {
-        vscode.window.showInformationMessage('Could not find java extension. Debugging is disabled.');
+        //TODO: Make this a visible warning message when project detected is java
+        console.log('Could not find java extension. Debugging is disabled.');
         allowDebug = false;
     }
 
