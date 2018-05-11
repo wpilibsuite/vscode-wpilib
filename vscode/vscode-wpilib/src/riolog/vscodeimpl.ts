@@ -1,8 +1,3 @@
-/*
-
-// add     `"enableProposedApi": true, ` to package.json
-// Also find the latest vscode.proposed.d.ts, and add it to the code base to be compiled.
-
 'use strict';
 
 import * as vscode from 'vscode';
@@ -19,12 +14,12 @@ interface IHTMLProvider {
 }
 
 export class RioLogWindowView extends EventEmitter implements IWindowView {
-    private webview: vscode.Webview;
+    private webview: vscode.WebviewPanel;
     private disposables: vscode.Disposable[] = [];
 
     constructor(resourceName: string, windowName: string, viewColumn: vscode.ViewColumn) {
         super();
-        this.webview = vscode.window.createWebview(resourceName,
+        this.webview = vscode.window.createWebviewPanel(resourceName,
             windowName, viewColumn, {
                 enableScripts: true,
                 enableCommandUris: true,
@@ -34,12 +29,12 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
         this.disposables.push(this.webview);
 
         this.webview.onDidChangeViewState((s) => {
-            if (s.active === true) {
+            if (s.webviewPanel.visible === true) {
                 this.emit('windowActive');
             }
         }, null, this.disposables);
 
-        this.webview.onDidReceiveMessage((data: IIPCReceiveMessage) => {
+        this.webview.webview.onDidReceiveMessage((data: IIPCReceiveMessage) => {
             this.emit('didReceiveMessage', data);
         }, null, this.disposables);
 
@@ -49,10 +44,10 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     }
 
     public setHTML(html: string): void {
-        this.webview.html = html;
+        this.webview.webview.html = html;
     }
     public async postMessage(message: IIPCSendMessage): Promise<boolean> {
-        return await this.webview.postMessage(message);
+        return await this.webview.webview.postMessage(message);
     }
     public dispose() {
         for (const d of this.disposables) {
@@ -111,7 +106,3 @@ export class LiveRioConsoleProvider implements IRioConsoleProvider {
         return new RioConsole();
     }
 }
-
-
-
-*/

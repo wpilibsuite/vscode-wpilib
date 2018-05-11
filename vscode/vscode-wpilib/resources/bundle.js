@@ -2,12 +2,13 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 const sharedscript_1 = require("../shared/sharedscript");
+const vscode = acquireVsCodeApi();
 function checkResize() {
     sharedscript_1.checkResizeImpl(document.documentElement);
 }
 exports.checkResize = checkResize;
 function sendMessage(message) {
-    window.parent.postMessage(message, '*');
+    vscode.postMessage(message, '*');
 }
 exports.sendMessage = sendMessage;
 window.addEventListener('message', event => {
@@ -702,13 +703,7 @@ function setViewerPage() {
 }
 exports.setViewerPage = setViewerPage;
 window.addEventListener('load', (_) => {
-    const isViewer = document.getElementById('isViewer');
-    if (isViewer) {
-        setViewerPage();
-    }
-    else {
-        setLivePage();
-    }
+    setLivePage();
 });
 
 },{"../script/implscript":1,"./interfaces":2,"./message":3}]},{},[4]);

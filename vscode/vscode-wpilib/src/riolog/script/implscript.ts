@@ -3,13 +3,17 @@
 import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
 import { IIPCReceiveMessage, IIPCSendMessage } from '../shared/interfaces';
 
+// tslint:disable-next-line:no-any
+declare function acquireVsCodeApi(): any;
+
+const vscode = acquireVsCodeApi();
 
 export function checkResize() {
     checkResizeImpl(document.documentElement);
 }
 
 export function sendMessage(message: IIPCReceiveMessage) {
-    window.parent.postMessage(message, '*');
+    vscode.postMessage(message, '*');
 }
 
 window.addEventListener('message', event => {
