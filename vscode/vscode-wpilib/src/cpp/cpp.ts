@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import { DebugCommands, startDebugging } from './debug';
 import { gradleRun, OutputPair } from '../shared/gradle';
 import * as path from 'path';
-import { WpiLibHeaders } from './header_search';
 import { CppGradleProperties, ExternalEditorConfig } from './cpp_gradle_properties';
 import { CppVsCodeProperties } from './cpp_vscode_properties';
 import { CppPreferences } from './cpp_preferences';
@@ -77,7 +76,6 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
         const workspaces = vscode.workspace.workspaceFolders;
 
         const gradleProps: CppGradleProperties[] = [];
-        const headerFinders: WpiLibHeaders[] = [];
         const cppProps: CppVsCodeProperties[] = [];
         const cppPrefs: CppPreferences[] = [];
 
@@ -94,11 +92,9 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
                 const cpr = new CppPreferences(w);
                 const gp = new CppGradleProperties(w, gradleChannel, cpr);
                 await gp.forceReparse();
-                const wh = new WpiLibHeaders(gp);
                 const cp = new CppVsCodeProperties(w, gp, cpr);
                 cppPrefs.push(cpr);
                 gradleProps.push(gp);
-                headerFinders.push(wh);
                 cppProps.push(cp);
             }
         }
@@ -107,9 +103,6 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
         preferences.onDidPreferencesFolderChanged(async (changed) => {
             // Nuke and reset
             // TODO: Remove existing header finders from the extension context
-            for (const p of headerFinders) {
-                p.dispose();
-            }
             for (const p of gradleProps) {
                 p.dispose();
             }
@@ -124,21 +117,15 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
                 const cpr = new CppPreferences(c.workspace);
                 const gp = new CppGradleProperties(c.workspace, gradleChannel, cpr);
                 await gp.forceReparse();
-                const wh = new WpiLibHeaders(gp);
                 const cp = new CppVsCodeProperties(c.workspace, gp, cpr);
                 cppPrefs.push(cpr);
                 gradleProps.push(gp);
-                headerFinders.push(wh);
                 cppProps.push(cp);
             }
-
-            context.subscriptions.push(...headerFinders);
             context.subscriptions.push(...gradleProps);
             context.subscriptions.push(...cppProps);
             context.subscriptions.push(...cppPrefs);
         });
-
-        context.subscriptions.push(...headerFinders);
         context.subscriptions.push(...gradleProps);
         context.subscriptions.push(...cppProps);
         context.subscriptions.push(...cppPrefs);
