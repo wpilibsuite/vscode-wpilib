@@ -105,22 +105,7 @@ export class CppGradleProperties {
     this.disposables.push(this.propertiesChange);
 
     buildPropertiesListener.onDidCreate((file) => {
-      let current: string | undefined;
-      try {
-        current = fs.readFileSync(file.fsPath, 'utf8');
-      } catch (error) {
-      }
-
-      if (current === undefined) {
-        this.lastConfig = defaultConfig;
-        this.libraryHeaderDirsChanged.fire([]);
-        this.localHeaderDirsChanged.fire([]);
-        this.propertiesChange.fire();
-        return;
-      }
-
-      const parsed: IEditorConfig = jsonc.parse(current);
-      this.loadNewFile(parsed);
+      this.handleNewFile(file);
     });
 
     buildPropertiesListener.onDidDelete(() => {
@@ -150,6 +135,33 @@ export class CppGradleProperties {
       const parsed: IEditorConfig = jsonc.parse(current);
       this.checkForChanges(parsed);
     });
+    vscode.workspace.findFiles(this.gradleJsonFileGlob, wp.uri.fsPath).then(async (f) => {
+      if (f.length === 0) {
+          // File not found, force a refresh.
+          await this.runGradleRefresh();
+      } else {
+        this.handleNewFile(f[0]);
+      }
+    });
+  }
+
+  private handleNewFile(file: vscode.Uri) {
+    let current: string | undefined;
+    try {
+      current = fs.readFileSync(file.fsPath, 'utf8');
+    } catch (error) {
+    }
+
+    if (current === undefined) {
+      this.lastConfig = defaultConfig;
+      this.libraryHeaderDirsChanged.fire([]);
+      this.localHeaderDirsChanged.fire([]);
+      this.propertiesChange.fire();
+      return;
+    }
+
+    const parsed: IEditorConfig = jsonc.parse(current);
+    this.loadNewFile(parsed);
   }
 
   private checkForChanges(newContents: IEditorConfig) {
