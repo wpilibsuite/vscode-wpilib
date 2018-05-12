@@ -1,113 +1,46 @@
 'use strict';
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { CppGradleProperties } from './cpp_gradle_properties';
 import { CppPreferences } from './cpp_preferences';
-
-interface Browse {
-  path?: string[];
-  limitSymbolsToIncludedHeaders?: boolean;
-  databaseFilename?: string;
-}
-
-interface Configuration {
-  name: string;
-  compilerPath?: string;
-  cStandard?: string;
-  cppStandard?: string;
-  includePath?: string[];
-  macFrameworkPath?: string[];
-  defines?: string[];
-  intelliSenseMode?: string;
-  compileCommands?: string;
-  forcedInclude?: string[];
-  browse?: Browse;
-}
-
-interface ConfigurationJson {
-  configurations: Configuration[];
-  version: number;
-}
-
-const systemHeaders: string[] = [
-  '\\arm-frc-linux-gnueabi\\include\\c++\\5.5.0',
-  '\\arm-frc-linux-gnueabi\\include\\c++\\5.5.0\\arm-frc-linux-gnueabi',
-  '\\arm-frc-linux-gnueabi\\include\\c++\\5.5.0\\backward',
-  '\\lib\\gcc\\arm-frc-linux-gnueabi\\5.5.0\\include',
-  '\\lib\\gcc\\arm-frc-linux-gnueabi\\5.5.0\\include-fixed',
-  '\\arm-frc-linux-gnueabi\\include',
-  '\\usr\\include'
-];
-
-const defaultDefines: string[] = [
-  '__linux__',
-  '__SIZE_TYPE__=unsigned int'
-];
-
-const cppStandard = 'c++14';
-const cStandard = 'c11';
-const intelliSenseMode = 'clang-x64';
-const platformName = 'RoboRio';
-
-const version = 3;
 
 export class CppVsCodeProperties {
   private gradleProps: CppGradleProperties;
   private cppPreferences: CppPreferences;
-
-  private readonly cppPropertiesFile: string;
-  private readonly configFolder: string;
+  private workspace: vscode.WorkspaceFolder;
 
   public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties,  prefs: CppPreferences) {
     this.gradleProps = gp;
     this.cppPreferences = prefs;
+    this.workspace = wp;
 
-    this.configFolder = path.join(wp.uri.fsPath, '.vscode');
-    this.cppPropertiesFile = path.join(this.configFolder, 'c_cpp_properties.json');
-
-    gp.onDidPropertiesChange(() => {
-      this.updateCppConfigurationFile();
+    gp.onDidPropertiesChange(async () => {
+      await this.updateCppConfigurationFile();
     });
   }
 
-  private updateCppConfigurationFile() {
+  private getConfiguration(): vscode.WorkspaceConfiguration {
+    return vscode.workspace.getConfiguration('C_Cpp.default', this.workspace.uri);
+  }
+
+  private async  updateCppConfigurationFile() : Promise<void> {
     const includes: string[] = this.cppPreferences.getAdditionalIncludeDirectories();
     const defines: string[] = this.cppPreferences.getAdditionalDefines();
 
     const compiler = this.gradleProps.getCompiler();
-    const sysroot = this.gradleProps.getSysRoot();
-
-    for (const s of systemHeaders) {
-      includes.push(path.join(sysroot, s));
-    }
 
     includes.push(...this.gradleProps.getLibraryHeaders());
     includes.push(...this.gradleProps.getLocalHeaders());
 
-    defines.push(...defaultDefines);
+    const config = this.getConfiguration();
 
-    const configuration: ConfigurationJson = {
-      version: version,
-      configurations: [
-        {
-          name: platformName,
-          intelliSenseMode: intelliSenseMode,
-          cStandard: cStandard,
-          cppStandard: cppStandard,
-          defines: defines,
-          includePath: includes,
-          compilerPath: path.normalize(compiler)
-        }
-      ]
-    };
-
-    const serialized = JSON.stringify(configuration, null, 4);
-    try {
-      fs.mkdirSync(this.configFolder);
-    } catch (error) {
-    }
-    fs.writeFileSync(this.cppPropertiesFile, serialized);
+    await config.update('browse.path', includes, vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('includePath', includes, vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('cppStandard', 'c++14', vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('cStandard', 'c11', vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('intelliSenseMode', 'clang-x64', vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('compilerPath', compiler, vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('defines', defines, vscode.ConfigurationTarget.WorkspaceFolder);
+    await config.update('browse.limitSymbolsToIncludedHeaders', true, vscode.ConfigurationTarget.WorkspaceFolder);
   }
 
   public dispose() {
