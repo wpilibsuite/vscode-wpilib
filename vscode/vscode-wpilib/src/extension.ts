@@ -218,6 +218,14 @@ export function activate(context: vscode.ExtensionContext) {
         await externalApi.getExampleTemplateAPI().createTemplate();
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.buildCode', async () => {
+        await externalApi.getExampleTemplateAPI().createTemplate();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.testCode', async () => {
+        await externalApi.getExampleTemplateAPI().createTemplate();
+    }));
+
     const help = new Help(path.join(context.extensionPath, 'resources'));
     context.subscriptions.push(help);
 
