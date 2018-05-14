@@ -22,7 +22,19 @@ export class CppVsCodeProperties {
     return vscode.workspace.getConfiguration('C_Cpp.default', this.workspace.uri);
   }
 
-  private async  updateCppConfigurationFile() : Promise<void> {
+  private getDisableUpdate(): boolean {
+    const res = vscode.workspace.getConfiguration('wpilibcpp', this.workspace.uri).get<boolean>('disableCppProperties');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
+  private async updateCppConfigurationFile() : Promise<void> {
+    if (this.getDisableUpdate()) {
+      return;
+    }
+
     const includes: string[] = this.cppPreferences.getAdditionalIncludeDirectories();
     const defines: string[] = this.cppPreferences.getAdditionalDefines();
 

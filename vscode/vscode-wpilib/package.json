@@ -71,6 +71,12 @@
                     "default": -1,
                     "description": "Team number to use",
                     "scope": "resource"
+                },
+                "wpilib.disableCppProperties": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Disable automatically setting C++ vscode settings",
+                    "scope": "resource"
                 }
             }
         },
