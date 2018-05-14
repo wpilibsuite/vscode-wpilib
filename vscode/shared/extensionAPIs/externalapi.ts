@@ -67,6 +67,21 @@ export abstract class IDeployDebugAPI implements IVersionable {
   }
 }
 
+const buildTestAPIExpectedVersion = 1;
+export function getBuildTestAPIExpectedVersion(): number {
+  return deployDebugAPIExpectedVersion;
+}
+export abstract class IBuildTestAPI implements IVersionable {
+  public abstract buildCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeBuild(builder: ICodeBuilder): void;
+  public abstract testCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeTest(builder: ICodeBuilder): void;
+  public abstract addLanguageChoice(language: string): void;
+  public getVersion(): number {
+    return buildTestAPIExpectedVersion;
+  }
+}
+
 const preferencesAPIExpectedVersion = 1;
 export function getPreferencesAPIExpectedVersion(): number {
   return preferencesAPIExpectedVersion;
@@ -145,6 +160,28 @@ export interface ICodeDeployer {
    * @param teamNumber The team number to deploy to
    */
   runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean>;
+
+  /**
+   * Get the display name to be used for selection
+   */
+  getDisplayName(): string;
+  getDescription(): string;
+}
+
+/**
+ * Interface to providing a code deployer or debugger
+ * to the core plugin.
+ */
+export interface ICodeBuilder {
+  /**
+   * Returns if this deployer is currently valid to be used
+   * in the current workspace
+   */
+  getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  /**
+   * Run the command with the specified team number
+   */
+  runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection
