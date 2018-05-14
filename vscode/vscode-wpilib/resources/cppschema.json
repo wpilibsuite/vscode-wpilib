@@ -1,0 +1,27 @@
+{
+  "title": "WPILib C++ Settings",
+  "type": "object",
+  "properties": {
+    "selectedComponent": {
+      "type": "string"
+    },
+    "additionalIncludeDirectories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "additionalDefines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "additionalDebugCommands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
