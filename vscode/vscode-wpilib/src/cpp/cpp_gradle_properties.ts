@@ -1,9 +1,11 @@
 'use strict';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as jsonc from 'jsonc-parser';
 import { gradleRun } from '../shared/gradle';
 import { CppPreferences } from './cpp_preferences';
+import { IPreferencesAPI } from '../shared/externalapi';
 
 function readFileAsync(file: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -81,7 +83,7 @@ export class CppGradleProperties {
   public workspace: vscode.WorkspaceFolder;
   private readonly gradleJsonFileGlob: string = '**/.editcfg';
 
-  public constructor(wp: vscode.WorkspaceFolder, ow: vscode.OutputChannel, cppPrefs: CppPreferences) {
+  public constructor(wp: vscode.WorkspaceFolder, ow: vscode.OutputChannel, cppPrefs: CppPreferences, langPrefs: IPreferencesAPI) {
     this.workspace = wp;
     this.outputWriter = ow;
     this.cppPreferences = cppPrefs;
@@ -137,8 +139,13 @@ export class CppGradleProperties {
     });
     vscode.workspace.findFiles(this.gradleJsonFileGlob, wp.uri.fsPath).then(async (f) => {
       if (f.length === 0) {
-          // File not found, force a refresh.
-          await this.runGradleRefresh();
+        const prefs = langPrefs.getPreferences(wp);
+        if (prefs !== undefined) {
+          if (fs.existsSync(path.join(wp.uri.fsPath, 'build.gradle')) && prefs.getCurrentLanguage() === 'cpp') {
+            // File not found, force a refresh.
+            await this.runGradleRefresh();
+          }
+        }
       } else {
         this.handleNewFile(f[0]);
       }

@@ -31,6 +31,7 @@ export class Preferences implements IPreferences {
   private readonly preferencesGlob: string = '**/' + this.preferenceFileName;
   private disposables: vscode.Disposable[] = [];
   public workspace: vscode.WorkspaceFolder;
+  private isWPILibProject: boolean = false;
 
   constructor(workspace: vscode.WorkspaceFolder) {
     this.workspace = workspace;
@@ -40,6 +41,7 @@ export class Preferences implements IPreferences {
 
     if (fs.existsSync(configFilePath)) {
       vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
+      this.isWPILibProject = true;
       this.preferencesFile = vscode.Uri.file(configFilePath);
       this.preferencesJson = defaultPreferences;
       this.updatePreferences();
@@ -55,12 +57,14 @@ export class Preferences implements IPreferences {
 
     this.configFileWatcher.onDidCreate((uri) => {
       vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
+      this.isWPILibProject = true;
       this.preferencesFile = uri;
       this.updatePreferences();
     });
 
     this.configFileWatcher.onDidDelete(() => {
       vscode.commands.executeCommand('setContext', 'isWPILibProject', false);
+      this.isWPILibProject = false;
       this.preferencesFile = undefined;
       this.updatePreferences();
     });
@@ -69,6 +73,10 @@ export class Preferences implements IPreferences {
       this.updatePreferences();
     });
 
+  }
+
+  public getIsWPILibProject(): boolean {
+    return this.isWPILibProject;
   }
 
   private getConfiguration(): vscode.WorkspaceConfiguration {

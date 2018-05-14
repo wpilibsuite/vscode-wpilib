@@ -94,12 +94,14 @@
             {
                 "command": "wpilibcore.startTool",
                 "title": "Start Tool",
-                "category": "WPILIB"
+                "category": "WPILIB",
+                "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.deployCode",
                 "title": "Deploy Robot Code",
-                "category": "WPILIB"
+                "category": "WPILIB",
+                "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.debugCode",
@@ -134,7 +136,14 @@
             {
                 "command": "wpilibcore.createCommand",
                 "title": "Create a new command",
-                "category": "WPILIB"
+                "category": "WPILIB",
+                "icon": "resources/wpilib.svg"
+            },
+            {
+                "command": "wpilibcore.help",
+                "title": "Open WPILib Help",
+                "category": "WPILib",
+                "icon": "resources/wpilib.svg"
             },
             {
                 "title": "Refresh C++ Properties",
@@ -153,11 +162,13 @@
                 {
                     "when": "isWPILibProject",
                     "command": "wpilibcore.deployCode",
-                    "group": "wpilib"
+                    "group": "wpilib",
+                    "icon": "resources/wpilib.svg"
                 },
                 {
                     "command": "wpilibcore.startTool",
-                    "group": "wpilib"
+                    "group": "wpilib",
+                    "icon": "resources/wpilib.svg"
                 }
             ],
             "explorer/context": [

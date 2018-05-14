@@ -11,6 +11,7 @@ import { ExampleTemplateAPI } from './exampletemplateapi';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { activateJava } from './java/java';
+import { Help } from './help';
 
 class ExternalAPI extends IExternalAPI {
     private toolApi: ToolAPI;
@@ -216,6 +217,23 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createTemplate', async () => {
         await externalApi.getExampleTemplateAPI().createTemplate();
     }));
+
+    const help = new Help(path.join(context.extensionPath, 'resources'));
+    context.subscriptions.push(help);
+
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces !== undefined) {
+        for (const wp of workspaces) {
+            const prefs = externalApi.getPreferencesAPI().getPreferences(wp);
+            if (prefs === undefined) {
+                continue;
+            }
+            if (prefs.getIsWPILibProject()) {
+                help.showStatusBarIcon();
+                break;
+            }
+        }
+    }
 
     return externalApi;
 }

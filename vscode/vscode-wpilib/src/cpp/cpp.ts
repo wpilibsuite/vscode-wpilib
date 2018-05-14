@@ -90,7 +90,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
                     continue;
                 }
                 const cpr = new CppPreferences(w);
-                const gp = new CppGradleProperties(w, gradleChannel, cpr);
+                const gp = new CppGradleProperties(w, gradleChannel, cpr, preferences);
                 await gp.forceReparse();
                 const cp = new CppVsCodeProperties(w, gp, cpr);
                 cppPrefs.push(cpr);
@@ -115,7 +115,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
             for (const c of changed) {
                 const cpr = new CppPreferences(c.workspace);
-                const gp = new CppGradleProperties(c.workspace, gradleChannel, cpr);
+                const gp = new CppGradleProperties(c.workspace, gradleChannel, cpr, preferences);
                 await gp.forceReparse();
                 const cp = new CppVsCodeProperties(c.workspace, gp, cpr);
                 cppPrefs.push(cpr);

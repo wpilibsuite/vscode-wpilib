@@ -104,6 +104,7 @@ export interface IPreferences {
   setAutoStartRioLog(autoStart: boolean, global: boolean): void;
   getAutoSaveOnDeploy(): boolean;
   setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void;
+  getIsWPILibProject(): boolean;
 }
 
 export interface IExampleTemplateCreator {
