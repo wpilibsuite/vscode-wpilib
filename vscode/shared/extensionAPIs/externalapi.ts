@@ -103,6 +103,7 @@ export abstract class IExternalAPI implements IVersionable {
   public abstract getToolAPI(): IToolAPI | undefined;
   public abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
   public abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
+  public abstract getBuildTestAPI(): IBuildTestAPI | undefined;
   public abstract getPreferencesAPI(): IPreferencesAPI | undefined;
   public abstract getCommandAPI(): ICommandAPI | undefined;
   public getVersion(): number {

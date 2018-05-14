@@ -69,7 +69,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
 }
 
 export class DeployDebugAPI extends IDeployDebugAPI {
-  public languageChoices: string[] = [];
+  private languageChoices: string[] = [];
   private deployers: ICodeDeployerQuickPick[] = [];
   private debuggers: ICodeDeployerQuickPick[] = [];
   private disposables: vscode.Disposable[] = [];
@@ -124,7 +124,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   public debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     return this.deployCommon(workspace, this.debuggers, true);
   }
-  public async deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+  public deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     return this.deployCommon(workspace, this.deployers, false);
   }
 
@@ -173,6 +173,10 @@ export class DeployDebugAPI extends IDeployDebugAPI {
       await this.startRioLog(teamNumber, !debug);
     }
     return true;
+  }
+
+  public getLanguageChoices(): string[] {
+    return this.languageChoices;
   }
 
   public dispose() {
