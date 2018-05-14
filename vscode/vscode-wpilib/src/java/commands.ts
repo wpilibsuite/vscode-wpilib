@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import { promisifyNcp } from '../shared/generator';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../shared/externalapi';
+import { getPackageName, getClassName } from '../utilities';
 
 interface JsonLayout {
   name: string;
@@ -130,20 +131,16 @@ export class Commands {
             }
             else {
               // Coult not root path, ask for one
-              const res = await vscode.window.showInputBox({
-                prompt: 'Please enter a package name "x.y.z"'
-              });
-              if (res !== undefined) {
-                javaPackage = res;
+              const res = await getPackageName();
+              if (res === undefined) {
+                return false;
               }
+              javaPackage = res;
             }
 
-            const className = await vscode.window.showInputBox({
-              prompt: 'Please enter a class name'
-            });
+            const className = await getClassName();
 
             if (className === undefined || className === '') {
-              await vscode.window.showInformationMessage('Invalid class name entered');
               return false;
             }
             return await performCopy(commandFolder, c, folder, className, javaPackage);

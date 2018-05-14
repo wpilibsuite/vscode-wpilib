@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import { promisifyNcp } from '../shared/generator';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../shared/externalapi';
+import { getClassName } from '../utilities';
 
 interface JsonLayout {
   name: string;
@@ -186,18 +187,13 @@ export class Commands {
             return currentLanguage === 'none' || currentLanguage === 'cpp';
           },
           async generate(folder: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-            const className = await vscode.window.showInputBox({
-              prompt: 'Please enter a class name'
-            });
+            const className = await getClassName();
 
             if (className === undefined || className === '') {
-              await vscode.window.showInformationMessage('Invalid class name entered');
               return false;
             }
 
             const workspaceRooted = path.relative(path.join(workspace.uri.path, 'src'), folder.path);
-
-
 
             // include root is /include
             // src root is /cpp
