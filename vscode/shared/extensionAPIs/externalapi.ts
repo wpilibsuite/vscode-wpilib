@@ -100,12 +100,12 @@ export function getExternalAPIExpectedVersion(): number {
   return externalAPIExpectedVersion;
 }
 export abstract class IExternalAPI implements IVersionable {
-  public abstract getToolAPI(): IToolAPI | undefined;
-  public abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
-  public abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
-  public abstract getBuildTestAPI(): IBuildTestAPI | undefined;
-  public abstract getPreferencesAPI(): IPreferencesAPI | undefined;
-  public abstract getCommandAPI(): ICommandAPI | undefined;
+  public abstract getToolAPI(): IToolAPI;
+  public abstract getExampleTemplateAPI(): IExampleTemplateAPI;
+  public abstract getDeployDebugAPI(): IDeployDebugAPI;
+  public abstract getBuildTestAPI(): IBuildTestAPI;
+  public abstract getPreferencesAPI(): IPreferencesAPI;
+  public abstract getCommandAPI(): ICommandAPI;
   public getVersion(): number {
     return externalAPIExpectedVersion;
   }
