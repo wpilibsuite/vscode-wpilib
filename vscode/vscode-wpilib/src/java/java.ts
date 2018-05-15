@@ -87,6 +87,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
                 return false;
             }
             const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+            gradleChannel.appendLine('Success!');
             console.log(result);
             return true;
         },
@@ -114,7 +115,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
                 gradleChannel.clear();
                 gradleChannel.show();
                 const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
-
+                gradleChannel.appendLine('Success!');
                 const parsed = parseGradleOutput(result);
 
                 const config: DebugCommands = {

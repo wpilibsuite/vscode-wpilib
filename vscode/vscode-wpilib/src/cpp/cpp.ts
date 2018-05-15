@@ -161,6 +161,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
                 return false;
             }
             const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+            gradleChannel.appendLine('Success!');
             console.log(result);
             return true;
         },
@@ -192,7 +193,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
                     return false;
                 }
                 const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
-
+                gradleChannel.appendLine('Success!');
                 const parsed = parseGradleOutput(result);
 
                 let cfg: ExternalEditorConfig | undefined = undefined;
