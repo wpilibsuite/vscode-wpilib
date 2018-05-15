@@ -1,9 +1,9 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { CppGradleProperties } from './cpp_gradle_properties';
-import { CppPreferences } from './cpp_preferences';
-import { CppVsCodeProperties } from './cpp_vscode_properties';
+import { CppGradleProperties } from './cppgradleproperties';
+import { CppPreferences } from './cpppreferences';
+import { CppVsCodeProperties } from './cppvscodeproperties';
 import { IPreferencesAPI } from '../shared/externalapi';
 
 export class PropertiesStore {

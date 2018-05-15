@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
-import { CppGradleProperties } from './cpp_gradle_properties';
-import { CppPreferences } from './cpp_preferences';
+import { CppGradleProperties } from './cppgradleproperties';
+import { CppPreferences } from './cpppreferences';
 
 export class CppVsCodeProperties {
   private gradleProps: CppGradleProperties;

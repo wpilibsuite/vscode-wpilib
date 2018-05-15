@@ -3,9 +3,9 @@
 import * as vscode from 'vscode';
 import { gradleRun, parseGradleOutput } from '../shared/gradle';
 import { IDeployDebugAPI, IPreferencesAPI, ICodeDeployer } from '../shared/externalapi';
-import { ExternalEditorConfig } from './cpp_gradle_properties';
+import { ExternalEditorConfig } from './cppgradleproperties';
 import * as path from 'path';
-import { CppPreferences } from './cpp_preferences';
+import { CppPreferences } from './cpppreferences';
 import { DebugCommands, startDebugging } from './debug';
 import { PropertiesStore } from './propertiesstore';
 

@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as jsonc from 'jsonc-parser';
 import { gradleRun } from '../shared/gradle';
-import { CppPreferences } from './cpp_preferences';
+import { CppPreferences } from './cpppreferences';
 import { IPreferencesAPI } from '../shared/externalapi';
 
 function readFileAsync(file: string): Promise<string> {
