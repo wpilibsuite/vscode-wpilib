@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { IPreferencesAPI } from './shared/externalapi';
 
 export class Help {
   private statusBar: vscode.StatusBarItem;
@@ -9,7 +10,7 @@ export class Help {
   private html: string = '';
   private webview: vscode.WebviewPanel | undefined;
 
-  constructor(resourceRoot: string) {
+  constructor(resourceRoot: string, preferences: IPreferencesAPI) {
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
     this.statusBar.text = 'WPILib';
     this.statusBar.command = 'wpilibcore.help';
@@ -21,6 +22,20 @@ export class Help {
 
     this.html = fs.readFileSync(path.join(resourceRoot, 'help.html'), 'utf8');
     this.replaceResources(resourceRoot);
+
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces !== undefined) {
+      for (const wp of workspaces) {
+        const prefs = preferences.getPreferences(wp);
+        if (prefs === undefined) {
+          continue;
+        }
+        if (prefs.getIsWPILibProject()) {
+          this.statusBar.show();
+          break;
+        }
+      }
+    }
   }
 
   public async showHelpView(): Promise<void> {
@@ -39,10 +54,6 @@ export class Help {
     const onDiskPath = vscode.Uri.file(resourceRoot);
     const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });
     this.html = this.html.replace(/replaceresource/g, replacePath.toString());
-  }
-
-  public showStatusBarIcon(): void {
-    this.statusBar.show();
   }
 
   public dispose() {

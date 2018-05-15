@@ -62,6 +62,7 @@ export abstract class IDeployDebugAPI implements IVersionable {
   public abstract debugCode(workspace: vscode.WorkspaceFolder, desktop: boolean): Promise<boolean>;
   public abstract registerCodeDebug(deployer: ICodeDeployer): void;
   public abstract addLanguageChoice(language: string): void;
+  public abstract getLanguageChoices(): string[];
   public getVersion(): number {
     return deployDebugAPIExpectedVersion;
   }

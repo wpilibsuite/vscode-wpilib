@@ -78,7 +78,6 @@ async function performCopy(commandRoot: string, command: JsonLayout, folder: vsc
     await Promise.all(movePromiseArray);
   }
 
-  console.log(copiedFiles);
   return true;
 }
 
