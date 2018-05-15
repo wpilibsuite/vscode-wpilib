@@ -53,8 +53,8 @@ export class CommandAPI extends ICommandAPI {
     }
     const preferences = this.preferencesApi.getPreferences(workspace);
     if (preferences === undefined) {
-        await vscode.window.showInformationMessage('Could not find a workspace');
-        return false;
+      await vscode.window.showInformationMessage('Could not find a workspace');
+      return false;
     }
 
     const validLanguages: ILanguageQuickPick[] = [];

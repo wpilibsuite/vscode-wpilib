@@ -16,65 +16,65 @@ import { CppStatusBar } from './cppstatusbar';
 // your extension is activated the very first time the command is executed
 export async function activateCpp(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
+  // Use the console to output diagnostic information (console.log) and errors (console.error)
+  // This line of code will only be executed once when your extension is activated
 
-    const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'cpp');
+  const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'cpp');
 
-    let allowDebug = true;
+  let allowDebug = true;
 
-    const promises = [];
+  const promises = [];
 
-    const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
-    if (cppExtension === undefined) {
-        //TODO: Make this a visible warning message when project detected is cpp
-        console.log('Could not find cpptools C++ extension. Debugging is disabled.');
-        allowDebug = false;
-    } else if (!cppExtension.isActive) {
-        promises.push(cppExtension.activate());
+  const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
+  if (cppExtension === undefined) {
+    //TODO: Make this a visible warning message when project detected is cpp
+    console.log('Could not find cpptools C++ extension. Debugging is disabled.');
+    allowDebug = false;
+  } else if (!cppExtension.isActive) {
+    promises.push(cppExtension.activate());
+  }
+
+  if (promises.length > 0) {
+    await Promise.all(promises);
+  }
+
+  const preferences = coreExports.getPreferencesAPI();
+  const debugDeployApi = coreExports.getDeployDebugAPI();
+  const exampleTemplate = coreExports.getExampleTemplateAPI();
+  const commandApi = coreExports.getCommandAPI();
+  const buildTestApi = coreExports.getBuildTestAPI();
+
+  const gradleChannel = vscode.window.createOutputChannel('gradleCpp');
+
+  // Setup build and test
+
+  const buildTest = new BuildTest(buildTestApi, gradleChannel, preferences);
+
+  context.subscriptions.push(buildTest);
+
+  const propertiesStore = new PropertiesStore(preferences, gradleChannel);
+
+  context.subscriptions.push(propertiesStore);
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.refreshProperties', () => {
+    for (const c of propertiesStore.getGradleProperties()) {
+      c.runGradleRefresh();
     }
+  }));
 
-    if (promises.length > 0) {
-        await Promise.all(promises);
-    }
+  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, propertiesStore, allowDebug);
+  context.subscriptions.push(debugDeploy);
 
-    const preferences = coreExports.getPreferencesAPI();
-    const debugDeployApi = coreExports.getDeployDebugAPI();
-    const exampleTemplate = coreExports.getExampleTemplateAPI();
-    const commandApi = coreExports.getCommandAPI();
-    const buildTestApi = coreExports.getBuildTestAPI();
+  const statusBar = new CppStatusBar(preferences, propertiesStore);
+  context.subscriptions.push(statusBar);
 
-    const gradleChannel = vscode.window.createOutputChannel('gradleCpp');
+  // Setup commands
+  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
+  context.subscriptions.push(commands);
 
-    // Setup build and test
-
-    const buildTest = new BuildTest(buildTestApi, gradleChannel, preferences);
-
-    context.subscriptions.push(buildTest);
-
-    const propertiesStore = new PropertiesStore(preferences, gradleChannel);
-
-    context.subscriptions.push(propertiesStore);
-
-    context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.refreshProperties', () => {
-        for (const c of propertiesStore.getGradleProperties()) {
-            c.runGradleRefresh();
-        }
-    }));
-
-    const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, propertiesStore, allowDebug);
-    context.subscriptions.push(debugDeploy);
-
-    const statusBar = new CppStatusBar(preferences, propertiesStore);
-    context.subscriptions.push(statusBar);
-
-    // Setup commands
-    const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
-    context.subscriptions.push(commands);
-
-    // Setup examples and template
-    const examples: Examples = new Examples(extensionResourceLocation, false, exampleTemplate);
-    context.subscriptions.push(examples);
-    const templates: Templates = new Templates(extensionResourceLocation, false, exampleTemplate);
-    context.subscriptions.push(templates);
+  // Setup examples and template
+  const examples: Examples = new Examples(extensionResourceLocation, false, exampleTemplate);
+  context.subscriptions.push(examples);
+  const templates: Templates = new Templates(extensionResourceLocation, false, exampleTemplate);
+  context.subscriptions.push(templates);
 }

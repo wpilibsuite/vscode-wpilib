@@ -37,7 +37,7 @@ async function performCopy(commandRoot: string, command: JsonLayout, folderSrc: 
   });
 
   await promisifyNcp(commandFolder, folderHeader.fsPath, {
-    filter: (cf : string): boolean => {
+    filter: (cf: string): boolean => {
       if (!fs.lstatSync(cf).isFile()) {
         return true;
       }
@@ -87,7 +87,7 @@ async function performCopy(commandRoot: string, command: JsonLayout, folderSrc: 
           const joinedName = path.join(path.relative(includeRoot.path, folderHeader.path), replaceName).replace(/\\/g, '/');
 
           const dataOut = dataIn.replace(new RegExp(`#include "${command.replacename}.h"`, 'g'), `#include "${joinedName}.h"`)
-                                .replace(new RegExp(command.replacename, 'g'), replaceName);
+            .replace(new RegExp(command.replacename, 'g'), replaceName);
 
 
 
@@ -180,8 +180,8 @@ export class Commands {
           async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
             const prefs = await preferences.getPreferences(workspace);
             if (prefs === undefined) {
-                console.log('Preferences without workspace?');
-                return false;
+              console.log('Preferences without workspace?');
+              return false;
             }
             const currentLanguage = prefs.getCurrentLanguage();
             return currentLanguage === 'none' || currentLanguage === 'cpp';

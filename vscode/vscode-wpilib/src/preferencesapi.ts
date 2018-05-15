@@ -59,10 +59,10 @@ export class PreferencesAPI extends IPreferencesAPI {
   public getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined {
     for (const p of this.preferences) {
       if (p.workspace.uri === workspace.uri) {
-          return p;
+        return p;
       }
-  }
-  return undefined;
+    }
+    return undefined;
   }
 
   public async getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined> {

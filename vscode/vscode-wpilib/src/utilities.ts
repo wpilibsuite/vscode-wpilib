@@ -24,7 +24,7 @@ export async function getClassName(): Promise<string | undefined> {
     const match = className.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*)$');
 
     if (match === null || match.length === 0) {
-       promptString = 'Invalid Classname. Please enter a valid classname';
+      promptString = 'Invalid Classname. Please enter a valid classname';
       continue;
     }
 
@@ -51,7 +51,7 @@ export async function getPackageName(): Promise<string | undefined> {
     const match = packageName.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$');
 
     if (match === null || match.length === 0) {
-       promptString = 'Invalid Package name. Please enter a valid pacakge name.';
+      promptString = 'Invalid Package name. Please enter a valid pacakge name.';
       continue;
     }
 

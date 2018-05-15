@@ -40,7 +40,7 @@ async function performCopy(commandRoot: string, command: JsonLayout, folder: vsc
           reject(err);
         } else {
           const dataOut = dataIn.replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo)
-                                .replace(new RegExp(command.replacename, 'g'), replaceName);
+            .replace(new RegExp(command.replacename, 'g'), replaceName);
           fs.writeFile(file, dataOut, 'utf8', (err1) => {
             if (err1) {
               reject(err);
@@ -107,8 +107,8 @@ export class Commands {
           async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
             const prefs = await preferences.getPreferences(workspace);
             if (prefs === undefined) {
-                console.log('Preferences without workspace?');
-                return false;
+              console.log('Preferences without workspace?');
+              return false;
             }
             const currentLanguage = prefs.getCurrentLanguage();
             return currentLanguage === 'none' || currentLanguage === 'java';

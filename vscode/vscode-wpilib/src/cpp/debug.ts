@@ -25,9 +25,9 @@ export async function startDebugging(commands: DebugCommands): Promise<void> {
     MIMode: 'gdb',
     setupCommands: [
       {
-          description: 'Enable pretty-printing for gdb',
-          text: 'enable-pretty-printing',
-          ignoreFailures: true
+        description: 'Enable pretty-printing for gdb',
+        text: 'enable-pretty-printing',
+        ignoreFailures: true
       },
       {
         text: 'set sysroot ' + commands.sysroot
@@ -36,7 +36,7 @@ export async function startDebugging(commands: DebugCommands): Promise<void> {
     additionalSOLibSearchPath: commands.soLibPath,
   };
 
-  for(const a of commands.additionalCommands) {
+  for (const a of commands.additionalCommands) {
     config.setupCommands.push({
       text: a
     });

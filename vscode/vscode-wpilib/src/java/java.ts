@@ -14,42 +14,42 @@ import { DebugDeploy } from './debugdeploy';
 // your extension is activated the very first time the command is executed
 export async function activateJava(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
 
-    const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'java');
+  const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'java');
 
-    let allowDebug = true;
+  let allowDebug = true;
 
-    const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
-    if (javaExtension === undefined) {
-        //TODO: Make this a visible warning message when project detected is java
-        console.log('Could not find java extension. Debugging is disabled.');
-        allowDebug = false;
-    }
+  const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
+  if (javaExtension === undefined) {
+    //TODO: Make this a visible warning message when project detected is java
+    console.log('Could not find java extension. Debugging is disabled.');
+    allowDebug = false;
+  }
 
-    const preferences = coreExports.getPreferencesAPI();
-    const debugDeployApi = coreExports.getDeployDebugAPI();
-    const exampleTemplate = coreExports.getExampleTemplateAPI();
-    const commandApi = coreExports.getCommandAPI();
-    const buildTestApi = coreExports.getBuildTestAPI();
+  const preferences = coreExports.getPreferencesAPI();
+  const debugDeployApi = coreExports.getDeployDebugAPI();
+  const exampleTemplate = coreExports.getExampleTemplateAPI();
+  const commandApi = coreExports.getCommandAPI();
+  const buildTestApi = coreExports.getBuildTestAPI();
 
-    const gradleChannel = vscode.window.createOutputChannel('gradleJava');
+  const gradleChannel = vscode.window.createOutputChannel('gradleJava');
 
-    // Setup build and test
+  // Setup build and test
 
-    const buildTest = new BuildTest(buildTestApi, gradleChannel, preferences);
+  const buildTest = new BuildTest(buildTestApi, gradleChannel, preferences);
 
-    context.subscriptions.push(buildTest);
+  context.subscriptions.push(buildTest);
 
-    // Setup debug and deploy
-    const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, allowDebug);
-    context.subscriptions.push(debugDeploy);
+  // Setup debug and deploy
+  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, allowDebug);
+  context.subscriptions.push(debugDeploy);
 
-    // Setup commands
-    const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
-    context.subscriptions.push(commands);
+  // Setup commands
+  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
+  context.subscriptions.push(commands);
 
-    // Setup examples and template
-    const examples: Examples = new Examples(extensionResourceLocation, true, exampleTemplate);
-    context.subscriptions.push(examples);
-    const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
-    context.subscriptions.push(templates);
+  // Setup examples and template
+  const examples: Examples = new Examples(extensionResourceLocation, true, exampleTemplate);
+  context.subscriptions.push(examples);
+  const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
+  context.subscriptions.push(templates);
 }

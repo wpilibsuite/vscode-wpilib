@@ -9,14 +9,14 @@ declare function acquireVsCodeApi(): any;
 const vscode = acquireVsCodeApi();
 
 export function checkResize() {
-    checkResizeImpl(document.documentElement);
+  checkResizeImpl(document.documentElement);
 }
 
 export function sendMessage(message: IIPCReceiveMessage) {
-    vscode.postMessage(message, '*');
+  vscode.postMessage(message, '*');
 }
 
 window.addEventListener('message', event => {
-    const data: IIPCSendMessage = event.data;
-    handleMessage(data);
+  const data: IIPCSendMessage = event.data;
+  handleMessage(data);
 });

@@ -9,7 +9,7 @@ export class CppVsCodeProperties {
   private workspace: vscode.WorkspaceFolder;
   private isRoboRio: boolean = true;
 
-  public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties,  prefs: CppPreferences) {
+  public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties, prefs: CppPreferences) {
     this.gradleProps = gp;
     this.cppPreferences = prefs;
     this.workspace = wp;
@@ -37,7 +37,7 @@ export class CppVsCodeProperties {
     return res;
   }
 
-  private async updateCppConfigurationFile() : Promise<void> {
+  private async updateCppConfigurationFile(): Promise<void> {
     if (this.getDisableUpdate()) {
       return;
     }
