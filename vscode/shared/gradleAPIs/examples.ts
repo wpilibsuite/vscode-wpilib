@@ -40,13 +40,18 @@ export class Examples {
           async generate(folderInto: vscode.Uri): Promise<boolean> {
             try {
               if (java) {
-                await generateCopyJava(path.join(examplesFolder, e.foldername),
-                  gradleFolder, folderInto.fsPath);
+                if (!await generateCopyJava(path.join(examplesFolder, e.foldername),
+                  gradleFolder, folderInto.fsPath)) {
+                  await vscode.window.showErrorMessage('Cannot create into non empty folder');
+                  return false;
+                }
               } else {
-                await generateCopyCpp(path.join(examplesFolder, e.foldername),
-                  gradleFolder, folderInto.fsPath);
+                if (!await generateCopyCpp(path.join(examplesFolder, e.foldername),
+                  gradleFolder, folderInto.fsPath)) {
+                  await vscode.window.showErrorMessage('Cannot create into non empty folder');
+                  return false;
+                }
               }
-
             } catch (err) {
               console.log(err);
               return false;

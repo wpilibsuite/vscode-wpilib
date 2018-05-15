@@ -29,7 +29,24 @@ export function promisifyNcp(source: string, dest: string, options: ncp.Options 
   });
 }
 
-export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string): Promise<void> {
+export function promisifyReadDir(pth: string): Promise<string[]> {
+  return new Promise<string[]>((resolve, reject) => {
+    fs.readdir(pth, (err, files) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(files);
+      }
+    });
+  });
+}
+
+export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string): Promise<boolean> {
+  const existingFiles = await promisifyReadDir(toFolder);
+  if (existingFiles.length > 0) {
+    return false;
+  }
+
   const codePath = path.join(toFolder, 'src');
   const src = promisifyNcp(fromTemplateFolder, codePath);
   const gradle = promisifyNcp(fromGradleFolder, toFolder, {
@@ -43,9 +60,15 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
   });
 
   await Promise.all([src, gradle]);
+  return true;
 }
 
-export async function generateCopyJava(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string): Promise<void> {
+export async function generateCopyJava(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string): Promise<boolean> {
+  const existingFiles = await promisifyReadDir(toFolder);
+  if (existingFiles.length > 0) {
+    return false;
+  }
+
   const rootCodePath = path.join(toFolder, 'src', 'main', 'java');
   const codePath = path.join(rootCodePath, 'frc', 'robot');
   await promisifyNcp(fromTemplateFolder, codePath);
@@ -101,4 +124,5 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
   });
   promiseArray.push(ncpPromise);
   await Promise.all(promiseArray);
+  return true;
 }
