@@ -1,0 +1,33 @@
+version: "{branch}-{build}"
+pull_requests:
+  do_not_increment_build_number: true
+skip_branch_with_pr: true
+branches:
+  only:
+  - master
+image: Visual Studio 2017
+init:
+- ps: Install-Product node $env:nodejs_version
+environment:
+  nodejs_version: 8
+install:
+- ps: >-
+    npm install vsce -g
+
+    ./gradlew clean
+cache: C:\Users\appveyor\.gradle
+build_script:
+- ps: >-
+    ./gradlew packageVsCode packageStandalone
+
+    if ($lastexitcode -ne 0) {
+        $errorstore = $errorMessage
+        ./gradlew --stop
+        throw ("Exec: " + $errorMessage)
+    }
+
+    ./gradlew --stop
+test: off
+artifacts:
+- path: '**/*.vsix'
+  name: VSIX
