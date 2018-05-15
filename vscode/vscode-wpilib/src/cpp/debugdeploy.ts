@@ -38,7 +38,11 @@ class DebugCodeDeployer implements ICodeDeployer {
       return false;
     }
     const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    this.gradleChannel.appendLine('Success!');
+    if (result.success) {
+      this.gradleChannel.appendLine('Success!');
+    } else {
+      return false;
+    }
     const parsed = parseGradleOutput(result);
 
     let cfg: ExternalEditorConfig | undefined = undefined;
@@ -133,7 +137,11 @@ class DeployCodeDeployer implements ICodeDeployer {
       return false;
     }
     const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    this.gradleChannel.appendLine('Success!');
+    if (result.success) {
+      this.gradleChannel.appendLine('Success!');
+    } else {
+      return false;
+    }
     console.log(result);
     return true;
   }

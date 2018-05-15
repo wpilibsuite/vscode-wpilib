@@ -28,7 +28,11 @@ class DebugCodeDeployer implements ICodeDeployer {
     this.gradleChannel.clear();
     this.gradleChannel.show();
     const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    this.gradleChannel.appendLine('Success!');
+    if (result.success) {
+      this.gradleChannel.appendLine('Success!');
+    } else {
+      return false;
+    }
     const parsed = parseGradleOutput(result);
 
     const config: DebugCommands = {
@@ -77,7 +81,11 @@ class DeployCodeDeployer implements ICodeDeployer {
       return false;
     }
     const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    this.gradleChannel.appendLine('Success!');
+    if (result.success) {
+      this.gradleChannel.appendLine('Success!');
+    } else {
+      return false;
+    }
     console.log(result);
     return true;
   }

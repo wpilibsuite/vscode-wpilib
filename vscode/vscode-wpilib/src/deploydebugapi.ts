@@ -164,11 +164,18 @@ export class DeployDebugAPI extends IDeployDebugAPI {
       await vscode.workspace.saveAll();
     }
     const teamNumber = await preferences.getTeamNumber();
-    const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace);
-    if (preferences.getAutoStartRioLog() && deploySuccess) {
-      await this.startRioLog(teamNumber, !debug);
+    try {
+      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace);
+      if (preferences.getAutoStartRioLog() && deploySuccess) {
+        await this.startRioLog(teamNumber, !debug);
+      }
+      return true;
     }
-    return true;
+    catch (err) {
+      await vscode.window.showErrorMessage('Unknown error occured. See output window or console log for more information.');
+      console.log(err);
+      return false;
+    }
   }
 
   public getLanguageChoices(): string[] {
