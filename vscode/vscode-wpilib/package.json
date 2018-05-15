@@ -2,7 +2,7 @@
     "name": "vscode-wpilib",
     "displayName": "vscode-wpilib",
     "description": "VSCode extension for WPILib Team Use",
-    "version": "0.0.38",
+    "version": "0.1.0",
     "publisher": "wpifirst",
     "engines": {
         "vscode": "^1.23.0"
