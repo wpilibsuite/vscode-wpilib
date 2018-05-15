@@ -67,6 +67,21 @@ export abstract class IDeployDebugAPI implements IVersionable {
   }
 }
 
+const buildTestAPIExpectedVersion = 1;
+export function getBuildTestAPIExpectedVersion(): number {
+  return deployDebugAPIExpectedVersion;
+}
+export abstract class IBuildTestAPI implements IVersionable {
+  public abstract buildCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeBuild(builder: ICodeBuilder): void;
+  public abstract testCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeTest(builder: ICodeBuilder): void;
+  public abstract addLanguageChoice(language: string): void;
+  public getVersion(): number {
+    return buildTestAPIExpectedVersion;
+  }
+}
+
 const preferencesAPIExpectedVersion = 1;
 export function getPreferencesAPIExpectedVersion(): number {
   return preferencesAPIExpectedVersion;
@@ -85,11 +100,12 @@ export function getExternalAPIExpectedVersion(): number {
   return externalAPIExpectedVersion;
 }
 export abstract class IExternalAPI implements IVersionable {
-  public abstract getToolAPI(): IToolAPI | undefined;
-  public abstract getExampleTemplateAPI(): IExampleTemplateAPI | undefined;
-  public abstract getDeployDebugAPI(): IDeployDebugAPI | undefined;
-  public abstract getPreferencesAPI(): IPreferencesAPI | undefined;
-  public abstract getCommandAPI(): ICommandAPI | undefined;
+  public abstract getToolAPI(): IToolAPI;
+  public abstract getExampleTemplateAPI(): IExampleTemplateAPI;
+  public abstract getDeployDebugAPI(): IDeployDebugAPI;
+  public abstract getBuildTestAPI(): IBuildTestAPI;
+  public abstract getPreferencesAPI(): IPreferencesAPI;
+  public abstract getCommandAPI(): ICommandAPI;
   public getVersion(): number {
     return externalAPIExpectedVersion;
   }
@@ -145,6 +161,28 @@ export interface ICodeDeployer {
    * @param teamNumber The team number to deploy to
    */
   runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean>;
+
+  /**
+   * Get the display name to be used for selection
+   */
+  getDisplayName(): string;
+  getDescription(): string;
+}
+
+/**
+ * Interface to providing a code deployer or debugger
+ * to the core plugin.
+ */
+export interface ICodeBuilder {
+  /**
+   * Returns if this deployer is currently valid to be used
+   * in the current workspace
+   */
+  getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  /**
+   * Run the command with the specified team number
+   */
+  runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection

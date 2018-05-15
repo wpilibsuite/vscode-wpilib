@@ -12,10 +12,12 @@ import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { activateJava } from './java/java';
 import { Help } from './help';
+import { BuildTestAPI } from './buildtestapi';
 
 class ExternalAPI extends IExternalAPI {
     private toolApi: ToolAPI;
     private debugDeployApi: DeployDebugAPI;
+    private buildTestApi: BuildTestAPI;
     private preferencesApi: PreferencesAPI;
     private exampleTemplateApi: ExampleTemplateAPI;
     private commandApi: CommandAPI;
@@ -24,6 +26,7 @@ class ExternalAPI extends IExternalAPI {
         this.toolApi = new ToolAPI();
         this.preferencesApi = new PreferencesAPI();
         this.debugDeployApi = new DeployDebugAPI(resourcesLocation, this.preferencesApi);
+        this.buildTestApi = new BuildTestAPI(this.preferencesApi);
         this.exampleTemplateApi = new ExampleTemplateAPI();
         this.commandApi = new CommandAPI(this.preferencesApi);
     }
@@ -40,9 +43,11 @@ class ExternalAPI extends IExternalAPI {
     public getPreferencesAPI(): PreferencesAPI {
         return this.preferencesApi;
     }
-
     public getCommandAPI(): CommandAPI {
         return this.commandApi;
+    }
+    public getBuildTestAPI(): BuildTestAPI {
+        return this.buildTestApi;
     }
 }
 
@@ -144,10 +149,10 @@ export function activate(context: vscode.ExtensionContext) {
 
         const debugDeployApi = externalApi.getDeployDebugAPI();
 
-        if (debugDeployApi.languageChoices.length <= 0) {
+        if (debugDeployApi.getLanguageChoices().length <= 0) {
             await vscode.window.showInformationMessage('No languages available to add');
         }
-        const result = await vscode.window.showQuickPick(debugDeployApi.languageChoices, { placeHolder: 'Pick a language' });
+        const result = await vscode.window.showQuickPick(debugDeployApi.getLanguageChoices(), { placeHolder: 'Pick a language' });
         if (result === undefined) {
             return;
         }
@@ -216,6 +221,26 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createTemplate', async () => {
         await externalApi.getExampleTemplateAPI().createTemplate();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.buildCode', async () => {
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+            return;
+        }
+        await externalApi.getBuildTestAPI().buildCode(workspace);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.testCode', async () => {
+        const preferencesApi = externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+            vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+            return;
+        }
+        await externalApi.getBuildTestAPI().testCode(workspace);
     }));
 
     const help = new Help(path.join(context.extensionPath, 'resources'));

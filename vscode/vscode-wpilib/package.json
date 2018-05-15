@@ -98,6 +98,16 @@
                 "icon": "resources/wpilib.svg"
             },
             {
+                "command": "wpilibcore.buildCode",
+                "title": "Build Robot Code",
+                "category": "WPILIB"
+            },
+            {
+                "command": "wpilibcore.testCode",
+                "title": "Test Robot Code",
+                "category": "WPILIB"
+            },
+            {
                 "command": "wpilibcore.deployCode",
                 "title": "Deploy Robot Code",
                 "category": "WPILIB",
@@ -166,6 +176,18 @@
                     "icon": "resources/wpilib.svg"
                 },
                 {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.buildCode",
+                    "group": "wpilib",
+                    "icon": "resources/wpilib.svg"
+                },
+                {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.testCode",
+                    "group": "wpilib",
+                    "icon": "resources/wpilib.svg"
+                },
+                {
                     "command": "wpilibcore.startTool",
                     "group": "wpilib",
                     "icon": "resources/wpilib.svg"
@@ -175,6 +197,16 @@
                 {
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.deployCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.buildCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.testCode",
                     "group": "wpilib"
                 },
                 {
