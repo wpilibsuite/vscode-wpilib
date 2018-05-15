@@ -38,7 +38,8 @@ async function main(args: args.Arguments): Promise<void> {
   }
 
   const vscodeProjects = projects.filter((v) => {
-    if (v.indexOf('vscode-wpilib-') >= 0) {
+    if (v.endsWith('vscode-wpilib')) {
+
       return true;
     }
     return false;
@@ -53,6 +54,9 @@ async function main(args: args.Arguments): Promise<void> {
 
   if (args.v) {
     console.log('running vscode publish');
+
+    console.log(vscodeProjects.length);
+    console.log(vscodeProjects);
 
     const vscodePublishResults = await runPackageVsCode(vscodeProjects);
 

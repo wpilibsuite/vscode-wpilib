@@ -236,7 +236,7 @@
         "watch": "npm run copyshared && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "package": "npm run clean && vsce package -o ../build/vscode-wpilib-core.vsix"
+        "package": "npm run clean && vsce package -o ../build/vscode-wpilib.vsix"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
