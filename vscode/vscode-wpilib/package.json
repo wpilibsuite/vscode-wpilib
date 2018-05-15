@@ -18,16 +18,16 @@
         "debuggers": [
             {
                 "type": "wpilib",
-                "label": "WPILib Deploy and Debug",
+                "label": "WPILib Debug",
                 "configurationAttributes": {
                     "launch": {
                         "required": [
-                            "debug"
+                            "desktop"
                         ],
                         "properties": {
-                            "debug": {
+                            "desktop": {
                                 "type": "boolean",
-                                "description": "True for debug, false for deploy"
+                                "description": "True for desktop, false for roboRIO"
                             }
                         }
                     }

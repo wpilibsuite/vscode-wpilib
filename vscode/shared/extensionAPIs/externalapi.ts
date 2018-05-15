@@ -59,7 +59,7 @@ export abstract class IDeployDebugAPI implements IVersionable {
   public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
   public abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
   public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
-  public abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract debugCode(workspace: vscode.WorkspaceFolder, desktop: boolean): Promise<boolean>;
   public abstract registerCodeDebug(deployer: ICodeDeployer): void;
   public abstract addLanguageChoice(language: string): void;
   public getVersion(): number {

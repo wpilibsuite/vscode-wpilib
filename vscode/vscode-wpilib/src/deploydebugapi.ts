@@ -24,22 +24,18 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
   public resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined,
     config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
     vscode.ProviderResult<vscode.DebugConfiguration> {
-    let debug = false;
-    if ('debug' in config) {
-      debug = config.debug;
+    let desktop = false;
+    if ('desktop' in config) {
+      desktop = config.desktop;
     } else {
-      console.log('debugger has no debug argument. Assuming deploy');
+      console.log('debugger has no desktop argument. Assuming roboRIO');
     }
     return new Promise<undefined>(async (resolve) => {
       const workspace = await this.preferences.getFirstOrSelectedWorkspace();
       if (workspace === undefined) {
         return;
       }
-      if (debug) {
-        await this.debugDeployAPI.debugCode(workspace);
-      } else {
-        await this.debugDeployAPI.deployCode(workspace);
-      }
+      await this.debugDeployAPI.debugCode(workspace, desktop);
       resolve();
     });
   }
@@ -48,15 +44,15 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     const configurationDeploy: vscode.DebugConfiguration = {
       type: 'wpilib',
-      name: 'WPILib Deploy',
+      name: 'WPILib roboRIO Debug',
       request: 'launch',
-      debug: false
+      desktop: false
     };
     const configurationDebug: vscode.DebugConfiguration = {
       type: 'wpilib',
-      name: 'WPILib Debug',
+      name: 'WPILib Desktop Debug',
       request: 'launch',
-      debug: true
+      desktop: true
     };
     return [configurationDeploy, configurationDebug];
   }
@@ -121,7 +117,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     this.languageChoices.push(language);
   }
 
-  public debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+  public debugCode(workspace: vscode.WorkspaceFolder, _desktop: boolean): Promise<boolean> {
     return this.deployCommon(workspace, this.debuggers, true);
   }
   public deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
