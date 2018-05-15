@@ -267,6 +267,38 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
         }
     }));
 
+    const rioStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
+
+    context.subscriptions.push(rioStatusBar);
+
+    rioStatusBar.command = 'wpilibcpp.toggleRioDesktop';
+    rioStatusBar.text = 'roboRIO';
+
+    // If any workspace is a C++ workspace, show the toggle
+    if (workspaces !== undefined) {
+        for (const wp of workspaces) {
+            const prop = preferences.getPreferences(wp);
+            if (prop !== undefined) {
+                if (prop.getIsWPILibProject() && prop.getCurrentLanguage() === 'cpp') {
+                    rioStatusBar.show();
+                    break;
+                }
+            }
+        }
+    }
+
+    context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.toggleRioDesktop', async () => {
+        // Toggle all configurations
+        for (const props of cppProps) {
+            const toggle = await props.toggleConfiguration();
+            if (toggle) {
+                rioStatusBar.text = 'roboRIO';
+            } else {
+                rioStatusBar.text = 'Desktop';
+            }
+        }
+    }));
+
     // Setup commands
     const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
     context.subscriptions.push(commands);

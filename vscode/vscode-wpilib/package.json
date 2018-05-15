@@ -159,6 +159,11 @@
                 "title": "Refresh C++ Properties",
                 "command": "wpilibcpp.refreshProperties",
                 "category": "WPILIB"
+            },
+            {
+                "title": "Toggle C++ between roboRIO and Desktop",
+                "command": "wpilibcpp.toggleRioDesktop",
+                "category": "WPILIB"
             }
         ],
         "keybindings": [

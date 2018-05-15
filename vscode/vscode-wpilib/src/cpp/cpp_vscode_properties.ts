@@ -7,6 +7,7 @@ export class CppVsCodeProperties {
   private gradleProps: CppGradleProperties;
   private cppPreferences: CppPreferences;
   private workspace: vscode.WorkspaceFolder;
+  private isRoboRio: boolean = true;
 
   public constructor(wp: vscode.WorkspaceFolder, gp: CppGradleProperties,  prefs: CppPreferences) {
     this.gradleProps = gp;
@@ -16,6 +17,12 @@ export class CppVsCodeProperties {
     gp.onDidPropertiesChange(async () => {
       await this.updateCppConfigurationFile();
     });
+  }
+
+  public async toggleConfiguration(): Promise<boolean> {
+    this.isRoboRio = !this.isRoboRio;
+    await this.updateCppConfigurationFile();
+    return this.isRoboRio;
   }
 
   private getConfiguration(): vscode.WorkspaceConfiguration {
@@ -56,6 +63,5 @@ export class CppVsCodeProperties {
   }
 
   public dispose() {
-
   }
 }
