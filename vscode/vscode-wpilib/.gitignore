@@ -2,7 +2,5 @@ out
 node_modules
 .vscode-test/
 *.vsix
-src/shared
-src/riolog/shared
 resources/cpp
 resources/java

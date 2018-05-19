@@ -13,6 +13,7 @@
     "activationEvents": [
         "*"
     ],
+    "enableProposedApi": true,
     "main": "./out/extension",
     "contributes": {
         "debuggers": [
@@ -211,12 +212,12 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "copyshared": "copyfiles -a -f ../shared/riolog/**.* src/riolog/shared && copyfiles -a -f ../shared/extensionAPIs/**.* src/shared && copyfiles -a -f ../shared/gradleAPIs/**.* src/shared && copyfiles -a -f ../shared/generatorAPIs/**.* src/shared && npm run copysharedCpp && npm run copysharedJava",
+        "copyshared": "npm run copysharedCpp && npm run copysharedJava",
         "copysharedCpp": "copyfiles -a -u 4 \"../../gradleBase/cpp/**/*\" resources/cpp/gradlebase && copyfiles -a -u 6 \"../../wpilibcExamples/src/main/cpp/**/*\" resources/cpp/src",
         "cleanCpp": "rmdir-cli resources/cpp/gradlebase && rmdir-cli resources/cpp/src && rmdir-cli src/shared",
         "copysharedJava": "copyfiles -a -u 4 \"../../gradleBase/java/**/*\" resources/java/gradlebase && copyfiles -a -u 10 \"../../wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/**/*\" resources/java/src",
         "cleanJava": "rmdir-cli resources/java/gradlebase && rmdir-cli resources/java/src && rmdir-cli src/shared",
-        "clean": "rmdir-cli src/riolog/shared && rmdir-cli src/shared && rmdir-cli out && npm run cleanJava && npm run cleanCpp",
+        "clean": "rmdir-cli out && npm run cleanJava && npm run cleanCpp",
         "compile": "npm run copyshared && tsc -p ./",
         "compileBundle": "npm run copyshared && tsc -p ./ && browserify ./out/riolog/shared/sharedscript.js > ./resources/bundle.js",
         "watch": "npm run copyshared && tsc -watch -p ./",
