@@ -1,9 +1,32 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { gradleRun, parseGradleOutput } from '../shared/gradle';
+import { gradleRun } from '../shared/gradle';
 import { IDeployDebugAPI, IPreferencesAPI, ICodeDeployer } from '../shared/externalapi';
 import { DebugCommands, startDebugging } from './debug';
+import { readFileAsync } from '../utilities';
+import * as path from 'path';
+import * as jsonc from 'jsonc-parser';
+
+interface JavaDebugInfo {
+  debugfile: string;
+  project: string;
+  artifact: string;
+}
+
+class JavaDebugQuickPick implements vscode.QuickPickItem {
+  public label: string;
+  public description?: string | undefined;
+  public detail?: string | undefined;
+  public picked?: boolean | undefined;
+
+  public debugInfo: JavaDebugInfo;
+
+  public constructor(debugInfo: JavaDebugInfo) {
+    this.debugInfo = debugInfo;
+    this.label = debugInfo.artifact;
+  }
+}
 
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
@@ -33,11 +56,34 @@ class DebugCodeDeployer implements ICodeDeployer {
     } else {
       return false;
     }
-    const parsed = parseGradleOutput(result);
+
+    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'));
+    const parsedDebugInfo: JavaDebugInfo[] = jsonc.parse(debugInfo);
+    let targetDebugInfo = parsedDebugInfo[0];
+    if (parsedDebugInfo.length > 1) {
+      const arr: JavaDebugQuickPick[] = [];
+      for (const i of parsedDebugInfo) {
+        arr.push(new JavaDebugQuickPick(i));
+      }
+      const picked = await vscode.window.showQuickPick(arr, {
+        placeHolder: 'Select an artifact'
+      });
+      if (picked === undefined) {
+        vscode.window.showInformationMessage('Artifact cancelled');
+        return false;
+      }
+      targetDebugInfo = picked.debugInfo;
+    }
+
+    const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
+
+    const targetReadInfo = await readFileAsync(debugPath);
+    const targetInfoParsed = jsonc.parse(targetReadInfo);
 
     const config: DebugCommands = {
-      serverAddress: parsed.ip,
-      serverPort: parsed.port,
+      serverAddress: targetInfoParsed.ipAddress,
+      serverPort: targetInfoParsed.port,
+      project: targetDebugInfo.project,
       workspace: workspace
     };
 

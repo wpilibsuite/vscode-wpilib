@@ -1,23 +1,51 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { gradleRun, parseGradleOutput } from '../shared/gradle';
+import { gradleRun } from '../shared/gradle';
 import { IDeployDebugAPI, IPreferencesAPI, ICodeDeployer } from '../shared/externalapi';
-import { ExternalEditorConfig } from './cppgradleproperties';
+import { readFileAsync } from '../utilities';
 import * as path from 'path';
-import { CppPreferences } from './cpppreferences';
+import * as jsonc from 'jsonc-parser';
 import { DebugCommands, startDebugging } from './debug';
-import { PropertiesStore } from './propertiesstore';
 
+interface CppDebugInfo {
+  debugfile: string;
+  artifact: string;
+}
+
+interface CppDebugCommand {
+  launchfile: string;
+  target: string;
+  gdb: string;
+  sysroot: string | null;
+  srcpaths: string[];
+  headerpaths: string[];
+  sofiles: string[];
+  libsrcpaths: string[];
+}
+
+class CppDebugQuickPick implements vscode.QuickPickItem {
+  public label: string;
+  public description?: string | undefined;
+  public detail?: string | undefined;
+  public picked?: boolean | undefined;
+
+  public debugInfo: CppDebugInfo;
+
+  public constructor(debugInfo: CppDebugInfo) {
+    this.debugInfo = debugInfo;
+    this.label = debugInfo.artifact;
+  }
+}
+
+//import { DebugCommands, startDebugging } from './debug';
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
   private gradleChannel: vscode.OutputChannel;
-  private propertiesStore: PropertiesStore;
 
-  constructor(preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel, propStore: PropertiesStore) {
+  constructor(preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel) {
     this.preferences = preferences;
     this.gradleChannel = gradleChannel;
-    this.propertiesStore = propStore;
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -43,27 +71,33 @@ class DebugCodeDeployer implements ICodeDeployer {
     } else {
       return false;
     }
-    const parsed = parseGradleOutput(result);
 
-    let cfg: ExternalEditorConfig | undefined = undefined;
-
-    for (const p of this.propertiesStore.getGradleProperties()) {
-      if (p.workspace.uri === workspace.uri) {
-        await p.forceReparse();
-        cfg = p.getLastConfig();
+    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'));
+    const parsedDebugInfo: CppDebugInfo[] = jsonc.parse(debugInfo);
+    let targetDebugInfo = parsedDebugInfo[0];
+    if (parsedDebugInfo.length > 1) {
+      const arr: CppDebugQuickPick[] = [];
+      for (const i of parsedDebugInfo) {
+        arr.push(new CppDebugQuickPick(i));
       }
+      const picked = await vscode.window.showQuickPick(arr, {
+        placeHolder: 'Select an artifact'
+      });
+      if (picked === undefined) {
+        vscode.window.showInformationMessage('Artifact cancelled');
+        return false;
+      }
+      targetDebugInfo = picked.debugInfo;
     }
 
-    if (cfg === undefined) {
-      console.log('debugging failed');
-      vscode.window.showInformationMessage('Debugging failed');
-      return false;
-    }
+    const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
 
+    const targetReadInfo = await readFileAsync(debugPath);
+    const targetInfoParsed: CppDebugCommand = jsonc.parse(targetReadInfo);
 
     let soPath = '';
 
-    for (const p of cfg.component.libSharedFilePaths) {
+    for (const p of targetInfoParsed.sofiles) {
       soPath += path.dirname(p) + ';';
     }
 
@@ -71,31 +105,21 @@ class DebugCodeDeployer implements ICodeDeployer {
 
     let sysroot = '';
 
-    if (cfg.compiler.sysroot !== null) {
-      sysroot = cfg.compiler.sysroot;
+    if (targetInfoParsed.sysroot !== null) {
+      sysroot = targetInfoParsed.sysroot;
     }
 
     const config: DebugCommands = {
-      serverAddress: parsed.ip,
-      serverPort: parsed.port,
+      target: targetInfoParsed.target,
       sysroot: sysroot,
-      executablePath: cfg.component.launchfile,
+      executablePath: targetInfoParsed.launchfile,
       workspace: workspace,
       soLibPath: soPath,
-      additionalCommands: []
+      gdbPath: targetInfoParsed.gdb,
+      headerPaths: targetInfoParsed.headerpaths,
+      libSrcPaths: targetInfoParsed.libsrcpaths,
+      srcPaths: targetInfoParsed.srcpaths
     };
-
-    let cppPref: CppPreferences | undefined = undefined;
-
-    for (const c of this.propertiesStore.getCppPreferences()) {
-      if (c.workspace.uri === workspace.uri) {
-        cppPref = c;
-      }
-    }
-
-    if (cppPref !== undefined) {
-      config.additionalCommands = cppPref.getAdditionalDebugCommands();
-    }
 
     await startDebugging(config);
 
@@ -158,11 +182,11 @@ export class DebugDeploy {
   private deployDeployer: DeployCodeDeployer;
 
 
-  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel, propStore: PropertiesStore, allowDebug: boolean) {
+  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel, allowDebug: boolean) {
     debugDeployApi = debugDeployApi;
     debugDeployApi.addLanguageChoice('cpp');
 
-    this.debugDeployer = new DebugCodeDeployer(preferences, gradleChannel, propStore);
+    this.debugDeployer = new DebugCodeDeployer(preferences, gradleChannel);
     this.deployDeployer = new DeployCodeDeployer(preferences, gradleChannel);
 
     debugDeployApi.registerCodeDeploy(this.deployDeployer);

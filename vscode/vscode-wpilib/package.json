@@ -38,10 +38,6 @@
             {
                 "fileMatch": "wpilib_preferences.json",
                 "url": "./resources/wpilibschema.json"
-            },
-            {
-                "fileMatch": "wpilib_cpp_preferences.json",
-                "url": "./resources/cppschema.json"
             }
         ],
         "configuration": {
@@ -154,16 +150,6 @@
                 "title": "Open WPILib Help",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
-            },
-            {
-                "title": "Refresh C++ Properties",
-                "command": "wpilibcpp.refreshProperties",
-                "category": "WPILIB"
-            },
-            {
-                "title": "Toggle C++ between roboRIO and Desktop",
-                "command": "wpilibcpp.toggleRioDesktop",
-                "category": "WPILIB"
             }
         ],
         "keybindings": [

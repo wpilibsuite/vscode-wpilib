@@ -1,15 +1,14 @@
 'use strict';
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 export interface DebugCommands {
   serverAddress: string;
   serverPort: string;
+  project: string;
   workspace: vscode.WorkspaceFolder;
 }
 
 export async function startDebugging(commands: DebugCommands): Promise<void> {
-  const bp = path.basename(commands.workspace.uri.fsPath);
 
   const config: vscode.DebugConfiguration = {
     name: 'wpilibJavaDebug',
@@ -17,7 +16,7 @@ export async function startDebugging(commands: DebugCommands): Promise<void> {
     request: 'attach',
     hostName: commands.serverAddress,
     port: commands.serverPort,
-    projectName: bp
+    projectName: commands.project
   };
 
   await vscode.debug.startDebugging(commands.workspace, config);

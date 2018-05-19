@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-
+import * as fs from 'fs';
 
 export function getIsWindows(): boolean {
   const nodePlatform: NodeJS.Platform = process.platform;
@@ -59,4 +59,16 @@ export async function getPackageName(): Promise<string | undefined> {
   }
   await vscode.window.showErrorMessage('Too many invalid package names entered');
   return undefined;
+}
+
+export function readFileAsync(file: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, 'utf8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
 }

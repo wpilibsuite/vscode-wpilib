@@ -8,9 +8,7 @@ import { Templates } from '../shared/templates';
 import { Commands } from './commands';
 import { IExternalAPI } from '../shared/externalapi';
 import { BuildTest } from './buildtest';
-import { PropertiesStore } from './propertiesstore';
 import { DebugDeploy } from './debugdeploy';
-import { CppStatusBar } from './cppstatusbar';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -52,21 +50,8 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
   context.subscriptions.push(buildTest);
 
-  const propertiesStore = new PropertiesStore(preferences, gradleChannel);
-
-  context.subscriptions.push(propertiesStore);
-
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcpp.refreshProperties', () => {
-    for (const c of propertiesStore.getGradleProperties()) {
-      c.runGradleRefresh();
-    }
-  }));
-
-  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, propertiesStore, allowDebug);
+  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, allowDebug);
   context.subscriptions.push(debugDeploy);
-
-  const statusBar = new CppStatusBar(preferences, propertiesStore);
-  context.subscriptions.push(statusBar);
 
   // Setup commands
   const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
