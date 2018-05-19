@@ -29,6 +29,7 @@ export function parseGradleOutput(output: IOutputPair): IDebuggerParse {
 export interface IOutputPair {
     stdout: string;
     stderr: string;
+    success: boolean;
 }
 
 export function executeCommandAsync(command: string, rootDir: string, ow?: vscode.OutputChannel): Promise<IOutputPair> {
@@ -38,9 +39,13 @@ export function executeCommandAsync(command: string, rootDir: string, ow?: vscod
             cwd: rootDir
         }, (err, stdout, stderr) => {
             if (err) {
-                reject(err);
+                if (err.message.indexOf('BUILD FAILED') >= 0) {
+                    resolve({ stdout: stdout, stderr: stderr, success: false });
+                } else {
+                    reject(err);
+                }
             } else {
-                resolve({ stdout: stdout, stderr: stderr });
+                resolve({ stdout: stdout, stderr: stderr, success: true });
             }
         });
 
