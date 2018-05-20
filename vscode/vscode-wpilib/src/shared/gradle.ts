@@ -32,8 +32,11 @@ export class TaskRunner {
   }
 }
 
-export function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number> {
+export function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder, online: boolean): Promise<number> {
   const runner = new TaskRunner();
-  const command = './gradlew ' + args;
+  let command = './gradlew ' + args;
+  if (!online) {
+    command += ' --offline';
+  }
   return runner.executeTask(command, 'gradle', rootDir, workspace);
 }

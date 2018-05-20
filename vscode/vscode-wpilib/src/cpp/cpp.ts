@@ -42,15 +42,13 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const commandApi = coreExports.getCommandAPI();
   const buildTestApi = coreExports.getBuildTestAPI();
 
-  const gradleChannel = vscode.window.createOutputChannel('gradleCpp');
-
   // Setup build and test
 
-  const buildTest = new BuildTest(buildTestApi, gradleChannel, preferences);
+  const buildTest = new BuildTest(buildTestApi, preferences);
 
   context.subscriptions.push(buildTest);
 
-  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, allowDebug);
+  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, allowDebug);
   context.subscriptions.push(debugDeploy);
 
   // Setup commands

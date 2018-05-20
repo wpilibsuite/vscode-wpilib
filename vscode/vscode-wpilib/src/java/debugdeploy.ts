@@ -45,8 +45,8 @@ class DebugCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
     if (result === 0) {
     } else {
       return false;
@@ -112,12 +112,12 @@ class DeployCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy --offline -PteamNumber=' + teamNumber;
+    const command = 'deploy -PteamNumber=' + teamNumber;
     if (workspace === undefined) {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
     if (result === 0) {
     } else {
       return false;

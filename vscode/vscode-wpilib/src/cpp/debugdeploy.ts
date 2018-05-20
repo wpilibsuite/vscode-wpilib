@@ -41,11 +41,9 @@ class CppDebugQuickPick implements vscode.QuickPickItem {
 //import { DebugCommands, startDebugging } from './debug';
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
-  private gradleChannel: vscode.OutputChannel;
 
-  constructor(preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel) {
+  constructor(preferences: IPreferencesAPI) {
     this.preferences = preferences;
-    this.gradleChannel = gradleChannel;
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -58,16 +56,13 @@ class DebugCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
-    this.gradleChannel.clear();
-    this.gradleChannel.show();
+    const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     if (workspace === undefined) {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
     if (result === 0) {
-      this.gradleChannel.appendLine('Success!');
     } else {
       return false;
     }
@@ -136,11 +131,9 @@ class DebugCodeDeployer implements ICodeDeployer {
 
 class DeployCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
-  private gradleChannel: vscode.OutputChannel;
 
-  constructor(preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel) {
+  constructor(preferences: IPreferencesAPI) {
     this.preferences = preferences;
-    this.gradleChannel = gradleChannel;
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -153,16 +146,13 @@ class DeployCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy --offline -PteamNumber=' + teamNumber;
-    this.gradleChannel.clear();
-    this.gradleChannel.show();
+    const command = 'deploy -PteamNumber=' + teamNumber;
     if (workspace === undefined) {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
     if (result === 0) {
-      this.gradleChannel.appendLine('Success!');
     } else {
       return false;
     }
@@ -181,13 +171,12 @@ export class DebugDeploy {
   private debugDeployer: DebugCodeDeployer;
   private deployDeployer: DeployCodeDeployer;
 
-
-  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel, allowDebug: boolean) {
+  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, allowDebug: boolean) {
     debugDeployApi = debugDeployApi;
     debugDeployApi.addLanguageChoice('cpp');
 
-    this.debugDeployer = new DebugCodeDeployer(preferences, gradleChannel);
-    this.deployDeployer = new DeployCodeDeployer(preferences, gradleChannel);
+    this.debugDeployer = new DebugCodeDeployer(preferences);
+    this.deployDeployer = new DeployCodeDeployer(preferences);
 
     debugDeployApi.registerCodeDeploy(this.deployDeployer);
 

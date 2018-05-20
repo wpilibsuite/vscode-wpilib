@@ -73,7 +73,7 @@ export function getBuildTestAPIExpectedVersion(): number {
   return deployDebugAPIExpectedVersion;
 }
 export abstract class IBuildTestAPI implements IVersionable {
-  public abstract buildCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract buildCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean>;
   public abstract registerCodeBuild(builder: ICodeBuilder): void;
   public abstract testCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
   public abstract registerCodeTest(builder: ICodeBuilder): void;
@@ -183,7 +183,7 @@ export interface ICodeBuilder {
   /**
    * Run the command with the specified team number
    */
-  runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  runBuilder(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection

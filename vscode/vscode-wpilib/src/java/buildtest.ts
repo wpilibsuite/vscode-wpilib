@@ -20,13 +20,13 @@ export class BuildTest {
         const currentLanguage = prefs.getCurrentLanguage();
         return currentLanguage === 'none' || currentLanguage === 'java';
       },
-      async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const command = 'assemble --offline';
+      async runBuilder(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
+        const command = 'assemble';
         if (workspace === undefined) {
           vscode.window.showInformationMessage('No workspace selected');
           return false;
         }
-        const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
         console.log(result);
         return true;
       },
@@ -49,8 +49,8 @@ export class BuildTest {
         return currentLanguage === 'none' || currentLanguage === 'java';
       },
       async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const command = 'test --offline';
-        const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+        const command = 'test';
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
         console.log(result);
         return true;
       },
