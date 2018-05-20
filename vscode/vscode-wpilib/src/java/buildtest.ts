@@ -6,7 +6,7 @@ import { gradleRun } from '../shared/gradle';
 
 export class BuildTest {
 
-  constructor(buildTestApi: IBuildTestAPI, gradleChannel: vscode.OutputChannel, preferences: IPreferencesAPI) {
+  constructor(buildTestApi: IBuildTestAPI, preferences: IPreferencesAPI) {
 
     buildTestApi.addLanguageChoice('java');
 
@@ -22,13 +22,11 @@ export class BuildTest {
       },
       async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
         const command = 'assemble --offline';
-        gradleChannel.clear();
-        gradleChannel.show();
         if (workspace === undefined) {
           vscode.window.showInformationMessage('No workspace selected');
           return false;
         }
-        const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace);
         console.log(result);
         return true;
       },
@@ -52,10 +50,7 @@ export class BuildTest {
       },
       async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
         const command = 'test --offline';
-        gradleChannel.clear();
-        gradleChannel.show();
-        const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
-
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace);
         console.log(result);
         return true;
       },

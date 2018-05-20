@@ -1,48 +1,39 @@
 'use strict';
 import * as vscode from 'vscode';
-import * as child_process from 'child_process';
+import { PromiseCondition } from './promisecondition';
 
-export interface IOutputPair {
-    stdout: string;
-    stderr: string;
-    success: boolean;
-}
-
-export function executeCommandAsync(command: string, rootDir: string, ow?: vscode.OutputChannel): Promise<IOutputPair> {
-    return new Promise(function (resolve, reject) {
-        const exec = child_process.exec;
-        const child = exec(command, {
-            cwd: rootDir
-        }, (err, stdout, stderr) => {
-            if (err) {
-                if (err.message.indexOf('BUILD FAILED') >= 0) {
-                    resolve({ stdout: stdout, stderr: stderr, success: false });
-                } else {
-                    reject(err);
-                }
-            } else {
-                resolve({ stdout: stdout, stderr: stderr, success: true });
-            }
-        });
-
-        if (ow === undefined) {
-            return;
-        }
-
-        child.stdout.on('data', (data) => {
-            ow.append(data.toString());
-        });
-
-        child.stderr.on('data', (data) => {
-            ow.append(data.toString());
-        });
-    });
-}
-
-export async function gradleRun(args: string, rootDir: string, ow?: vscode.OutputChannel): Promise<IOutputPair> {
-    let command = 'gradlew ' + args;
-    if (process.platform !== 'win32') {
-        command = './' + command;
+const runners: TaskRunner[] = [];
+vscode.tasks.onDidEndTaskProcess(e => {
+  for (let i = 0; i < runners.length; i++) {
+    if (runners[i].execution === undefined) {
+      continue;
     }
-    return await executeCommandAsync(command, rootDir, ow);
+    if (e.execution === runners[i].execution) {
+      runners[i].condition.set(e.exitCode);
+      runners.splice(i, 1);
+      break;
+    }
+  }
+});
+
+export class TaskRunner {
+  public condition: PromiseCondition<number> = new PromiseCondition(-1);
+  public execution: vscode.TaskExecution | undefined;
+  public async executeTask(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number> {
+    const shell = new vscode.ShellExecution(command, {
+      cwd: rootDir
+    });
+    const task = new vscode.Task({ type: 'wpilibgradle' }, workspace, name, 'wpilib', shell);
+    const runningTask = await vscode.tasks.executeTask(task);
+    this.execution = runningTask;
+    this.condition.reset(-1);
+    runners.push(this);
+    return await this.condition.wait();
+  }
+}
+
+export function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number> {
+  const runner = new TaskRunner();
+  const command = './gradlew ' + args;
+  return runner.executeTask(command, 'gradle', rootDir, workspace);
 }

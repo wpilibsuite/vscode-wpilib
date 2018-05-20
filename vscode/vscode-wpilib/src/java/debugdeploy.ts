@@ -30,11 +30,9 @@ class JavaDebugQuickPick implements vscode.QuickPickItem {
 
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
-  private gradleChannel: vscode.OutputChannel;
 
-  constructor(preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel) {
+  constructor(preferences: IPreferencesAPI) {
     this.preferences = preferences;
-    this.gradleChannel = gradleChannel;
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -48,11 +46,8 @@ class DebugCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'deploy --offline -PdebugMode -PteamNumber=' + teamNumber;
-    this.gradleChannel.clear();
-    this.gradleChannel.show();
-    const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    if (result.success) {
-      this.gradleChannel.appendLine('Success!');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    if (result === 0) {
     } else {
       return false;
     }
@@ -102,11 +97,9 @@ class DebugCodeDeployer implements ICodeDeployer {
 
 class DeployCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
-  private gradleChannel: vscode.OutputChannel;
 
-  constructor(preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel) {
+  constructor(preferences: IPreferencesAPI) {
     this.preferences = preferences;
-    this.gradleChannel = gradleChannel;
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -120,15 +113,12 @@ class DeployCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'deploy --offline -PteamNumber=' + teamNumber;
-    this.gradleChannel.clear();
-    this.gradleChannel.show();
     if (workspace === undefined) {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    if (result.success) {
-      this.gradleChannel.appendLine('Success!');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    if (result === 0) {
     } else {
       return false;
     }
@@ -148,12 +138,12 @@ export class DebugDeploy {
   private deployDeployer: DeployCodeDeployer;
 
 
-  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, gradleChannel: vscode.OutputChannel, allowDebug: boolean) {
+  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, allowDebug: boolean) {
     debugDeployApi = debugDeployApi;
     debugDeployApi.addLanguageChoice('java');
 
-    this.debugDeployer = new DebugCodeDeployer(preferences, gradleChannel);
-    this.deployDeployer = new DeployCodeDeployer(preferences, gradleChannel);
+    this.debugDeployer = new DebugCodeDeployer(preferences);
+    this.deployDeployer = new DeployCodeDeployer(preferences);
 
     debugDeployApi.registerCodeDeploy(this.deployDeployer);
 

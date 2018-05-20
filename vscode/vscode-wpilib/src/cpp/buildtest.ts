@@ -28,7 +28,7 @@ export class BuildTest {
           vscode.window.showInformationMessage('No workspace selected');
           return false;
         }
-        const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace);
         console.log(result);
         return true;
       },
@@ -54,7 +54,7 @@ export class BuildTest {
         const command = 'test --offline';
         gradleChannel.clear();
         gradleChannel.show();
-        const result = await gradleRun(command, workspace.uri.fsPath, gradleChannel);
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace);
 
         console.log(result);
         return true;

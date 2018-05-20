@@ -31,16 +31,14 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   const commandApi = coreExports.getCommandAPI();
   const buildTestApi = coreExports.getBuildTestAPI();
 
-  const gradleChannel = vscode.window.createOutputChannel('gradleJava');
-
   // Setup build and test
 
-  const buildTest = new BuildTest(buildTestApi, gradleChannel, preferences);
+  const buildTest = new BuildTest(buildTestApi, preferences);
 
   context.subscriptions.push(buildTest);
 
   // Setup debug and deploy
-  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, gradleChannel, allowDebug);
+  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, allowDebug);
   context.subscriptions.push(debugDeploy);
 
   // Setup commands

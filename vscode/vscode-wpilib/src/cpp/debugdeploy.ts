@@ -65,8 +65,8 @@ class DebugCodeDeployer implements ICodeDeployer {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    if (result.success) {
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    if (result === 0) {
       this.gradleChannel.appendLine('Success!');
     } else {
       return false;
@@ -160,8 +160,8 @@ class DeployCodeDeployer implements ICodeDeployer {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, this.gradleChannel);
-    if (result.success) {
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace);
+    if (result === 0) {
       this.gradleChannel.appendLine('Success!');
     } else {
       return false;
