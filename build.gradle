@@ -1,6 +1,66 @@
 plugins {
     id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.0"
+    id 'io.pry.gradle.offline_dependencies' version '0.3'
+    id "base"
 }
+
+repositories {
+  maven {
+    url offlineRepositoryRoot
+  }
+}
+
+offlineDependencies {
+    includeBuildscriptDependencies false
+    repositories {
+        maven {
+            url "${System.getProperty('user.home')}/releases/maven/development"
+
+        }
+    }
+}
+
+configurations {
+    cppSource
+    javaSource
+}
+
+dependencies {
+    cppSource 'edu.wpi.first.wpilibc:examples:+:@zip'
+    javaSource 'edu.wpi.first.wpilibj:examples:+:@zip'
+
+    cppSource 'edu.wpi.first.wpilibc:templates:+:@zip'
+    javaSource 'edu.wpi.first.wpilibj:templates:+:@zip'
+
+    cppSource 'edu.wpi.first.wpilibc:commands:+:@zip'
+    javaSource 'edu.wpi.first.wpilibj:commands:+:@zip'
+}
+
+
+task extractCppDependencies(type: Copy) {
+    dependsOn configurations.cppSource
+
+    from {
+        configurations.cppSource.collect { it }
+        configurations.cppSource.collect { zipTree(it) }
+    }
+    into 'vscode-wpilib/resources/cpp/src'
+}
+
+task extractJavaDependencies(type: Copy) {
+    dependsOn configurations.javaSource
+
+    from {
+        configurations.javaSource.collect { zipTree(it) }
+    }
+    into 'vscode-wpilib/resources/java/src'
+}
+
+task extractDependencies() {
+    dependsOn extractCppDependencies
+    dependsOn extractJavaDependencies
+}
+
 
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
 // already specified on the command line
