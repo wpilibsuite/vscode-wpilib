@@ -37,16 +37,12 @@ class DebugCodeDeployer implements ICodeDeployer {
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const prefs = await this.preferences.getPreferences(workspace);
-    if (prefs === undefined) {
-      console.log('Preferences without workspace?');
-      return false;
-    }
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
     const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
     if (result === 0) {
     } else {
       return false;
@@ -104,20 +100,16 @@ class DeployCodeDeployer implements ICodeDeployer {
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const prefs = await this.preferences.getPreferences(workspace);
-    if (prefs === undefined) {
-      console.log('Preferences without workspace?');
-      return false;
-    }
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
     const command = 'deploy -PteamNumber=' + teamNumber;
     if (workspace === undefined) {
       vscode.window.showInformationMessage('No workspace selected');
       return false;
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, false);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
     if (result === 0) {
     } else {
       return false;

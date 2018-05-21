@@ -57,9 +57,9 @@ export function getDeployDebugAPIExpectedVersion(): number {
 }
 export abstract class IDeployDebugAPI implements IVersionable {
   public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  public abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract deployCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean>;
   public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
-  public abstract debugCode(workspace: vscode.WorkspaceFolder, desktop: boolean): Promise<boolean>;
+  public abstract debugCode(workspace: vscode.WorkspaceFolder, desktop: boolean, online: boolean): Promise<boolean>;
   public abstract registerCodeDebug(deployer: ICodeDeployer): void;
   public abstract addLanguageChoice(language: string): void;
   public abstract getLanguageChoices(): string[];
@@ -75,7 +75,7 @@ export function getBuildTestAPIExpectedVersion(): number {
 export abstract class IBuildTestAPI implements IVersionable {
   public abstract buildCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean>;
   public abstract registerCodeBuild(builder: ICodeBuilder): void;
-  public abstract testCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract testCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean>;
   public abstract registerCodeTest(builder: ICodeBuilder): void;
   public abstract addLanguageChoice(language: string): void;
   public getVersion(): number {
@@ -88,7 +88,7 @@ export function getPreferencesAPIExpectedVersion(): number {
   return preferencesAPIExpectedVersion;
 }
 export abstract class IPreferencesAPI implements IVersionable {
-  public abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences | undefined;
+  public abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
   public abstract onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
   public abstract getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
   public getVersion(): number {
@@ -122,6 +122,7 @@ export interface IPreferences {
   getAutoSaveOnDeploy(): boolean;
   setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void;
   getIsWPILibProject(): boolean;
+  getOnline(): boolean;
 }
 
 export interface IExampleTemplateCreator {
@@ -161,7 +162,7 @@ export interface ICodeDeployer {
    *
    * @param teamNumber The team number to deploy to
    */
-  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection

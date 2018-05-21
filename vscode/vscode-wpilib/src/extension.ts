@@ -28,7 +28,7 @@ class ExternalAPI extends IExternalAPI {
     this.debugDeployApi = new DeployDebugAPI(resourcesLocation, this.preferencesApi);
     this.buildTestApi = new BuildTestAPI(this.preferencesApi);
     this.exampleTemplateApi = new ExampleTemplateAPI();
-    this.commandApi = new CommandAPI(this.preferencesApi);
+    this.commandApi = new CommandAPI();
   }
 
   public getToolAPI(): ToolAPI {

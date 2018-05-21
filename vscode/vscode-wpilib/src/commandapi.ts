@@ -1,7 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator } from './shared/externalapi';
-import { PreferencesAPI } from './preferencesapi';
 
 interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: ICommandCreator;
@@ -14,11 +13,9 @@ interface ILanguageQuickPick extends vscode.QuickPickItem {
 export class CommandAPI extends ICommandAPI {
   private disposables: vscode.Disposable[] = [];
   private creators: ILanguageQuickPick[] = [];
-  private preferencesApi: PreferencesAPI;
 
-  public constructor(preferencesApi: PreferencesAPI) {
+  public constructor() {
     super();
-    this.preferencesApi = preferencesApi;
   }
 
   public addCommandProvider(provider: ICommandCreator): void {
@@ -49,11 +46,6 @@ export class CommandAPI extends ICommandAPI {
   public async createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean> {
     if (this.creators.length === 0) {
       await vscode.window.showInformationMessage('No command providers found');
-      return false;
-    }
-    const preferences = this.preferencesApi.getPreferences(workspace);
-    if (preferences === undefined) {
-      await vscode.window.showInformationMessage('Could not find a workspace');
       return false;
     }
 

@@ -27,9 +27,6 @@ export class Help {
     if (workspaces !== undefined) {
       for (const wp of workspaces) {
         const prefs = preferences.getPreferences(wp);
-        if (prefs === undefined) {
-          continue;
-        }
         if (prefs.getIsWPILibProject()) {
           this.statusBar.show();
           break;

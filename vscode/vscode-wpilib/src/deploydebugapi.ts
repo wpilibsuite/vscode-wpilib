@@ -35,7 +35,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       if (workspace === undefined) {
         return;
       }
-      await this.debugDeployAPI.debugCode(workspace, desktop);
+      await this.debugDeployAPI.debugCode(workspace, desktop, this.preferences.getPreferences(workspace).getOnline());
       resolve();
     });
   }
@@ -117,25 +117,20 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     this.languageChoices.push(language);
   }
 
-  public debugCode(workspace: vscode.WorkspaceFolder, _desktop: boolean): Promise<boolean> {
-    return this.deployCommon(workspace, this.debuggers, true);
+  public debugCode(workspace: vscode.WorkspaceFolder, _desktop: boolean, online: boolean): Promise<boolean> {
+    return this.deployCommon(workspace, this.debuggers, true, online);
   }
-  public deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.deployCommon(workspace, this.deployers, false);
+  public deployCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
+    return this.deployCommon(workspace, this.deployers, false, online);
   }
 
-  private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[], debug: boolean): Promise<boolean> {
+  private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[], debug: boolean, online: boolean): Promise<boolean> {
     if (deployer.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
     }
 
     const preferences = this.preferences.getPreferences(workspace);
-
-    if (preferences === undefined) {
-      vscode.window.showInformationMessage('Could not find a workspace');
-      return false;
-    }
 
     const validDeployers: ICodeDeployerQuickPick[] = [];
     for (const d of deployer) {
@@ -165,7 +160,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     }
     const teamNumber = await preferences.getTeamNumber();
     try {
-      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace);
+      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace, online);
       if (preferences.getAutoStartRioLog() && deploySuccess) {
         await this.startRioLog(teamNumber, !debug);
       }

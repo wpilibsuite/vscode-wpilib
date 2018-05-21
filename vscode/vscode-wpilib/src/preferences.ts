@@ -186,6 +186,14 @@ export class Preferences implements IPreferences {
     this.getConfiguration().update('autoSaveOnDeploy', autoSave, target);
   }
 
+  public getOnline(): boolean {
+    const res = this.getConfiguration().get<boolean>('online');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
   public dispose() {
     for (const d of this.disposables) {
       d.dispose();

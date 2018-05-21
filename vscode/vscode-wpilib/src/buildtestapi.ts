@@ -23,8 +23,8 @@ export class BuildTestAPI extends IBuildTestAPI {
   public buildCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
     return this.buildTestCommon(workspace, this.builders, online);
   }
-  public testCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.buildTestCommon(workspace, this.testers, false);
+  public testCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
+    return this.buildTestCommon(workspace, this.testers, online);
   }
 
   private async buildTestCommon(workspace: vscode.WorkspaceFolder, builder: ICodeBuilderQuickPick[], online: boolean): Promise<boolean> {
@@ -34,11 +34,6 @@ export class BuildTestAPI extends IBuildTestAPI {
     }
 
     const preferences = this.preferences.getPreferences(workspace);
-
-    if (preferences === undefined) {
-      vscode.window.showInformationMessage('Could not find a workspace');
-      return false;
-    }
 
     const validBuilders: ICodeBuilderQuickPick[] = [];
     for (const d of builder) {

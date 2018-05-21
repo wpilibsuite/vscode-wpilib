@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "publisher": "wpifirst",
     "engines": {
-        "vscode": "^1.23.0"
+        "vscode": "^1.24.0"
     },
     "categories": [
         "Other"
@@ -69,10 +69,10 @@
                     "description": "Team number to use",
                     "scope": "resource"
                 },
-                "wpilib.disableCppProperties": {
+                "wpilib.online": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Disable automatically setting C++ vscode settings",
+                    "description": "Perform gradle commands without offline flag",
                     "scope": "resource"
                 }
             }
@@ -97,11 +97,6 @@
             {
                 "command": "wpilibcore.buildCode",
                 "title": "Build Robot Code",
-                "category": "WPILIB"
-            },
-            {
-                "command": "wpilibcore.buildCodeOnline",
-                "title": "Build Robot Code Online",
                 "category": "WPILIB"
             },
             {

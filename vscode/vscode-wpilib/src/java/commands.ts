@@ -106,10 +106,6 @@ export class Commands {
           },
           async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
             const prefs = await preferences.getPreferences(workspace);
-            if (prefs === undefined) {
-              console.log('Preferences without workspace?');
-              return false;
-            }
             const currentLanguage = prefs.getCurrentLanguage();
             return currentLanguage === 'none' || currentLanguage === 'java';
           },
