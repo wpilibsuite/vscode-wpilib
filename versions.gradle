@@ -1,0 +1,55 @@
+def versionFiles = [new File('vscode-wpilib/package.json'), new File('wpilib-utility-standalone/package.json')]
+def oldVersionFile = new File("$buildDir/existingVersions.json")
+
+task updateVersions(type: Task) {
+    doLast {
+        def existingVersions = []
+
+        versionFiles.each {
+            def file = it
+
+            def parsedJson = new groovy.json.JsonSlurper().parseText(file.text)
+
+            def existingVersion = new Expando();
+            existingVersion.version = parsedJson.version
+
+            existingVersion.file = file.toString()
+
+            existingVersions << existingVersion
+
+            parsedJson.version = pubVersion
+
+            def converted = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(parsedJson))
+
+            file.text = converted
+        }
+        if (oldVersionFile.exists()) {
+            return
+        }
+
+            oldVersionFile.parentFile.mkdirs()
+
+            oldVersionFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(existingVersions))
+    }
+}
+
+task resetVersions(type: Task) {
+    doLast {
+        def oldVersions = new groovy.json.JsonSlurper().parseText(oldVersionFile.text)
+        versionFiles.each {
+            def file = it
+
+            def parsedJson = new groovy.json.JsonSlurper().parseText(file.text)
+            for (Object oldv : oldVersions) {
+                if (file.toString().equals(oldv.file)) {
+                    parsedJson.version = oldv.version
+                    break
+                }
+            }
+            def converted = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(parsedJson))
+
+            file.text = converted
+        }
+        oldVersionFile.delete()
+    }
+}

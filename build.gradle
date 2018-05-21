@@ -1,5 +1,28 @@
-task build() {}
+plugins {
+    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.0"
+}
 
-task clean(type: Delete) {
-    delete buildDir
+// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
+// already specified on the command line
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+ext.pubVersion = ''
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+if (pubVersion == '') {
+    pubVersion = '0.0.1-unknown'
+}
+
+apply from: 'versions.gradle'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.7'
 }
