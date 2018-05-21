@@ -11,6 +11,7 @@ interface JsonLayout {
   description: string;
   tags: string[];
   foldername: string;
+  gradlebase: string;
 }
 
 export class Examples {
@@ -19,7 +20,7 @@ export class Examples {
   constructor(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
     const examplesFolder = path.join(resourceRoot, 'src', 'examples');
     const resourceFile = path.join(examplesFolder, this.exampleResourceName);
-    const gradleFolder = path.join(resourceRoot, 'gradlebase');
+    const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         console.log(err);
@@ -41,13 +42,13 @@ export class Examples {
             try {
               if (java) {
                 if (!await generateCopyJava(path.join(examplesFolder, e.foldername),
-                  gradleFolder, folderInto.fsPath)) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath)) {
                   await vscode.window.showErrorMessage('Cannot create into non empty folder');
                   return false;
                 }
               } else {
                 if (!await generateCopyCpp(path.join(examplesFolder, e.foldername),
-                  gradleFolder, folderInto.fsPath)) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath)) {
                   await vscode.window.showErrorMessage('Cannot create into non empty folder');
                   return false;
                 }
