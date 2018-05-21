@@ -151,6 +151,16 @@
                 "title": "Open WPILib Help",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
+            },
+            {
+                "command": "wpilibcore.refreshCppProperties",
+                "title": "Refresh Gradle C++ Properties",
+                "category": "WPILib C++"
+            },
+            {
+                "command": "wpilibcore.selectCppToolchain",
+                "title": "Select Current C++ Toolchain",
+                "category": "WPILib C++"
             }
         ],
         "keybindings": [

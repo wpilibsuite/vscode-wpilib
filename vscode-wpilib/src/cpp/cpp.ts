@@ -9,6 +9,7 @@ import { Commands } from './commands';
 import { IExternalAPI } from '../shared/externalapi';
 import { BuildTest } from './buildtest';
 import { DebugDeploy } from './debugdeploy';
+//import { activateCppProvider } from '../cppprovider/cppprovider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -41,6 +42,9 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
   const buildTestApi = coreExports.getBuildTestAPI();
+
+  // TODO: Waiting for update
+  //await activateCppProvider(context, coreExports);
 
   // Setup build and test
 

@@ -53,15 +53,15 @@ class ExternalAPI extends IExternalAPI {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
   // Resources folder will be used for RioLog
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
   const externalApi = new ExternalAPI(extensionResourceLocation);
 
-  activateCpp(context, externalApi);
-  activateJava(context, externalApi);
+  await activateCpp(context, externalApi);
+  await activateJava(context, externalApi);
 
   createVsCommands(context, externalApi);
 
