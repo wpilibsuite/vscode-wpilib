@@ -7,8 +7,8 @@ import { ToolChain, Source } from './jsonformats';
 import * as path from 'path';
 import * as glob from 'glob';
 import { PersistentFolderState } from './persistentState';
-import { TaskRunner } from './gradle';
 import { IPreferences } from '../shared/externalapi';
+import { TaskRunner } from '../shared/gradle';
 
 function promisifyReadFile(location: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
