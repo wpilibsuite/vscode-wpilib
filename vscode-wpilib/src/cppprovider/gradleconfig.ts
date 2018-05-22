@@ -7,8 +7,8 @@ import { ToolChain, Source } from './jsonformats';
 import * as path from 'path';
 import * as glob from 'glob';
 import { PersistentFolderState } from './persistentState';
-import { TaskRunner } from './gradle';
 import { IPreferences } from '../shared/externalapi';
+import { gradleRun } from '../shared/gradle';
 
 function promisifyReadFile(location: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
@@ -156,12 +156,7 @@ export class GradleConfig {
 
   public async runGradleRefresh(): Promise<number> {
     const online = this.preferences.getOnline();
-    const runner = new TaskRunner();
-    let command = './gradlew generateVsCodeConfig';
-    if (online === undefined || online === false) {
-      command += ' --offline';
-    }
-    return runner.executeTask(command, 'gradle', this.workspace.uri.fsPath, this.workspace);
+    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online);
   }
 
   public async findMatchingBinary(uris: vscode.Uri[]): Promise<BinaryFind[]> {

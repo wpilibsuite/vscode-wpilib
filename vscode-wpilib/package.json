@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "publisher": "wpifirst",
     "engines": {
-        "vscode": "^1.24.0"
+        "vscode": "^1.23.0"
     },
     "categories": [
         "Other"
@@ -13,7 +13,6 @@
     "activationEvents": [
         "*"
     ],
-    "enableProposedApi": true,
     "main": "./out/extension",
     "contributes": {
         "debuggers": [
