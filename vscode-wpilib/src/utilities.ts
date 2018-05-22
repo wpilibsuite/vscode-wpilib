@@ -8,57 +8,35 @@ export function getIsWindows(): boolean {
 }
 
 export async function getClassName(): Promise<string | undefined> {
-  let count = 0;
-  let promptString = 'Please enter a class name';
-  while (count < 3) {
-    count++;
-    const className = await vscode.window.showInputBox({
-      prompt: promptString
-    });
-
-    if (className === undefined || className === '') {
-      vscode.window.showInformationMessage('Class entering cancelled');
+  const promptString = 'Please enter a class name';
+  const className = await vscode.window.showInputBox({
+    prompt: promptString,
+    validateInput: (s) => {
+      const match = s.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*)$');
+      if (match === null || match.length === 0) {
+        return 'Invalid Classname';
+      }
       return undefined;
     }
-
-    const match = className.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*)$');
-
-    if (match === null || match.length === 0) {
-      promptString = 'Invalid Classname. Please enter a valid classname';
-      continue;
-    }
-
-    return className;
-  }
-  await vscode.window.showErrorMessage('Too many invalid class names entered');
-  return undefined;
+  });
+  return className;
 }
 
 export async function getPackageName(): Promise<string | undefined> {
-  let count = 0;
-  let promptString = 'Please enter a package name';
-  while (count < 3) {
-    count++;
-    const packageName = await vscode.window.showInputBox({
-      prompt: promptString
-    });
+  const promptString = 'Please enter a package name';
+  const packageName = await vscode.window.showInputBox({
+    prompt: promptString,
+    validateInput: (s) => {
+      const match = s.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$');
 
-    if (packageName === undefined || packageName === '') {
-      vscode.window.showInformationMessage('Package entering cancelled');
+      if (match === null || match.length === 0) {
+        return 'Invalid Package Name';
+      }
+
       return undefined;
     }
-
-    const match = packageName.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$');
-
-    if (match === null || match.length === 0) {
-      promptString = 'Invalid Package name. Please enter a valid pacakge name.';
-      continue;
-    }
-
-    return packageName;
-  }
-  await vscode.window.showErrorMessage('Too many invalid package names entered');
-  return undefined;
+  });
+  return packageName;
 }
 
 export function readFileAsync(file: string): Promise<string> {

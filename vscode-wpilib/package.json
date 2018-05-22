@@ -141,7 +141,7 @@
             },
             {
                 "command": "wpilibcore.createCommand",
-                "title": "Create a new command",
+                "title": "Create a new class/command",
                 "category": "WPILIB",
                 "icon": "resources/wpilib.svg"
             },
@@ -211,7 +211,7 @@
                     "group": "wpilib"
                 },
                 {
-                    "when": "explorerResourceIsFolder",
+                    "when": "explorerResourceIsFolder && isWPILibProject",
                     "command": "wpilibcore.createCommand",
                     "group": "wpilib"
                 }
