@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
-import * as path from 'path';
-import * as url from 'url';
+// import * as path from 'path';
+// import * as url from 'url';
 
 let mainWindow: Electron.BrowserWindow | undefined;
 
@@ -13,12 +13,7 @@ function createWindow() {
     width: 180,
   });
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-      pathname: path.join(__dirname, '../index.html'),
-      protocol: 'file:',
-      slashes: true,
-  }));
+  mainWindow.loadFile('index.html');
 
   mainWindow.setMenu(null);
 

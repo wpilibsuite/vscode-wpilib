@@ -1,11 +1,6 @@
 
 import * as electron from 'electron';
-import * as path from 'path';
-import * as url from 'url';
 const remote = electron.remote;
-
-let rioLogWindow: Electron.BrowserWindow | undefined;
-let generatorWindow: Electron.BrowserWindow | undefined;
 
 window.addEventListener('load', () => {
   const mainDiv = document.getElementById('mainDiv');
@@ -16,64 +11,26 @@ window.addEventListener('load', () => {
   const rioLogButton = document.createElement('button');
   rioLogButton.appendChild(document.createTextNode('Start RioLog'));
   rioLogButton.addEventListener('click', () => {
-    if (rioLogWindow !== undefined) {
-      return;
-    }
-    rioLogWindow = new remote.BrowserWindow({
-      backgroundColor: '#2e2c29',
-      height: 600,
-      modal: true,
-      parent: remote.getCurrentWindow(),
-      title: 'RioLog',
-      width: 800,
-    });
+    const bWindow = remote.getCurrentWindow();
 
-    rioLogWindow.loadURL(url.format({
-      pathname: path.join(__dirname, '../riolog.html'),
-      protocol: 'file:',
-      slashes: true,
-    }));
+    bWindow.setSize(800, 600);
+    bWindow.setTitle('RioLog');
 
-    rioLogWindow.setMenu(null);
+    bWindow.loadFile('riolog.html');
 
-    remote.getCurrentWindow().hide();
-
-    rioLogWindow.on('closed', () => {
-      rioLogWindow = undefined;
-      remote.getCurrentWindow().close();
-    });
+    return;
   });
   mainDiv.appendChild(rioLogButton);
 
   const generatorButton = document.createElement('button');
   generatorButton.appendChild(document.createTextNode('Start Generator'));
   generatorButton.addEventListener('click', () => {
-    if (generatorWindow !== undefined) {
-      return;
-    }
-    generatorWindow = new remote.BrowserWindow({
-      backgroundColor: '#2e2c29',
-      height: 600,
-      modal: true,
-      parent: remote.getCurrentWindow(),
-      title: 'Generator',
-      width: 800,
-    });
+    const bWindow = remote.getCurrentWindow();
 
-    generatorWindow.loadURL(url.format({
-      pathname: path.join(__dirname, '../generator.html'),
-      protocol: 'file:',
-      slashes: true,
-    }));
+    bWindow.setSize(800, 600);
+    bWindow.setTitle('Generator');
 
-    generatorWindow.setMenu(null);
-
-    remote.getCurrentWindow().hide();
-
-    generatorWindow.on('closed', () => {
-      generatorWindow = undefined;
-      remote.getCurrentWindow().close();
-    });
+    bWindow.loadFile('generator.html');
   });
   mainDiv.appendChild(generatorButton);
 });

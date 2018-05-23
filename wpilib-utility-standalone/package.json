@@ -7,6 +7,7 @@
     "clean": "rmdir-cli out",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "start": "npm run compile && electron ./out/main.js",
+    "watch": "tsc -watch -p ./",
     "packageWindows": "electron-packager . wpilibutility --platform=win32 --arch=ia32 --overwrite --out ../build",
     "packageLinux": "electron-packager . wpilibutility --platform=darwin --overwrite --out ../build",
     "packageMac": "electron-packager . wpilibutility --platform=linux --overwrite --out ../build"
