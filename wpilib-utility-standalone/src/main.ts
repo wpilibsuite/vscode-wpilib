@@ -7,10 +7,10 @@ let mainWindow: Electron.BrowserWindow | undefined;
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    height: 150,
-    width: 180,
     backgroundColor: '#2e2c29',
-    title: 'WPILib Utility'
+    height: 150,
+    title: 'WPILib Utility',
+    width: 180,
   });
 
   // and load the index.html of the app.
@@ -23,11 +23,11 @@ function createWindow() {
   mainWindow.setMenu(null);
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
-  //mainWindow.webContents.send('messageFromMain', 'hello');
+  // mainWindow.webContents.send('messageFromMain', 'hello');
 
-  //console.log('logging');
+  // console.log('logging');
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

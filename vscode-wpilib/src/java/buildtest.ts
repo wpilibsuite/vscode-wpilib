@@ -12,7 +12,7 @@ export class BuildTest {
 
     buildTestApi.registerCodeBuild({
       async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const prefs = await preferences.getPreferences(workspace);
+        const prefs = preferences.getPreferences(workspace);
         const currentLanguage = prefs.getCurrentLanguage();
         return currentLanguage === 'none' || currentLanguage === 'java';
       },
@@ -31,12 +31,12 @@ export class BuildTest {
       },
       getDescription(): string {
         return 'Java Build';
-      }
+      },
     });
 
     buildTestApi.registerCodeTest({
       async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const prefs = await preferences.getPreferences(workspace);
+        const prefs = preferences.getPreferences(workspace);
         const currentLanguage = prefs.getCurrentLanguage();
         return currentLanguage === 'none' || currentLanguage === 'java';
       },
@@ -51,10 +51,11 @@ export class BuildTest {
       },
       getDescription(): string {
         return 'Java Test';
-      }
+      },
     });
   }
 
+  // tslint:disable-next-line:no-empty
   public dispose() {
 
   }

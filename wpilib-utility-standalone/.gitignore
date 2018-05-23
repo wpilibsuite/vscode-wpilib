@@ -3,5 +3,5 @@ dist/
 out/
 release/
 src/riolog/shared
-resources/src
+resources/
 src/shared/

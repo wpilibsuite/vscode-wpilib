@@ -1,26 +1,26 @@
 'use strict';
 
-export interface Source {
+export interface ISource {
   srcDirs: string[];
   includes: string[];
   excludes: string[];
 }
 
-export interface SourceSet {
-  source: Source;
-  exportedHeaders: Source;
+export interface ISourceSet {
+  source: ISource;
+  exportedHeaders: ISource;
   cpp: boolean;
   args: string[];
   macros: string[];
 }
 
-export interface Binary {
+export interface IBinary {
   componentName: string;
-  sourceSets: SourceSet[];
+  sourceSets: ISourceSet[];
   libHeaders: string[];
 }
 
-export interface ToolChain {
+export interface IToolChain {
   name: string;
   architecture: string;
   operatingSystem: string;
@@ -33,5 +33,5 @@ export interface ToolChain {
   systemCppArgs: string[];
   systemCMacros: string[];
   systemCArgs: string[];
-  binaries: Binary[];
+  binaries: IBinary[];
 }

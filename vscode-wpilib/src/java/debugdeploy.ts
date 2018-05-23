@@ -1,17 +1,22 @@
 'use strict';
 
-import * as vscode from 'vscode';
-import { gradleRun } from '../shared/gradle';
-import { IDeployDebugAPI, IPreferencesAPI, ICodeDeployer } from '../shared/externalapi';
-import { DebugCommands, startDebugging } from './debug';
-import { readFileAsync } from '../utilities';
-import * as path from 'path';
 import * as jsonc from 'jsonc-parser';
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { ICodeDeployer, IDeployDebugAPI, IPreferencesAPI } from '../shared/externalapi';
+import { gradleRun } from '../shared/gradle';
+import { readFileAsync } from '../utilities';
+import { IDebugCommands, startDebugging } from './debug';
 
-interface JavaDebugInfo {
+interface IJavaDebugInfo {
   debugfile: string;
   project: string;
   artifact: string;
+}
+
+interface ITargetInfo {
+  ipAddress: string;
+  port: string;
 }
 
 class JavaDebugQuickPick implements vscode.QuickPickItem {
@@ -20,9 +25,9 @@ class JavaDebugQuickPick implements vscode.QuickPickItem {
   public detail?: string | undefined;
   public picked?: boolean | undefined;
 
-  public debugInfo: JavaDebugInfo;
+  public debugInfo: IJavaDebugInfo;
 
-  public constructor(debugInfo: JavaDebugInfo) {
+  public constructor(debugInfo: IJavaDebugInfo) {
     this.debugInfo = debugInfo;
     this.label = debugInfo.artifact;
   }
@@ -36,20 +41,19 @@ class DebugCodeDeployer implements ICodeDeployer {
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const prefs = await this.preferences.getPreferences(workspace);
+    const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
     const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
-    if (result === 0) {
-    } else {
+    if (result !== 0) {
       return false;
     }
 
     const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'));
-    const parsedDebugInfo: JavaDebugInfo[] = jsonc.parse(debugInfo);
+    const parsedDebugInfo: IJavaDebugInfo[] = jsonc.parse(debugInfo) as IJavaDebugInfo[];
     let targetDebugInfo = parsedDebugInfo[0];
     if (parsedDebugInfo.length > 1) {
       const arr: JavaDebugQuickPick[] = [];
@@ -57,7 +61,7 @@ class DebugCodeDeployer implements ICodeDeployer {
         arr.push(new JavaDebugQuickPick(i));
       }
       const picked = await vscode.window.showQuickPick(arr, {
-        placeHolder: 'Select an artifact'
+        placeHolder: 'Select an artifact',
       });
       if (picked === undefined) {
         vscode.window.showInformationMessage('Artifact cancelled');
@@ -69,13 +73,13 @@ class DebugCodeDeployer implements ICodeDeployer {
     const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
 
     const targetReadInfo = await readFileAsync(debugPath);
-    const targetInfoParsed = jsonc.parse(targetReadInfo);
+    const targetInfoParsed = jsonc.parse(targetReadInfo) as ITargetInfo;
 
-    const config: DebugCommands = {
+    const config: IDebugCommands = {
+      project: targetDebugInfo.project,
       serverAddress: targetInfoParsed.ipAddress,
       serverPort: targetInfoParsed.port,
-      project: targetDebugInfo.project,
-      workspace: workspace
+      workspace,
     };
 
     await startDebugging(config);
@@ -99,7 +103,7 @@ class DeployCodeDeployer implements ICodeDeployer {
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const prefs = await this.preferences.getPreferences(workspace);
+    const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
@@ -110,8 +114,7 @@ class DeployCodeDeployer implements ICodeDeployer {
       return false;
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
-    if (result === 0) {
-    } else {
+    if (result !== 0) {
       return false;
     }
     console.log(result);
@@ -129,7 +132,6 @@ export class DebugDeploy {
   private debugDeployer: DebugCodeDeployer;
   private deployDeployer: DeployCodeDeployer;
 
-
   constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, allowDebug: boolean) {
     debugDeployApi = debugDeployApi;
     debugDeployApi.addLanguageChoice('java');
@@ -144,6 +146,7 @@ export class DebugDeploy {
     }
   }
 
+  // tslint:disable-next-line:no-empty
   public dispose() {
 
   }

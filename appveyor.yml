@@ -24,9 +24,9 @@ cache: C:\Users\appveyor\.gradle
 build_script:
 - ps: >-
     If (Test-Path Env:APPVEYOR_REPO_TAG_NAME) {
-        ./gradlew build updateVersions extractCppDependencies -PjenkinsBuild -PreleaseType=OFFICIAL --continue --no-daemon
+        ./gradlew build updateVersions updateAllDependencies -PjenkinsBuild -PreleaseType=OFFICIAL --continue --no-daemon
     } Else {
-        ./gradlew build updateVersions extractCppDependencies -PjenkinsBuild --continue --no-daemon
+        ./gradlew build updateVersions updateAllDependencies -PjenkinsBuild --continue --no-daemon
     }
 
     if ($lastexitcode -ne 0) {
@@ -37,11 +37,21 @@ build_script:
 
     npm install
 
+    npm run lint
+
     vsce package
 
     if ($lastexitcode -eq 0) {
         echo $lastexitcode
     }
+
+    cd ..
+    cd wpilib-utility-standalone
+
+    npm install
+    npm run lint
+    npm run compile
+
 test: off
 artifacts:
 - path: '**/*.vsix'

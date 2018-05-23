@@ -43,18 +43,17 @@ export function gradleRun(args: string, rootDir: string, workspace: vscode.Works
 }
 */
 
-
 'use strict';
-import * as vscode from 'vscode';
 import * as child_process from 'child_process';
+import * as vscode from 'vscode';
 
 const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel('gradle');
 
 export function executeCommandAsync(command: string, rootDir: string, ow?: vscode.OutputChannel): Promise<number> {
-  return new Promise(function (resolve, _) {
+  return new Promise((resolve, _) => {
     const exec = child_process.exec;
     const child = exec(command, {
-      cwd: rootDir
+      cwd: rootDir,
     }, (err) => {
       if (err) {
         resolve(1);
@@ -87,5 +86,5 @@ export async function gradleRun(args: string, rootDir: string, _: vscode.Workspa
   }
   outputChannel.clear();
   outputChannel.show();
-  return await executeCommandAsync(command, rootDir, outputChannel);
+  return executeCommandAsync(command, rootDir, outputChannel);
 }

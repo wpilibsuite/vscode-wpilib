@@ -1,7 +1,7 @@
 'use strict';
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { IPreferencesAPI } from './shared/externalapi';
 
 export class Help {
@@ -39,18 +39,11 @@ export class Help {
     if (this.webview === undefined) {
       this.webview = vscode.window.createWebviewPanel('wpilibhelp', 'WPILib Help', vscode.ViewColumn.Active);
       this.webview.webview.html = this.html;
-      this.webview.onDidDispose(_ => {
+      this.webview.onDidDispose((_) => {
         this.webview = undefined;
       });
     }
     this.webview.reveal();
-  }
-
-  private replaceResources(resourceRoot: string) {
-
-    const onDiskPath = vscode.Uri.file(resourceRoot);
-    const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });
-    this.html = this.html.replace(/replaceresource/g, replacePath.toString());
   }
 
   public dispose() {
@@ -60,5 +53,12 @@ export class Help {
     for (const d of this.disposables) {
       d.dispose();
     }
+  }
+
+  private replaceResources(resourceRoot: string) {
+
+    const onDiskPath = vscode.Uri.file(resourceRoot);
+    const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });
+    this.html = this.html.replace(/replaceresource/g, replacePath.toString());
   }
 }

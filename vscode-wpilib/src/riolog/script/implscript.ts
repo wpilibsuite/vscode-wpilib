@@ -1,7 +1,7 @@
 'use strict';
 
-import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
 import { IIPCReceiveMessage, IIPCSendMessage } from '../shared/interfaces';
+import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
 
 // tslint:disable-next-line:no-any
 declare function acquireVsCodeApi(): any;
@@ -13,10 +13,11 @@ export function checkResize() {
 }
 
 export function sendMessage(message: IIPCReceiveMessage) {
+  // tslint:disable-next-line:no-unsafe-any
   vscode.postMessage(message, '*');
 }
 
-window.addEventListener('message', event => {
-  const data: IIPCSendMessage = event.data;
+window.addEventListener('message', (event) => {
+  const data: IIPCSendMessage = event.data as IIPCSendMessage;
   handleMessage(data);
 });

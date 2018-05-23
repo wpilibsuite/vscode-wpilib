@@ -1,8 +1,9 @@
 'use strict';
 
-import { sendMessage, checkResize } from '../script/implscript';
-import { IPrintMessage, IErrorMessage, MessageType } from './message';
-import { ReceiveTypes, IIPCSendMessage, SendTypes } from './interfaces';
+/* tslint:disable:prefer-conditional-expression */
+import { checkResize, sendMessage } from '../script/implscript';
+import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
+import { IErrorMessage, IPrintMessage, MessageType } from './message';
 
 let paused = false;
 export function onPause() {
@@ -14,15 +15,15 @@ export function onPause() {
     paused = false;
     pauseElement.innerHTML = 'Pause';
     sendMessage({
+      message: false,
       type: ReceiveTypes.Pause,
-      message: false
     });
   } else {
     paused = true;
     pauseElement.innerHTML = 'Paused: 0';
     sendMessage({
+      message: true,
       type: ReceiveTypes.Pause,
-      message: true
     });
   }
 }
@@ -37,15 +38,15 @@ export function onDiscard() {
     discard = false;
     dButton.innerHTML = 'Discard';
     sendMessage({
+      message: false,
       type: ReceiveTypes.Discard,
-      message: false
     });
   } else {
     discard = true;
     dButton.innerHTML = 'Resume';
     sendMessage({
+      message: true,
       type: ReceiveTypes.Discard,
-      message: true
     });
   }
 }
@@ -126,14 +127,14 @@ export function onAutoReconnect() {
     autoReconnect = false;
     // send a disconnect
     sendMessage({
+      message: false,
       type: ReceiveTypes.Reconnect,
-      message: false
     });
   } else {
     autoReconnect = true;
     sendMessage({
+      message: true,
       type: ReceiveTypes.Reconnect,
-      message: true
     });
   }
   const arButton = document.getElementById('autoreconnect');
@@ -205,8 +206,8 @@ export function onSaveLog() {
   }
 
   sendMessage({
+    message: logs,
     type: ReceiveTypes.Save,
-    message: logs
   });
 }
 
@@ -302,9 +303,9 @@ function insertLocation(loc: string, li: HTMLLIElement, color?: string) {
 
 export function addMessage(message: IPrintMessage | IErrorMessage) {
   if (message.messageType === MessageType.Print) {
-    addPrint(<IPrintMessage>message);
+    addPrint(message as IPrintMessage);
   } else {
-    addError(<IErrorMessage>message);
+    addError(message as IErrorMessage);
   }
 }
 
@@ -366,12 +367,12 @@ export function addError(message: IErrorMessage) {
       if (li.dataset.message === undefined) {
         return;
       }
-      const parsed = JSON.parse(li.dataset.message);
+      const parsed = JSON.parse(li.dataset.message) as IPrintMessage | IErrorMessage;
       li.innerHTML = '';
       if (li.dataset.type === 'warning') {
-        insertMessage(parsed.timestamp, parsed.details, li, 'Yellow');
+        insertMessage(parsed.timestamp, (parsed as IErrorMessage).details, li, 'Yellow');
       } else {
-        insertMessage(parsed.timestamp, parsed.details, li, 'Red');
+        insertMessage(parsed.timestamp, (parsed as IErrorMessage).details, li, 'Red');
       }
     } else {
       // expand
@@ -382,9 +383,9 @@ export function addError(message: IErrorMessage) {
       const parsed = JSON.parse(li.dataset.message);
       li.innerHTML = '';
       if (li.dataset.type === 'warning') {
-        expandError(parsed, li, 'Yellow');
+        expandError(parsed as IErrorMessage, li, 'Yellow');
       } else {
-        expandError(parsed, li, 'Red');
+        expandError(parsed as IErrorMessage, li, 'Red');
       }
     }
     checkResize();
@@ -398,12 +399,13 @@ window.addEventListener('resize', () => {
 
 // tslint:disable-next-line:no-any
 function handleFileSelect(evt: any) {
+  // tslint:disable-next-line:no-unsafe-any
   const files: FileList = evt.target.files; // filelist
   const firstFile = files[0];
   const reader = new FileReader();
   reader.onload = (loaded: Event) => {
-    const target: FileReader = <FileReader>loaded.target;
-    const parsed = JSON.parse(target.result);
+    const target: FileReader = loaded.target as FileReader;
+    const parsed = JSON.parse(target.result as string) as Array<IPrintMessage | IErrorMessage>;
     for (const p of parsed) {
       addMessage(p);
     }
@@ -433,11 +435,11 @@ export function checkResizeImpl(element: HTMLElement) {
 export function handleMessage(data: IIPCSendMessage): void {
   switch (data.type) {
     case SendTypes.New:
-      addMessage(<IPrintMessage | IErrorMessage>data.message);
+      addMessage(data.message as IPrintMessage | IErrorMessage);
       document.body.scrollTop = document.body.scrollHeight;
       break;
     case SendTypes.Batch:
-      for (const message of <(IPrintMessage | IErrorMessage)[]>data.message) {
+      for (const message of data.message as Array<IPrintMessage | IErrorMessage>) {
         addMessage(message);
       }
       document.body.scrollTop = document.body.scrollHeight;
@@ -445,11 +447,11 @@ export function handleMessage(data: IIPCSendMessage): void {
     case SendTypes.PauseUpdate:
       const pause = document.getElementById('pause');
       if (pause !== null) {
-        pause.innerHTML = 'Paused: ' + <number>data.message;
+        pause.innerHTML = 'Paused: ' + (data.message as number);
       }
       break;
     case SendTypes.ConnectionChanged:
-      const bMessage: boolean = <boolean>data.message;
+      const bMessage: boolean = data.message as boolean;
       if (bMessage === true) {
         onConnect();
       } else {
@@ -461,8 +463,7 @@ export function handleMessage(data: IIPCSendMessage): void {
   }
   checkResize();
 }
-//position:fixed;bottom: 0px;left:0px;list-style-type:none;padding-bottom:0;padding-left:0;padding-top:0;padding-right:0;width: 49.8%; margin-bottom: 1px"
-//position:fixed;bottom: 0px;right:0px;list-style-type:none;padding-bottom:0;padding-left:0;padding-top:0;padding-right:0;width: 49.8%;margin-bottom: 1px"
+
 function createSplitUl(left: boolean): HTMLUListElement {
   const splitDiv = document.createElement('ul');
   splitDiv.style.position = 'fixed';
@@ -498,8 +499,8 @@ function onChangeTeamNumber() {
   }
   console.log('sending message');
   sendMessage({
+    message: parseInt((newNumber as HTMLInputElement).value, 10),
     type: ReceiveTypes.ChangeNumber,
-    message: parseInt((<HTMLInputElement>newNumber).value)
   });
   console.log('sent message');
 }
@@ -509,7 +510,7 @@ function setLivePage() {
   if (mdv === undefined) {
     return;
   }
-  const mainDiv: HTMLDivElement = <HTMLDivElement>mdv;
+  const mainDiv: HTMLDivElement = mdv as HTMLDivElement;
   currentScreenHeight = 100;
   mainDiv.innerHTML = '';
   const ul = document.createElement('ul');
@@ -564,7 +565,7 @@ export function setViewerPage() {
   if (autoReconnect === true) {
     onAutoReconnect();
   }
-  const mainDiv: HTMLDivElement = <HTMLDivElement>mdv;
+  const mainDiv: HTMLDivElement = mdv as HTMLDivElement;
   currentScreenHeight = 60;
   mainDiv.innerHTML = '';
   const ul = document.createElement('ul');
@@ -589,7 +590,6 @@ export function setViewerPage() {
     setLivePage();
   }));
   mainDiv.appendChild(leftList);
-
 
   const rightList = createSplitUl(false);
   rightList.appendChild(createButton('showwarnings', 'Don\'t Show Warnings', onShowWarnings));

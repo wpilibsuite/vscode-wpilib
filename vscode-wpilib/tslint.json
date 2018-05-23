@@ -1,5 +1,25 @@
 {
+	"extends": "tslint:latest",
 	"rules": {
+		"no-implicit-dependencies": [
+			true,
+			"dev"
+		],
+		"variable-name": [
+			true,
+			"allow-leading-underscore"
+		],
+		"max-classes-per-file": [
+			false
+		],
+		"max-line-length": [
+			true,
+			150
+		],
+		"await-promise": [
+			true,
+			"Thenable"
+		],
 		"no-string-throw": true,
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
@@ -13,9 +33,14 @@
 		],
 		"switch-default": true,
 		"no-switch-case-fall-through": true,
-		"await-promise": true,
 		"no-floating-promises": true,
-		"quotemark": [true, "single"],
+		"no-console": [
+			false
+		],
+		"quotemark": [
+			true,
+			"single"
+		],
 		"triple-equals": true,
 		"no-unnecessary-type-assertion": true,
 		"prefer-for-of": true,
@@ -32,5 +57,5 @@
 		"no-var-keyword": true,
 		"eofline": true
 	},
-	"defaultSeverity": "warning"
+	"defaultSeverity": "error"
 }

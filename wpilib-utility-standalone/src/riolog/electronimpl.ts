@@ -1,11 +1,12 @@
 'use strict';
-import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole, IIPCReceiveMessage, IIPCSendMessage } from './shared/interfaces';
+import * as electron from 'electron';
 import { EventEmitter } from 'events';
-import { RioConsole } from './shared/rioconsole';
 import * as fs from 'fs';
-import { IPrintMessage, IErrorMessage } from './shared/message';
+import { IIPCReceiveMessage, IIPCSendMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView } from './shared/interfaces';
+import { IErrorMessage, IPrintMessage } from './shared/message';
+import { RioConsole } from './shared/rioconsole';
 
-const dialog = require('electron').remote.dialog;
+const dialog = electron.remote.dialog;
 
 export class RioLogWindowView extends EventEmitter implements IWindowView {
   private fromMain: (data: IIPCSendMessage) => Promise<void>;
@@ -19,15 +20,15 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     this.emit('didReceiveMessage', data);
   }
 
-  async postMessage(message: IIPCSendMessage): Promise<boolean> {
+  public async postMessage(message: IIPCSendMessage): Promise<boolean> {
     await this.fromMain(message);
     return true;
   }
 
-  async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
+  public async handleSave(saveData: Array<IPrintMessage | IErrorMessage>): Promise<boolean> {
     const file = await new Promise<string>((resolve, _) => {
       dialog.showSaveDialog({
-        title: 'Select a file to save to'
+        title: 'Select a file to save to',
       }, (f) => {
         resolve(f);
       });
@@ -47,7 +48,8 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     return true;
   }
 
-  dispose() {
+  // tslint:disable-next-line:no-empty
+  public dispose() {
 
   }
 }
@@ -59,13 +61,13 @@ export class RioLogWebviewProvider implements IWindowProvider {
     this.view = view;
   }
 
-  createWindowView(): IWindowView {
+  public createWindowView(): IWindowView {
     return this.view;
   }
 }
 
 export class LiveRioConsoleProvider implements IRioConsoleProvider {
-  getRioConsole(): IRioConsole {
+  public getRioConsole(): IRioConsole {
       return new RioConsole();
   }
 }

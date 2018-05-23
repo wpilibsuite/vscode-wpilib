@@ -1,15 +1,15 @@
-import * as path from 'path';
+import * as electron from 'electron';
 import * as fs from 'fs';
+import * as path from 'path';
 import { generateCopyCpp, generateCopyJava } from './shared/generator';
 
-const remote = require('electron').remote;
+const remote = electron.remote;
 const dialog = remote.dialog;
 const app = remote.app;
-const shell = require('electron').shell;
+const shell = electron.shell;
 const basepath = app.getAppPath();
 
 console.log(basepath);
-
 
 let resourceRoot = path.join(basepath, 'resources');
 if (basepath.indexOf('default_app.asar') >= 0) {
@@ -42,7 +42,6 @@ interface IDisplayJSON {
   tags: string[];
   foldername: string;
 }
-
 
 window.addEventListener('load', () => {
   const mainDiv = document.getElementById('mainDiv');
@@ -138,25 +137,25 @@ function loadFile(fName: string): Promise<string> {
 
 async function handleJavaTemplates() {
   const contents = await loadFile(javaTemplatesFile);
-  const parsed: IDisplayJSON[] = JSON.parse(contents);
+  const parsed: IDisplayJSON[] = JSON.parse(contents) as IDisplayJSON[];
   displayItems(parsed, javaTemplatesRoot, true);
 }
 
 async function handleJavaExamples() {
   const contents = await loadFile(javaExamplesFile);
-  const parsed: IDisplayJSON[] = JSON.parse(contents);
+  const parsed: IDisplayJSON[] = JSON.parse(contents) as IDisplayJSON[];
   displayItems(parsed, javaExamplesRoot, true);
 }
 
 async function handleCppTemplates() {
   const contents = await loadFile(cppTemplatesFile);
-  const parsed: IDisplayJSON[] = JSON.parse(contents);
+  const parsed: IDisplayJSON[] = JSON.parse(contents) as IDisplayJSON[];
   displayItems(parsed, cppTemplatesRoot, false);
 }
 
 async function handleCppExamples() {
   const contents = await loadFile(cppExamplesFile);
-  const parsed: IDisplayJSON[] = JSON.parse(contents);
+  const parsed: IDisplayJSON[] = JSON.parse(contents) as IDisplayJSON[];
   displayItems(parsed, cppTemplatesRoot, false);
 }
 
@@ -197,7 +196,7 @@ function displayItems(toDisplay: IDisplayJSON[], rootFolder: string, java: boole
   itemsDiv.appendChild(ul);
 }
 
-document.addEventListener('keydown', function (e) {
+document.addEventListener('keydown', (e) => {
   if (e.which === 123) {
     remote.getCurrentWindow().webContents.toggleDevTools();
   } else if (e.which === 116) {
@@ -208,8 +207,8 @@ document.addEventListener('keydown', function (e) {
 function askForFolder(): Promise<string[]> {
   return new Promise<string[]>((resolve) => {
     dialog.showOpenDialog({
+      defaultPath: projectRootPath,
       properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
-      defaultPath: projectRootPath
     }, (paths) => {
       resolve(paths);
     });
@@ -221,7 +220,7 @@ async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<v
   if (dirArr === undefined) {
     return;
   }
-  //console.log(dirArr);
+  // console.log(dirArr);
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
@@ -233,16 +232,16 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
   if (dirArr === undefined) {
     return;
   }
-  //console.log(dirArr);
+  // console.log(dirArr);
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
   await generateCopyJava(templateFolder, javaGradleRoot, toFolder);
 
   dialog.showMessageBox({
-    message: 'Creation of project complete',
     buttons: ['Open Folder', 'OK'],
-    noLink: true
+    message: 'Creation of project complete',
+    noLink: true,
   }, (r) => {
     if (r === 1) {
       shell.showItemInFolder(path.join(toFolder, 'build.gradle'));

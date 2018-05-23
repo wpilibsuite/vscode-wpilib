@@ -19,7 +19,7 @@ export class CommandAPI extends ICommandAPI {
   }
 
   public addCommandProvider(provider: ICommandCreator): void {
-    let lp: ILanguageQuickPick | undefined = undefined;
+    let lp: ILanguageQuickPick | undefined;
     for (const p of this.creators) {
       if (p.label === provider.getLanguage()) {
         lp = p;
@@ -31,16 +31,16 @@ export class CommandAPI extends ICommandAPI {
       // Not found
       lp = {
         creators: [],
+        description: 'Choice of language',
         label: provider.getLanguage(),
-        description: 'Choice of language'
       };
       this.creators.push(lp);
     }
 
     lp.creators.push({
       creator: provider,
+      description: provider.getDescription(),
       label: provider.getDisplayName(),
-      description: provider.getDescription()
     });
   }
   public async createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean> {
@@ -56,7 +56,7 @@ export class CommandAPI extends ICommandAPI {
           continue;
         }
         const language = d.creator.getLanguage();
-        let lp: ILanguageQuickPick | undefined = undefined;
+        let lp: ILanguageQuickPick | undefined;
         for (const p of validLanguages) {
           if (p.label === language) {
             lp = p;
@@ -67,8 +67,8 @@ export class CommandAPI extends ICommandAPI {
           // Not found
           lp = {
             creators: [],
+            description: 'Choice of language',
             label: language,
-            description: 'Choice of language'
           };
           validLanguages.push(lp);
         }
@@ -99,7 +99,7 @@ export class CommandAPI extends ICommandAPI {
       return false;
     }
 
-    return await selection.creator.generate(folder, workspace);
+    return selection.creator.generate(folder, workspace);
   }
 
   public dispose() {

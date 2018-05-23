@@ -3,6 +3,7 @@
  * See 'LICENSE' in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 'use strict';
+/* tslint:disable */
 
 import * as vscode from 'vscode';
 

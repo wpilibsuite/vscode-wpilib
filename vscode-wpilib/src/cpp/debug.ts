@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 
-export interface DebugCommands {
+export interface IDebugCommands {
   target: string;
   sysroot: string;
   executablePath: string;
@@ -13,45 +13,48 @@ export interface DebugCommands {
   gdbPath: string;
 }
 
-export async function startDebugging(commands: DebugCommands): Promise<void> {
+export async function startDebugging(commands: IDebugCommands): Promise<void> {
   const config: vscode.DebugConfiguration = {
-    name: 'wpilibCppDebug',
-    type: 'cppdbg',
-    request: 'launch',
-    miDebuggerServerAddress: commands.target,
-    miDebuggerPath: commands.gdbPath,
-    program: commands.executablePath,
+    MIMode: 'gdb',
+    additionalSOLibSearchPath: commands.soLibPath,
     cwd: commands.workspace.uri.fsPath,
     externalConsole: true,
-    MIMode: 'gdb',
+    miDebuggerPath: commands.gdbPath,
+    miDebuggerServerAddress: commands.target,
+    name: 'wpilibCppDebug',
+    program: commands.executablePath,
+    request: 'launch',
     setupCommands: [
       {
         description: 'Enable pretty-printing for gdb',
+        ignoreFailures: true,
         text: 'enable-pretty-printing',
-        ignoreFailures: true
       },
       {
-        text: 'set sysroot ' + commands.sysroot
+        text: 'set sysroot ' + commands.sysroot,
       },
     ],
-    additionalSOLibSearchPath: commands.soLibPath,
+    type: 'cppdbg',
   };
 
   for (const a of commands.srcPaths) {
+    /* tslint:disable-next-line:no-unsafe-any */
     config.setupCommands.push({
-      text: 'dir ' + a
+      text: 'dir ' + a,
     });
   }
 
   for (const a of commands.headerPaths) {
+    /* tslint:disable-next-line:no-unsafe-any */
     config.setupCommands.push({
-      text: 'dir ' + a
+      text: 'dir ' + a,
     });
   }
 
   for (const a of commands.libSrcPaths) {
+    /* tslint:disable-next-line:no-unsafe-any */
     config.setupCommands.push({
-      text: 'dir ' + a
+      text: 'dir ' + a,
     });
   }
 

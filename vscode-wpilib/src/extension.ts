@@ -1,17 +1,17 @@
 'use strict';
 
-import * as vscode from 'vscode';
-import { IExternalAPI, } from './shared/externalapi';
 import * as path from 'path';
-import { ToolAPI } from './toolapi';
-import { DeployDebugAPI } from './deploydebugapi';
-import { PreferencesAPI } from './preferencesapi';
-import { ExampleTemplateAPI } from './exampletemplateapi';
+import * as vscode from 'vscode';
+import { BuildTestAPI } from './buildtestapi';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
-import { activateJava } from './java/java';
+import { DeployDebugAPI } from './deploydebugapi';
+import { ExampleTemplateAPI } from './exampletemplateapi';
 import { Help } from './help';
-import { BuildTestAPI } from './buildtestapi';
+import { activateJava } from './java/java';
+import { PreferencesAPI } from './preferencesapi';
+import { IExternalAPI } from './shared/externalapi';
+import { ToolAPI } from './toolapi';
 import { createVsCommands } from './vscommands';
 
 class ExternalAPI extends IExternalAPI {
@@ -76,5 +76,6 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
+// tslint:disable-next-line:no-empty
 export function deactivate() {
 }

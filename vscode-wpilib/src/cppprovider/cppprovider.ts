@@ -2,12 +2,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { setExtensionContext } from './persistentState';
+import { IExternalAPI } from '../shared/externalapi';
 import { ApiProvider } from './apiprovider';
 import { CppToolsApi } from './cppextensionapi';
+import { setExtensionContext } from './persistentState';
 import { createCommands } from './vscommands';
-import { IExternalAPI } from '../shared/externalapi';
-
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

@@ -1,9 +1,9 @@
 'use-strict';
 
-import { CustomConfigurationProvider, SourceFileConfigurationItem, SourceFileConfiguration, CppToolsApi } from './cppextensionapi';
 import * as vscode from 'vscode';
-import { GradleConfig, BinaryFind } from './gradleconfig';
 import { IPreferencesAPI } from '../shared/externalapi';
+import { CppToolsApi, CustomConfigurationProvider, SourceFileConfiguration, SourceFileConfigurationItem } from './cppextensionapi';
+import { GradleConfig, IBinaryFind } from './gradleconfig';
 
 function parseLanguage(_: string[], isCpp: boolean): string {
   if (!isCpp) {
@@ -15,19 +15,19 @@ function parseLanguage(_: string[], isCpp: boolean): string {
   return arg;
 }
 
-function getSourceFileConfiguration(file: BinaryFind): SourceFileConfiguration {
+function getSourceFileConfiguration(file: IBinaryFind): SourceFileConfiguration {
   const ret: SourceFileConfiguration = {
-    standard: parseLanguage(file.args, file.cpp),
-    intelliSenseMode: file.msvc ? 'msvc-x64' : 'clang-x64',
-    includePath: file.includePaths,
+    compilerPath: file.compiler,
     defines: file.macros,
-    compilerPath: file.compiler
+    includePath: file.includePaths,
+    intelliSenseMode: file.msvc ? 'msvc-x64' : 'clang-x64',
+    standard: parseLanguage(file.args, file.cpp),
   };
   return ret;
 }
 
 export class ApiProvider implements CustomConfigurationProvider {
-
+  public name: string = 'wpilib';
   public workspace: vscode.WorkspaceFolder;
   private gradleConfig: GradleConfig;
   private disposables: vscode.Disposable[] = [];
@@ -38,6 +38,8 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.gradleConfig = new GradleConfig(workspace, preferences.getPreferences(workspace));
     this.disposables.push(this.gradleConfig);
     this.cppToolsApi = cppToolsApi;
+
+    /* tslint:disable-next-line:no-floating-promises */
     this.gradleConfig.loadConfigs().then(() => {
       this.cppToolsApi.registerCustomConfigurationProvider(this);
       this.gradleConfig.refreshEvent.event(() => {
@@ -45,8 +47,6 @@ export class ApiProvider implements CustomConfigurationProvider {
       });
     });
   }
-
-  public name: string = 'wpilib';
 
   public async canProvideConfiguration(uri: vscode.Uri, _?: vscode.CancellationToken | undefined): Promise<boolean> {
     const fileWp = vscode.workspace.getWorkspaceFolder(uri);
@@ -61,8 +61,8 @@ export class ApiProvider implements CustomConfigurationProvider {
     const ret: SourceFileConfigurationItem[] = [];
     for (const b of bins) {
       ret.push({
+        configuration: getSourceFileConfiguration(b),
         uri: b.uri.fsPath,
-        configuration: getSourceFileConfiguration(b)
       });
     }
     console.log(JSON.stringify(ret, null, 4));

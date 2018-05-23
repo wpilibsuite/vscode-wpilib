@@ -56,11 +56,32 @@ task extractJavaDependencies(type: Copy) {
     into 'vscode-wpilib/resources/java/src'
 }
 
-task extractDependencies() {
+task copyFromVsCodeToStandaloneResources(type: Copy) {
     dependsOn extractCppDependencies
     dependsOn extractJavaDependencies
+    from ('vscode-wpilib/resources/java') {
+        into 'java'
+    }
+    from ('vscode-wpilib/resources/cpp') {
+        into 'cpp'
+    }
+    into 'wpilib-utility-standalone/resources'
 }
 
+task copyFromVsCodeToStandaloneSrc(type: Copy) {
+    from ('vscode-wpilib/src/riolog/shared') {
+        into 'riolog/shared'
+    }
+    from ('vscode-wpilib/src/shared/generator.ts') {
+        into 'shared'
+    }
+    into 'wpilib-utility-standalone/src'
+}
+
+task updateAllDependencies() {
+    dependsOn copyFromVsCodeToStandaloneResources
+    dependsOn copyFromVsCodeToStandaloneSrc
+}
 
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
 // already specified on the command line

@@ -1,67 +1,23 @@
 'use strict';
 
-import { IPrintMessage, IErrorMessage } from './message';
-import { IWindowView, IDisposable, IWindowProvider, IRioConsole, IRioConsoleProvider, IIPCReceiveMessage, SendTypes, ReceiveTypes } from './interfaces';
+// tslint:disable-next-line:max-line-length
+import { IDisposable, IIPCReceiveMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView, ReceiveTypes, SendTypes } from './interfaces';
+import { IErrorMessage, IPrintMessage } from './message';
 
 export class RioLogWindow {
   private webview: IWindowView | undefined = undefined;
   private rioConsole: IRioConsole | undefined = undefined;
   private running: boolean = false;
   private disposables: IDisposable[] = [];
-  private pausedArray: (IPrintMessage | IErrorMessage)[] = [];
+  private pausedArray: Array<IPrintMessage | IErrorMessage> = [];
   private paused: boolean = false;
-  private hiddenArray: (IPrintMessage | IErrorMessage)[] = [];
+  private hiddenArray: Array<IPrintMessage | IErrorMessage> = [];
   private windowProvider: IWindowProvider;
   private rioConsoleProvider: IRioConsoleProvider;
 
   constructor(windowProv: IWindowProvider, rioConProivder: IRioConsoleProvider) {
     this.windowProvider = windowProv;
     this.rioConsoleProvider = rioConProivder;
-  }
-
-  private createWebView() {
-    this.webview = this.windowProvider.createWindowView();
-    this.webview.on('windowActive', async () => {
-      if (this.webview === undefined) {
-        return;
-      }
-      // Window goes active.
-      await this.webview.postMessage({
-        type: SendTypes.Batch,
-        message: this.hiddenArray
-      });
-      if (this.rioConsole !== undefined) {
-        if (this.rioConsole.connected === true) {
-          await this.webview.postMessage({
-            type: SendTypes.ConnectionChanged,
-            message: true
-          });
-        } else {
-          await this.webview.postMessage({
-            type: SendTypes.ConnectionChanged,
-            message: false
-          });
-        }
-      }
-    });
-  }
-
-  private createRioConsole() {
-    this.rioConsole = this.rioConsoleProvider.getRioConsole();
-  }
-
-  private async sendPaused() {
-    if (this.webview === undefined) {
-      return;
-    }
-    const success = await this.webview.postMessage({
-      type: SendTypes.Batch,
-      message: this.pausedArray
-    });
-    if (!success) {
-      this.hiddenArray.push(...this.pausedArray);
-    }
-    this.pausedArray = [];
   }
 
   public start(teamNumber: number) {
@@ -85,96 +41,19 @@ export class RioLogWindow {
     });
 
     this.webview.on('didReceiveMessage', async (data: IIPCReceiveMessage) => {
-      this.onMessageReceived(data);
+      await this.onMessageReceived(data);
     });
 
     this.rioConsole.on('connectionChanged', async (c: boolean) => {
-      this.onConnectionChanged(c);
+      await this.onConnectionChanged(c);
     });
 
-    this.rioConsole.on('message', (message: IPrintMessage | IErrorMessage) => {
-      this.onNewMessageToSend(message);
+    this.rioConsole.on('message', async (message: IPrintMessage | IErrorMessage) => {
+      await this.onNewMessageToSend(message);
     });
 
     this.rioConsole.setTeamNumber(teamNumber);
     this.rioConsole.startListening();
-  }
-
-  private async onConnectionChanged(connected: boolean) {
-    if (this.webview === undefined) {
-      return;
-    }
-    if (connected) {
-      await this.webview.postMessage({
-        type: SendTypes.ConnectionChanged,
-        message: true
-      });
-    } else {
-      await this.webview.postMessage({
-        type: SendTypes.ConnectionChanged,
-        message: false
-      });
-    }
-  }
-
-  private async onNewMessageToSend(message: IPrintMessage | IErrorMessage) {
-    if (this.webview === undefined) {
-      return;
-    }
-    if (this.paused === true) {
-      this.pausedArray.push(message);
-      await this.webview.postMessage({
-        type: SendTypes.PauseUpdate,
-        message: this.pausedArray.length
-      });
-    } else {
-      const success = await this.webview.postMessage({
-        type: SendTypes.New,
-        message: message
-      });
-      if (!success) {
-        this.hiddenArray.push(message);
-      }
-    }
-  }
-
-  private async onMessageReceived(data: IIPCReceiveMessage): Promise<void> {
-    if (this.rioConsole === undefined) {
-      return;
-    }
-    if (data.type === ReceiveTypes.Discard) {
-      if (<boolean>data.message === false) {
-        this.rioConsole.discard = false;
-      } else {
-        this.rioConsole.discard = true;
-      }
-    } else if (data.type === ReceiveTypes.Pause) {
-      const old = this.paused;
-      this.paused = <boolean>data.message;
-      if (old === true && this.paused === false) {
-        await this.sendPaused();
-      }
-    } else if (data.type === ReceiveTypes.Save) {
-      if (this.webview === undefined) {
-        return;
-      }
-      const deserializedLogs: (IPrintMessage | IErrorMessage)[] = [];
-      for (const d of <string[]>data.message) {
-        const parsed = JSON.parse(d);
-        deserializedLogs.push(parsed);
-      }
-      await this.webview.handleSave(deserializedLogs);
-    } else if (data.type === ReceiveTypes.Reconnect) {
-      const newValue = <boolean>data.message;
-      this.rioConsole.setAutoReconnect(newValue);
-      if (newValue === false) {
-        this.rioConsole.disconnect();
-      }
-    } else if (data.type === ReceiveTypes.ChangeNumber) {
-      const number = <number>data.message;
-      console.log('setting team number');
-      this.rioConsole.setTeamNumber(number);
-    }
   }
 
   public stop() {
@@ -187,6 +66,130 @@ export class RioLogWindow {
     this.stop();
     for (const d of this.disposables) {
       d.dispose();
+    }
+  }
+
+  private createWebView() {
+    this.webview = this.windowProvider.createWindowView();
+    this.webview.on('windowActive', async () => {
+      if (this.webview === undefined) {
+        return;
+      }
+      // Window goes active.
+      await this.webview.postMessage({
+        message: this.hiddenArray,
+        type: SendTypes.Batch,
+      });
+      if (this.rioConsole !== undefined) {
+        if (this.rioConsole.connected === true) {
+          await this.webview.postMessage({
+            message: true,
+            type: SendTypes.ConnectionChanged,
+          });
+        } else {
+          await this.webview.postMessage({
+            message: false,
+            type: SendTypes.ConnectionChanged,
+          });
+        }
+      }
+    });
+  }
+
+  private createRioConsole() {
+    this.rioConsole = this.rioConsoleProvider.getRioConsole();
+  }
+
+  private async sendPaused() {
+    if (this.webview === undefined) {
+      return;
+    }
+    const success = await this.webview.postMessage({
+      message: this.pausedArray,
+      type: SendTypes.Batch,
+    });
+    if (!success) {
+      this.hiddenArray.push(...this.pausedArray);
+    }
+    this.pausedArray = [];
+  }
+
+  private async onConnectionChanged(connected: boolean) {
+    if (this.webview === undefined) {
+      return;
+    }
+    if (connected) {
+      await this.webview.postMessage({
+        message: true,
+        type: SendTypes.ConnectionChanged,
+      });
+    } else {
+      await this.webview.postMessage({
+        message: false,
+        type: SendTypes.ConnectionChanged,
+      });
+    }
+  }
+
+  private async onNewMessageToSend(message: IPrintMessage | IErrorMessage) {
+    if (this.webview === undefined) {
+      return;
+    }
+    if (this.paused === true) {
+      this.pausedArray.push(message);
+      await this.webview.postMessage({
+        message: this.pausedArray.length,
+        type: SendTypes.PauseUpdate,
+      });
+    } else {
+      const success = await this.webview.postMessage({
+        message,
+        type: SendTypes.New,
+
+      });
+      if (!success) {
+        this.hiddenArray.push(message);
+      }
+    }
+  }
+
+  private async onMessageReceived(data: IIPCReceiveMessage): Promise<void> {
+    if (this.rioConsole === undefined) {
+      return;
+    }
+    if (data.type === ReceiveTypes.Discard) {
+      // tslint:disable-next-line:prefer-conditional-expression
+      if (data.message as boolean === false) {
+        this.rioConsole.discard = false;
+      } else {
+        this.rioConsole.discard = true;
+      }
+    } else if (data.type === ReceiveTypes.Pause) {
+      const old = this.paused;
+      this.paused = data.message as boolean;
+      if (old === true && this.paused === false) {
+        await this.sendPaused();
+      }
+    } else if (data.type === ReceiveTypes.Save) {
+      if (this.webview === undefined) {
+        return;
+      }
+      const deserializedLogs: Array<IPrintMessage | IErrorMessage> = [];
+      for (const d of data.message as string[]) {
+        const parsed = JSON.parse(d);
+        deserializedLogs.push(parsed as IPrintMessage | IErrorMessage);
+      }
+      await this.webview.handleSave(deserializedLogs);
+    } else if (data.type === ReceiveTypes.Reconnect) {
+      const newValue = data.message as boolean;
+      this.rioConsole.setAutoReconnect(newValue);
+      if (newValue === false) {
+        this.rioConsole.disconnect();
+      }
+    } else if (data.type === ReceiveTypes.ChangeNumber) {
+      const number = data.message as number;
+      console.log('setting team number');
+      this.rioConsole.setTeamNumber(number);
     }
   }
 }

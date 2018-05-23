@@ -1,8 +1,8 @@
-import * as ncp from 'ncp';
-import * as mkdirp from 'mkdirp';
-import * as path from 'path';
-import * as glob from 'glob';
 import * as fs from 'fs';
+import * as glob from 'glob';
+import * as mkdirp from 'mkdirp';
+import * as ncp from 'ncp';
+import * as path from 'path';
 
 export function promisifyMkdirp(dest: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
@@ -56,7 +56,7 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
         return false;
       }
       return true;
-    }
+    },
   });
 
   await Promise.all([src, gradle]);
@@ -76,8 +76,8 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
   const files = await new Promise<string[]>((resolve, reject) => {
     glob('**/*', {
       cwd: codePath,
+      nodir: true,
       nomount: true,
-      nodir: true
     }, (err, matches) => {
       if (err) {
         reject(err);
@@ -91,7 +91,7 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
   const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)';
   const replacePackageTo = 'frc.robot';
 
-  const promiseArray: Promise<void>[] = [];
+  const promiseArray: Array<Promise<void>> = [];
 
   for (const f of files) {
     const file = path.join(codePath, f);
@@ -120,7 +120,7 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
         return false;
       }
       return true;
-    }
+    },
   });
   promiseArray.push(ncpPromise);
   await Promise.all(promiseArray);

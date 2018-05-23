@@ -1,9 +1,10 @@
 'use strict';
 
+import * as jsonc from 'jsonc-parser';
 import * as net from 'net';
 import * as timers from 'timers';
 
-async function properRace<T>(promises: Promise<T>[]): Promise<T> {
+async function properRace<T>(promises: Array<Promise<T>>): Promise<T> {
   if (promises.length < 1) {
     return Promise.reject('Can\'t start a race without promises!');
   }
@@ -17,9 +18,10 @@ async function properRace<T>(promises: Promise<T>[]): Promise<T> {
   } catch (index) {
     // The promise has rejected, remove it from the list of promises and just continue the race.
     console.log('reject promise');
+    // tslint:disable-next-line:no-unsafe-any
     const p = promises.splice(index, 1)[0];
     p.catch((e) => console.log('A promise has been rejected, but awaiting others', e));
-    return await properRace(promises);
+    return properRace(promises);
   }
 
 }
@@ -30,15 +32,14 @@ interface IDriverStationData {
 
 const constantIps: string[] = [
   '172.22.11.2',
-  '127.0.0.1'
+  '127.0.0.1',
 ];
 
 const teamIps: string[] = [
   'roboRIO-TEAM-FRC.local',
   'roboRIO-TEAM-FRC.lan',
-  'roboRIO-TEAM-FRC.frc-field.local'
+  'roboRIO-TEAM-FRC.frc-field.local',
 ];
-
 
 interface ISocketPromisePair {
   socket: net.Socket;
@@ -65,7 +66,7 @@ function timerPromise(ms: number): ICancellableTimer {
       }
       console.log('cancelled timer');
       timers.clearTimeout(timer);
-    }
+    },
   };
 }
 
@@ -92,7 +93,7 @@ function getSocketFromDS(port: number): ISocketPromisePair {
   const retVal = new DSSocketPromisePair(s, ds, new Promise((resolve, reject) => {
     // First connect to ds, and wait for data
     ds.on('data', (data) => {
-      const parsed: IDriverStationData = JSON.parse(data.toString());
+      const parsed: IDriverStationData = jsonc.parse(data.toString()) as IDriverStationData;
       if (parsed.robotIP === 0) {
         ds.end();
         ds.destroy();
@@ -102,9 +103,13 @@ function getSocketFromDS(port: number): ISocketPromisePair {
       }
       let ipAddr = '';
       const ip = parsed.robotIP;
+      // tslint:disable-next-line:no-bitwise
       ipAddr += ((ip >> 24) & 0xff) + '.';
+      // tslint:disable-next-line:no-bitwise
       ipAddr += ((ip >> 16) & 0xff) + '.';
+      // tslint:disable-next-line:no-bitwise
       ipAddr += ((ip >> 8) & 0xff) + '.';
+      // tslint:disable-next-line:no-bitwise
       ipAddr += (ip & 0xff);
       s.on('error', (_) => {
         console.log('failed connection to ' + ip + ' at ' + port);
@@ -220,7 +225,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
   }
   pairs.push(getSocketFromIP(port, `10.${Math.trunc(teamNumber / 100)}.${teamNumber % 100}.2`));
   pairs.push(getSocketFromDS(port));
-  const connectors: Promise<net.Socket | undefined>[] = [];
+  const connectors: Array<Promise<net.Socket | undefined>> = [];
   for (const p of pairs) {
     connectors.push(p.promise);
   }
@@ -233,8 +238,8 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
       p.dispose();
       try {
         await p.promise;
+      // tslint:disable-next-line:no-empty
       } catch {
-
       }
     }
   } else {
@@ -245,8 +250,8 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
         p.dispose();
         try {
           await p.promise;
+        // tslint:disable-next-line:no-empty
         } catch {
-
         }
       }
     }

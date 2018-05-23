@@ -4,6 +4,7 @@
     "description": "VSCode extension for WPILib Team Use",
     "version": "0.1.0",
     "publisher": "wpifirst",
+    "license": "BSD-3-Clause",
     "engines": {
         "vscode": "^1.23.0"
     },
@@ -220,14 +221,14 @@
     },
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "npm run compile",
+        "vscode:prepublish": "npm run compile && npm run lint",
         "clean": "rmdir-cli out",
         "compile": "tsc -p ./",
+        "lint": "tslint -c tslint.json -p tsconfig.json",
         "compileBundle": "tsc -p ./ && browserify ./out/riolog/shared/sharedscript.js > ./resources/bundle.js",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "package": "npm run clean && vsce package -o ../build/vscode-wpilib.vsix"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
@@ -235,8 +236,8 @@
         "browserify": "^16.2.2",
         "copyfiles": "^2.0.0",
         "rmdir-cli": "^2.0.6",
-        "tslint": "^5.9.1",
-        "typescript": "^2.7.2",
+        "tslint": "^5.10.0",
+        "typescript": "^2.8.3",
         "vscode": "^1.1.17"
     },
     "dependencies": {

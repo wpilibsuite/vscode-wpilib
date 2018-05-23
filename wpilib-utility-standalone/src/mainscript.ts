@@ -1,8 +1,8 @@
 
+import * as electron from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-const { BrowserWindow } = require('electron').remote;
-const remote = require('electron').remote;
+const remote = electron.remote;
 
 let rioLogWindow: Electron.BrowserWindow | undefined;
 let generatorWindow: Electron.BrowserWindow | undefined;
@@ -19,13 +19,13 @@ window.addEventListener('load', () => {
     if (rioLogWindow !== undefined) {
       return;
     }
-    rioLogWindow = new BrowserWindow({
-      parent: remote.getCurrentWindow(),
-      modal: true,
-      height: 600,
-      width: 800,
+    rioLogWindow = new remote.BrowserWindow({
       backgroundColor: '#2e2c29',
-      title: 'RioLog'
+      height: 600,
+      modal: true,
+      parent: remote.getCurrentWindow(),
+      title: 'RioLog',
+      width: 800,
     });
 
     rioLogWindow.loadURL(url.format({
@@ -48,13 +48,13 @@ window.addEventListener('load', () => {
     if (generatorWindow !== undefined) {
       return;
     }
-    generatorWindow = new BrowserWindow({
-      parent: remote.getCurrentWindow(),
-      modal: true,
-      height: 600,
-      width: 800,
+    generatorWindow = new electron.BrowserWindow({
       backgroundColor: '#2e2c29',
-      title: 'Generator'
+      height: 600,
+      modal: true,
+      parent: remote.getCurrentWindow(),
+      title: 'Generator',
+      width: 800,
     });
 
     generatorWindow.loadURL(url.format({

@@ -23,13 +23,13 @@ export class ToolAPI extends IToolAPI {
       return false;
     }
 
-    return await result.runner.runTool();
+    return result.runner.runTool();
   }
   public addTool(tool: IToolRunner): void {
     const qpi: IToolQuickPick = {
-      label: tool.getDisplayName(),
       description: tool.getDescription(),
-      runner: tool
+      label: tool.getDisplayName(),
+      runner: tool,
     };
     this.tools.push(qpi);
   }

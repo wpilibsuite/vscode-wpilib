@@ -88,8 +88,8 @@ export function getPreferencesAPIExpectedVersion(): number {
   return preferencesAPIExpectedVersion;
 }
 export abstract class IPreferencesAPI implements IVersionable {
-  public abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
   public abstract onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+  public abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
   public abstract getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
   public getVersion(): number {
     return preferencesAPIExpectedVersion;
@@ -114,13 +114,13 @@ export abstract class IExternalAPI implements IVersionable {
 
 export interface IPreferences {
   getTeamNumber(): Promise<number>;
-  setTeamNumber(teamNumber: number, global: boolean): void;
+  setTeamNumber(teamNumber: number, global: boolean): Promise<void>;
   getCurrentLanguage(): string;
-  setCurrentLanguage(language: string): void;
+  setCurrentLanguage(language: string): Promise<void>;
   getAutoStartRioLog(): boolean;
-  setAutoStartRioLog(autoStart: boolean, global: boolean): void;
+  setAutoStartRioLog(autoStart: boolean, global: boolean): Promise<void>;
   getAutoSaveOnDeploy(): boolean;
-  setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void;
+  setAutoSaveOnDeploy(autoSave: boolean, global: boolean): Promise<void>;
   getIsWPILibProject(): boolean;
   getOnline(): boolean;
 }
@@ -145,7 +145,6 @@ export interface IToolRunner {
   getDisplayName(): string;
   getDescription(): string;
 }
-
 
 /**
  * Interface to providing a code deployer or debugger

@@ -1,8 +1,8 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { ICodeBuilder, IBuildTestAPI } from './shared/externalapi';
 import { PreferencesAPI } from './preferencesapi';
+import { IBuildTestAPI, ICodeBuilder } from './shared/externalapi';
 
 interface ICodeBuilderQuickPick extends vscode.QuickPickItem {
   builder: ICodeBuilder;
@@ -23,8 +23,40 @@ export class BuildTestAPI extends IBuildTestAPI {
   public buildCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
     return this.buildTestCommon(workspace, this.builders, online);
   }
+
   public testCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
     return this.buildTestCommon(workspace, this.testers, online);
+  }
+
+  public registerCodeBuild(builder: ICodeBuilder): void {
+    const qpi: ICodeBuilderQuickPick = {
+      builder,
+      description: builder.getDescription(),
+      label: builder.getDisplayName(),
+    };
+    this.builders.push(qpi);
+  }
+  public registerCodeTest(builder: ICodeBuilder): void {
+    const qpi: ICodeBuilderQuickPick = {
+      builder,
+      description: builder.getDescription(),
+      label: builder.getDisplayName(),
+    };
+    this.testers.push(qpi);
+  }
+
+  public addLanguageChoice(language: string): void {
+    this.languageChoices.push(language);
+  }
+
+  public getLanguageChoices(): string[] {
+    return this.languageChoices;
+  }
+
+  public dispose() {
+    for (const d of this.disposables) {
+      d.dispose();
+    }
   }
 
   private async buildTestCommon(workspace: vscode.WorkspaceFolder, builder: ICodeBuilderQuickPick[], online: boolean): Promise<boolean> {
@@ -64,35 +96,5 @@ export class BuildTestAPI extends IBuildTestAPI {
 
     const deploySuccess = await langSelection.builder.runBuilder(workspace, online);
     return deploySuccess;
-  }
-
-  public registerCodeBuild(builder: ICodeBuilder): void {
-    const qpi: ICodeBuilderQuickPick = {
-      builder: builder,
-      label: builder.getDisplayName(),
-      description: builder.getDescription()
-    };
-    this.builders.push(qpi);
-  }
-  public registerCodeTest(builder: ICodeBuilder): void {
-    const qpi: ICodeBuilderQuickPick = {
-      builder: builder,
-      label: builder.getDisplayName(),
-      description: builder.getDescription()
-    };
-    this.testers.push(qpi);
-  }
-  public addLanguageChoice(language: string): void {
-    this.languageChoices.push(language);
-  }
-
-  public getLanguageChoices(): string[] {
-    return this.languageChoices;
-  }
-
-  public dispose() {
-    for (const d of this.disposables) {
-      d.dispose();
-    }
   }
 }

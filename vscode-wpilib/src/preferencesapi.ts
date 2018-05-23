@@ -1,14 +1,13 @@
 'use strict';
-import { IPreferencesAPI, IPreferencesChangedPair, IPreferences } from './shared/externalapi';
 import * as vscode from 'vscode';
 import { Preferences } from './preferences';
+import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from './shared/externalapi';
 
 export class PreferencesAPI extends IPreferencesAPI {
+  public onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
   private preferences: Preferences[] = [];
   private preferencesEmitter: vscode.EventEmitter<IPreferencesChangedPair[]> = new vscode.EventEmitter<IPreferencesChangedPair[]>();
   private disposables: vscode.Disposable[] = [];
-  public onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
-
 
   constructor() {
     super();
@@ -42,8 +41,8 @@ export class PreferencesAPI extends IPreferencesAPI {
         const p = new Preferences(w);
         this.preferences.push(p);
         const pair: IPreferencesChangedPair = {
+          preference: p,
           workspace: w,
-          preference: p
         };
         pairArr.push(pair);
       }

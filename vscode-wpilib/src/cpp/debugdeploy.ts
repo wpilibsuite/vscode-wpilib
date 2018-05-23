@@ -1,19 +1,19 @@
 'use strict';
 
-import * as vscode from 'vscode';
-import { gradleRun } from '../shared/gradle';
-import { IDeployDebugAPI, IPreferencesAPI, ICodeDeployer } from '../shared/externalapi';
-import { readFileAsync } from '../utilities';
-import * as path from 'path';
 import * as jsonc from 'jsonc-parser';
-import { DebugCommands, startDebugging } from './debug';
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { ICodeDeployer, IDeployDebugAPI, IPreferencesAPI } from '../shared/externalapi';
+import { gradleRun } from '../shared/gradle';
+import { readFileAsync } from '../utilities';
+import { IDebugCommands, startDebugging } from './debug';
 
-interface CppDebugInfo {
+interface ICppDebugInfo {
   debugfile: string;
   artifact: string;
 }
 
-interface CppDebugCommand {
+interface ICppDebugCommand {
   launchfile: string;
   target: string;
   gdb: string;
@@ -30,15 +30,14 @@ class CppDebugQuickPick implements vscode.QuickPickItem {
   public detail?: string | undefined;
   public picked?: boolean | undefined;
 
-  public debugInfo: CppDebugInfo;
+  public debugInfo: ICppDebugInfo;
 
-  public constructor(debugInfo: CppDebugInfo) {
+  public constructor(debugInfo: ICppDebugInfo) {
     this.debugInfo = debugInfo;
     this.label = debugInfo.artifact;
   }
 }
 
-//import { DebugCommands, startDebugging } from './debug';
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
 
@@ -47,7 +46,7 @@ class DebugCodeDeployer implements ICodeDeployer {
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const prefs = await this.preferences.getPreferences(workspace);
+    const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
@@ -58,13 +57,12 @@ class DebugCodeDeployer implements ICodeDeployer {
       return false;
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
-    if (result === 0) {
-    } else {
+    if (result !== 0) {
       return false;
     }
 
     const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'));
-    const parsedDebugInfo: CppDebugInfo[] = jsonc.parse(debugInfo);
+    const parsedDebugInfo: ICppDebugInfo[] = jsonc.parse(debugInfo) as ICppDebugInfo[];
     let targetDebugInfo = parsedDebugInfo[0];
     if (parsedDebugInfo.length > 1) {
       const arr: CppDebugQuickPick[] = [];
@@ -72,7 +70,7 @@ class DebugCodeDeployer implements ICodeDeployer {
         arr.push(new CppDebugQuickPick(i));
       }
       const picked = await vscode.window.showQuickPick(arr, {
-        placeHolder: 'Select an artifact'
+        placeHolder: 'Select an artifact',
       });
       if (picked === undefined) {
         vscode.window.showInformationMessage('Artifact cancelled');
@@ -84,7 +82,7 @@ class DebugCodeDeployer implements ICodeDeployer {
     const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
 
     const targetReadInfo = await readFileAsync(debugPath);
-    const targetInfoParsed: CppDebugCommand = jsonc.parse(targetReadInfo);
+    const targetInfoParsed: ICppDebugCommand = jsonc.parse(targetReadInfo) as ICppDebugCommand;
 
     let soPath = '';
 
@@ -100,16 +98,16 @@ class DebugCodeDeployer implements ICodeDeployer {
       sysroot = targetInfoParsed.sysroot;
     }
 
-    const config: DebugCommands = {
-      target: targetInfoParsed.target,
-      sysroot: sysroot,
+    const config: IDebugCommands = {
       executablePath: targetInfoParsed.launchfile,
-      workspace: workspace,
-      soLibPath: soPath,
       gdbPath: targetInfoParsed.gdb,
       headerPaths: targetInfoParsed.headerpaths,
       libSrcPaths: targetInfoParsed.libsrcpaths,
-      srcPaths: targetInfoParsed.srcpaths
+      soLibPath: soPath,
+      srcPaths: targetInfoParsed.srcpaths,
+      sysroot,
+      target: targetInfoParsed.target,
+      workspace,
     };
 
     await startDebugging(config);
@@ -133,7 +131,7 @@ class DeployCodeDeployer implements ICodeDeployer {
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const prefs = await this.preferences.getPreferences(workspace);
+    const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
@@ -144,8 +142,7 @@ class DeployCodeDeployer implements ICodeDeployer {
       return false;
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
-    if (result === 0) {
-    } else {
+    if (result !== 0) {
       return false;
     }
     console.log(result);
@@ -177,6 +174,7 @@ export class DebugDeploy {
     }
   }
 
+  // tslint:disable-next-line:no-empty
   public dispose() {
 
   }

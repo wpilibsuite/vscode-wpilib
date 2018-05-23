@@ -1,12 +1,12 @@
 'use strict';
-import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from './externalapi';
-import { generateCopyJava, generateCopyCpp } from './generator';
+import { generateCopyCpp, generateCopyJava } from './generator';
 
-interface JsonLayout {
+interface IJsonLayout {
   name: string;
   description: string;
   tags: string[];
@@ -26,7 +26,7 @@ export class Examples {
         console.log(err);
         return;
       }
-      const examples: JsonLayout[] = jsonc.parse(data);
+      const examples: IJsonLayout[] = jsonc.parse(data) as IJsonLayout[];
       for (const e of examples) {
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {
@@ -58,13 +58,14 @@ export class Examples {
               return false;
             }
             return true;
-          }
+          },
         };
         core.addExampleProvider(provider);
       }
     });
   }
 
+  // tslint:disable-next-line:no-empty
   public dispose() {
 
   }

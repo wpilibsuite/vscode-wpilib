@@ -1,17 +1,17 @@
 'use strict';
 
-import * as net from 'net';
-import { connectToRobot } from './rioconnector';
-import { PrintMessage, ErrorMessage } from './message';
 import { EventEmitter } from 'events';
-import { PromiseCondition } from './promisecond';
+import * as net from 'net';
 import { IRioConsole } from './interfaces';
+import { ErrorMessage, PrintMessage } from './message';
+import { PromiseCondition } from './promisecond';
+import { connectToRobot } from './rioconnector';
 
 export class RioConsole extends EventEmitter implements IRioConsole {
-  private autoReconnect: boolean = true;
-  private cleanup: boolean = false;
   public discard: boolean = false;
   public connected: boolean = false;
+  private autoReconnect: boolean = true;
+  private cleanup: boolean = false;
   private promise: Promise<void> | undefined;
   private condition: PromiseCondition = new PromiseCondition();
   private closeFunc: (() => void) | undefined;
@@ -31,6 +31,43 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     if (value === true) {
       this.condition.set();
     }
+  }
+
+  public startListening(): void {
+    const asyncFunction = async () => {
+      while (!this.cleanup) {
+        while (!this.autoReconnect) {
+          if (this.cleanup) {
+            return;
+          }
+          await this.condition.wait();
+          this.condition.reset();
+        }
+        await this.runFunction(this.teamNumber);
+      }
+      console.log('finished loop');
+    };
+    this.promise = asyncFunction();
+  }
+
+  public closeSocket() {
+    if (this.closeFunc !== undefined) {
+      this.closeFunc();
+    }
+  }
+
+  public disconnect(): void {
+    this.closeSocket();
+  }
+
+  public setTeamNumber(teamNumber: number): void {
+    this.teamNumber = teamNumber;
+  }
+
+  public async dispose() {
+    this.stop();
+    this.removeAllListeners();
+    await this.promise;
   }
 
   private async connect(teamNumber: number): Promise<net.Socket | undefined> {
@@ -115,42 +152,5 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     });
     this.connected = false;
     this.emit('connectionChanged', false);
-  }
-
-  public startListening(): void {
-    const asyncFunction = async () => {
-      while (!this.cleanup) {
-        while (!this.autoReconnect) {
-          if (this.cleanup) {
-            return;
-          }
-          await this.condition.wait();
-          this.condition.reset();
-        }
-        await this.runFunction(this.teamNumber);
-      }
-      console.log('finished loop');
-    };
-    this.promise = asyncFunction();
-  }
-
-  public closeSocket() {
-    if (this.closeFunc !== undefined) {
-      this.closeFunc();
-    }
-  }
-
-  public disconnect(): void {
-    this.closeSocket();
-  }
-
-  public setTeamNumber(teamNumber: number): void {
-    this.teamNumber = teamNumber;
-  }
-
-  public async dispose() {
-    this.stop();
-    this.removeAllListeners();
-    await this.promise;
   }
 }

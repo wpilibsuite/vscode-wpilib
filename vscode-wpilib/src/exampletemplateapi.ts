@@ -16,7 +16,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
   private examples: ILanguageQuickPick[] = [];
 
   public addTemplateProvider(provider: IExampleTemplateCreator): void {
-    let lp: ILanguageQuickPick | undefined = undefined;
+    let lp: ILanguageQuickPick | undefined;
     for (const p of this.templates) {
       if (p.label === provider.getLanguage()) {
         lp = p;
@@ -28,20 +28,20 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       // Not found
       lp = {
         creators: [],
+        description: 'Choice of language',
         label: provider.getLanguage(),
-        description: 'Choice of language'
       };
       this.templates.push(lp);
     }
 
     lp.creators.push({
       creator: provider,
+      description: provider.getDescription(),
       label: provider.getDisplayName(),
-      description: provider.getDescription()
     });
   }
   public addExampleProvider(provider: IExampleTemplateCreator): void {
-    let lp: ILanguageQuickPick | undefined = undefined;
+    let lp: ILanguageQuickPick | undefined;
     for (const p of this.examples) {
       if (p.label === provider.getLanguage()) {
         lp = p;
@@ -53,23 +53,31 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       // Not found
       lp = {
         creators: [],
+        description: 'Choice of language',
         label: provider.getLanguage(),
-        description: 'Choice of language'
       };
       this.examples.push(lp);
     }
 
     lp.creators.push({
       creator: provider,
+      description: provider.getDescription(),
       label: provider.getDisplayName(),
-      description: provider.getDescription()
     });
   }
+
   public createExample(): Promise<boolean> {
     return this.getSelection('Example', this.examples);
   }
+
   public createTemplate(): Promise<boolean> {
     return this.getSelection('Template', this.templates);
+  }
+
+  public dispose() {
+    for (const d of this.disposables) {
+      d.dispose();
+    }
   }
 
   private async getSelection(type: string, langs: ILanguageQuickPick[]): Promise<boolean> {
@@ -77,14 +85,14 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       vscode.window.showInformationMessage(`No ${type.toLowerCase()} providers found`);
       return false;
     } else if (langs.length === 1) {
-      return await this.runSelection(langs[0], type);
+      return this.runSelection(langs[0], type);
     } else {
       const selection = await vscode.window.showQuickPick(langs, { placeHolder: 'Pick a language' });
       if (selection === undefined) {
         await vscode.window.showInformationMessage('Langauge not picked, cancelling.');
         return false;
       }
-      return await this.runSelection(selection, type);
+      return this.runSelection(selection, type);
     }
   }
 
@@ -99,7 +107,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       canSelectFiles: false,
       canSelectFolders: true,
       canSelectMany: false,
-      openLabel: 'Select Folder'
+      openLabel: 'Select Folder',
     };
     const result = await vscode.window.showOpenDialog(open);
     if (result === undefined) {
@@ -124,7 +132,8 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
           }
         }
       }
-      const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?', 'Yes (Current Window)', 'Yes (New Window)', 'No');
+      const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
+                                                                       'Yes (Current Window)', 'Yes (New Window)', 'No');
       if (openSelection === undefined) {
         return true;
       } else if (openSelection === 'Yes (Current Window)') {
@@ -136,11 +145,5 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       }
     }
     return true;
-  }
-
-  public dispose() {
-    for (const d of this.disposables) {
-      d.dispose();
-    }
   }
 }

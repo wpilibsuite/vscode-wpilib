@@ -1,28 +1,16 @@
 'use strict';
 
-import * as jsonc from 'jsonc-parser';
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import { ToolChain, Source } from './jsonformats';
-import * as path from 'path';
 import * as glob from 'glob';
-import { PersistentFolderState } from './persistentState';
+import * as jsonc from 'jsonc-parser';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import { IPreferences } from '../shared/externalapi';
 import { gradleRun } from '../shared/gradle';
+import { promisifyReadFile } from '../utilities';
+import { ISource, IToolChain } from './jsonformats';
+import { PersistentFolderState } from './persistentState';
 
-function promisifyReadFile(location: string): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    fs.readFile(location, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
-
-export interface BinaryFind {
+export interface IBinaryFind {
   includePaths: string[];
   cpp: boolean;
   compiler: string;
@@ -46,15 +34,14 @@ export function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
-
-
 export class GradleConfig {
   public workspace: vscode.WorkspaceFolder;
-  private toolchains: ToolChain[] = [];
+  public refreshEvent: vscode.EventEmitter<void>;
+  private toolchains: IToolChain[] = [];
   private selectedName: PersistentFolderState<string>;
   private disposables: vscode.Disposable[] = [];
 
-  private foundFiles: BinaryFind[] = [];
+  private foundFiles: IBinaryFind[] = [];
 
   private statusBar: vscode.StatusBarItem;
 
@@ -62,7 +49,7 @@ export class GradleConfig {
 
   private configRelativePattern: vscode.RelativePattern;
   private configWatcher: vscode.FileSystemWatcher;
-  public refreshEvent: vscode.EventEmitter<void>;
+
   private preferences: IPreferences;
 
   constructor(workspace: vscode.WorkspaceFolder, preferences: IPreferences) {
@@ -86,72 +73,19 @@ export class GradleConfig {
 
     this.disposables.push(this.statusBar);
 
-    this.configWatcher.onDidCreate(async _ => {
+    this.configWatcher.onDidCreate(async (_) => {
       await this.loadConfigs();
     }, this.disposables);
 
-    this.configWatcher.onDidDelete(_ => {
+    this.configWatcher.onDidDelete((_) => {
       this.statusBar.text = 'none';
       this.toolchains = [];
       this.foundFiles = [];
     }, this.disposables);
 
-    this.configWatcher.onDidChange(async _ => {
+    this.configWatcher.onDidChange(async (_) => {
       await this.loadConfigs();
     }, this.disposables);
-  }
-
-  private enumerateSourceSet(source: Source): Promise<string[]>[] {
-    const promises: Promise<string[]>[] = [];
-    for (const s of source.srcDirs) {
-      let includes: string = '**/*';
-      if (source.includes.length === 0) {
-        includes = '{';
-        let first = true;
-        for (const i of source.includes) {
-          if (first) {
-            first = false;
-          } else {
-            includes += ',';
-          }
-          includes += i;
-        }
-        includes += '}';
-      }
-
-      let excludes: string = '';
-      if (source.excludes.length === 0) {
-        excludes = '{';
-        let first = true;
-        for (const i of source.excludes) {
-          if (first) {
-            first = false;
-          } else {
-            excludes += ',';
-          }
-          excludes += i;
-        }
-        excludes += '}';
-      }
-      promises.push(new Promise<string[]>((resolve, reject) => {
-        glob(includes, {
-          cwd: s,
-          ignore: excludes,
-          nodir: true
-        }, (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            const newArr: string[] = [];
-            for (const d of data) {
-              newArr.push(path.join(s, d));
-            }
-            resolve(newArr);
-          }
-        });
-      }));
-    }
-    return promises;
   }
 
   public async runGradleRefresh(): Promise<number> {
@@ -159,10 +93,10 @@ export class GradleConfig {
     return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online);
   }
 
-  public async findMatchingBinary(uris: vscode.Uri[]): Promise<BinaryFind[]> {
+  public async findMatchingBinary(uris: vscode.Uri[]): Promise<IBinaryFind[]> {
 
     let findCount = 0;
-    const finds: BinaryFind[] = [];
+    const finds: IBinaryFind[] = [];
 
     for (let i = 0; i < uris.length; i++) {
       // Remove non c++ files
@@ -198,7 +132,7 @@ export class GradleConfig {
       if (tc.name === this.selectedName.Value) {
         for (const bin of tc.binaries) {
           for (const sourceSet of bin.sourceSets) {
-            const arr: Promise<string[]>[] = [];
+            const arr: Array<Promise<string[]>> = [];
             arr.push(...this.enumerateSourceSet(sourceSet.source));
             arr.push(...this.enumerateSourceSet(sourceSet.exportedHeaders));
             const matches = await Promise.all(arr);
@@ -220,13 +154,13 @@ export class GradleConfig {
                         includePaths.push(...s.exportedHeaders.srcDirs);
                       }
                       finds.push({
-                        args: args,
-                        includePaths: includePaths,
+                        args,
                         compiler: tc.cppPath,
                         cpp: true,
-                        macros: macros,
+                        includePaths,
+                        macros,
                         msvc: tc.msvc,
-                        uri: uri
+                        uri,
                       });
                     } else {
                       const args: string[] = [];
@@ -241,13 +175,13 @@ export class GradleConfig {
                         includePaths.push(...s.exportedHeaders.srcDirs);
                       }
                       finds.push({
-                        args: args,
-                        includePaths: includePaths,
+                        args,
                         compiler: tc.cppPath,
                         cpp: false,
-                        macros: macros,
+                        includePaths,
+                        macros,
                         msvc: tc.msvc,
-                        uri: uri
+                        uri,
                       });
                     }
                     if (findCount === uris.length) {
@@ -278,7 +212,7 @@ export class GradleConfig {
       return;
     }
 
-    const newToolchains: ToolChain[] = jsonc.parse(file);
+    const newToolchains: IToolChain[] = jsonc.parse(file) as IToolChain[];
     for (const newToolChain of newToolchains) {
       let foundTc = false;
       for (const existingChain of this.toolchains) {
@@ -332,7 +266,7 @@ export class GradleConfig {
       return;
     }
     const result = await vscode.window.showQuickPick(selections, {
-      placeHolder: 'Pick a configuration'
+      placeHolder: 'Pick a configuration',
     });
     if (result !== undefined) {
       this.selectedName.Value = result;
@@ -345,5 +279,58 @@ export class GradleConfig {
     for (const d of this.disposables) {
       d.dispose();
     }
+  }
+
+  private enumerateSourceSet(source: ISource): Array<Promise<string[]>> {
+    const promises: Array<Promise<string[]>> = [];
+    for (const s of source.srcDirs) {
+      let includes: string = '**/*';
+      if (source.includes.length === 0) {
+        includes = '{';
+        let first = true;
+        for (const i of source.includes) {
+          if (first) {
+            first = false;
+          } else {
+            includes += ',';
+          }
+          includes += i;
+        }
+        includes += '}';
+      }
+
+      let excludes: string = '';
+      if (source.excludes.length === 0) {
+        excludes = '{';
+        let first = true;
+        for (const i of source.excludes) {
+          if (first) {
+            first = false;
+          } else {
+            excludes += ',';
+          }
+          excludes += i;
+        }
+        excludes += '}';
+      }
+      promises.push(new Promise<string[]>((resolve, reject) => {
+        glob(includes, {
+          cwd: s,
+          ignore: excludes,
+          nodir: true,
+        }, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            const newArr: string[] = [];
+            for (const d of data) {
+              newArr.push(path.join(s, d));
+            }
+            resolve(newArr);
+          }
+        });
+      }));
+    }
+    return promises;
   }
 }

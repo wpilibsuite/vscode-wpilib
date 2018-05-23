@@ -1,9 +1,10 @@
 'use strict';
 
+/* tslint:disable:prefer-conditional-expression */
 export enum MessageType {
   Error,
   Warning,
-  Print
+  Print,
 }
 
 export interface IMessage {
@@ -42,7 +43,7 @@ export class PrintMessage implements IPrintMessage {
   }
 }
 
-interface StringNumberPair {
+interface IStringNumberPair {
   byteLength: number;
   data: string;
 }
@@ -79,6 +80,7 @@ export class ErrorMessage implements IMessage {
     tmp = this.getSizedString(data, count);
     this.callStack = tmp.data;
     count += tmp.byteLength;
+    // tslint:disable-next-line:no-bitwise
     if ((this.flags & 1) !== 0) {
       this.messageType = MessageType.Error;
     } else {
@@ -86,13 +88,13 @@ export class ErrorMessage implements IMessage {
     }
   }
 
-  private getSizedString(data: Buffer, start: number): StringNumberPair {
+  private getSizedString(data: Buffer, start: number): IStringNumberPair {
     const size = data.readUInt16BE(start);
     start += 2;
     const count = size + 2;
     return {
       byteLength: count,
-      data: data.toString('utf8', start, start + count - 2)
+      data: data.toString('utf8', start, start + count - 2),
     };
   }
 }

@@ -1,22 +1,22 @@
 'use strict';
 import * as vscode from 'vscode';
 
-export interface DebugCommands {
+export interface IDebugCommands {
   serverAddress: string;
   serverPort: string;
   project: string;
   workspace: vscode.WorkspaceFolder;
 }
 
-export async function startDebugging(commands: DebugCommands): Promise<void> {
+export async function startDebugging(commands: IDebugCommands): Promise<void> {
 
   const config: vscode.DebugConfiguration = {
-    name: 'wpilibJavaDebug',
-    type: 'java',
-    request: 'attach',
     hostName: commands.serverAddress,
+    name: 'wpilibJavaDebug',
     port: commands.serverPort,
-    projectName: commands.project
+    projectName: commands.project,
+    request: 'attach',
+    type: 'java',
   };
 
   await vscode.debug.startDebugging(commands.workspace, config);

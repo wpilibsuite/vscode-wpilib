@@ -1,8 +1,8 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { IExternalAPI } from './shared/externalapi';
 import { requestTeamNumber } from './preferences';
+import { IExternalAPI } from './shared/externalapi';
 
 export function createVsCommands(context: vscode.ExtensionContext, externalApi: IExternalAPI) {
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLog', async () => {
@@ -87,7 +87,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
-    preferences.setCurrentLanguage(result);
+    await preferences.setCurrentLanguage(result);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setAutoSave', async () => {
@@ -108,7 +108,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     if (request === undefined) {
       return;
     }
-    preferences.setAutoSaveOnDeploy(result === 'Yes', request === 'Globally');
+    await preferences.setAutoSaveOnDeploy(result === 'Yes', request === 'Globally');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStartRioLog', async () => {
@@ -129,7 +129,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     if (request === undefined) {
       return;
     }
-    preferences.setAutoStartRioLog(result === 'Yes', request === 'Globally');
+    await preferences.setAutoStartRioLog(result === 'Yes', request === 'Globally');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createExample', async () => {

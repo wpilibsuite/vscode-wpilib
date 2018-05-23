@@ -1,15 +1,15 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { Examples } from '../shared/examples';
-import { Templates } from '../shared/templates';
-import { Commands } from './commands';
 import { IExternalAPI } from '../shared/externalapi';
+import { Templates } from '../shared/templates';
 import { BuildTest } from './buildtest';
+import { Commands } from './commands';
 import { DebugDeploy } from './debugdeploy';
-//import { activateCppProvider } from '../cppprovider/cppprovider';
+// import { activateCppProvider } from '../cppprovider/cppprovider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,7 +24,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
   const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
   if (cppExtension === undefined) {
-    //TODO: Make this a visible warning message when project detected is cpp
+    // TODO: Make this a visible warning message when project detected is cpp
     console.log('Could not find cpptools C++ extension. Debugging is disabled.');
     allowDebug = false;
   } else if (!cppExtension.isActive) {
@@ -38,7 +38,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const buildTestApi = coreExports.getBuildTestAPI();
 
   // TODO: Waiting for update
-  //await activateCppProvider(context, coreExports);
+  // await activateCppProvider(context, coreExports);
 
   // Setup build and test
 

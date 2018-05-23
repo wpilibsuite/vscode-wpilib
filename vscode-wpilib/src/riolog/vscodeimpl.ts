@@ -1,13 +1,12 @@
 'use strict';
 
-import * as vscode from 'vscode';
 import { EventEmitter } from 'events';
-import { IWindowView, IWindowProvider, IRioConsoleProvider, IRioConsole, IIPCSendMessage, IIPCReceiveMessage } from './shared/interfaces';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { IIPCReceiveMessage, IIPCSendMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView } from './shared/interfaces';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 import { RioConsole } from './shared/rioconsole';
-import { IPrintMessage, IErrorMessage } from './shared/message';
-
 
 interface IHTMLProvider {
   getHTML(): string;
@@ -21,9 +20,9 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     super();
     this.webview = vscode.window.createWebviewPanel(resourceName,
       windowName, viewColumn, {
-        enableScripts: true,
         enableCommandUris: true,
-        retainContextWhenHidden: true
+        enableScripts: true,
+        retainContextWhenHidden: true,
       });
 
     this.disposables.push(this.webview);
@@ -47,7 +46,7 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     this.webview.webview.html = html;
   }
   public async postMessage(message: IIPCSendMessage): Promise<boolean> {
-    return await this.webview.webview.postMessage(message);
+    return this.webview.webview.postMessage(message);
   }
   public dispose() {
     for (const d of this.disposables) {
@@ -55,30 +54,15 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     }
   }
 
-  public async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
+  public async handleSave(saveData: Array<IPrintMessage | IErrorMessage>): Promise<boolean> {
     const d = await vscode.workspace.openTextDocument({
+      content: JSON.stringify(saveData, null, 4),
       language: 'json',
-      content: JSON.stringify(saveData, null, 4)
     });
     await vscode.window.showTextDocument(d);
     return true;
   }
 }
-
-export class RioLogWebviewProvider implements IWindowProvider {
-  private htmlProvider: RioLogHTMLProvider;
-
-  constructor(resourceRoot: string) {
-    this.htmlProvider = new RioLogHTMLProvider(resourceRoot);
-  }
-
-  public createWindowView(): IWindowView {
-    const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
-    wv.setHTML(this.htmlProvider.getHTML());
-    return wv;
-  }
-}
-
 
 export class RioLogHTMLProvider implements IHTMLProvider {
   private html: string | undefined;
@@ -98,6 +82,20 @@ export class RioLogHTMLProvider implements IHTMLProvider {
       return '';
     }
     return this.html;
+  }
+}
+
+export class RioLogWebviewProvider implements IWindowProvider {
+  private htmlProvider: RioLogHTMLProvider;
+
+  constructor(resourceRoot: string) {
+    this.htmlProvider = new RioLogHTMLProvider(resourceRoot);
+  }
+
+  public createWindowView(): IWindowView {
+    const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
+    wv.setHTML(this.htmlProvider.getHTML());
+    return wv;
   }
 }
 

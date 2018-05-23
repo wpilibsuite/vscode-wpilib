@@ -1,6 +1,7 @@
 'use strict';
-import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as timers from 'timers';
+import * as vscode from 'vscode';
 
 export function getIsWindows(): boolean {
   const nodePlatform: NodeJS.Platform = process.platform;
@@ -17,7 +18,7 @@ export async function getClassName(): Promise<string | undefined> {
         return 'Invalid Classname';
       }
       return undefined;
-    }
+    },
   });
   return className;
 }
@@ -34,7 +35,7 @@ export async function getPackageName(): Promise<string | undefined> {
       }
 
       return undefined;
-    }
+    },
   });
   return packageName;
 }
@@ -48,5 +49,49 @@ export function readFileAsync(file: string): Promise<string> {
         resolve(data);
       }
     });
+  });
+}
+
+export function promisifyReadFile(filename: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+      fs.readFile(filename, 'utf8', (err, data) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve(data);
+          }
+      });
+  });
+}
+
+export function promisifyWriteFile(filename: string, contents: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      fs.writeFile(filename, contents, 'utf8', (err) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+  });
+}
+
+export function promisifyMkDir(dirName: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+      fs.mkdir(dirName, (err) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+  });
+}
+
+export function promisifyTimer(time: number): Promise<void> {
+  return new Promise<void>((resolve, _) => {
+      timers.setTimeout(() => {
+          resolve();
+      }, time);
   });
 }

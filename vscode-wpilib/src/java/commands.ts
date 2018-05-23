@@ -1,13 +1,13 @@
 'use strict';
-import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
-import { promisifyNcp } from '../shared/generator';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../shared/externalapi';
-import { getPackageName, getClassName } from '../utilities';
+import { promisifyNcp } from '../shared/generator';
+import { getClassName, getPackageName } from '../utilities';
 
-interface JsonLayout {
+interface IJsonLayout {
   name: string;
   description: string;
   tags: string[];
@@ -15,7 +15,8 @@ interface JsonLayout {
   replacename: string;
 }
 
-async function performCopy(commandRoot: string, command: JsonLayout, folder: vscode.Uri, replaceName: string, javaPackage: string): Promise<boolean> {
+async function performCopy(commandRoot: string, command: IJsonLayout, folder: vscode.Uri, replaceName: string,
+                           javaPackage: string): Promise<boolean> {
   const commandFolder = path.join(commandRoot, command.foldername);
   const copiedFiles: string[] = [];
   await promisifyNcp(commandFolder, folder.fsPath, {
@@ -24,13 +25,13 @@ async function performCopy(commandRoot: string, command: JsonLayout, folder: vsc
         copiedFiles.push(path.relative(commandFolder, cf));
       }
       return true;
-    }
+    },
   });
 
   const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:commands)\\..+?(?=;|\\.)';
   const replacePackageTo = javaPackage;
 
-  const promiseArray: Promise<void>[] = [];
+  const promiseArray: Array<Promise<void>> = [];
 
   for (const f of copiedFiles) {
     const file = path.join(folder.fsPath, f);
@@ -55,7 +56,7 @@ async function performCopy(commandRoot: string, command: JsonLayout, folder: vsc
 
   await Promise.all(promiseArray);
 
-  const movePromiseArray: Promise<void>[] = [];
+  const movePromiseArray: Array<Promise<void>> = [];
   for (const f of copiedFiles) {
     const file = path.join(folder.fsPath, f);
     const bname = path.basename(file);
@@ -92,7 +93,7 @@ export class Commands {
         console.log(err);
         return;
       }
-      const commands: JsonLayout[] = jsonc.parse(data);
+      const commands: IJsonLayout[] = jsonc.parse(data) as IJsonLayout[];
       for (const c of commands) {
         const provider: ICommandCreator = {
           getLanguage(): string {
@@ -105,7 +106,7 @@ export class Commands {
             return c.name;
           },
           async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-            const prefs = await preferences.getPreferences(workspace);
+            const prefs = preferences.getPreferences(workspace);
             const currentLanguage = prefs.getCurrentLanguage();
             return currentLanguage === 'none' || currentLanguage === 'java';
           },
@@ -123,8 +124,7 @@ export class Commands {
                 javaPackage = packageslash.substring(1).replace(/\//g, '.');
               }
               console.log(packageslash);
-            }
-            else {
+            } else {
               // Coult not root path, ask for one
               const res = await getPackageName();
               if (res === undefined) {
@@ -138,14 +138,15 @@ export class Commands {
             if (className === undefined || className === '') {
               return false;
             }
-            return await performCopy(commandFolder, c, folder, className, javaPackage);
-          }
+            return performCopy(commandFolder, c, folder, className, javaPackage);
+          },
         };
         core.addCommandProvider(provider);
       }
     });
   }
 
+  // tslint:disable-next-line:no-empty
   public dispose() {
 
   }

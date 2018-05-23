@@ -1,16 +1,16 @@
 'use strict';
-import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import { IPreferences } from './shared/externalapi';
-import { ConfigurationTarget } from 'vscode';
+import { promisifyMkDir, promisifyWriteFile } from './utilities';
 
-interface PreferencesJson {
+interface IPreferencesJson {
   currentLanguage: string;
 }
 
-const defaultPreferences: PreferencesJson = {
+const defaultPreferences: IPreferencesJson = {
   currentLanguage: 'none',
 };
 
@@ -19,18 +19,18 @@ export async function requestTeamNumber(): Promise<number> {
   if (teamNumber === undefined) {
     return -1;
   }
-  return parseInt(teamNumber);
+  return parseInt(teamNumber, 10);
 }
 
 export class Preferences implements IPreferences {
+  public workspace: vscode.WorkspaceFolder;
   private preferencesFile?: vscode.Uri;
   private readonly configFolder: string;
   private readonly preferenceFileName: string = 'wpilib_preferences.json';
-  private preferencesJson: PreferencesJson;
+  private preferencesJson: IPreferencesJson;
   private configFileWatcher: vscode.FileSystemWatcher;
   private readonly preferencesGlob: string = '**/' + this.preferenceFileName;
   private disposables: vscode.Disposable[] = [];
-  public workspace: vscode.WorkspaceFolder;
   private isWPILibProject: boolean = false;
 
   constructor(workspace: vscode.WorkspaceFolder) {
@@ -79,56 +79,15 @@ export class Preferences implements IPreferences {
     return this.isWPILibProject;
   }
 
-  private getConfiguration(): vscode.WorkspaceConfiguration {
-    return vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
-  }
-
-  private updatePreferences() {
-    if (this.preferencesFile === undefined) {
-      this.preferencesJson = defaultPreferences;
-      return;
-    }
-
-    const results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
-    this.preferencesJson = jsonc.parse(results);
-  }
-
-  private writePreferences() {
-    if (this.preferencesFile === undefined) {
-      const configFilePath = path.join(this.configFolder, this.preferenceFileName);
-      this.preferencesFile = vscode.Uri.file(configFilePath);
-      fs.mkdirSync(path.dirname(this.preferencesFile.fsPath));
-    }
-    fs.writeFileSync(this.preferencesFile.fsPath, JSON.stringify(this.preferencesJson, null, 4));
-  }
-
-  private async noTeamNumberLogic(): Promise<number> {
-    // Ask if user wants to set team number.
-    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes (Globally)', 'Yes (Workspace)', 'No');
-    if (teamRequest === undefined) {
-      return -1;
-    }
-    const teamNumber = await requestTeamNumber();
-    if (teamRequest === 'No') {
-      return teamNumber;
-    }
-    if (teamNumber !== -1 && teamRequest === 'Yes (Globally)') {
-      await this.setTeamNumber(teamNumber, true);
-    } else if (teamNumber !== -1 && teamRequest === 'Yes (Workspace)') {
-      await this.setTeamNumber(teamNumber, false);
-    }
-    return teamNumber;
-  }
-
   public async getTeamNumber(): Promise<number> {
     // If always ask, get it.
     const alwaysAsk = this.getConfiguration().get<boolean>('alwaysAskForTeamNumber');
     if (alwaysAsk !== undefined && alwaysAsk === true) {
-      return await requestTeamNumber();
+      return requestTeamNumber();
     }
     const res = this.getConfiguration().get<number>('teamNumber');
     if (res === undefined || res < 0) {
-      return await this.noTeamNumberLogic();
+      return this.noTeamNumberLogic();
     }
     return res;
   }
@@ -136,9 +95,9 @@ export class Preferences implements IPreferences {
   public async setTeamNumber(teamNumber: number, global: boolean): Promise<void> {
     try {
       if (global) {
-        await this.getConfiguration().update('teamNumber', teamNumber, ConfigurationTarget.Global);
+        await this.getConfiguration().update('teamNumber', teamNumber, vscode.ConfigurationTarget.Global);
       } else {
-        await this.getConfiguration().update('teamNumber', teamNumber, ConfigurationTarget.WorkspaceFolder);
+        await this.getConfiguration().update('teamNumber', teamNumber, vscode.ConfigurationTarget.WorkspaceFolder);
       }
     } catch (err) {
       console.log('error setting team number', err);
@@ -149,9 +108,9 @@ export class Preferences implements IPreferences {
     return this.preferencesJson.currentLanguage;
   }
 
-  public setCurrentLanguage(language: string): void {
+  public async setCurrentLanguage(language: string): Promise<void> {
     this.preferencesJson.currentLanguage = language;
-    this.writePreferences();
+    await this.writePreferences();
   }
 
   public getAutoStartRioLog(): boolean {
@@ -162,12 +121,12 @@ export class Preferences implements IPreferences {
     return res;
   }
 
-  public setAutoStartRioLog(autoStart: boolean, global: boolean): void {
-    let target: vscode.ConfigurationTarget = ConfigurationTarget.Global;
+  public async setAutoStartRioLog(autoStart: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
     if (!global) {
-      target = ConfigurationTarget.WorkspaceFolder;
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
     }
-    this.getConfiguration().update('autoStartRioLog', autoStart, target);
+    return this.getConfiguration().update('autoStartRioLog', autoStart, target);
   }
 
   public getAutoSaveOnDeploy(): boolean {
@@ -178,12 +137,12 @@ export class Preferences implements IPreferences {
     return res;
   }
 
-  public setAutoSaveOnDeploy(autoSave: boolean, global: boolean): void {
-    let target: vscode.ConfigurationTarget = ConfigurationTarget.Global;
+  public async setAutoSaveOnDeploy(autoSave: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
     if (!global) {
-      target = ConfigurationTarget.WorkspaceFolder;
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
     }
-    this.getConfiguration().update('autoSaveOnDeploy', autoSave, target);
+    return this.getConfiguration().update('autoSaveOnDeploy', autoSave, target);
   }
 
   public getOnline(): boolean {
@@ -198,5 +157,47 @@ export class Preferences implements IPreferences {
     for (const d of this.disposables) {
       d.dispose();
     }
+  }
+
+  private getConfiguration(): vscode.WorkspaceConfiguration {
+    return vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
+  }
+
+  private updatePreferences() {
+    if (this.preferencesFile === undefined) {
+      this.preferencesJson = defaultPreferences;
+      return;
+    }
+
+    const results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
+    this.preferencesJson = jsonc.parse(results) as IPreferencesJson;
+  }
+
+  private async writePreferences(): Promise<void> {
+    if (this.preferencesFile === undefined) {
+      const configFilePath = path.join(this.configFolder, this.preferenceFileName);
+      this.preferencesFile = vscode.Uri.file(configFilePath);
+      await promisifyMkDir(path.dirname(this.preferencesFile.fsPath));
+    }
+    await promisifyWriteFile(this.preferencesFile.fsPath, JSON.stringify(this.preferencesJson, null, 4));
+  }
+
+  private async noTeamNumberLogic(): Promise<number> {
+    // Ask if user wants to set team number.
+    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?',
+      'Yes (Globally)', 'Yes (Workspace)', 'No');
+    if (teamRequest === undefined) {
+      return -1;
+    }
+    const teamNumber = await requestTeamNumber();
+    if (teamRequest === 'No') {
+      return teamNumber;
+    }
+    if (teamNumber !== -1 && teamRequest === 'Yes (Globally)') {
+      await this.setTeamNumber(teamNumber, true);
+    } else if (teamNumber !== -1 && teamRequest === 'Yes (Workspace)') {
+      await this.setTeamNumber(teamNumber, false);
+    }
+    return teamNumber;
   }
 }
