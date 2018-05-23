@@ -35,7 +35,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       if (workspace === undefined) {
         return;
       }
-      await this.debugDeployAPI.debugCode(workspace, desktop, this.preferences.getPreferences(workspace).getOnline());
+      await this.debugDeployAPI.debugCode(workspace, desktop);
       resolve();
     });
   }
@@ -115,11 +115,11 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     this.languageChoices.push(language);
   }
 
-  public debugCode(workspace: vscode.WorkspaceFolder, _desktop: boolean, online: boolean): Promise<boolean> {
-    return this.deployCommon(workspace, this.debuggers, true, online);
+  public debugCode(workspace: vscode.WorkspaceFolder, _desktop: boolean): Promise<boolean> {
+    return this.deployCommon(workspace, this.debuggers, true);
   }
-  public deployCode(workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
-    return this.deployCommon(workspace, this.deployers, false, online);
+  public deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    return this.deployCommon(workspace, this.deployers, false);
   }
 
   public getLanguageChoices(): string[] {
@@ -133,7 +133,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   }
 
   private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[],
-                             debug: boolean, online: boolean): Promise<boolean> {
+                             debug: boolean): Promise<boolean> {
     if (deployer.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
@@ -169,7 +169,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     }
     const teamNumber = await preferences.getTeamNumber();
     try {
-      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace, online);
+      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace);
       if (preferences.getAutoStartRioLog() && deploySuccess) {
         await this.startRioLog(teamNumber, !debug);
       }

@@ -74,6 +74,12 @@
                     "default": false,
                     "description": "Perform gradle commands without offline flag",
                     "scope": "resource"
+                },
+                "wpilib.skipTests": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to skip running tests on build",
+                    "scope": "resource"
                 }
             }
         },

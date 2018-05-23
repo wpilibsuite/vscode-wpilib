@@ -45,8 +45,12 @@ class DebugCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
-    const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+    if (this.preferences.getPreferences(workspace).getSkipTests()) {
+      command += ' -Xcheck';
+    }
+    const online = this.preferences.getPreferences(workspace).getOnline();
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
     if (result !== 0) {
       return false;
@@ -107,12 +111,12 @@ class DeployCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, online: boolean): Promise<boolean> {
-    const command = 'deploy -PteamNumber=' + teamNumber;
-    if (workspace === undefined) {
-      vscode.window.showInformationMessage('No workspace selected');
-      return false;
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    let command = 'deploy -PteamNumber=' + teamNumber;
+    if (this.preferences.getPreferences(workspace).getSkipTests()) {
+      command += ' -Xcheck';
     }
+    const online = this.preferences.getPreferences(workspace).getOnline();
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
     if (result !== 0) {
       return false;

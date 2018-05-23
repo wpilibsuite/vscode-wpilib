@@ -45,7 +45,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
       return;
     }
-    await externalApi.getDeployDebugAPI().deployCode(workspace, preferencesApi.getPreferences(workspace).getOnline());
+    await externalApi.getDeployDebugAPI().deployCode(workspace);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.debugCode', async () => {
@@ -55,7 +55,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
       return;
     }
-    await externalApi.getDeployDebugAPI().debugCode(workspace, false, preferencesApi.getPreferences(workspace).getOnline());
+    await externalApi.getDeployDebugAPI().debugCode(workspace, false);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {
@@ -151,7 +151,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
       return;
     }
-    await externalApi.getBuildTestAPI().buildCode(workspace, preferencesApi.getPreferences(workspace).getOnline());
+    await externalApi.getBuildTestAPI().buildCode(workspace);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.testCode', async () => {
@@ -161,6 +161,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
       return;
     }
-    await externalApi.getBuildTestAPI().testCode(workspace, preferencesApi.getPreferences(workspace).getOnline());
+    await externalApi.getBuildTestAPI().testCode(workspace);
   }));
 }
