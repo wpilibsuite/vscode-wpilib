@@ -37,7 +37,15 @@ build_script:
 
     npm install
 
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
     npm run lint
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
 
     vsce package
 
@@ -51,9 +59,21 @@ build_script:
 
     npm install
 
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
     npm run lint
 
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
     npm run compile
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
 
 test: off
 artifacts:
