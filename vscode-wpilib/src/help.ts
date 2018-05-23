@@ -13,6 +13,7 @@ export class Help {
   constructor(resourceRoot: string, preferences: IPreferencesAPI) {
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
     this.statusBar.text = 'WPILib';
+    this.statusBar.tooltip = 'Open WPILib Help';
     this.statusBar.command = 'wpilibcore.help';
     this.disposables.push(this.statusBar);
 

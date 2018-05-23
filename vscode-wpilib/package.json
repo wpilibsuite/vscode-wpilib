@@ -81,69 +81,69 @@
             {
                 "command": "wpilibcore.startRioLog",
                 "title": "Start RioLog",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setTeamNumber",
                 "title": "Set Team Number",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.startTool",
                 "title": "Start Tool",
-                "category": "WPILIB",
+                "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.buildCode",
                 "title": "Build Robot Code",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.testCode",
                 "title": "Test Robot Code",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.deployCode",
                 "title": "Deploy Robot Code",
-                "category": "WPILIB",
+                "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.debugCode",
                 "title": "Debug Robot Code",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setLanguage",
                 "title": "Set Language",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setAutoSave",
                 "title": "Set Auto Save On Deploy",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setStartRioLog",
                 "title": "Set Auto Start RioLog on Deploy",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createExample",
                 "title": "Create new project from an example",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createTemplate",
                 "title": "Create new project from a template",
-                "category": "WPILIB"
+                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createCommand",
                 "title": "Create a new class/command",
-                "category": "WPILIB",
+                "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {

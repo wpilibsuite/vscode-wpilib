@@ -16,7 +16,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.openCommandPalette', async () => {
-    await vscode.commands.executeCommand('workbench.action.showCommands', 'wpilib');
+    await vscode.commands.executeCommand('workbench.action.quickOpen', '>WPILib');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
