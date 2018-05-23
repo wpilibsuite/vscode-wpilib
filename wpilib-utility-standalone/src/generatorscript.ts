@@ -17,15 +17,13 @@ if (basepath.indexOf('default_app.asar') >= 0) {
 }
 const examplesFileName = 'examples.json';
 const templatesFileName = 'templates.json';
-const resourceSrcRoot = path.join(resourceRoot, 'src');
-const cppRoot = path.join(resourceSrcRoot, 'cpp');
-const cppGradleRoot = path.join(cppRoot, 'gradlebase');
+const cppRoot = path.join(resourceRoot, 'cpp', 'src');
+const gradleRoot = path.join(resourceRoot, 'gradle');
 const cppTemplatesRoot = path.join(cppRoot, 'templates');
 const cppExamplesRoot = path.join(cppRoot, 'examples');
 const cppTemplatesFile = path.join(cppTemplatesRoot, templatesFileName);
 const cppExamplesFile = path.join(cppExamplesRoot, examplesFileName);
-const javaRoot = path.join(resourceSrcRoot, 'java');
-const javaGradleRoot = path.join(javaRoot, 'gradlebase');
+const javaRoot = path.join(resourceRoot, 'java', 'src');
 const javaTemplatesRoot = path.join(javaRoot, 'templates');
 const javaExamplesRoot = path.join(javaRoot, 'examples');
 const javaTemplatesFile = path.join(javaTemplatesRoot, templatesFileName);
@@ -41,6 +39,7 @@ interface IDisplayJSON {
   description: string;
   tags: string[];
   foldername: string;
+  gradlebase: string;
 }
 
 window.addEventListener('load', () => {
@@ -224,7 +223,7 @@ async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<v
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  await generateCopyCpp(templateFolder, cppGradleRoot, toFolder);
+  await generateCopyCpp(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
 }
 
 async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<void> {
@@ -236,14 +235,15 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  await generateCopyJava(templateFolder, javaGradleRoot, toFolder);
+  await generateCopyJava(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
 
   dialog.showMessageBox({
     buttons: ['Open Folder', 'OK'],
     message: 'Creation of project complete',
     noLink: true,
   }, (r) => {
-    if (r === 1) {
+    if (r === 0) {
+      console.log(toFolder);
       shell.showItemInFolder(path.join(toFolder, 'build.gradle'));
     }
     console.log(r);

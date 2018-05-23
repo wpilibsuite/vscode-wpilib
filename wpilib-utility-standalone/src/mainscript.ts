@@ -36,8 +36,11 @@ window.addEventListener('load', () => {
 
     rioLogWindow.setMenu(null);
 
+    remote.getCurrentWindow().hide();
+
     rioLogWindow.on('closed', () => {
       rioLogWindow = undefined;
+      remote.getCurrentWindow().close();
     });
   });
   mainDiv.appendChild(rioLogButton);
@@ -48,7 +51,7 @@ window.addEventListener('load', () => {
     if (generatorWindow !== undefined) {
       return;
     }
-    generatorWindow = new electron.BrowserWindow({
+    generatorWindow = new remote.BrowserWindow({
       backgroundColor: '#2e2c29',
       height: 600,
       modal: true,
@@ -65,8 +68,11 @@ window.addEventListener('load', () => {
 
     generatorWindow.setMenu(null);
 
+    remote.getCurrentWindow().hide();
+
     generatorWindow.on('closed', () => {
       generatorWindow = undefined;
+      remote.getCurrentWindow().close();
     });
   });
   mainDiv.appendChild(generatorButton);
