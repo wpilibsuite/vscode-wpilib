@@ -53,7 +53,7 @@ window.addEventListener('load', async () => {
   const languages: Array<[string, (e?: Event) => void, (e?: Event) => void]> = [
     ['Java', handleJavaTemplates, handleJavaExamples],
     ['C++', handleCppTemplates, handleCppExamples],
-    ['Python', () => alert('Work in progess.'), () => alert('Work in progess.')],
+    // ['Python', () => alert('Work in progess.'), () => alert('Work in progess.')],
   ];
 
   for (const languageDetails of languages) {
@@ -89,11 +89,11 @@ window.addEventListener('load', async () => {
     examplesRadioButton.name = 'language';
     examplesRadioButton.value = `${languageLowerCase}ex`;
 
+    examplesRadioButton.addEventListener('click', examplesEventHandler);
+
     const examplesRadioLabel = document.createElement('label');
     examplesRadioLabel.htmlFor = examplesId;
     examplesRadioLabel.innerText = `${language} Examples`;
-
-    examplesRadioButton.addEventListener('click', examplesEventHandler);
 
     // Add to the form
     radioForm.appendChild(templatesRadioButton);
