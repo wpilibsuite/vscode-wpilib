@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from './externalapi';
 import { generateCopyCpp, generateCopyJava } from './generator';
 
-interface IJsonLayout {
+export interface IExampleJsonLayout {
   name: string;
   description: string;
   tags: string[];
@@ -26,7 +26,7 @@ export class Examples {
         console.log(err);
         return;
       }
-      const examples: IJsonLayout[] = jsonc.parse(data) as IJsonLayout[];
+      const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
       for (const e of examples) {
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {

@@ -7,7 +7,7 @@ import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../shared/externa
 import { promisifyNcp } from '../shared/generator';
 import { getClassName, getPackageName } from '../utilities';
 
-interface IJsonLayout {
+export interface IJavaJsonLayout {
   name: string;
   description: string;
   tags: string[];
@@ -15,7 +15,7 @@ interface IJsonLayout {
   replacename: string;
 }
 
-async function performCopy(commandRoot: string, command: IJsonLayout, folder: vscode.Uri, replaceName: string,
+async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder: vscode.Uri, replaceName: string,
                            javaPackage: string): Promise<boolean> {
   const commandFolder = path.join(commandRoot, command.foldername);
   const copiedFiles: string[] = [];
@@ -93,7 +93,7 @@ export class Commands {
         console.log(err);
         return;
       }
-      const commands: IJsonLayout[] = jsonc.parse(data) as IJsonLayout[];
+      const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];
       for (const c of commands) {
         const provider: ICommandCreator = {
           getLanguage(): string {

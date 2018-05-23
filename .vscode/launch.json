@@ -30,7 +30,7 @@
             "outFiles": [
                 "${workspaceFolder}/vscode-wpilib/out/test/**/*.js"
             ],
-            "preLaunchTask": "standalone-watch"
+            "preLaunchTask": "vscode-watch"
         },
         {
             "type": "node",
