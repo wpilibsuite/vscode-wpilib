@@ -46,10 +46,13 @@ build_script:
     }
 
     cd ..
+
     cd wpilib-utility-standalone
 
     npm install
+
     npm run lint
+
     npm run compile
 
 test: off
