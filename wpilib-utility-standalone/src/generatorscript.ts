@@ -42,7 +42,7 @@ interface IDisplayJSON {
   gradlebase: string;
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const mainDiv = document.getElementById('mainDiv');
   if (mainDiv === null) {
     return;
@@ -94,13 +94,7 @@ window.addEventListener('load', () => {
   radioForm.appendChild(cppRadioExamples);
   radioForm.appendChild(cppRadioLabelExamples);
 
-  const langChangeButton = document.createElement('button');
-  langChangeButton.id = 'languageButton';
-  langChangeButton.innerText = 'Choose Lang/Type';
-
-  radioForm.appendChild(langChangeButton);
-
-  langChangeButton.addEventListener('click', async (_ev) => {
+  async function eventCheck(_ev: MouseEvent) {
     if (javaRadio.checked) {
       await handleJavaTemplates();
     } else if (javaRadioExamples.checked) {
@@ -112,13 +106,20 @@ window.addEventListener('load', () => {
     } else {
       console.log('hmm, invalid click');
     }
-  });
+  }
+
+  javaRadio.addEventListener('click', eventCheck);
+  javaRadioExamples.addEventListener('click', eventCheck);
+  cppRadio.addEventListener('click', eventCheck);
+  cppRadioExamples.addEventListener('click', eventCheck);
 
   mainDiv.appendChild(radioForm);
 
   const itemsDiv = document.createElement('div');
   itemsDiv.id = 'shownItems';
   mainDiv.appendChild(itemsDiv);
+
+  await handleJavaTemplates();
 
 });
 
@@ -219,11 +220,16 @@ async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<v
   if (dirArr === undefined) {
     return;
   }
-  // console.log(dirArr);
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  await generateCopyCpp(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
+  const result = await generateCopyCpp(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
+  if (!result) {
+    dialog.showMessageBox({
+      message: 'Cannot extract into non empty directory',
+      noLink: true,
+    });
+  }
 }
 
 async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<void> {
@@ -231,11 +237,18 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
   if (dirArr === undefined) {
     return;
   }
-  // console.log(dirArr);
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  await generateCopyJava(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
+  const result = await generateCopyJava(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
+
+  if (!result) {
+    dialog.showMessageBox({
+      message: 'Cannot extract into non empty directory',
+      noLink: true,
+    });
+    return;
+  }
 
   dialog.showMessageBox({
     buttons: ['Open Folder', 'OK'],
