@@ -91,7 +91,7 @@ test: off
 artifacts:
 - path: '**/*.vsix'
   name: VSIX
-- path: WPILibStandalone.zip
+- path: '**/WPILibStandalone.zip'
   name: Standalone
 deploy:
 - provider: GitHub
