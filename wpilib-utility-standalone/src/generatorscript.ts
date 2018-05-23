@@ -107,7 +107,7 @@ window.addEventListener('load', async () => {
   itemsDiv.id = 'shownItems';
   mainDiv.appendChild(itemsDiv);
 
-  await handleJavaTemplates();
+  (document.getElementById('javaRadio') as HTMLInputElement).click();
 
 });
 
