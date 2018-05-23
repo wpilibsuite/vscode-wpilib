@@ -96,7 +96,7 @@ artifacts:
 deploy:
 - provider: GitHub
   auth_token:
-    secure: jecQI2sLa3l2Ubgls0IS5xeqCezIqisLyC4y8VSm7JZzXM7r+wWc7Fs7aoCQJ51G
+    secure: h4+50xyT4O2QudfUFvnjoUGSZUxNePY9WaYshTsaTzJctxhFFb21eERKx40qumep
   artifact: /.*\.*/
   on:
     appveyor_repo_tag: true
