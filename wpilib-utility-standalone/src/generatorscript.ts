@@ -93,7 +93,7 @@ window.addEventListener('load', () => {
     examplesRadioLabel.htmlFor = examplesId;
     examplesRadioLabel.innerText = `${language} Examples`;
 
-    templatesRadioButton.addEventListener('click', examplesEventHandler);
+    examplesRadioButton.addEventListener('click', examplesEventHandler);
 
     // Add to the form
     radioForm.appendChild(templatesRadioButton);
