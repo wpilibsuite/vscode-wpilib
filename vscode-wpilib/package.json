@@ -221,7 +221,7 @@
     },
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "npm run compile && npm run lint",
+        "vscode:prepublish": "npm run compile && npm run compileBundle && npm run lint",
         "clean": "rmdir-cli out",
         "compile": "tsc -p ./",
         "lint": "tslint -c tslint.json -p tsconfig.json",

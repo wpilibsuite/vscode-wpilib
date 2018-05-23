@@ -75,10 +75,24 @@ build_script:
         throw ("Exec: " + $errorMessage)
     }
 
+    npm run packageWindows
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
+    7z a WPILibStandalone.zip $env:APPVEYOR_BUILD_FOLDER\\build\\wpilibutility-win32-ia32\\*
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
 test: off
 artifacts:
 - path: '**/*.vsix'
   name: VSIX
+- path: WPILibStandalone.zip
+  name: Standalone
 deploy:
 - provider: GitHub
   auth_token:
