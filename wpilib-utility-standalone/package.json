@@ -18,7 +18,6 @@
   "author": "WPILib Suite",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "copyfiles": "^2.0.0",
     "electron": "^2.0.2",
     "electron-packager": "^12.1.0",
     "rmdir-cli": "^2.0.6",
