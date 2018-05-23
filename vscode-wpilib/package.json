@@ -153,6 +153,12 @@
                 "icon": "resources/wpilib.svg"
             },
             {
+                "command": "wpilibcore.openCommandPalette",
+                "title": "Open WPILib Command Palette",
+                "category": "WPILib",
+                "icon": "resources/wpilib.svg"
+            },
+            {
                 "command": "wpilibcore.refreshCppProperties",
                 "title": "Refresh Gradle C++ Properties",
                 "category": "WPILib C++"
@@ -172,27 +178,27 @@
         "menus": {
             "editor/title": [
                 {
+                    "command": "wpilibcore.openCommandPalette",
+                    "group": "navigation@9"
+                },
+                {
                     "when": "isWPILibProject",
                     "command": "wpilibcore.deployCode",
-                    "group": "wpilib",
-                    "icon": "resources/wpilib.svg"
+                    "group": "wpilib@1"
                 },
                 {
                     "when": "isWPILibProject",
                     "command": "wpilibcore.buildCode",
-                    "group": "wpilib",
-                    "icon": "resources/wpilib.svg"
+                    "group": "wpilib@2"
                 },
                 {
                     "when": "isWPILibProject",
                     "command": "wpilibcore.testCode",
-                    "group": "wpilib",
-                    "icon": "resources/wpilib.svg"
+                    "group": "wpilib@3"
                 },
                 {
                     "command": "wpilibcore.startTool",
-                    "group": "wpilib",
-                    "icon": "resources/wpilib.svg"
+                    "group": "wpilib@4"
                 }
             ],
             "explorer/context": [

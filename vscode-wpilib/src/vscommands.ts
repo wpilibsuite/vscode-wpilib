@@ -15,6 +15,10 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
   }));
 
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.openCommandPalette', async () => {
+    await vscode.commands.executeCommand('workbench.action.showCommands', 'wpilib');
+  }));
+
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
