@@ -47,71 +47,59 @@ window.addEventListener('load', async () => {
   if (mainDiv === null) {
     return;
   }
+
   const radioForm = document.createElement('div');
-  const javaRadio = document.createElement('input');
-  javaRadio.type = 'radio';
-  javaRadio.id = 'javaRadio';
-  javaRadio.name = 'language';
-  javaRadio.value = 'java';
-  javaRadio.checked = true;
-  const javaRadioLabel = document.createElement('label');
-  javaRadioLabel.htmlFor = 'javaRadio';
-  javaRadioLabel.innerText = 'Java Templates';
 
-  const javaRadioExamples = document.createElement('input');
-  javaRadioExamples.type = 'radio';
-  javaRadioExamples.id = 'javaRadioExamples';
-  javaRadioExamples.name = 'language';
-  javaRadioExamples.value = 'javaex';
-  const javaRadioLabelExamples = document.createElement('label');
-  javaRadioLabelExamples.htmlFor = 'javaRadioExamples';
-  javaRadioLabelExamples.innerText = 'Java Examples';
+  const languages: Array<[string, (e?: Event) => void, (e?: Event) => void]> = [
+    ['Java', handleJavaTemplates, handleJavaExamples],
+    ['C++', handleCppTemplates, handleCppExamples],
+  ];
 
-  const cppRadio = document.createElement('input');
-  cppRadio.type = 'radio';
-  cppRadio.id = 'cppRadio';
-  cppRadio.name = 'language';
-  cppRadio.value = 'cpp';
-  const cppRadioLabel = document.createElement('label');
-  cppRadioLabel.htmlFor = 'cppRadio';
-  cppRadioLabel.innerText = 'C++ Templates';
+  for (const languageDetails of languages) {
+    let language;
+    let templatesEventHandler;
+    let examplesEventHandler;
 
-  const cppRadioExamples = document.createElement('input');
-  cppRadioExamples.type = 'radio';
-  cppRadioExamples.id = 'cppRadioExamples';
-  cppRadioExamples.name = 'language';
-  cppRadioExamples.value = 'cppex';
-  const cppRadioLabelExamples = document.createElement('label');
-  cppRadioLabelExamples.htmlFor = 'cppRadioExamples';
-  cppRadioLabelExamples.innerText = 'C++ Examples';
+    [language, templatesEventHandler, examplesEventHandler] = languageDetails;
 
-  radioForm.appendChild(javaRadio);
-  radioForm.appendChild(javaRadioLabel);
-  radioForm.appendChild(javaRadioExamples);
-  radioForm.appendChild(javaRadioLabelExamples);
-  radioForm.appendChild(cppRadio);
-  radioForm.appendChild(cppRadioLabel);
-  radioForm.appendChild(cppRadioExamples);
-  radioForm.appendChild(cppRadioLabelExamples);
+    const languageLowerCase = language.toLocaleLowerCase();
 
-  async function eventCheck(_ev: MouseEvent) {
-    if (javaRadio.checked) {
-      await handleJavaTemplates();
-    } else if (javaRadioExamples.checked) {
-      await handleJavaExamples();
-    } else if (cppRadio.checked) {
-      await handleCppTemplates();
-    } else if (cppRadioExamples.checked) {
-      await handleCppExamples();
-    } else {
-      console.log('hmm, invalid click');
-    }
+    // Templates
+    const templatesRadioButton = document.createElement('input');
+    const templatesId = `${languageLowerCase}Radio`;
+
+    templatesRadioButton.type = 'radio';
+    templatesRadioButton.id = templatesId;
+    templatesRadioButton.name = 'language';
+    templatesRadioButton.value = languageLowerCase;
+
+    templatesRadioButton.addEventListener('click', templatesEventHandler);
+
+    const templatesRadioLabel = document.createElement('label');
+    templatesRadioLabel.htmlFor = templatesId;
+    templatesRadioLabel.innerText = `${language} Templates`;
+
+    // Examples
+    const examplesRadioButton = document.createElement('input');
+    const examplesId = `${languageLowerCase}RadioExamples`;
+
+    examplesRadioButton.type = 'radio';
+    examplesRadioButton.id = examplesId;
+    examplesRadioButton.name = 'language';
+    examplesRadioButton.value = `${languageLowerCase}ex`;
+
+    examplesRadioButton.addEventListener('click', examplesEventHandler);
+
+    const examplesRadioLabel = document.createElement('label');
+    examplesRadioLabel.htmlFor = examplesId;
+    examplesRadioLabel.innerText = `${language} Examples`;
+
+    // Add to the form
+    radioForm.appendChild(templatesRadioButton);
+    radioForm.appendChild(templatesRadioLabel);
+    radioForm.appendChild(examplesRadioButton);
+    radioForm.appendChild(examplesRadioLabel);
   }
-
-  javaRadio.addEventListener('click', eventCheck);
-  javaRadioExamples.addEventListener('click', eventCheck);
-  cppRadio.addEventListener('click', eventCheck);
-  cppRadioExamples.addEventListener('click', eventCheck);
 
   mainDiv.appendChild(radioForm);
 
@@ -119,7 +107,7 @@ window.addEventListener('load', async () => {
   itemsDiv.id = 'shownItems';
   mainDiv.appendChild(itemsDiv);
 
-  await handleJavaTemplates();
+  (document.getElementById('javaRadio') as HTMLInputElement).click();
 
 });
 
