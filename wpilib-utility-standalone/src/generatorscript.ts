@@ -53,7 +53,6 @@ window.addEventListener('load', async () => {
   const languages: Array<[string, (e?: Event) => void, (e?: Event) => void]> = [
     ['Java', handleJavaTemplates, handleJavaExamples],
     ['C++', handleCppTemplates, handleCppExamples],
-    // ['Python', () => alert('Work in progess.'), () => alert('Work in progess.')],
   ];
 
   for (const languageDetails of languages) {
