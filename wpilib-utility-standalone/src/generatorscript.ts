@@ -42,7 +42,7 @@ interface IDisplayJSON {
   gradlebase: string;
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const mainDiv = document.getElementById('mainDiv');
   if (mainDiv === null) {
     return;
@@ -107,6 +107,8 @@ window.addEventListener('load', () => {
   const itemsDiv = document.createElement('div');
   itemsDiv.id = 'shownItems';
   mainDiv.appendChild(itemsDiv);
+
+  await handleJavaTemplates();
 
 });
 
