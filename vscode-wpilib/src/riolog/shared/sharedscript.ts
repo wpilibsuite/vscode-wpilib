@@ -1,7 +1,7 @@
 'use strict';
 
 /* tslint:disable:prefer-conditional-expression */
-import { checkResize, sendMessage } from '../script/implscript';
+import { checkResize, scrollImpl, sendMessage } from '../script/implscript';
 import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
 import { IErrorMessage, IPrintMessage, MessageType } from './message';
 
@@ -314,7 +314,7 @@ function limitList() {
   if (ul === null) {
     return;
   }
-  if (ul.firstChild !== null) {
+  if (ul.childElementCount > 1000 && ul.firstChild !== null) {
     ul.removeChild(ul.firstChild);
   }
 }
@@ -448,13 +448,13 @@ export function handleMessage(data: IIPCSendMessage): void {
   switch (data.type) {
     case SendTypes.New:
       addMessage(data.message as IPrintMessage | IErrorMessage);
-      document.body.scrollTop = document.body.scrollHeight;
+      scrollImpl();
       break;
     case SendTypes.Batch:
       for (const message of data.message as Array<IPrintMessage | IErrorMessage>) {
         addMessage(message);
       }
-      document.body.scrollTop = document.body.scrollHeight;
+      scrollImpl();
       break;
     case SendTypes.PauseUpdate:
       const pause = document.getElementById('pause');

@@ -9,7 +9,11 @@ import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
 const remote = electron.remote;
 
 export function checkResize() {
-    checkResizeImpl(document.body);
+    checkResizeImpl(document.documentElement);
+}
+
+export function scrollImpl() {
+    document.documentElement.scrollTop = document.documentElement.scrollHeight;
 }
 
 const rioLogWindowView = new RioLogWindowView(async (data) => {

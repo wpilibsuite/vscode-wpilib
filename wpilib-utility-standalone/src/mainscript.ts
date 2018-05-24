@@ -8,6 +8,7 @@ window.addEventListener('load', () => {
     return;
   }
   mainDiv.appendChild(document.createTextNode('WPILib Utility'));
+  mainDiv.appendChild(document.createElement('br'));
   const rioLogButton = document.createElement('button');
   rioLogButton.appendChild(document.createTextNode('Start RioLog'));
   rioLogButton.addEventListener('click', () => {
@@ -20,7 +21,9 @@ window.addEventListener('load', () => {
 
     return;
   });
+  rioLogButton.style.marginTop = '5px';
   mainDiv.appendChild(rioLogButton);
+  mainDiv.appendChild(document.createElement('br'));
 
   const generatorButton = document.createElement('button');
   generatorButton.appendChild(document.createTextNode('Start Generator'));
@@ -32,5 +35,6 @@ window.addEventListener('load', () => {
 
     bWindow.loadFile('generator.html');
   });
+  generatorButton.style.marginTop = '5px';
   mainDiv.appendChild(generatorButton);
 });

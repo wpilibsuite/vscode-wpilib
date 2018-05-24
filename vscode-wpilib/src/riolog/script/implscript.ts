@@ -12,6 +12,10 @@ export function checkResize() {
   checkResizeImpl(document.documentElement);
 }
 
+export function scrollImpl() {
+  document.body.scrollTop = document.body.scrollHeight;
+}
+
 export function sendMessage(message: IIPCReceiveMessage) {
   // tslint:disable-next-line:no-unsafe-any
   vscode.postMessage(message, '*');

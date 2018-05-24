@@ -10,7 +10,7 @@ function createWindow() {
     backgroundColor: '#2e2c29',
     height: 150,
     title: 'WPILib Utility',
-    width: 180,
+    width: 350,
   });
 
   mainWindow.loadFile('index.html');

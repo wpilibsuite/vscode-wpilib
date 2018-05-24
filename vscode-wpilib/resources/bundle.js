@@ -423,7 +423,7 @@ function limitList() {
     if (ul === null) {
         return;
     }
-    if (ul.firstChild !== null) {
+    if (ul.childElementCount > 1000 && ul.firstChild !== null) {
         ul.removeChild(ul.firstChild);
     }
 }
