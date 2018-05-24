@@ -164,10 +164,10 @@ class SimulateCodeDeployer implements ICodeDeployer {
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
-    return currentLanguage === 'none' || currentLanguage === 'java';
+    return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'simulateExternalJava';
+    const command = 'simulateExternalCpp';
     const online = this.preferences.getPreferences(workspace).getOnline();
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
     if (result !== 0) {
