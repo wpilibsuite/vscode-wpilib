@@ -24,7 +24,7 @@ export class TaskRunner {
     const shell = new vscode.ShellExecution(command, {
       cwd: rootDir
     });
-    const task = new vscode.Task({ type: 'wpilibgradle' }, workspace, name, 'wpilib', shell);
+    const task = new vscode.Task({ type: 'wpilibgradle' }, workspace, name, shell);
     const runningTask = await vscode.tasks.executeTask(task);
     this.execution = runningTask;
     this.condition.reset(-1);
@@ -33,13 +33,13 @@ export class TaskRunner {
   }
 }
 
-export function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder, online: boolean): Promise<number> {
+export function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder, online: boolean, name: string): Promise<number> {
   const runner = new TaskRunner();
   let command = './gradlew ' + args;
   if (!online) {
     command += ' --offline';
   }
-  return runner.executeTask(command, 'gradle', rootDir, workspace);
+  return runner.executeTask(command, name, rootDir, workspace);
 }
 */
 
@@ -76,7 +76,7 @@ export function executeCommandAsync(command: string, rootDir: string, ow?: vscod
   });
 }
 
-export async function gradleRun(args: string, rootDir: string, _: vscode.WorkspaceFolder, online: boolean): Promise<number> {
+export async function gradleRun(args: string, rootDir: string, _workspace: vscode.WorkspaceFolder, online: boolean, _name: string): Promise<number> {
   let command = 'gradlew ' + args;
   if (process.platform !== 'win32') {
     command = './' + command;

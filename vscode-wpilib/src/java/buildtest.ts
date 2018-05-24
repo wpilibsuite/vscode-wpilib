@@ -19,7 +19,7 @@ export class BuildTest {
       async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
         const command = 'assemble';
         const online = preferences.getPreferences(workspace).getOnline();
-        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Build');
         console.log(result);
         return true;
       },
@@ -40,7 +40,7 @@ export class BuildTest {
       async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
         const command = 'test';
         const online = preferences.getPreferences(workspace).getOnline();
-        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online);
+        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Test');
         console.log(result);
         return true;
       },

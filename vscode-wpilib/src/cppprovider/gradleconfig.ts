@@ -90,7 +90,7 @@ export class GradleConfig {
 
   public async runGradleRefresh(): Promise<number> {
     const online = this.preferences.getOnline();
-    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online);
+    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online, 'C++ Configuration');
   }
 
   public async findMatchingBinary(uris: vscode.Uri[]): Promise<IBinaryFind[]> {
