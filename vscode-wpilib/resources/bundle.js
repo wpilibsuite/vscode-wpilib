@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
 const sharedscript_1 = require("../shared/sharedscript");
@@ -8,10 +8,11 @@ function checkResize() {
 }
 exports.checkResize = checkResize;
 function sendMessage(message) {
+    // tslint:disable-next-line:no-unsafe-any
     vscode.postMessage(message, '*');
 }
 exports.sendMessage = sendMessage;
-window.addEventListener('message', event => {
+window.addEventListener('message', (event) => {
     const data = event.data;
     sharedscript_1.handleMessage(data);
 });
@@ -38,6 +39,7 @@ var ReceiveTypes;
 },{}],3:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+/* tslint:disable:prefer-conditional-expression */
 var MessageType;
 (function (MessageType) {
     MessageType[MessageType["Error"] = 0] = "Error";
@@ -79,6 +81,7 @@ class ErrorMessage {
         tmp = this.getSizedString(data, count);
         this.callStack = tmp.data;
         count += tmp.byteLength;
+        // tslint:disable-next-line:no-bitwise
         if ((this.flags & 1) !== 0) {
             this.messageType = MessageType.Error;
         }
@@ -92,7 +95,7 @@ class ErrorMessage {
         const count = size + 2;
         return {
             byteLength: count,
-            data: data.toString('utf8', start, start + count - 2)
+            data: data.toString('utf8', start, start + count - 2),
         };
     }
 }
@@ -101,9 +104,10 @@ exports.ErrorMessage = ErrorMessage;
 },{}],4:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+/* tslint:disable:prefer-conditional-expression */
 const implscript_1 = require("../script/implscript");
-const message_1 = require("./message");
 const interfaces_1 = require("./interfaces");
+const message_1 = require("./message");
 let paused = false;
 function onPause() {
     const pauseElement = document.getElementById('pause');
@@ -114,16 +118,16 @@ function onPause() {
         paused = false;
         pauseElement.innerHTML = 'Pause';
         implscript_1.sendMessage({
+            message: false,
             type: interfaces_1.ReceiveTypes.Pause,
-            message: false
         });
     }
     else {
         paused = true;
         pauseElement.innerHTML = 'Paused: 0';
         implscript_1.sendMessage({
+            message: true,
             type: interfaces_1.ReceiveTypes.Pause,
-            message: true
         });
     }
 }
@@ -138,16 +142,16 @@ function onDiscard() {
         discard = false;
         dButton.innerHTML = 'Discard';
         implscript_1.sendMessage({
+            message: false,
             type: interfaces_1.ReceiveTypes.Discard,
-            message: false
         });
     }
     else {
         discard = true;
         dButton.innerHTML = 'Resume';
         implscript_1.sendMessage({
+            message: true,
             type: interfaces_1.ReceiveTypes.Discard,
-            message: true
         });
     }
 }
@@ -232,15 +236,15 @@ function onAutoReconnect() {
         autoReconnect = false;
         // send a disconnect
         implscript_1.sendMessage({
+            message: false,
             type: interfaces_1.ReceiveTypes.Reconnect,
-            message: false
         });
     }
     else {
         autoReconnect = true;
         implscript_1.sendMessage({
+            message: true,
             type: interfaces_1.ReceiveTypes.Reconnect,
-            message: true
         });
     }
     const arButton = document.getElementById('autoreconnect');
@@ -312,8 +316,8 @@ function onSaveLog() {
         logs.push(m);
     }
     implscript_1.sendMessage({
+        message: logs,
         type: interfaces_1.ReceiveTypes.Save,
-        message: logs
     });
 }
 exports.onSaveLog = onSaveLog;
@@ -509,6 +513,7 @@ window.addEventListener('resize', () => {
 });
 // tslint:disable-next-line:no-any
 function handleFileSelect(evt) {
+    // tslint:disable-next-line:no-unsafe-any
     const files = evt.target.files; // filelist
     const firstFile = files[0];
     const reader = new FileReader();
@@ -573,8 +578,6 @@ function handleMessage(data) {
     implscript_1.checkResize();
 }
 exports.handleMessage = handleMessage;
-//position:fixed;bottom: 0px;left:0px;list-style-type:none;padding-bottom:0;padding-left:0;padding-top:0;padding-right:0;width: 49.8%; margin-bottom: 1px"
-//position:fixed;bottom: 0px;right:0px;list-style-type:none;padding-bottom:0;padding-left:0;padding-top:0;padding-right:0;width: 49.8%;margin-bottom: 1px"
 function createSplitUl(left) {
     const splitDiv = document.createElement('ul');
     splitDiv.style.position = 'fixed';
@@ -609,8 +612,8 @@ function onChangeTeamNumber() {
     }
     console.log('sending message');
     implscript_1.sendMessage({
+        message: parseInt(newNumber.value, 10),
         type: interfaces_1.ReceiveTypes.ChangeNumber,
-        message: parseInt(newNumber.value)
     });
     console.log('sent message');
 }
