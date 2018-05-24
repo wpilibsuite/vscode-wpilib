@@ -12,9 +12,9 @@ interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
 class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
   private preferences: PreferencesAPI;
-  private debugDeployAPI: DeployDebugAPI;
+  private debugDeployAPI: IDeployDebugAPI;
 
-  constructor(preferences: PreferencesAPI, ddApi: DeployDebugAPI) {
+  constructor(preferences: PreferencesAPI, ddApi: IDeployDebugAPI) {
     this.preferences = preferences;
     this.debugDeployAPI = ddApi;
     const regProv = vscode.debug.registerDebugConfigurationProvider('wpilib', this);
@@ -35,7 +35,11 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       if (workspace === undefined) {
         return;
       }
-      await this.debugDeployAPI.debugCode(workspace, desktop);
+      if (desktop) {
+        await this.debugDeployAPI.simulateCode(workspace);
+      } else {
+        await this.debugDeployAPI.debugCode(workspace);
+      }
       resolve();
     });
   }
@@ -68,6 +72,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   private languageChoices: string[] = [];
   private deployers: ICodeDeployerQuickPick[] = [];
   private debuggers: ICodeDeployerQuickPick[] = [];
+  private simulators: ICodeDeployerQuickPick[] = [];
   private disposables: vscode.Disposable[] = [];
   private preferences: PreferencesAPI;
   private debugConfigurationProvider: WPILibDebugConfigurationProvider;
@@ -111,15 +116,30 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     };
     this.debuggers.push(qpi);
   }
+
+  public registerCodeSimulate(deployer: ICodeDeployer): void {
+    const qpi: ICodeDeployerQuickPick = {
+      deployer,
+      description: deployer.getDescription(),
+      label: deployer.getDisplayName(),
+    };
+    this.simulators.push(qpi);
+  }
+
   public addLanguageChoice(language: string): void {
     this.languageChoices.push(language);
   }
 
-  public debugCode(workspace: vscode.WorkspaceFolder, _desktop: boolean): Promise<boolean> {
-    return this.deployCommon(workspace, this.debuggers, true);
+  public debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    return this.deployCommon(workspace, this.debuggers, true, false);
   }
+
   public deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.deployCommon(workspace, this.deployers, false);
+    return this.deployCommon(workspace, this.deployers, false, false);
+  }
+
+  public simulateCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    return this.deployCommon(workspace, this.simulators, true, true);
   }
 
   public getLanguageChoices(): string[] {
@@ -133,7 +153,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   }
 
   private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[],
-                             debug: boolean): Promise<boolean> {
+                             debug: boolean, desktop: boolean): Promise<boolean> {
     if (deployer.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
@@ -170,7 +190,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     const teamNumber = await preferences.getTeamNumber();
     try {
       const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace);
-      if (preferences.getAutoStartRioLog() && deploySuccess) {
+      if (preferences.getAutoStartRioLog() && deploySuccess && !desktop) {
         await this.startRioLog(teamNumber, !debug);
       }
       return true;

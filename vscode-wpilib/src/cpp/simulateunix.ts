@@ -1,25 +1,26 @@
 'use strict';
 import * as vscode from 'vscode';
 
-export interface IDebugCommands {
-  target: string;
-  sysroot: string;
+export interface IUnixSimulateCommands {
   executablePath: string;
+  extensions: string;
   workspace: vscode.WorkspaceFolder;
+  stopAtEntry: boolean;
+  clang: boolean;
   soLibPath: string;
   srcPaths: Set<string>;
-  gdbPath: string;
 }
 
-export async function startDebugging(commands: IDebugCommands): Promise<void> {
+export async function startUnixSimulation(commands: IUnixSimulateCommands): Promise<void> {
   const config: vscode.DebugConfiguration = {
-    MIMode: 'gdb',
+    MIMode: commands.clang ? 'lldb' : 'gdb',
     additionalSOLibSearchPath: commands.soLibPath,
     cwd: commands.workspace.uri.fsPath,
+    environment: {
+      HALSIM_EXTENSIONS: commands.extensions,
+    },
     externalConsole: true,
-    miDebuggerPath: commands.gdbPath,
-    miDebuggerServerAddress: commands.target,
-    name: 'wpilibCppDebug',
+    name: 'WPILib C++ Simulate',
     program: commands.executablePath,
     request: 'launch',
     setupCommands: [
@@ -28,10 +29,8 @@ export async function startDebugging(commands: IDebugCommands): Promise<void> {
         ignoreFailures: true,
         text: 'enable-pretty-printing',
       },
-      {
-        text: 'set sysroot ' + commands.sysroot,
-      },
     ],
+    stopAtEntry: commands.stopAtEntry,
     type: 'cppdbg',
   };
 

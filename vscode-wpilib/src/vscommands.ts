@@ -42,7 +42,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      vscode.window.showInformationMessage('Cannot deploy code in an empty workspace');
       return;
     }
     await externalApi.getDeployDebugAPI().deployCode(workspace);
@@ -52,10 +52,20 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot debug code in an empty workspace');
+      return;
+    }
+    await externalApi.getDeployDebugAPI().debugCode(workspace);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.simulateCode', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
       vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
       return;
     }
-    await externalApi.getDeployDebugAPI().debugCode(workspace, false);
+    await externalApi.getDeployDebugAPI().simulateCode(workspace);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {

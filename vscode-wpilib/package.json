@@ -80,6 +80,12 @@
                     "default": false,
                     "description": "Set to skip running tests on build",
                     "scope": "resource"
+                },
+                "wpilib.stopSimulationOnEntry": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Set to make simulation code stop automatically on entry",
+                    "scope": "resource"
                 }
             }
         },
@@ -119,6 +125,11 @@
             {
                 "command": "wpilibcore.debugCode",
                 "title": "Debug Robot Code",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.simulateCode",
+                "title": "Simulate Robot Code on Desktop",
                 "category": "WPILib"
             },
             {

@@ -161,6 +161,14 @@ export class Preferences implements IPreferences {
     return res;
   }
 
+  public getStopSimulationOnEntry(): boolean {
+    const res = this.getConfiguration().get<boolean>('stopSimulationOnEntry');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
   public dispose() {
     for (const d of this.disposables) {
       d.dispose();

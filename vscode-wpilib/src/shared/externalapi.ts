@@ -59,8 +59,10 @@ export abstract class IDeployDebugAPI implements IVersionable {
   public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
   public abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
   public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
-  public abstract debugCode(workspace: vscode.WorkspaceFolder, desktop: boolean): Promise<boolean>;
+  public abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
   public abstract registerCodeDebug(deployer: ICodeDeployer): void;
+  public abstract simulateCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract registerCodeSimulate(deployer: ICodeDeployer): void;
   public abstract addLanguageChoice(language: string): void;
   public abstract getLanguageChoices(): string[];
   public getVersion(): number {
@@ -124,6 +126,7 @@ export interface IPreferences {
   getIsWPILibProject(): boolean;
   getOnline(): boolean;
   getSkipTests(): boolean;
+  getStopSimulationOnEntry(): boolean;
 }
 
 export interface IExampleTemplateCreator {

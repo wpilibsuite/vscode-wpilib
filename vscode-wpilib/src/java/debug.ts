@@ -12,7 +12,7 @@ export async function startDebugging(commands: IDebugCommands): Promise<void> {
 
   const config: vscode.DebugConfiguration = {
     hostName: commands.serverAddress,
-    name: 'wpilibJavaDebug',
+    name: 'WPILib Java Debug',
     port: commands.serverPort,
     projectName: commands.project,
     request: 'attach',
