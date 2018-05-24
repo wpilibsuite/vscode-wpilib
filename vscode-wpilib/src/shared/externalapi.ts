@@ -25,6 +25,18 @@ export abstract class IToolAPI implements IVersionable {
   }
 }
 
+const executeAPIExpectedVersion = 1;
+export function getExecuteAPIExpectedVersion(): number {
+  return executeAPIExpectedVersion;
+}
+export abstract class IExecuteAPI implements IVersionable {
+  public abstract executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number>;
+  public abstract cancelCommands(): Promise<number>;
+  public getVersion(): number {
+    return executeAPIExpectedVersion;
+  }
+}
+
 const exampleTemplateAPIExpectedVersion = 1;
 export function getExampleTemplateAPIExpectedVersion(): number {
   return exampleTemplateAPIExpectedVersion;
@@ -57,11 +69,11 @@ export function getDeployDebugAPIExpectedVersion(): number {
 }
 export abstract class IDeployDebugAPI implements IVersionable {
   public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  public abstract deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
   public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
-  public abstract debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
   public abstract registerCodeDebug(deployer: ICodeDeployer): void;
-  public abstract simulateCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
   public abstract registerCodeSimulate(deployer: ICodeDeployer): void;
   public abstract addLanguageChoice(language: string): void;
   public abstract getLanguageChoices(): string[];
@@ -75,9 +87,9 @@ export function getBuildTestAPIExpectedVersion(): number {
   return deployDebugAPIExpectedVersion;
 }
 export abstract class IBuildTestAPI implements IVersionable {
-  public abstract buildCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
   public abstract registerCodeBuild(builder: ICodeBuilder): void;
-  public abstract testCode(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  public abstract testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
   public abstract registerCodeTest(builder: ICodeBuilder): void;
   public abstract addLanguageChoice(language: string): void;
   public getVersion(): number {
@@ -109,6 +121,7 @@ export abstract class IExternalAPI implements IVersionable {
   public abstract getBuildTestAPI(): IBuildTestAPI;
   public abstract getPreferencesAPI(): IPreferencesAPI;
   public abstract getCommandAPI(): ICommandAPI;
+  public abstract getExecuteAPI(): IExecuteAPI;
   public getVersion(): number {
     return externalAPIExpectedVersion;
   }
@@ -127,6 +140,10 @@ export interface IPreferences {
   getOnline(): boolean;
   getSkipTests(): boolean;
   getStopSimulationOnEntry(): boolean;
+
+  setOnline(value: boolean, global: boolean): Promise<void>;
+  setSkipTests(value: boolean, global: boolean): Promise<void>;
+  setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
 }
 
 export interface IExampleTemplateCreator {
@@ -165,7 +182,7 @@ export interface ICodeDeployer {
    *
    * @param teamNumber The team number to deploy to
    */
-  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection
@@ -187,7 +204,7 @@ export interface ICodeBuilder {
   /**
    * Run the command with the specified team number
    */
-  runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  runBuilder(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection

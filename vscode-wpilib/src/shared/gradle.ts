@@ -43,48 +43,49 @@ export function gradleRun(args: string, rootDir: string, workspace: vscode.Works
 }
 */
 
-'use strict';
-import * as child_process from 'child_process';
-import * as vscode from 'vscode';
+// 'use strict';
+// import * as child_process from 'child_process';
+// import * as vscode from 'vscode';
 
-const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel('gradle');
+// const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel('gradle');
 
-export function executeCommandAsync(command: string, rootDir: string, ow?: vscode.OutputChannel): Promise<number> {
-  return new Promise((resolve, _) => {
-    const exec = child_process.exec;
-    const child = exec(command, {
-      cwd: rootDir,
-    }, (err) => {
-      if (err) {
-        resolve(1);
-      } else {
-        resolve(0);
-      }
-    });
+// export function executeCommandAsync(command: string, rootDir: string, ow?: vscode.OutputChannel): Promise<number> {
+//   return new Promise((resolve, _) => {
+//     const exec = child_process.exec;
+//     const child = exec(command, {
+//       cwd: rootDir,
+//     }, (err) => {
+//       if (err) {
+//         resolve(1);
+//       } else {
+//         resolve(0);
+//       }
+//     });
 
-    if (ow === undefined) {
-      return;
-    }
+//     if (ow === undefined) {
+//       return;
+//     }
 
-    child.stdout.on('data', (data) => {
-      ow.append(data.toString());
-    });
+//     child.stdout.on('data', (data) => {
+//       ow.append(data.toString());
+//     });
 
-    child.stderr.on('data', (data) => {
-      ow.append(data.toString());
-    });
-  });
-}
+//     child.stderr.on('data', (data) => {
+//       ow.append(data.toString());
+//     });
+//   });
+// }
 
-export async function gradleRun(args: string, rootDir: string, _workspace: vscode.WorkspaceFolder, online: boolean, _name: string): Promise<number> {
-  let command = 'gradlew ' + args;
-  if (process.platform !== 'win32') {
-    command = './' + command;
-  }
-  if (!online) {
-    command += ' --offline';
-  }
-  outputChannel.clear();
-  outputChannel.show();
-  return executeCommandAsync(command, rootDir, outputChannel);
-}
+// export async function gradleRun(args: string, rootDir: string, _workspace: vscode.WorkspaceFolder, online: boolean,
+// _name: string): Promise<number> {
+//   let command = 'gradlew ' + args;
+//   if (process.platform !== 'win32') {
+//     command = './' + command;
+//   }
+//   if (!online) {
+//     command += ' --offline';
+//   }
+//   outputChannel.clear();
+//   outputChannel.show();
+//   return executeCommandAsync(command, rootDir, outputChannel);
+// }

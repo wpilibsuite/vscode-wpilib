@@ -32,21 +32,19 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   }
 
   const preferences = coreExports.getPreferencesAPI();
-  const debugDeployApi = coreExports.getDeployDebugAPI();
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
-  const buildTestApi = coreExports.getBuildTestAPI();
 
   // TODO: Waiting for update
   // await activateCppProvider(context, coreExports);
 
   // Setup build and test
 
-  const buildTest = new BuildTest(buildTestApi, preferences);
+  const buildTest = new BuildTest(coreExports);
 
   context.subscriptions.push(buildTest);
 
-  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, allowDebug);
+  const debugDeploy = new DebugDeploy(coreExports, allowDebug);
   context.subscriptions.push(debugDeploy);
 
   // Setup commands

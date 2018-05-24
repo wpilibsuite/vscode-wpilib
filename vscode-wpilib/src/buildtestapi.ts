@@ -20,12 +20,12 @@ export class BuildTestAPI extends IBuildTestAPI {
     this.preferences = preferences;
   }
 
-  public buildCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.buildTestCommon(workspace, this.builders);
+  public buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
+    return this.buildTestCommon(workspace, this.builders, source);
   }
 
-  public testCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.buildTestCommon(workspace, this.testers);
+  public testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
+    return this.buildTestCommon(workspace, this.testers, source);
   }
 
   public registerCodeBuild(builder: ICodeBuilder): void {
@@ -59,7 +59,8 @@ export class BuildTestAPI extends IBuildTestAPI {
     }
   }
 
-  private async buildTestCommon(workspace: vscode.WorkspaceFolder, builder: ICodeBuilderQuickPick[]): Promise<boolean> {
+  private async buildTestCommon(workspace: vscode.WorkspaceFolder, builder: ICodeBuilderQuickPick[],
+                                source: vscode.Uri | undefined): Promise<boolean> {
     if (builder.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
@@ -94,7 +95,7 @@ export class BuildTestAPI extends IBuildTestAPI {
       await vscode.workspace.saveAll();
     }
 
-    const deploySuccess = await langSelection.builder.runBuilder(workspace);
+    const deploySuccess = await langSelection.builder.runBuilder(workspace, source);
     return deploySuccess;
   }
 }

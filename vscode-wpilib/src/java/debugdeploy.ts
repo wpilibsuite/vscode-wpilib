@@ -3,9 +3,8 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ICodeDeployer, IDeployDebugAPI, IPreferencesAPI } from '../shared/externalapi';
-import { gradleRun } from '../shared/gradle';
-import { readFileAsync } from '../utilities';
+import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../shared/externalapi';
+import { gradleRun, readFileAsync } from '../utilities';
 import { IDebugCommands, startDebugging } from './debug';
 import { ISimulateCommands, startSimulation } from './simulate';
 
@@ -44,9 +43,11 @@ class JavaQuickPick<T> implements vscode.QuickPickItem {
 
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
 
-  constructor(preferences: IPreferencesAPI) {
-    this.preferences = preferences;
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -60,7 +61,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       command += ' -Xcheck';
     }
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Debug');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Debug', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -110,9 +111,11 @@ class DebugCodeDeployer implements ICodeDeployer {
 
 class DeployCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
 
-  constructor(preferences: IPreferencesAPI) {
-    this.preferences = preferences;
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -126,7 +129,7 @@ class DeployCodeDeployer implements ICodeDeployer {
       command += ' -Xcheck';
     }
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Deploy');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Deploy', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -143,9 +146,11 @@ class DeployCodeDeployer implements ICodeDeployer {
 
 class SimulateCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
 
-  constructor(preferences: IPreferencesAPI) {
-    this.preferences = preferences;
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -156,7 +161,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'simulateExternalJava';
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Simulate');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Simulate', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -226,13 +231,13 @@ export class DebugDeploy {
   private deployDeployer: DeployCodeDeployer;
   private simulator: SimulateCodeDeployer;
 
-  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, allowDebug: boolean) {
-    debugDeployApi = debugDeployApi;
+  constructor(externalApi: IExternalAPI, allowDebug: boolean) {
+    const debugDeployApi = externalApi.getDeployDebugAPI();
     debugDeployApi.addLanguageChoice('java');
 
-    this.debugDeployer = new DebugCodeDeployer(preferences);
-    this.deployDeployer = new DeployCodeDeployer(preferences);
-    this.simulator = new SimulateCodeDeployer(preferences);
+    this.debugDeployer = new DebugCodeDeployer(externalApi);
+    this.deployDeployer = new DeployCodeDeployer(externalApi);
+    this.simulator = new SimulateCodeDeployer(externalApi);
 
     debugDeployApi.registerCodeDeploy(this.deployDeployer);
 

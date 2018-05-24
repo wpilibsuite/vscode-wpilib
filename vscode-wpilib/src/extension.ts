@@ -7,6 +7,7 @@ import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { DeployDebugAPI } from './deploydebugapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
+import { ExecuteAPI } from './executor';
 import { Help } from './help';
 import { activateJava } from './java/java';
 import { PreferencesAPI } from './preferencesapi';
@@ -21,6 +22,7 @@ class ExternalAPI extends IExternalAPI {
   private preferencesApi: PreferencesAPI;
   private exampleTemplateApi: ExampleTemplateAPI;
   private commandApi: CommandAPI;
+  private executeApi: ExecuteAPI;
   constructor(resourcesLocation: string) {
     super();
     this.toolApi = new ToolAPI();
@@ -29,6 +31,7 @@ class ExternalAPI extends IExternalAPI {
     this.buildTestApi = new BuildTestAPI(this.preferencesApi);
     this.exampleTemplateApi = new ExampleTemplateAPI();
     this.commandApi = new CommandAPI();
+    this.executeApi = new ExecuteAPI();
   }
 
   public getToolAPI(): ToolAPI {
@@ -48,6 +51,9 @@ class ExternalAPI extends IExternalAPI {
   }
   public getBuildTestAPI(): BuildTestAPI {
     return this.buildTestApi;
+  }
+  public getExecuteAPI(): ExecuteAPI {
+    return this.executeApi;
   }
 }
 

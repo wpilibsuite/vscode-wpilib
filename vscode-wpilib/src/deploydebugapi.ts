@@ -11,19 +11,20 @@ interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
 
 class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
-  private preferences: PreferencesAPI;
   private debugDeployAPI: IDeployDebugAPI;
 
-  constructor(preferences: PreferencesAPI, ddApi: IDeployDebugAPI) {
-    this.preferences = preferences;
+  constructor(ddApi: IDeployDebugAPI) {
     this.debugDeployAPI = ddApi;
     const regProv = vscode.debug.registerDebugConfigurationProvider('wpilib', this);
     this.disposables.push(regProv);
   }
 
-  public resolveDebugConfiguration(_: vscode.WorkspaceFolder | undefined,
+  public resolveDebugConfiguration(workspace: vscode.WorkspaceFolder | undefined,
                                    config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
     vscode.ProviderResult<vscode.DebugConfiguration> {
+    if (workspace === undefined) {
+      return config;
+    }
     let desktop = false;
     if ('desktop' in config) {
       desktop = config.desktop as boolean;
@@ -31,20 +32,16 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       console.log('debugger has no desktop argument. Assuming roboRIO');
     }
     return new Promise<undefined>(async (resolve) => {
-      const workspace = await this.preferences.getFirstOrSelectedWorkspace();
-      if (workspace === undefined) {
-        return;
-      }
       if (desktop) {
-        await this.debugDeployAPI.simulateCode(workspace);
+        await this.debugDeployAPI.simulateCode(workspace, undefined);
       } else {
-        await this.debugDeployAPI.debugCode(workspace);
+        await this.debugDeployAPI.debugCode(workspace, undefined);
       }
       resolve();
     });
   }
 
-  public provideDebugConfigurations(_folder: vscode.WorkspaceFolder | undefined,
+  public provideDebugConfigurations(_workspace: vscode.WorkspaceFolder | undefined,
                                     __?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     const configurationDeploy: vscode.DebugConfiguration = {
       desktop: false,
@@ -90,7 +87,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     this.liveWindow = new RioLogWindow(this.rioLogWebViewProvider, this.rioLogConsoleProvider);
     this.disposables.push(this.liveWindow);
 
-    this.debugConfigurationProvider = new WPILibDebugConfigurationProvider(this.preferences, this);
+    this.debugConfigurationProvider = new WPILibDebugConfigurationProvider(this);
     this.disposables.push(this.debugConfigurationProvider);
   }
 
@@ -130,16 +127,16 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     this.languageChoices.push(language);
   }
 
-  public debugCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.deployCommon(workspace, this.debuggers, true, false);
+  public debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
+    return this.deployCommon(workspace, this.debuggers, true, false, source);
   }
 
-  public deployCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.deployCommon(workspace, this.deployers, false, false);
+  public deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
+    return this.deployCommon(workspace, this.deployers, false, false, source);
   }
 
-  public simulateCode(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    return this.deployCommon(workspace, this.simulators, true, true);
+  public simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
+    return this.deployCommon(workspace, this.simulators, true, true, source);
   }
 
   public getLanguageChoices(): string[] {
@@ -153,7 +150,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   }
 
   private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[],
-                             debug: boolean, desktop: boolean): Promise<boolean> {
+                             debug: boolean, desktop: boolean, source: vscode.Uri | undefined): Promise<boolean> {
     if (deployer.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
@@ -189,7 +186,7 @@ export class DeployDebugAPI extends IDeployDebugAPI {
     }
     const teamNumber = await preferences.getTeamNumber();
     try {
-      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace);
+      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace, source);
       if (preferences.getAutoStartRioLog() && deploySuccess && !desktop) {
         await this.startRioLog(teamNumber, !debug);
       }

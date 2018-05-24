@@ -1,7 +1,7 @@
 'use-strict';
 
 import * as vscode from 'vscode';
-import { IPreferencesAPI } from '../shared/externalapi';
+import { IExternalAPI } from '../shared/externalapi';
 import { CppToolsApi, CustomConfigurationProvider, SourceFileConfiguration, SourceFileConfigurationItem } from './cppextensionapi';
 import { GradleConfig, IBinaryFind } from './gradleconfig';
 
@@ -33,9 +33,10 @@ export class ApiProvider implements CustomConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
   private cppToolsApi: CppToolsApi;
 
-  constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, preferences: IPreferencesAPI) {
+  constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI) {
     this.workspace = workspace;
-    this.gradleConfig = new GradleConfig(workspace, preferences.getPreferences(workspace));
+    this.gradleConfig = new GradleConfig(workspace, externalApi.getPreferencesAPI().getPreferences(workspace),
+                                         externalApi.getExecuteAPI());
     this.disposables.push(this.gradleConfig);
     this.cppToolsApi = cppToolsApi;
 

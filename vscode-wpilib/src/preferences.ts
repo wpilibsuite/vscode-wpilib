@@ -15,7 +15,16 @@ const defaultPreferences: IPreferencesJson = {
 };
 
 export async function requestTeamNumber(): Promise<number> {
-  const teamNumber = await vscode.window.showInputBox({ prompt: 'Enter your team number' });
+  const teamNumber = await vscode.window.showInputBox({
+    prompt: 'Enter your team number',
+    validateInput: (v) => {
+      const match = v.match(/^\d{0,5}$/gm);
+      if (match === null || match.length === 0) {
+        return 'Invalid team number';
+      }
+      return undefined;
+    },
+  });
   if (teamNumber === undefined) {
     return -1;
   }
@@ -127,6 +136,30 @@ export class Preferences implements IPreferences {
       target = vscode.ConfigurationTarget.WorkspaceFolder;
     }
     return this.getConfiguration().update('autoStartRioLog', autoStart, target);
+  }
+
+  public async setOnline(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('online', value, target);
+  }
+
+  public async setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('stopSimulationOnEntry', value, target);
+  }
+
+  public async setSkipTests(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('skipTests', value, target);
   }
 
   public getAutoSaveOnDeploy(): boolean {

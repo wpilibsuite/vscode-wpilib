@@ -4,9 +4,8 @@ import * as glob from 'glob';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IPreferences } from '../shared/externalapi';
-import { gradleRun } from '../shared/gradle';
-import { promisifyReadFile } from '../utilities';
+import { IExecuteAPI, IPreferences } from '../shared/externalapi';
+import { gradleRun, promisifyReadFile } from '../utilities';
 import { ISource, IToolChain } from './jsonformats';
 import { PersistentFolderState } from './persistentState';
 
@@ -51,9 +50,11 @@ export class GradleConfig {
   private configWatcher: vscode.FileSystemWatcher;
 
   private preferences: IPreferences;
+  private executeApi: IExecuteAPI;
 
-  constructor(workspace: vscode.WorkspaceFolder, preferences: IPreferences) {
+  constructor(workspace: vscode.WorkspaceFolder, preferences: IPreferences, executeApi: IExecuteAPI) {
     this.preferences = preferences;
+    this.executeApi = executeApi;
     this.workspace = workspace;
 
     this.configRelativePattern = new vscode.RelativePattern(path.join(workspace.uri.fsPath, 'build'), this.configFile);
@@ -90,7 +91,7 @@ export class GradleConfig {
 
   public async runGradleRefresh(): Promise<number> {
     const online = this.preferences.getOnline();
-    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online, 'C++ Configuration');
+    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online, 'C++ Configuration', this.executeApi);
   }
 
   public async findMatchingBinary(uris: vscode.Uri[]): Promise<IBinaryFind[]> {

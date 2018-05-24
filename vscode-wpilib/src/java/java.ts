@@ -26,19 +26,17 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   }
 
   const preferences = coreExports.getPreferencesAPI();
-  const debugDeployApi = coreExports.getDeployDebugAPI();
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
-  const buildTestApi = coreExports.getBuildTestAPI();
 
   // Setup build and test
 
-  const buildTest = new BuildTest(buildTestApi, preferences);
+  const buildTest = new BuildTest(coreExports);
 
   context.subscriptions.push(buildTest);
 
   // Setup debug and deploy
-  const debugDeploy = new DebugDeploy(debugDeployApi, preferences, allowDebug);
+  const debugDeploy = new DebugDeploy(coreExports, allowDebug);
   context.subscriptions.push(debugDeploy);
 
   // Setup commands

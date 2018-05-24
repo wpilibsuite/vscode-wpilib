@@ -38,34 +38,54 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await externalApi.getToolAPI().startTool();
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.deployCode', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.deployCode', async (source: vscode.Uri | undefined) => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
       vscode.window.showInformationMessage('Cannot deploy code in an empty workspace');
       return;
     }
-    await externalApi.getDeployDebugAPI().deployCode(workspace);
+    await externalApi.getDeployDebugAPI().deployCode(workspace, source);
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.debugCode', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.debugCode', async (source: vscode.Uri | undefined) => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
       vscode.window.showInformationMessage('Cannot debug code in an empty workspace');
       return;
     }
-    await externalApi.getDeployDebugAPI().debugCode(workspace);
+    await externalApi.getDeployDebugAPI().debugCode(workspace, source);
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.simulateCode', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.simulateCode', async (source: vscode.Uri | undefined) => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
       vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
       return;
     }
-    await externalApi.getDeployDebugAPI().simulateCode(workspace);
+    await externalApi.getDeployDebugAPI().simulateCode(workspace, source);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.testCode', async (source: vscode.Uri | undefined) => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      return;
+    }
+    await externalApi.getBuildTestAPI().testCode(workspace, source);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.buildCode', async (source: vscode.Uri | undefined) => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      return;
+    }
+    await externalApi.getBuildTestAPI().buildCode(workspace, source);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {
@@ -102,6 +122,69 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const preferences = preferencesApi.getPreferences(workspace);
     await preferences.setCurrentLanguage(result);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setSkipTests', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set skip tests in an empty workspace');
+      return;
+    }
+
+    const result = await vscode.window.showInformationMessage('Skip tests on deploy?', 'Yes', 'No');
+    if (result === undefined) {
+      console.log('Invalid selection for settting skip tests');
+      return;
+    }
+    const preferences = preferencesApi.getPreferences(workspace);
+    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+    if (request === undefined) {
+      return;
+    }
+    await preferences.setSkipTests(result === 'Yes', request === 'Globally');
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setOnline', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set online in an empty workspace');
+      return;
+    }
+
+    const result = await vscode.window.showInformationMessage('Run commands in Online mode?', 'Yes', 'No');
+    if (result === undefined) {
+      console.log('Invalid selection for settting online');
+      return;
+    }
+    const preferences = preferencesApi.getPreferences(workspace);
+    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+    if (request === undefined) {
+      return;
+    }
+    await preferences.setOnline(result === 'Yes', request === 'Globally');
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStopSimulationOnEntry', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set stop simulation in an empty workspace');
+      return;
+    }
+
+    const result = await vscode.window.showInformationMessage('Stop simulation debugging on entry?', 'Yes', 'No');
+    if (result === undefined) {
+      console.log('Invalid selection for settting stop simulation on entry');
+      return;
+    }
+    const preferences = preferencesApi.getPreferences(workspace);
+    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
+    if (request === undefined) {
+      return;
+    }
+    await preferences.setStopSimulationOnEntry(result === 'Yes', request === 'Globally');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setAutoSave', async () => {
@@ -154,23 +237,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await externalApi.getExampleTemplateAPI().createTemplate();
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.buildCode', async () => {
-    const preferencesApi = externalApi.getPreferencesAPI();
-    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-    if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
-      return;
-    }
-    await externalApi.getBuildTestAPI().buildCode(workspace);
-  }));
-
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.testCode', async () => {
-    const preferencesApi = externalApi.getPreferencesAPI();
-    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-    if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
-      return;
-    }
-    await externalApi.getBuildTestAPI().testCode(workspace);
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.cancelTasks', async () => {
+    await externalApi.getExecuteAPI().cancelCommands();
   }));
 }

@@ -143,6 +143,21 @@
                 "category": "WPILib"
             },
             {
+                "command": "wpilibcore.setSkipTests",
+                "title": "Set Skip Tests",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.setOnline",
+                "title": "Set Run Commands in Online Mode",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.setStopSimulationOnEntry",
+                "title": "Set Stop Simulation on Entry",
+                "category": "WPILib"
+            },
+            {
                 "command": "wpilibcore.setStartRioLog",
                 "title": "Set Auto Start RioLog on Deploy",
                 "category": "WPILib"
@@ -160,6 +175,12 @@
             {
                 "command": "wpilibcore.createCommand",
                 "title": "Create a new class/command",
+                "category": "WPILib",
+                "icon": "resources/wpilib.svg"
+            },
+            {
+                "command": "wpilibcore.cancelTasks",
+                "title": "Cancel currently running tasks",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },

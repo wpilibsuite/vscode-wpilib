@@ -3,9 +3,8 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ICodeDeployer, IDeployDebugAPI, IPreferencesAPI } from '../shared/externalapi';
-import { gradleRun } from '../shared/gradle';
-import { getIsWindows, readFileAsync } from '../utilities';
+import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../shared/externalapi';
+import { getIsWindows, gradleRun, readFileAsync } from '../utilities';
 import { IDebugCommands, startDebugging } from './debug';
 import { IUnixSimulateCommands, startUnixSimulation } from './simulateunix';
 import { IWindowsSimulateCommands, startWindowsSimulation } from './simulatewindows';
@@ -45,9 +44,11 @@ class CppQuickPick<T> implements vscode.QuickPickItem {
 
 class DebugCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
 
-  constructor(preferences: IPreferencesAPI) {
-    this.preferences = preferences;
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -58,7 +59,7 @@ class DebugCodeDeployer implements ICodeDeployer {
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Debug');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Debug', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -126,9 +127,11 @@ class DebugCodeDeployer implements ICodeDeployer {
 
 class DeployCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
 
-  constructor(preferences: IPreferencesAPI) {
-    this.preferences = preferences;
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -139,7 +142,7 @@ class DeployCodeDeployer implements ICodeDeployer {
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'deploy -PteamNumber=' + teamNumber;
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Deploy');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Deploy', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -156,9 +159,11 @@ class DeployCodeDeployer implements ICodeDeployer {
 
 class SimulateCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
 
-  constructor(preferences: IPreferencesAPI) {
-    this.preferences = preferences;
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
   }
 
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
@@ -169,7 +174,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'simulateExternalCpp';
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Simulate');
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Simulate', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -264,13 +269,13 @@ export class DebugDeploy {
   private deployDeployer: DeployCodeDeployer;
   private simulator: SimulateCodeDeployer;
 
-  constructor(debugDeployApi: IDeployDebugAPI, preferences: IPreferencesAPI, allowDebug: boolean) {
-    debugDeployApi = debugDeployApi;
+  constructor(externalApi: IExternalAPI, allowDebug: boolean) {
+    const debugDeployApi = externalApi.getDeployDebugAPI();
     debugDeployApi.addLanguageChoice('cpp');
 
-    this.debugDeployer = new DebugCodeDeployer(preferences);
-    this.deployDeployer = new DeployCodeDeployer(preferences);
-    this.simulator = new SimulateCodeDeployer(preferences);
+    this.debugDeployer = new DebugCodeDeployer(externalApi);
+    this.deployDeployer = new DeployCodeDeployer(externalApi);
+    this.simulator = new SimulateCodeDeployer(externalApi);
 
     debugDeployApi.registerCodeDeploy(this.deployDeployer);
 
