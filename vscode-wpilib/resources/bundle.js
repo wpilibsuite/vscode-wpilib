@@ -418,7 +418,17 @@ function addMessage(message) {
     }
 }
 exports.addMessage = addMessage;
+function limitList() {
+    const ul = document.getElementById('list');
+    if (ul === null) {
+        return;
+    }
+    if (ul.firstChild !== null) {
+        ul.removeChild(ul.firstChild);
+    }
+}
 function addPrint(message) {
+    limitList();
     const ul = document.getElementById('list');
     if (ul === null) {
         return;
@@ -449,6 +459,7 @@ function expandError(message, li, color) {
 }
 exports.expandError = expandError;
 function addError(message) {
+    limitList();
     const ul = document.getElementById('list');
     if (ul === null) {
         return;

@@ -309,8 +309,19 @@ export function addMessage(message: IPrintMessage | IErrorMessage) {
   }
 }
 
+function limitList() {
+  const ul = document.getElementById('list') as HTMLUListElement;
+  if (ul === null) {
+    return;
+  }
+  if (ul.firstChild !== null) {
+    ul.removeChild(ul.firstChild);
+  }
+}
+
 export function addPrint(message: IPrintMessage) {
-  const ul = document.getElementById('list');
+  limitList();
+  const ul = document.getElementById('list') as HTMLUListElement;
   if (ul === null) {
     return;
   }
@@ -339,6 +350,7 @@ export function expandError(message: IErrorMessage, li: HTMLLIElement, color?: s
 }
 
 export function addError(message: IErrorMessage) {
+  limitList();
   const ul = document.getElementById('list');
   if (ul === null) {
     return;
