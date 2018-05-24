@@ -1,59 +1,88 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { IExternalAPI } from '../shared/externalapi';
+import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../shared/externalapi';
 import { gradleRun } from '../utilities';
 
+class CodeBuilder implements ICodeBuilder {
+  private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
+
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
+  }
+
+  public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    const prefs = this.preferences.getPreferences(workspace);
+    const currentLanguage = prefs.getCurrentLanguage();
+    return currentLanguage === 'none' || currentLanguage === 'cpp';
+  }
+
+  public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    const command = 'assemble';
+    const online = this.preferences.getPreferences(workspace).getOnline();
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Build', this.executeApi);
+    console.log(result);
+    return true;
+  }
+
+  public getDisplayName(): string {
+    return 'cpp';
+  }
+
+  public getDescription(): string {
+    return 'C++ Build';
+  }
+}
+
+class CodeTester implements ICodeBuilder {
+  private preferences: IPreferencesAPI;
+  private executeApi: IExecuteAPI;
+
+  constructor(externalApi: IExternalAPI) {
+    this.preferences = externalApi.getPreferencesAPI();
+    this.executeApi = externalApi.getExecuteAPI();
+  }
+
+  public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    const prefs = this.preferences.getPreferences(workspace);
+    const currentLanguage = prefs.getCurrentLanguage();
+    return currentLanguage === 'none' || currentLanguage === 'cpp';
+  }
+
+  public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    const command = 'test';
+    const online = this.preferences.getPreferences(workspace).getOnline();
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Test', this.executeApi);
+
+    console.log(result);
+    return true;
+  }
+
+  public getDisplayName(): string {
+    return 'cpp';
+  }
+
+  public getDescription(): string {
+    return 'C++ Test';
+  }
+}
+
 export class BuildTest {
+  private build: CodeBuilder;
+  private test: CodeTester;
+
   constructor(externalApi: IExternalAPI) {
     const buildTestApi = externalApi.getBuildTestAPI();
-    const preferences = externalApi.getPreferencesAPI();
-    const executeApi = externalApi.getExecuteAPI();
 
     buildTestApi.addLanguageChoice('cpp');
 
-    buildTestApi.registerCodeBuild({
-      async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const prefs = preferences.getPreferences(workspace);
-        const currentLanguage = prefs.getCurrentLanguage();
-        return currentLanguage === 'none' || currentLanguage === 'cpp';
-      },
-      async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const command = 'assemble';
-        const online = preferences.getPreferences(workspace).getOnline();
-        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Build', executeApi);
-        console.log(result);
-        return true;
-      },
-      getDisplayName(): string {
-        return 'cpp';
-      },
-      getDescription(): string {
-        return 'C++ Build';
-      },
-    });
+    this.build = new CodeBuilder(externalApi);
+    this.test = new CodeTester(externalApi);
 
-    buildTestApi.registerCodeTest({
-      async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const prefs = preferences.getPreferences(workspace);
-        const currentLanguage = prefs.getCurrentLanguage();
-        return currentLanguage === 'none' || currentLanguage === 'cpp';
-      },
-      async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-        const command = 'test';
-        const online = preferences.getPreferences(workspace).getOnline();
-        const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Test', executeApi);
-
-        console.log(result);
-        return true;
-      },
-      getDisplayName(): string {
-        return 'cpp';
-      },
-      getDescription(): string {
-        return 'C++ Test';
-      },
-    });
+    buildTestApi.registerCodeBuild(this.build);
+    buildTestApi.registerCodeTest(this.test);
   }
 
   // tslint:disable-next-line:no-empty
