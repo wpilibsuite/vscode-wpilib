@@ -11,10 +11,10 @@ interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
 
 class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
-  private debugDeployAPI: IDeployDebugAPI;
+  private deployDebugAPI: IDeployDebugAPI;
 
   constructor(ddApi: IDeployDebugAPI) {
-    this.debugDeployAPI = ddApi;
+    this.deployDebugAPI = ddApi;
     const regProv = vscode.debug.registerDebugConfigurationProvider('wpilib', this);
     this.disposables.push(regProv);
   }
@@ -33,9 +33,9 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     }
     return new Promise<undefined>(async (resolve) => {
       if (desktop) {
-        await this.debugDeployAPI.simulateCode(workspace, undefined);
+        await this.deployDebugAPI.simulateCode(workspace, undefined);
       } else {
-        await this.debugDeployAPI.debugCode(workspace, undefined);
+        await this.deployDebugAPI.debugCode(workspace, undefined);
       }
       resolve();
     });

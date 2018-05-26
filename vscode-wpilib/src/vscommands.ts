@@ -110,12 +110,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const debugDeployApi = externalApi.getDeployDebugAPI();
+    const deployDebugApi = externalApi.getDeployDebugAPI();
 
-    if (debugDeployApi.getLanguageChoices().length <= 0) {
+    if (deployDebugApi.getLanguageChoices().length <= 0) {
       await vscode.window.showInformationMessage('No languages available to add');
     }
-    const result = await vscode.window.showQuickPick(debugDeployApi.getLanguageChoices(), { placeHolder: 'Pick a language' });
+    const result = await vscode.window.showQuickPick(deployDebugApi.getLanguageChoices(), { placeHolder: 'Pick a language' });
     if (result === undefined) {
       return;
     }

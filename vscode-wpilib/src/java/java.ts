@@ -8,7 +8,7 @@ import { IExternalAPI } from '../shared/externalapi';
 import { Templates } from '../shared/templates';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
-import { DebugDeploy } from './debugdeploy';
+import { DeployDebug } from './deploydebug';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -36,8 +36,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   context.subscriptions.push(buildTest);
 
   // Setup debug and deploy
-  const debugDeploy = new DebugDeploy(coreExports, allowDebug);
-  context.subscriptions.push(debugDeploy);
+  const deployDebug = new DeployDebug(coreExports, allowDebug);
+  context.subscriptions.push(deployDebug);
 
   // Setup commands
   const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);

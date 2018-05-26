@@ -19,13 +19,13 @@ class ExternalAPI extends IExternalAPI {
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const externalApi = new ExternalAPI();
     externalApi.preferencesApi = await PreferencesAPI.Create();
-    externalApi.debugDeployApi = await DeployDebugAPI.Create(resourceFolder, externalApi.preferencesApi);
+    externalApi.deployDebugApi = await DeployDebugAPI.Create(resourceFolder, externalApi.preferencesApi);
     externalApi.buildTestApi = new BuildTestAPI(externalApi.preferencesApi);
     return externalApi;
   }
 
   private toolApi: ToolAPI;
-  private debugDeployApi: DeployDebugAPI | undefined;
+  private deployDebugApi: DeployDebugAPI | undefined;
   private buildTestApi: BuildTestAPI | undefined;
   private preferencesApi: PreferencesAPI | undefined;
   private exampleTemplateApi: ExampleTemplateAPI;
@@ -48,7 +48,7 @@ class ExternalAPI extends IExternalAPI {
   }
   public getDeployDebugAPI(): DeployDebugAPI {
     // tslint:disable-next-line:no-non-null-assertion
-    return this.debugDeployApi!;
+    return this.deployDebugApi!;
   }
   public getPreferencesAPI(): PreferencesAPI {
     // tslint:disable-next-line:no-non-null-assertion

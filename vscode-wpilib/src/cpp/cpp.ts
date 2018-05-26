@@ -8,7 +8,7 @@ import { IExternalAPI } from '../shared/externalapi';
 import { Templates } from '../shared/templates';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
-import { DebugDeploy } from './debugdeploy';
+import { DeployDebug } from './deploydebug';
 // import { activateCppProvider } from '../cppprovider/cppprovider';
 
 // this method is called when your extension is activated
@@ -44,8 +44,8 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
   context.subscriptions.push(buildTest);
 
-  const debugDeploy = new DebugDeploy(coreExports, allowDebug);
-  context.subscriptions.push(debugDeploy);
+  const deployDebug = new DeployDebug(coreExports, allowDebug);
+  context.subscriptions.push(deployDebug);
 
   // Setup commands
   const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);

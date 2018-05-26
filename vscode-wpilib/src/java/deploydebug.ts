@@ -4,31 +4,30 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../shared/externalapi';
-import { getIsWindows, gradleRun, readFileAsync } from '../utilities';
+import { gradleRun, readFileAsync } from '../utilities';
 import { IDebugCommands, startDebugging } from './debug';
-import { IUnixSimulateCommands, startUnixSimulation } from './simulateunix';
-import { IWindowsSimulateCommands, startWindowsSimulation } from './simulatewindows';
+import { ISimulateCommands, startSimulation } from './simulate';
 
-interface ICppDebugInfo {
+interface IJavaDebugInfo {
   debugfile: string;
+  project: string;
   artifact: string;
 }
 
-interface ICppDebugCommand {
-  name?: string;
-  extensions?: string;
-  clang?: boolean;
-  launchfile: string;
-  target: string;
-  gdb: string;
-  sysroot: string | null;
-  srcpaths: string[];
-  headerpaths: string[];
-  sofiles: string[];
-  libsrcpaths: string[];
+interface ITargetInfo {
+  ipAddress: string;
+  port: string;
 }
 
-class CppQuickPick<T> implements vscode.QuickPickItem {
+interface IJavaSimulateInfo {
+  name: string;
+  extensions: string[];
+  librarydir: string;
+  mainclass: string;
+  robotclass: string;
+}
+
+class JavaQuickPick<T> implements vscode.QuickPickItem {
   public label: string;
   public description?: string | undefined;
   public detail?: string | undefined;
@@ -54,23 +53,26 @@ class DebugCodeDeployer implements ICodeDeployer {
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
-    return currentLanguage === 'none' || currentLanguage === 'cpp';
+    return currentLanguage === 'none' || currentLanguage === 'java';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+    let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+    if (this.preferences.getPreferences(workspace).getSkipTests()) {
+      command += ' -Xcheck';
+    }
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Debug', this.executeApi);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Debug', this.executeApi);
     if (result !== 0) {
       return false;
     }
 
     const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'));
-    const parsedDebugInfo: ICppDebugInfo[] = jsonc.parse(debugInfo) as ICppDebugInfo[];
+    const parsedDebugInfo: IJavaDebugInfo[] = jsonc.parse(debugInfo) as IJavaDebugInfo[];
     let targetDebugInfo = parsedDebugInfo[0];
     if (parsedDebugInfo.length > 1) {
-      const arr: Array<CppQuickPick<ICppDebugInfo>> = [];
+      const arr: Array<JavaQuickPick<IJavaDebugInfo>> = [];
       for (const i of parsedDebugInfo) {
-        arr.push(new CppQuickPick<ICppDebugInfo>(i, i.artifact));
+        arr.push(new JavaQuickPick<IJavaDebugInfo>(i, i.artifact));
       }
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
@@ -85,43 +87,25 @@ class DebugCodeDeployer implements ICodeDeployer {
     const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
 
     const targetReadInfo = await readFileAsync(debugPath);
-    const targetInfoParsed: ICppDebugCommand = jsonc.parse(targetReadInfo) as ICppDebugCommand;
-
-    const set = new Set<string>(targetInfoParsed.sofiles);
-
-    let soPath = '';
-
-    for (const p of set) {
-      soPath += path.dirname(p) + ';';
-    }
-
-    soPath = soPath.substring(0, soPath.length - 1);
-
-    let sysroot = '';
-
-    if (targetInfoParsed.sysroot !== null) {
-      sysroot = targetInfoParsed.sysroot;
-    }
+    const targetInfoParsed = jsonc.parse(targetReadInfo) as ITargetInfo;
 
     const config: IDebugCommands = {
-      executablePath: targetInfoParsed.launchfile,
-      gdbPath: targetInfoParsed.gdb,
-      soLibPath: soPath,
-      srcPaths: new Set<string>(targetInfoParsed.srcpaths),
-      sysroot,
-      target: targetInfoParsed.target,
+      project: targetDebugInfo.project,
+      serverAddress: targetInfoParsed.ipAddress,
+      serverPort: targetInfoParsed.port,
       workspace,
     };
 
     await startDebugging(config);
+
     console.log(result);
     return true;
   }
   public getDisplayName(): string {
-    return 'cpp';
+    return 'java';
   }
   public getDescription(): string {
-    return 'C++ Debugging';
+    return 'Java Debugging';
   }
 }
 
@@ -137,12 +121,15 @@ class DeployCodeDeployer implements ICodeDeployer {
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
-    return currentLanguage === 'none' || currentLanguage === 'cpp';
+    return currentLanguage === 'none' || currentLanguage === 'java';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy -PteamNumber=' + teamNumber;
+    let command = 'deploy -PteamNumber=' + teamNumber;
+    if (this.preferences.getPreferences(workspace).getSkipTests()) {
+      command += ' -Xcheck';
+    }
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Deploy', this.executeApi);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Deploy', this.executeApi);
     if (result !== 0) {
       return false;
     }
@@ -150,10 +137,10 @@ class DeployCodeDeployer implements ICodeDeployer {
     return true;
   }
   public getDisplayName(): string {
-    return 'cpp';
+    return 'java';
   }
   public getDescription(): string {
-    return 'C++ Deployment';
+    return 'Java Deploy';
   }
 }
 
@@ -169,24 +156,23 @@ class SimulateCodeDeployer implements ICodeDeployer {
   public async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const prefs = this.preferences.getPreferences(workspace);
     const currentLanguage = prefs.getCurrentLanguage();
-    return currentLanguage === 'none' || currentLanguage === 'cpp';
+    return currentLanguage === 'none' || currentLanguage === 'java';
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'simulateExternalCpp';
+    const command = 'simulateExternalJava';
     const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Simulate', this.executeApi);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Simulate', this.executeApi);
     if (result !== 0) {
       return false;
     }
 
     const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'desktopinfo.json'));
-    const parsedSimulateInfo: ICppDebugCommand[] = jsonc.parse(simulateInfo) as ICppDebugCommand[];
+    const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(simulateInfo) as IJavaSimulateInfo[];
     let targetSimulateInfo = parsedSimulateInfo[0];
     if (parsedSimulateInfo.length > 1) {
-      const arr: Array<CppQuickPick<ICppDebugCommand>> = [];
+      const arr: Array<JavaQuickPick<IJavaSimulateInfo>> = [];
       for (const i of parsedSimulateInfo) {
-        // tslint:disable-next-line:no-non-null-assertion
-        arr.push(new CppQuickPick<ICppDebugCommand>(i, i.name!));
+        arr.push(new JavaQuickPick<IJavaSimulateInfo>(i, i.name));
       }
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
@@ -199,11 +185,9 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     let extensions = '';
-    // tslint:disable-next-line:no-non-null-assertion
-    const targetExtensions = targetSimulateInfo.extensions!;
-    if (targetExtensions.length > 0) {
+    if (targetSimulateInfo.extensions.length > 0) {
       const extList = [];
-      for (const e of targetExtensions) {
+      for (const e of targetSimulateInfo.extensions) {
         extList.push({
           label: path.basename(e),
           path: e,
@@ -221,67 +205,45 @@ class SimulateCodeDeployer implements ICodeDeployer {
       }
     }
 
-    if (!getIsWindows()) {
-      const set = new Set<string>(targetSimulateInfo.sofiles);
+    const config: ISimulateCommands = {
+      extensions,
+      librarydir: targetSimulateInfo.librarydir,
+      mainclass: targetSimulateInfo.mainclass,
+      robotclass: targetSimulateInfo.robotclass,
+      stopOnEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
+      workspace,
+    };
 
-      let soPath = '';
+    await startSimulation(config);
 
-      for (const p of set) {
-        soPath += path.dirname(p) + ';';
-      }
-
-      soPath = soPath.substring(0, soPath.length - 1);
-
-      const config: IUnixSimulateCommands = {
-        // tslint:disable-next-line:no-non-null-assertion
-        clang: targetSimulateInfo.clang!,
-        executablePath: targetSimulateInfo.launchfile,
-        extensions,
-        soLibPath: soPath,
-        srcPaths: new Set<string>(targetSimulateInfo.srcpaths),
-        stopAtEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
-        workspace,
-      };
-
-      await startUnixSimulation(config);
-    } else {
-      const config: IWindowsSimulateCommands = {
-        extensions,
-        launchfile: targetSimulateInfo.launchfile,
-        stopAtEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
-        workspace,
-      };
-
-      await startWindowsSimulation(config);
-    }
     return true;
   }
   public getDisplayName(): string {
-    return 'cpp';
+    return 'java';
   }
   public getDescription(): string {
-    return 'C++ Simulation';
+    return 'Java Simulation';
   }
 }
 
-export class DebugDeploy {
-  private debugDeployer: DebugCodeDeployer;
+export class DeployDebug {
+  private deployDebuger: DebugCodeDeployer;
   private deployDeployer: DeployCodeDeployer;
   private simulator: SimulateCodeDeployer;
 
   constructor(externalApi: IExternalAPI, allowDebug: boolean) {
-    const debugDeployApi = externalApi.getDeployDebugAPI();
-    debugDeployApi.addLanguageChoice('cpp');
+    const deployDebugApi = externalApi.getDeployDebugAPI();
+    deployDebugApi.addLanguageChoice('java');
 
-    this.debugDeployer = new DebugCodeDeployer(externalApi);
+    this.deployDebuger = new DebugCodeDeployer(externalApi);
     this.deployDeployer = new DeployCodeDeployer(externalApi);
     this.simulator = new SimulateCodeDeployer(externalApi);
 
-    debugDeployApi.registerCodeDeploy(this.deployDeployer);
+    deployDebugApi.registerCodeDeploy(this.deployDeployer);
 
     if (allowDebug) {
-      debugDeployApi.registerCodeDebug(this.debugDeployer);
-      debugDeployApi.registerCodeSimulate(this.simulator);
+      deployDebugApi.registerCodeDebug(this.deployDebuger);
+      deployDebugApi.registerCodeSimulate(this.simulator);
     }
   }
 
