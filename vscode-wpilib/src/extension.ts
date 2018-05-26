@@ -16,19 +16,25 @@ import { ToolAPI } from './toolapi';
 import { createVsCommands } from './vscommands';
 
 class ExternalAPI extends IExternalAPI {
+  public static async Create(resourceFolder: string): Promise<ExternalAPI> {
+    const externalApi = new ExternalAPI();
+    externalApi.preferencesApi = await PreferencesAPI.Create();
+    externalApi.debugDeployApi = await DeployDebugAPI.Create(resourceFolder, externalApi.preferencesApi);
+    externalApi.buildTestApi = new BuildTestAPI(externalApi.preferencesApi);
+    return externalApi;
+  }
+
   private toolApi: ToolAPI;
-  private debugDeployApi: DeployDebugAPI;
-  private buildTestApi: BuildTestAPI;
-  private preferencesApi: PreferencesAPI;
+  private debugDeployApi: DeployDebugAPI | undefined;
+  private buildTestApi: BuildTestAPI | undefined;
+  private preferencesApi: PreferencesAPI | undefined;
   private exampleTemplateApi: ExampleTemplateAPI;
   private commandApi: CommandAPI;
   private executeApi: ExecuteAPI;
-  constructor(resourcesLocation: string) {
+
+  private constructor() {
     super();
     this.toolApi = new ToolAPI();
-    this.preferencesApi = new PreferencesAPI();
-    this.debugDeployApi = new DeployDebugAPI(resourcesLocation, this.preferencesApi);
-    this.buildTestApi = new BuildTestAPI(this.preferencesApi);
     this.exampleTemplateApi = new ExampleTemplateAPI();
     this.commandApi = new CommandAPI();
     this.executeApi = new ExecuteAPI();
@@ -41,16 +47,19 @@ class ExternalAPI extends IExternalAPI {
     return this.exampleTemplateApi;
   }
   public getDeployDebugAPI(): DeployDebugAPI {
-    return this.debugDeployApi;
+    // tslint:disable-next-line:no-non-null-assertion
+    return this.debugDeployApi!;
   }
   public getPreferencesAPI(): PreferencesAPI {
-    return this.preferencesApi;
+    // tslint:disable-next-line:no-non-null-assertion
+    return this.preferencesApi!;
   }
   public getCommandAPI(): CommandAPI {
     return this.commandApi;
   }
   public getBuildTestAPI(): BuildTestAPI {
-    return this.buildTestApi;
+    // tslint:disable-next-line:no-non-null-assertion
+    return this.buildTestApi!;
   }
   public getExecuteAPI(): ExecuteAPI {
     return this.executeApi;
@@ -64,14 +73,15 @@ export async function activate(context: vscode.ExtensionContext) {
   // Resources folder will be used for RioLog
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
-  const externalApi = new ExternalAPI(extensionResourceLocation);
+  const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
   await activateCpp(context, externalApi);
   await activateJava(context, externalApi);
 
   createVsCommands(context, externalApi);
 
-  const help = new Help(extensionResourceLocation, externalApi.getPreferencesAPI());
+  const help = await Help.Create(extensionResourceLocation, externalApi.getPreferencesAPI());
+
   context.subscriptions.push(help);
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)

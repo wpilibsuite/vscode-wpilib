@@ -4,55 +4,20 @@ import { Preferences } from './preferences';
 import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from './shared/externalapi';
 
 export class PreferencesAPI extends IPreferencesAPI {
+  public static async Create(): Promise<PreferencesAPI> {
+    const prefs = new PreferencesAPI();
+    await prefs.asyncInitialize();
+    return prefs;
+  }
+
   public onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
   private preferences: Preferences[] = [];
   private preferencesEmitter: vscode.EventEmitter<IPreferencesChangedPair[]> = new vscode.EventEmitter<IPreferencesChangedPair[]>();
   private disposables: vscode.Disposable[] = [];
 
-  constructor() {
+  private constructor() {
     super();
     this.onDidPreferencesFolderChanged = this.preferencesEmitter.event;
-
-    const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
-      for (const w of workspaces) {
-        this.preferences.push(new Preferences(w));
-      }
-    }
-    this.disposables.push(this.preferencesEmitter);
-
-    this.disposables.push(vscode.workspace.onDidChangeWorkspaceFolders(() => {
-      // Nuke and reset
-      // TODO: Remove existing preferences from the extension context
-      for (const p of this.preferences) {
-        p.dispose();
-      }
-
-      const wp = vscode.workspace.workspaceFolders;
-
-      if (wp === undefined) {
-        return;
-      }
-
-      const pairArr: IPreferencesChangedPair[] = [];
-      this.preferences = [];
-
-      for (const w of wp) {
-        const p = new Preferences(w);
-        this.preferences.push(p);
-        const pair: IPreferencesChangedPair = {
-          preference: p,
-          workspace: w,
-        };
-        pairArr.push(pair);
-      }
-
-      this.preferencesEmitter.fire(pairArr);
-
-      this.disposables.push(...this.preferences);
-    }));
-    this.disposables.push(...this.preferences);
-
   }
 
   public getPreferences(workspace: vscode.WorkspaceFolder): IPreferences {
@@ -87,5 +52,48 @@ export class PreferencesAPI extends IPreferencesAPI {
     for (const d of this.disposables) {
       d.dispose();
     }
+  }
+
+  private async asyncInitialize() {
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces !== undefined) {
+      for (const w of workspaces) {
+        const preferences = await Preferences.Create(w);
+        this.preferences.push(preferences);
+      }
+    }
+    this.disposables.push(this.preferencesEmitter);
+
+    this.disposables.push(vscode.workspace.onDidChangeWorkspaceFolders(async () => {
+      // Nuke and reset
+      // TODO: Remove existing preferences from the extension context
+      for (const p of this.preferences) {
+        p.dispose();
+      }
+
+      const wp = vscode.workspace.workspaceFolders;
+
+      if (wp === undefined) {
+        return;
+      }
+
+      const pairArr: IPreferencesChangedPair[] = [];
+      this.preferences = [];
+
+      for (const w of wp) {
+        const p = await Preferences.Create(w);
+        this.preferences.push(p);
+        const pair: IPreferencesChangedPair = {
+          preference: p,
+          workspace: w,
+        };
+        pairArr.push(pair);
+      }
+
+      this.preferencesEmitter.fire(pairArr);
+
+      this.disposables.push(...this.preferences);
+    }));
+    this.disposables.push(...this.preferences);
   }
 }

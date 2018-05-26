@@ -65,6 +65,14 @@ export function promisifyReadFile(filename: string): Promise<string> {
   });
 }
 
+export function promisifyExists(filename: string): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
+    fs.exists(filename, (e) => {
+      resolve(e);
+    });
+  });
+}
+
 export function promisifyWriteFile(filename: string, contents: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     fs.writeFile(filename, contents, 'utf8', (err) => {

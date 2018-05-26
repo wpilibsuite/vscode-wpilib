@@ -1,10 +1,9 @@
 'use strict';
-import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IPreferences } from './shared/externalapi';
-import { promisifyMkDir, promisifyWriteFile } from './utilities';
+import { promisifyExists, promisifyMkDir, promisifyReadFile, promisifyWriteFile } from './utilities';
 
 interface IPreferencesJson {
   currentLanguage: string;
@@ -32,56 +31,49 @@ export async function requestTeamNumber(): Promise<number> {
 }
 
 export class Preferences implements IPreferences {
+  public static async Create(workspace: vscode.WorkspaceFolder): Promise<Preferences> {
+    const prefs = new Preferences(workspace);
+    await prefs.asyncInitialize();
+    return prefs;
+  }
+
   public workspace: vscode.WorkspaceFolder;
+
   private preferencesFile?: vscode.Uri;
   private readonly configFolder: string;
   private readonly preferenceFileName: string = 'wpilib_preferences.json';
-  private preferencesJson: IPreferencesJson;
+  private preferencesJson: IPreferencesJson = defaultPreferences;
   private configFileWatcher: vscode.FileSystemWatcher;
   private readonly preferencesGlob: string = '**/' + this.preferenceFileName;
   private disposables: vscode.Disposable[] = [];
   private isWPILibProject: boolean = false;
 
-  constructor(workspace: vscode.WorkspaceFolder) {
+  private constructor(workspace: vscode.WorkspaceFolder) {
     this.workspace = workspace;
     this.configFolder = path.join(workspace.uri.fsPath, '.wpilib');
-
-    const configFilePath = path.join(this.configFolder, this.preferenceFileName);
-
-    if (fs.existsSync(configFilePath)) {
-      vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
-      this.isWPILibProject = true;
-      this.preferencesFile = vscode.Uri.file(configFilePath);
-      this.preferencesJson = defaultPreferences;
-      this.updatePreferences();
-    } else {
-      // Set up defaults, and create
-      this.preferencesJson = defaultPreferences;
-    }
 
     const rp = new vscode.RelativePattern(workspace, this.preferencesGlob);
 
     this.configFileWatcher = vscode.workspace.createFileSystemWatcher(rp);
     this.disposables.push(this.configFileWatcher);
 
-    this.configFileWatcher.onDidCreate((uri) => {
-      vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
+    this.configFileWatcher.onDidCreate(async (uri) => {
+      await vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
       this.isWPILibProject = true;
       this.preferencesFile = uri;
-      this.updatePreferences();
+      await this.updatePreferences();
     });
 
-    this.configFileWatcher.onDidDelete(() => {
-      vscode.commands.executeCommand('setContext', 'isWPILibProject', false);
+    this.configFileWatcher.onDidDelete(async () => {
+      await vscode.commands.executeCommand('setContext', 'isWPILibProject', false);
       this.isWPILibProject = false;
       this.preferencesFile = undefined;
-      this.updatePreferences();
+      await this.updatePreferences();
     });
 
-    this.configFileWatcher.onDidChange(() => {
-      this.updatePreferences();
+    this.configFileWatcher.onDidChange(async () => {
+      await this.updatePreferences();
     });
-
   }
 
   public getIsWPILibProject(): boolean {
@@ -208,17 +200,32 @@ export class Preferences implements IPreferences {
     }
   }
 
+  private async asyncInitialize() {
+    const configFilePath = path.join(this.configFolder, this.preferenceFileName);
+
+    if (await promisifyExists(configFilePath)) {
+      vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
+      this.isWPILibProject = true;
+      this.preferencesFile = vscode.Uri.file(configFilePath);
+      this.preferencesJson = defaultPreferences;
+      await this.updatePreferences();
+    } else {
+      // Set up defaults, and create
+      this.preferencesJson = defaultPreferences;
+    }
+  }
+
   private getConfiguration(): vscode.WorkspaceConfiguration {
     return vscode.workspace.getConfiguration('wpilib', this.workspace.uri);
   }
 
-  private updatePreferences() {
+  private async updatePreferences() {
     if (this.preferencesFile === undefined) {
       this.preferencesJson = defaultPreferences;
       return;
     }
 
-    const results = fs.readFileSync(this.preferencesFile.fsPath, 'utf8');
+    const results = await promisifyReadFile(this.preferencesFile.fsPath);
     this.preferencesJson = jsonc.parse(results) as IPreferencesJson;
   }
 

@@ -66,6 +66,13 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
 }
 
 export class DeployDebugAPI extends IDeployDebugAPI {
+  public static async Create(resourceFolder: string, preferences: PreferencesAPI): Promise<DeployDebugAPI> {
+    const dda = new DeployDebugAPI(preferences);
+    dda.rioLogWebViewProvider = await RioLogWebviewProvider.Create(resourceFolder);
+    dda.liveWindow = new RioLogWindow(dda.rioLogWebViewProvider, dda.rioLogConsoleProvider);
+    dda.disposables.push(dda.liveWindow);
+    return dda;
+  }
   private languageChoices: string[] = [];
   private deployers: ICodeDeployerQuickPick[] = [];
   private debuggers: ICodeDeployerQuickPick[] = [];
@@ -74,25 +81,23 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   private preferences: PreferencesAPI;
   private debugConfigurationProvider: WPILibDebugConfigurationProvider;
 
-  private rioLogWebViewProvider: RioLogWebviewProvider;
+  private rioLogWebViewProvider: RioLogWebviewProvider | undefined;
   private rioLogConsoleProvider: LiveRioConsoleProvider;
-  private liveWindow: RioLogWindow;
+  private liveWindow: RioLogWindow | undefined;
 
-  constructor(resourcesFolder: string, preferences: PreferencesAPI) {
+  private constructor(preferences: PreferencesAPI) {
     super();
     this.preferences = preferences;
 
-    this.rioLogWebViewProvider = new RioLogWebviewProvider(resourcesFolder);
     this.rioLogConsoleProvider = new LiveRioConsoleProvider();
-    this.liveWindow = new RioLogWindow(this.rioLogWebViewProvider, this.rioLogConsoleProvider);
-    this.disposables.push(this.liveWindow);
 
     this.debugConfigurationProvider = new WPILibDebugConfigurationProvider(this);
     this.disposables.push(this.debugConfigurationProvider);
   }
 
   public async startRioLog(teamNumber: number, _: boolean): Promise<boolean> {
-    this.liveWindow.start(teamNumber);
+    // tslint:disable-next-line:no-non-null-assertion
+    this.liveWindow!.start(teamNumber);
     return true;
   }
   public registerCodeDeploy(deployer: ICodeDeployer): void {

@@ -1,9 +1,9 @@
 'use strict';
 
 import { EventEmitter } from 'events';
-import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { promisifyReadFile } from '../utilities';
 import { IIPCReceiveMessage, IIPCSendMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView } from './shared/interfaces';
 import { IErrorMessage, IPrintMessage } from './shared/message';
 import { RioConsole } from './shared/rioconsole';
@@ -65,16 +65,21 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 }
 
 export class RioLogHTMLProvider implements IHTMLProvider {
-  private html: string | undefined;
-
-  constructor(resourceRoot: string) {
+  public static async Create(resourceRoot: string): Promise<RioLogHTMLProvider> {
+    const provider = new RioLogHTMLProvider();
     const htmlFile = path.join(resourceRoot, 'live.html');
     const scriptFile = path.join(resourceRoot, 'bundle.js');
 
-    this.html = fs.readFileSync(htmlFile, 'utf8');
-    this.html += '\r\n<script>\r\n';
-    this.html += fs.readFileSync(scriptFile, 'utf8');
-    this.html += '\r\n</script>\r\n';
+    provider.html = await promisifyReadFile(htmlFile);
+    provider.html += '\r\n<script>\r\n';
+    provider.html += await promisifyReadFile(scriptFile);
+    provider.html += '\r\n</script>\r\n';
+    return provider;
+  }
+
+  private html: string | undefined;
+
+  private constructor() {
   }
 
   public getHTML(): string {
@@ -86,15 +91,21 @@ export class RioLogHTMLProvider implements IHTMLProvider {
 }
 
 export class RioLogWebviewProvider implements IWindowProvider {
-  private htmlProvider: RioLogHTMLProvider;
+  public static async Create(resourceRoot: string): Promise<RioLogWebviewProvider> {
+    const provider = new RioLogWebviewProvider();
+    provider.htmlProvider = await RioLogHTMLProvider.Create(resourceRoot);
+    return provider;
+  }
 
-  constructor(resourceRoot: string) {
-    this.htmlProvider = new RioLogHTMLProvider(resourceRoot);
+  private htmlProvider: RioLogHTMLProvider | undefined;
+
+  private constructor() {
   }
 
   public createWindowView(): IWindowView {
     const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
-    wv.setHTML(this.htmlProvider.getHTML());
+    // tslint:disable-next-line:no-non-null-assertion
+    wv.setHTML(this.htmlProvider!.getHTML());
     return wv;
   }
 }

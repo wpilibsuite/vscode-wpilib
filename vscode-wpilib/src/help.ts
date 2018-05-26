@@ -1,16 +1,24 @@
 'use strict';
-import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IPreferencesAPI } from './shared/externalapi';
+import { promisifyReadFile } from './utilities';
 
 export class Help {
+  public static async Create(resourceRoot: string, preferences: IPreferencesAPI): Promise<Help> {
+    const help = new Help(preferences);
+    await help.asyncInitialize(resourceRoot);
+    return help;
+  }
+
   private statusBar: vscode.StatusBarItem;
   private disposables: vscode.Disposable[] = [];
   private html: string = '';
   private webview: vscode.WebviewPanel | undefined;
+  private preferences: IPreferencesAPI;
 
-  constructor(resourceRoot: string, preferences: IPreferencesAPI) {
+  private constructor(preferences: IPreferencesAPI) {
+    this.preferences = preferences;
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
     this.statusBar.text = 'WPILib';
     this.statusBar.tooltip = 'Open WPILib Help';
@@ -20,20 +28,6 @@ export class Help {
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.help', async () => {
       await this.showHelpView();
     }));
-
-    this.html = fs.readFileSync(path.join(resourceRoot, 'help.html'), 'utf8');
-    this.replaceResources(resourceRoot);
-
-    const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
-      for (const wp of workspaces) {
-        const prefs = preferences.getPreferences(wp);
-        if (prefs.getIsWPILibProject()) {
-          this.statusBar.show();
-          break;
-        }
-      }
-    }
   }
 
   public async showHelpView(): Promise<void> {
@@ -56,8 +50,23 @@ export class Help {
     }
   }
 
-  private replaceResources(resourceRoot: string) {
+  private async asyncInitialize(resourceRoot: string) {
+    this.html = await promisifyReadFile(path.join(resourceRoot, 'help.html'));
+    this.replaceResources(resourceRoot);
 
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces !== undefined) {
+      for (const wp of workspaces) {
+        const prefs = this.preferences.getPreferences(wp);
+        if (prefs.getIsWPILibProject()) {
+          this.statusBar.show();
+          break;
+        }
+      }
+    }
+  }
+
+  private replaceResources(resourceRoot: string) {
     const onDiskPath = vscode.Uri.file(resourceRoot);
     const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });
     this.html = this.html.replace(/replaceresource/g, replacePath.toString());
