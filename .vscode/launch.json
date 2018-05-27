@@ -35,7 +35,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Electron: Main",
+            "name": "Standalone: Main",
             "protocol": "inspector",
             "runtimeExecutable": "${workspaceFolder}/wpilib-utility-standalone/node_modules/.bin/electron",
             "runtimeArgs": [
@@ -51,7 +51,7 @@
             "preLaunchTask": "standalone-watch"
         },
         {
-            "name": "Electron: Renderer",
+            "name": "Standalone: Renderer",
             "type": "chrome",
             "request": "attach",
             "port": 9223,
@@ -61,7 +61,7 @@
     ],
     "compounds": [
         {
-            "name": "Electron: All",
+            "name": "Standalone: All",
             "configurations": [
                 "Electron: Main",
                 "Electron: Renderer"
