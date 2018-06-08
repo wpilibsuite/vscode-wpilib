@@ -99,22 +99,7 @@ export class GradleConfig {
     let findCount = 0;
     const finds: IBinaryFind[] = [];
 
-    for (let i = 0; i < uris.length; i++) {
-      // Remove non c++ files
-      const end1 = uris[i].fsPath.endsWith('.cpp');
-      const end2 = uris[i].fsPath.endsWith('.hpp');
-      const end3 = uris[i].fsPath.endsWith('.cc');
-      const end4 = uris[i].fsPath.endsWith('.hh');
-      const end5 = uris[i].fsPath.endsWith('.c');
-      const end6 = uris[i].fsPath.endsWith('.h');
-
-      if (!end1 && !end2
-        && !end3 && !end4
-        && !end5 && !end6) {
-        uris.splice(i, 1);
-        continue;
-      }
-
+    for (let i = uris.length - 1; i > 0; i--) {
       for (const f of this.foundFiles) {
         if (f.uri.fsPath === uris[i].fsPath) {
           findCount++;
