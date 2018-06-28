@@ -7,15 +7,15 @@
 
     {
       "type": "wpilib",
-      "name": "WPILib Deploy",
+      "name": "WPILib Desktop Debug",
       "request": "launch",
-      "debug": false
+      "desktop": true,
     },
     {
       "type": "wpilib",
-      "name": "WPILib Debug",
+      "name": "WPILib roboRIO Debug",
       "request": "launch",
-      "debug": true
+      "desktop": false,
     }
   ]
 }

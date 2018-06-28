@@ -188,7 +188,7 @@ export class Commands {
               return false;
             }
 
-            const workspaceRooted = path.relative(path.join(workspace.uri.path, 'src'), folder.path);
+            const workspaceRooted = path.relative(path.join(workspace.uri.path, 'src', 'main'), folder.path);
 
             // include root is /include
             // src root is /cpp

@@ -12,10 +12,6 @@ import { createCommands } from './vscommands';
 // your extension is activated the very first time the command is executed
 export async function activateCppProvider(context: vscode.ExtensionContext, coreExports: IExternalAPI): Promise<void> {
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "gradle-vscode-cpp" is now active!');
-
     setExtensionContext(context);
 
     const workspaces = vscode.workspace.workspaceFolders;

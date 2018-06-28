@@ -47,7 +47,7 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
     return false;
   }
 
-  const codePath = path.join(toFolder, 'src');
+  const codePath = path.join(toFolder, 'src', 'main');
   const src = promisifyNcp(fromTemplateFolder, codePath);
   const gradle = promisifyNcp(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {

@@ -70,7 +70,7 @@ export class GradleConfig {
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
     this.statusBar.text = this.selectedName.Value;
     this.statusBar.tooltip = 'Click to change toolchain';
-    this.statusBar.command = 'gradlevscpp.selectToolchain';
+    this.statusBar.command = 'wpilibcore.selectCppToolchain';
 
     this.disposables.push(this.statusBar);
 
@@ -245,7 +245,7 @@ export class GradleConfig {
       selections.push(c.name);
     }
     if (selections.length === 0) {
-      const configResult = await vscode.window.showInformationMessage('No configuration. Would you line to refresh the configurations?', 'Yes', 'No');
+      const configResult = await vscode.window.showInformationMessage('No configuration. Would you like to refresh the configurations?', 'Yes', 'No');
       if (configResult === 'Yes') {
         await this.runGradleRefresh();
       }

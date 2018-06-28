@@ -2,45 +2,36 @@ plugins {
     id "java"
     id "eclipse"
     id "idea"
-    id "jaci.openrio.gradle.GradleRIO" version "2018.01.22"
+    id "edu.wpi.first.GradleRIO" version "2018.06.21"
 }
 
-def TEAM = 5333
+def TEAM = 9999
 def ROBOT_CLASS = "frc.robot.Robot"
-
-if (project.hasProperty('teamNumber')) {
-    TEAM = teamNumber.toInteger()
-}
-
-def useDebug = false
-
-if(project.hasProperty('debugMode')) {
-    useDebug = true;
-}
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
     targets {
-        target("roborio", jaci.openrio.gradle.frc.RoboRIO) {
-            team = TEAM
+        target("roborio", edu.wpi.first.gradlerio.frc.RoboRIO) {
+            // Team can be overridden by command line, for use with VSCode
+            team = getTeamOrDefault(TEAM)
         }
     }
     artifacts {
-        artifact('frcJava', jaci.openrio.gradle.frc.FRCJavaArtifact) {
+        artifact('frcJava', edu.wpi.first.gradlerio.frc.FRCJavaArtifact) {
             targets << "roborio"
-            debug = useDebug
+            // Debug can be overridden by command line, for use with VSCode
+            debug = getDebugOrDefault(false)
         }
     }
 }
 
-// Defining my dependencies. In this case, WPILib (+ friends), CTRE Phoenix (Talon SRX)
+// Defining my dependencies. In this case, WPILib (+ friends), CTRE Toolsuite (Talon SRX)
 // and NavX.
 dependencies {
     compile wpilib()
     compile ctre()
     compile navx()
-    compile openrio.powerup.matchData()
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
@@ -48,9 +39,9 @@ dependencies {
 // knows where to look for our Robot Class.
 jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    manifest jaci.openrio.gradle.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
+    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.4'
+wrapper {
+    gradleVersion = '4.8'
 }
