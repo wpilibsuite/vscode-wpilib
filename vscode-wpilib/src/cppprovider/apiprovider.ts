@@ -1,8 +1,8 @@
 'use-strict';
 
 import * as vscode from 'vscode';
+import { CppToolsApi, CustomConfigurationProvider, SourceFileConfiguration, SourceFileConfigurationItem } from 'vscode-cpptools';
 import { IExternalAPI } from '../shared/externalapi';
-import { CppToolsApi, CustomConfigurationProvider, SourceFileConfiguration, SourceFileConfigurationItem } from './cppextensionapi';
 import { GradleConfig, IBinaryFind } from './gradleconfig';
 
 function parseLanguage(_: string[], isCpp: boolean): string {
@@ -27,6 +27,7 @@ function getSourceFileConfiguration(file: IBinaryFind): SourceFileConfiguration 
 }
 
 export class ApiProvider implements CustomConfigurationProvider {
+  public extensionId: string = 'vscode-wpilib';
   public name: string = 'wpilib';
   public workspace: vscode.WorkspaceFolder;
   private gradleConfig: GradleConfig;
@@ -66,7 +67,7 @@ export class ApiProvider implements CustomConfigurationProvider {
         uri: b.uri.fsPath,
       });
     }
-    console.log(JSON.stringify(ret, null, 4));
+    // console.log(JSON.stringify(ret, null, 4));
     return ret;
   }
 

@@ -3,6 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { activateCppProvider } from '../cppprovider/cppprovider';
 import { Examples } from '../shared/examples';
 import { IExternalAPI } from '../shared/externalapi';
 import { Templates } from '../shared/templates';
@@ -35,8 +36,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
 
-  // TODO: Waiting for update
-  // await activateCppProvider(context, coreExports);
+  await activateCppProvider(context, coreExports);
 
   // Setup build and test
 

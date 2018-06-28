@@ -2,9 +2,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { getCppToolsApi, Version } from 'vscode-cpptools';
 import { IExternalAPI } from '../shared/externalapi';
 import { ApiProvider } from './apiprovider';
-import { CppToolsApi } from './cppextensionapi';
 import { setExtensionContext } from './persistentState';
 import { createCommands } from './vscommands';
 
@@ -20,27 +20,21 @@ export async function activateCppProvider(context: vscode.ExtensionContext, core
 
     const workspaces = vscode.workspace.workspaceFolders;
 
-    const vsCppExt = vscode.extensions.getExtension<CppToolsApi>('ms-vscode.cpptools');
-    if (vsCppExt === undefined) {
-        console.log('failure todo');
-        return;
-    }
+    const cppToolsApi = await getCppToolsApi(Version.v1);
 
-    if (!vsCppExt.isActive) {
-        await vsCppExt.activate();
-    }
+    if (cppToolsApi) {
+        context.subscriptions.push(cppToolsApi);
 
-    const cppToolsApi: CppToolsApi = vsCppExt.exports;
+        const configLoaders: ApiProvider[] = [];
 
-    const configLoaders: ApiProvider[] = [];
-
-    if (workspaces !== undefined) {
-        for (const wp of workspaces) {
-            const configLoader = new ApiProvider(wp, cppToolsApi, coreExports);
-            context.subscriptions.push(configLoader);
-            configLoaders.push(configLoader);
+        if (workspaces !== undefined) {
+            for (const wp of workspaces) {
+                const configLoader = new ApiProvider(wp, cppToolsApi, coreExports);
+                context.subscriptions.push(configLoader);
+                configLoaders.push(configLoader);
+            }
         }
-    }
 
-    createCommands(context, configLoaders);
+        createCommands(context, configLoaders);
+    }
 }
