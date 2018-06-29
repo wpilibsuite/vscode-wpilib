@@ -4,6 +4,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.wpi.first.wpilibc</groupId>
   <artifactId>templates</artifactId>
-  <version>2018.424242.4.1-20180521134327-999-g68bbad2</version>
+  <version>2018.424242.4.1-20180628183835-1068-g1d8456e-dirty</version>
   <packaging>zip</packaging>
 </project>
