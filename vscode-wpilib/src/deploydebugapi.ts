@@ -11,34 +11,37 @@ interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
 
 class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
-  private deployDebugAPI: IDeployDebugAPI;
+  // private deployDebugAPI: IDeployDebugAPI;
 
-  constructor(ddApi: IDeployDebugAPI) {
-    this.deployDebugAPI = ddApi;
+  constructor(_ddApi: IDeployDebugAPI) {
+    // this.deployDebugAPI = ddApi;
     const regProv = vscode.debug.registerDebugConfigurationProvider('wpilib', this);
     this.disposables.push(regProv);
   }
 
-  public resolveDebugConfiguration(workspace: vscode.WorkspaceFolder | undefined,
+  public resolveDebugConfiguration(_workspace: vscode.WorkspaceFolder | undefined,
                                    config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
     vscode.ProviderResult<vscode.DebugConfiguration> {
-    if (workspace === undefined) {
-      return config;
-    }
-    let desktop = false;
-    if ('desktop' in config) {
-      desktop = config.desktop as boolean;
-    } else {
-      console.log('debugger has no desktop argument. Assuming roboRIO');
-    }
-    return new Promise<undefined>(async (resolve) => {
-      if (desktop) {
-        await this.deployDebugAPI.simulateCode(workspace, undefined);
-      } else {
-        await this.deployDebugAPI.debugCode(workspace, undefined);
-      }
-      resolve();
-    });
+    vscode.window.showInformationMessage('This functionality is disabled for the Alpha test.');
+    return config;
+
+    // if (workspace === undefined) {
+    //   return config;
+    // }
+    // let desktop = false;
+    // if ('desktop' in config) {
+    //   desktop = config.desktop as boolean;
+    // } else {
+    //   console.log('debugger has no desktop argument. Assuming roboRIO');
+    // }
+    // return new Promise<undefined>(async (resolve) => {
+    //   if (desktop) {
+    //     await this.deployDebugAPI.simulateCode(workspace, undefined);
+    //   } else {
+    //     await this.deployDebugAPI.debugCode(workspace, undefined);
+    //   }
+    //   resolve();
+    // });
   }
 
   public provideDebugConfigurations(_workspace: vscode.WorkspaceFolder | undefined,
