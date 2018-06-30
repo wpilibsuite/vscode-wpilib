@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as timers from 'timers';
 import * as vscode from 'vscode';
-import { setExecutePermissions } from './permissions';
 import { IExecuteAPI } from './shared/externalapi';
+import { setExecutePermissions } from './shared/permissions';
 
 export function getIsWindows(): boolean {
   const nodePlatform: NodeJS.Platform = process.platform;

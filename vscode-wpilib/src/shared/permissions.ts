@@ -1,10 +1,9 @@
 'use strict';
 
 import * as fs from 'fs';
-import { getIsWindows } from './utilities';
 
 export function setExecutePermissions(file: string): Promise<void> {
-  if (getIsWindows()) {
+  if (process.platform === 'win32') {
     return Promise.resolve();
   }
   return new Promise<void>((resolve, reject) => {

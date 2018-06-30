@@ -3,7 +3,7 @@ import * as glob from 'glob';
 import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';
 import * as path from 'path';
-import { setExecutePermissions } from '../permissions';
+import { setExecutePermissions } from './permissions';
 
 export function promisifyMkdirp(dest: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {

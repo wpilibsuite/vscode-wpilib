@@ -80,6 +80,9 @@ task copyFromVsCodeToStandaloneSrc(type: Copy) {
     from ('vscode-wpilib/src/shared/generator.ts') {
         into 'shared'
     }
+    from ('vscode-wpilib/src/shared/permissions.ts') {
+        into 'shared'
+    }
     into 'wpilib-utility-standalone/src'
 }
 
