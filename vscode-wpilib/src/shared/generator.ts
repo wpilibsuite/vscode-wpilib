@@ -3,6 +3,7 @@ import * as glob from 'glob';
 import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';
 import * as path from 'path';
+import { setExecutePermissions } from '../permissions';
 
 export function promisifyMkdirp(dest: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
@@ -59,7 +60,8 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
     },
   });
 
-  await Promise.all([src, gradle]);
+  await Promise.all([src, gradle, setExecutePermissions(path.join(toFolder, 'gradlew'))]);
+
   return true;
 }
 
@@ -123,6 +125,7 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
     },
   });
   promiseArray.push(ncpPromise);
+  promiseArray.push(setExecutePermissions(path.join(toFolder, 'gradlew')));
   await Promise.all(promiseArray);
   return true;
 }

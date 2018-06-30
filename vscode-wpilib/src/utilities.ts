@@ -1,7 +1,9 @@
 'use strict';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as timers from 'timers';
 import * as vscode from 'vscode';
+import { setExecutePermissions } from './permissions';
 import { IExecuteAPI } from './shared/externalapi';
 
 export function getIsWindows(): boolean {
@@ -105,11 +107,13 @@ export function promisifyTimer(time: number): Promise<void> {
   });
 }
 
-export function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
-                          online: boolean, name: string, executeApi: IExecuteAPI): Promise<number> {
+export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
+                                online: boolean, name: string, executeApi: IExecuteAPI): Promise<number> {
   let command = './gradlew ' + args;
   if (!online) {
     command += ' --offline';
   }
+
+  await setExecutePermissions(path.join(workspace.uri.fsPath, 'gradlew'));
   return executeApi.executeCommand(command, name, rootDir, workspace);
 }
