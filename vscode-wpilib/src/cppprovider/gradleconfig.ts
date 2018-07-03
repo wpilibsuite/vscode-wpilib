@@ -187,7 +187,7 @@ export class GradleConfig {
     return finds;
   }
 
-  public async loadConfigs(): Promise<void> {
+  public async loadConfigs(): Promise<boolean> {
     this.toolchains = [];
 
     let file = '';
@@ -195,7 +195,7 @@ export class GradleConfig {
       file = await promisifyReadFile(path.join(this.workspace.uri.fsPath, 'build', this.configFile));
     } catch (err) {
       this.statusBar.show();
-      return;
+      return false;
     }
 
     const newToolchains: IToolChain[] = jsonc.parse(file) as IToolChain[];
@@ -237,6 +237,7 @@ export class GradleConfig {
     this.foundFiles = [];
 
     this.statusBar.show();
+    return true;
   }
 
   public async selectToolChain(): Promise<void> {
@@ -248,6 +249,9 @@ export class GradleConfig {
       const configResult = await vscode.window.showInformationMessage('No configuration. Would you like to refresh the configurations?', 'Yes', 'No');
       if (configResult === 'Yes') {
         await this.runGradleRefresh();
+        if (await vscode.window.showInformationMessage('Please reload the window to finish configuration', 'Yes', 'Not Now') === 'Yes') {
+          await vscode.commands.executeCommand('workbench.action.reloadWindow');
+        }
       }
       return;
     }

@@ -28,11 +28,12 @@ function getSourceFileConfiguration(file: IBinaryFind): SourceFileConfiguration 
 
 export class ApiProvider implements CustomConfigurationProvider {
   public extensionId: string = 'vscode-wpilib';
-  public name: string = 'wpilib';
+  public name: string = 'WPILib';
   public workspace: vscode.WorkspaceFolder;
   private gradleConfig: GradleConfig;
   private disposables: vscode.Disposable[] = [];
   private cppToolsApi: CppToolsApi;
+  private registered: boolean = false;
 
   constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI) {
     this.workspace = workspace;
@@ -42,11 +43,16 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.cppToolsApi = cppToolsApi;
 
     /* tslint:disable-next-line:no-floating-promises */
-    this.gradleConfig.loadConfigs().then(() => {
-      this.cppToolsApi.registerCustomConfigurationProvider(this);
-      this.gradleConfig.refreshEvent.event(() => {
-        this.cppToolsApi.didChangeCustomConfiguration(this);
-      });
+    this.gradleConfig.loadConfigs().then((found) => {
+      if (found && !this.registered) {
+        this.cppToolsApi.registerCustomConfigurationProvider(this);
+        this.gradleConfig.refreshEvent.event(() => {
+          this.cppToolsApi.didChangeCustomConfiguration(this);
+        });
+        this.registered = true;
+      }
+    }).catch(() => {
+      console.log('Rejected load?');
     });
   }
 
@@ -71,8 +77,16 @@ export class ApiProvider implements CustomConfigurationProvider {
     return ret;
   }
 
-  public loadConfigs(): Promise<void> {
-    return this.gradleConfig.loadConfigs();
+  public async loadConfigs(): Promise<void> {
+    const found = this.gradleConfig.loadConfigs();
+
+    if (found && !this.registered) {
+      this.cppToolsApi.registerCustomConfigurationProvider(this);
+      this.gradleConfig.refreshEvent.event(() => {
+        this.cppToolsApi.didChangeCustomConfiguration(this);
+      });
+      this.registered = true;
+    }
   }
 
   public selectToolChain(): Promise<void> {
