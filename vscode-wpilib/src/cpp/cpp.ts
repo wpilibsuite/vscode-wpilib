@@ -29,7 +29,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
     console.log('Could not find cpptools C++ extension. Debugging is disabled.');
     allowDebug = false;
   } else if (!cppExtension.isActive) {
-    await cppExtension.activate();
+    // await cppExtension.activate();
   }
 
   const preferences = coreExports.getPreferencesAPI();

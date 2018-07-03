@@ -99,7 +99,7 @@ export class GradleConfig {
     let findCount = 0;
     const finds: IBinaryFind[] = [];
 
-    for (let i = uris.length - 1; i > 0; i--) {
+    for (let i = uris.length - 1; i >= 0; i--) {
       for (const f of this.foundFiles) {
         if (f.uri.fsPath === uris[i].fsPath) {
           findCount++;
@@ -271,7 +271,7 @@ export class GradleConfig {
     const promises: Array<Promise<string[]>> = [];
     for (const s of source.srcDirs) {
       let includes: string = '**/*';
-      if (source.includes.length === 0) {
+      if (source.includes.length !== 0) {
         includes = '{';
         let first = true;
         for (const i of source.includes) {
@@ -286,7 +286,7 @@ export class GradleConfig {
       }
 
       let excludes: string = '';
-      if (source.excludes.length === 0) {
+      if (source.excludes.length !== 0) {
         excludes = '{';
         let first = true;
         for (const i of source.excludes) {

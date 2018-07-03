@@ -59,7 +59,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     return bins.length !== 0;
   }
   public async provideConfigurations(uris: vscode.Uri[], _?: vscode.CancellationToken | undefined): Promise<SourceFileConfigurationItem[]> {
-    const bins = await this.gradleConfig.findMatchingBinary(uris);
+    const bins = await this.gradleConfig.findMatchingBinary([...uris]);
     const ret: SourceFileConfigurationItem[] = [];
     for (const b of bins) {
       ret.push({
