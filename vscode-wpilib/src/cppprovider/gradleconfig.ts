@@ -294,7 +294,9 @@ export class GradleConfig {
   private enumerateSourceSet(source: ISource): Array<Promise<string[]>> {
     const promises: Array<Promise<string[]>> = [];
     for (const s of source.srcDirs) {
-      let includes: string = '**/*';
+      const includes: string = '**/*';
+      // TODO: Figure out includes
+      /*
       if (source.includes.length !== 0) {
         includes = '{';
         let first = true;
@@ -308,8 +310,10 @@ export class GradleConfig {
         }
         includes += '}';
       }
+      */
 
-      let excludes: string = '';
+      const excludes: string = '';
+      /*
       if (source.excludes.length !== 0) {
         excludes = '{';
         let first = true;
@@ -323,6 +327,7 @@ export class GradleConfig {
         }
         excludes += '}';
       }
+      */
       promises.push(new Promise<string[]>((resolve, reject) => {
         glob(includes, {
           cwd: s,
