@@ -34,6 +34,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
   private cppToolsApi: CppToolsApi;
   private registered: boolean = false;
+  private externalApi: IExternalAPI;
 
   constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI) {
     this.workspace = workspace;
@@ -41,9 +42,24 @@ export class ApiProvider implements CustomConfigurationProvider {
                                          externalApi.getExecuteAPI());
     this.disposables.push(this.gradleConfig);
     this.cppToolsApi = cppToolsApi;
+    this.externalApi = externalApi;
 
     /* tslint:disable-next-line:no-floating-promises */
-    this.gradleConfig.loadConfigs().then((found) => {
+    this.gradleConfig.loadConfigs().then(async (found) => {
+      if (!found) {
+        const p = this.externalApi.getPreferencesAPI().getPreferences(this.workspace);
+        if (p.getCurrentLanguage() === 'cpp') {
+          const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
+                                                                          'Yes', 'No');
+          if (configResult === 'Yes') {
+            await this.runGradleRefresh();
+            if (await vscode.window.showInformationMessage('Please reload the window to finish configuration', 'Yes', 'Not Now') === 'Yes') {
+              await vscode.commands.executeCommand('workbench.action.reloadWindow');
+            }
+          }
+          return;
+        }
+      }
       if (found && !this.registered) {
         this.cppToolsApi.registerCustomConfigurationProvider(this);
         this.gradleConfig.refreshEvent.event(() => {

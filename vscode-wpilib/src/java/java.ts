@@ -16,6 +16,10 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'java');
 
+  const preferences = coreExports.getPreferencesAPI();
+  const exampleTemplate = coreExports.getExampleTemplateAPI();
+  const commandApi = coreExports.getCommandAPI();
+
   let allowDebug = true;
 
   const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
@@ -24,10 +28,6 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
     console.log('Could not find java extension. Debugging is disabled.');
     allowDebug = false;
   }
-
-  const preferences = coreExports.getPreferencesAPI();
-  const exampleTemplate = coreExports.getExampleTemplateAPI();
-  const commandApi = coreExports.getCommandAPI();
 
   // Setup build and test
 

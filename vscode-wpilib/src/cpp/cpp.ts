@@ -10,7 +10,6 @@ import { Templates } from '../shared/templates';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
-// import { activateCppProvider } from '../cppprovider/cppprovider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -21,6 +20,10 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'cpp');
 
+  const preferences = coreExports.getPreferencesAPI();
+  const exampleTemplate = coreExports.getExampleTemplateAPI();
+  const commandApi = coreExports.getCommandAPI();
+
   let allowDebug = true;
 
   const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
@@ -28,13 +31,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
     // TODO: Make this a visible warning message when project detected is cpp
     console.log('Could not find cpptools C++ extension. Debugging is disabled.');
     allowDebug = false;
-  } else if (!cppExtension.isActive) {
-    // await cppExtension.activate();
   }
-
-  const preferences = coreExports.getPreferencesAPI();
-  const exampleTemplate = coreExports.getExampleTemplateAPI();
-  const commandApi = coreExports.getCommandAPI();
 
   await activateCppProvider(context, coreExports);
 

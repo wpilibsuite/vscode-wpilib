@@ -33,5 +33,6 @@ export interface IToolChain {
   systemCppArgs: string[];
   systemCMacros: string[];
   systemCArgs: string[];
+  allLibFiles: string[];
   binaries: IBinary[];
 }

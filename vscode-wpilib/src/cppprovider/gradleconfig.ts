@@ -95,14 +95,12 @@ export class GradleConfig {
   }
 
   public async findMatchingBinary(uris: vscode.Uri[]): Promise<IBinaryFind[]> {
-
-    let findCount = 0;
+    const inputCount = uris.length;
     const finds: IBinaryFind[] = [];
 
     for (let i = uris.length - 1; i >= 0; i--) {
       for (const f of this.foundFiles) {
         if (f.uri.fsPath === uris[i].fsPath) {
-          findCount++;
           finds.push(f);
           uris.splice(i, 1);
           break;
@@ -126,7 +124,6 @@ export class GradleConfig {
               for (const file of set) {
                 for (const uri of uris) {
                   if (normalizeDriveLetter(uri.fsPath) === normalizeDriveLetter(file)) {
-                    findCount++;
                     if (sourceSet.cpp) {
                       const args: string[] = [];
                       args.push(...tc.systemCppArgs);
@@ -170,7 +167,7 @@ export class GradleConfig {
                         uri,
                       });
                     }
-                    if (findCount === uris.length) {
+                    if (finds.length === inputCount) {
                       this.foundFiles.push(...finds);
                       return finds;
                     }
@@ -180,10 +177,33 @@ export class GradleConfig {
             }
           }
         }
+        if (finds.length !== inputCount) {
+          // Missing files, search in tc libs
+          for (const dir of tc.allLibFiles) {
+            for (const uri of uris) {
+              if (normalizeDriveLetter(uri.fsPath).indexOf(normalizeDriveLetter(dir)) >= 0) {
+                finds.push({
+                  args: tc.systemCppArgs,
+                  compiler: tc.cppPath,
+                  cpp: true,
+                  includePaths: tc.allLibFiles,
+                  macros: tc.systemCppMacros,
+                  msvc: tc.msvc,
+                  uri,
+                });
+                if (finds.length === inputCount) {
+                  this.foundFiles.push(...finds);
+                  return finds;
+                }
+              }
+            }
+          }
+        }
       }
     }
 
     this.foundFiles.push(...finds);
+
     return finds;
   }
 
