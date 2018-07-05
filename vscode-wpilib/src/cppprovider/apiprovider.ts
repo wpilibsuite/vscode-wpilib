@@ -99,6 +99,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     if (found && !this.registered) {
       this.cppToolsApi.registerCustomConfigurationProvider(this);
+      this.cppToolsApi.didChangeCustomConfiguration(this);
       this.gradleConfig.refreshEvent.event(() => {
         this.cppToolsApi.didChangeCustomConfiguration(this);
       });
