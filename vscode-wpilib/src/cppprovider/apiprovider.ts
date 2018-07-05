@@ -62,6 +62,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       }
       if (found && !this.registered) {
         this.cppToolsApi.registerCustomConfigurationProvider(this);
+        this.cppToolsApi.didChangeCustomConfiguration(this);
         this.gradleConfig.refreshEvent.event(() => {
           this.cppToolsApi.didChangeCustomConfiguration(this);
         });
@@ -86,7 +87,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     for (const b of bins) {
       ret.push({
         configuration: getSourceFileConfiguration(b),
-        uri: b.uri.fsPath,
+        uri: b.uri.toString(),
       });
     }
     // console.log(JSON.stringify(ret, null, 4));
