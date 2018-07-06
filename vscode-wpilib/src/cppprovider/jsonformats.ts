@@ -1,5 +1,13 @@
 'use strict';
 
+export interface ISourceBinaryPair {
+  source: ISource;
+  componentName: string;
+  cpp: boolean;
+  args: string[];
+  macros: string[];
+}
+
 export interface ISource {
   srcDirs: string[];
   includes: string[];
@@ -20,6 +28,11 @@ export interface IBinary {
   libHeaders: string[];
 }
 
+export interface IBinaryMap {
+  0: string;
+  1: number;
+}
+
 export interface IToolChain {
   name: string;
   architecture: string;
@@ -35,4 +48,6 @@ export interface IToolChain {
   systemCArgs: string[];
   allLibFiles: string[];
   binaries: IBinary[];
+  sourceBinaries: ISourceBinaryPair[];
+  nameBinaryMap: { [name: string]: number };
 }
