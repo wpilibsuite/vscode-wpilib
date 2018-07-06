@@ -2,5 +2,6 @@
   "java.configuration.updateBuildConfiguration": "disabled",
   "java.import.gradle.enabled": false,
   "wpilib.online": true,
-  "C_Cpp.default.configurationProvider": "vscode-wpilib"
+  "C_Cpp.default.configurationProvider": "vscode-wpilib",
+  "C_Cpp.default.intelliSenseMode": "clang-x64"
 }

@@ -122,9 +122,9 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.disposables.push(this.statusBar);
 
-    this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange));
-    this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange));
-    this.disposables.push(this.configWatcher.onDidDelete(this.onDelete));
+    this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange, this));
+    this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange, this));
+    this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
 
     this.loadConfigs().then(async (found) => {
       if (!found) {
@@ -137,8 +137,9 @@ export class ApiProvider implements CustomConfigurationProvider {
           return;
         }
       }
-    }).catch(() => {
+    }).catch((err) => {
       console.log('Rejected load?');
+      console.log(err);
     });
   }
 
