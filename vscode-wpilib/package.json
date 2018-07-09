@@ -39,6 +39,11 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "taskDefinitions": [
+            {
+                "type": "wpilibgradle"
+            }
+        ],
         "debuggers": [
             {
                 "type": "wpilib",
