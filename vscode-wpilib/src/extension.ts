@@ -6,6 +6,7 @@ import { BuildTestAPI } from './buildtestapi';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { DeployDebugAPI } from './deploydebugapi';
+import { EclipseUpgrade } from './eclipseupgrade';
 import { ExampleTemplateAPI } from './exampletemplateapi';
 import { ExecuteAPI } from './executor';
 import { Help } from './help';
@@ -83,6 +84,8 @@ export async function activate(context: vscode.ExtensionContext) {
   const help = await Help.Create(extensionResourceLocation, externalApi.getPreferencesAPI());
 
   context.subscriptions.push(help);
+
+  context.subscriptions.push(new EclipseUpgrade(extensionResourceLocation));
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated

@@ -35,7 +35,8 @@
         "onCommand:wpilibcore.createExample",
         "onCommand:wpilibcore.createTemplate",
         "onCommand:wpilibcore.cancelTasks",
-        "onCommand:wpilibcore.help"
+        "onCommand:wpilibcore.help",
+        "onCommand:wpilibcore.upgradeEclipseProject"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -233,6 +234,11 @@
                 "command": "wpilibcore.selectCppToolchain",
                 "title": "Select Current C++ Toolchain",
                 "category": "WPILib C++"
+            },
+            {
+                "command": "wpilibcore.upgradeEclipseProject",
+                "title": "Upgrade a WPILib Eclipse project",
+                "category": "WPILib"
             }
         ],
         "keybindings": [
@@ -320,6 +326,7 @@
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
         "vscode-cpptools": "1.2.2",
-        "vscode-jsonrpc": "^3.6.2"
+        "vscode-jsonrpc": "^3.6.2",
+        "properties": "^1.2.1"
     }
 }
