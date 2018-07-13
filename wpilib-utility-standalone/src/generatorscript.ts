@@ -211,7 +211,7 @@ async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<v
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  const result = await generateCopyCpp(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
+  const result = await generateCopyCpp(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder, false);
   if (!result) {
     dialog.showMessageBox({
       message: 'Cannot extract into non empty directory',
@@ -228,7 +228,8 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  const result = await generateCopyJava(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder);
+  const result = await generateCopyJava(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder,
+                                        'frc.robot.Robot', path.join('frc', 'robot'));
 
   if (!result) {
     dialog.showMessageBox({
