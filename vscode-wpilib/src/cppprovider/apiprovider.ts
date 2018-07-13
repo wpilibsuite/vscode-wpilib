@@ -122,8 +122,11 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.disposables.push(this.statusBar);
 
+    // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange, this));
+    // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange, this));
+    // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
 
     this.loadConfigs().then(async (found) => {
@@ -258,9 +261,9 @@ export class ApiProvider implements CustomConfigurationProvider {
     return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online, 'C++ Configuration', this.executeApi);
   }
 
-  public async dispose(): Promise<void> {
+  public dispose() {
     for (const d of this.disposables) {
-      await d.dispose();
+      d.dispose();
     }
   }
 
