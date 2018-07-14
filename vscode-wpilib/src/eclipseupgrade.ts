@@ -55,7 +55,7 @@ export class EclipseUpgrade {
       canSelectMany: false,
       defaultUri: vscode.Uri.file(path.join(os.homedir(), 'eclipse-workspace')),
       filters: {
-        'Eclipse Project': ['project'],
+        'Eclipse Project': ['properties'],
       },
       openLabel: 'Select a Project',
     });
