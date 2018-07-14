@@ -1,13 +1,12 @@
 'use strict';
 
-import * as glob from 'glob';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem } from 'vscode-cpptools';
 import { IExecuteAPI, IExternalAPI, IPreferences } from '../shared/externalapi';
 import { gradleRun, promisifyReadFile } from '../utilities';
-import { ISource, IToolChain } from './jsonformats';
+import { IToolChain } from './jsonformats';
 import { PersistentFolderState } from './persistentState';
 
 const isWindows = (process.platform === 'win32');
@@ -22,64 +21,6 @@ function normalizeDriveLetter(pth: string): string {
   }
 
   return pth;
-}
-
-async function enumerateSourceSet(source: ISource): Promise<string[]> {
-  const files: string[] = [];
-  for (const s of source.srcDirs) {
-    const includes: string = '**/*';
-    // TODO: Figure out includes
-    /*
-    if (source.includes.length !== 0) {
-      includes = '{';
-      let first = true;
-      for (const i of source.includes) {
-        if (first) {
-          first = false;
-        } else {
-          includes += ',';
-        }
-        includes += i;
-      }
-      includes += '}';
-    }
-    */
-
-    const excludes: string = '';
-    /*
-    if (source.excludes.length !== 0) {
-      excludes = '{';
-      let first = true;
-      for (const i of source.excludes) {
-        if (first) {
-          first = false;
-        } else {
-          excludes += ',';
-        }
-        excludes += i;
-      }
-      excludes += '}';
-    }
-    */
-    files.push(...await new Promise<string[]>((resolve, reject) => {
-      glob(includes, {
-        cwd: s,
-        ignore: excludes,
-        nodir: true,
-      }, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          const newArr: string[] = [];
-          for (const d of data) {
-            newArr.push(path.join(s, d));
-          }
-          resolve(newArr);
-        }
-      });
-    }));
-  }
-  return files;
 }
 
 export class ApiProvider implements CustomConfigurationProvider {
@@ -286,18 +227,19 @@ export class ApiProvider implements CustomConfigurationProvider {
       }
     }
 
+    console.log(`Searching for Binary for ${uriPath}`);
+
     const normalizedPath = normalizeDriveLetter(uri.fsPath);
 
     for (const tc of this.toolchains) {
       if (tc.name === this.selectedName.Value) {
         for (const sb of tc.sourceBinaries) {
-          const files = await enumerateSourceSet(sb.source);
-          for (const file of files) {
-            if (normalizedPath === file) {
+          for (const source of sb.source.srcDirs) {
+            if (normalizedPath.startsWith(source)) {
+              console.log(`Found Binary for ${uriPath}`);
               // Found, find binary
               const index: number = tc.nameBinaryMap[sb.componentName];
-              console.log(index);
-              if (index) {
+              if (index >= 0) {
                 const bin = tc.binaries[index];
                 if (sb.cpp) {
                   const args: string[] = [];
@@ -350,8 +292,31 @@ export class ApiProvider implements CustomConfigurationProvider {
             }
           }
         }
+        for (const alf of tc.allLibFiles) {
+          if (normalizedPath.startsWith(alf)) {
+            console.log(`Found global lib for ${uriPath}`);
+            const args: string[] = [];
+            args.push(...tc.systemCppArgs);
+            const macros: string[] = [];
+            macros.push(...tc.systemCppMacros);
+            const includePaths: string[] = [];
+            includePaths.push(...tc.allLibFiles);
+            this.foundFiles.push({
+              configuration: {
+                compilerPath: tc.cppPath,
+                defines: macros,
+                includePath: includePaths,
+                intelliSenseMode: tc.msvc ? 'msvc-x64' : 'clang-x64',
+                standard: 'c++14',
+              },
+              uri: uriPath,
+            });
+            return true;
+          }
+        }
       }
     }
+    console.log(`Did not find provider for ${uriPath}`);
     return false;
   }
 }
