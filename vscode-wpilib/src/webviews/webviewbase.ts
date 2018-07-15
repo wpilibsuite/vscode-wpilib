@@ -19,7 +19,7 @@ export abstract class WebViewBase {
     this.html = await promisifyReadFile(htmlPath);
     if (scriptPath) {
       const script = await promisifyReadFile(scriptPath);
-      this.html = this.html.replace(/replacescript/g, script);
+      this.html = this.html.split('replacescript').join(script);
     }
     const onDiskPath = vscode.Uri.file(extensionContext.extensionPath);
     const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });

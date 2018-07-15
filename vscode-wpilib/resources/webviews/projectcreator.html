@@ -6,6 +6,17 @@
   <script>
     replacescript
   </script>
+
+  <style>
+    .error {
+      color: red;
+      border-color: red;
+      border-width: 2px;
+    };
+    .invisible {
+      visibility: hidden;
+    };
+  </style>
 </head>
 
 <body>
@@ -28,9 +39,14 @@
   <br/> Create new folder? Highly recommended to be checked
   <input id="newFolderCB" type="checkbox" checked/>
   <br/>
-  <br/> Enter a project name
-  <input id="projectName" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"/>
+  <br/> <div id="projectnamediv">Enter a project name</div>
+  <input id="projectName" oninput="validateProject();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
+
+  <div id="packagediv" style="visibility: hidden">
+    <br/> <div id="packagenamediv">Enter a package name</div>
+    <input id="packageinput" type="text" value='frc.robot' oninput="validatePackage();" style="width: 100%; margin-top: 10px; margin-bottom: 10px"/>
+  </div>
 
   <button id="generateProject" onclick="generateProject()">Generate Project</button>
 </body>
