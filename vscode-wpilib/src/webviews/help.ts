@@ -25,7 +25,7 @@ export class Help extends WebViewBase {
     this.disposables.push(this.statusBar);
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.help', async () => {
-      await this.displayWebView(vscode.ViewColumn.Active);
+      this.displayWebView(vscode.ViewColumn.Active);
     }));
   }
 

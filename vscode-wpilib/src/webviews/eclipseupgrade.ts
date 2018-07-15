@@ -43,12 +43,13 @@ export class EclipseUpgrade extends WebViewBase {
     super('wpilibeclipseupgrade', 'WPILib Eclipse Upgrade');
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.upgradeEclipseProject', async () => {
-      await this.displayWebView(vscode.ViewColumn.Active, true, {
+      this.displayWebView(vscode.ViewColumn.Active, true, {
         enableScripts: true,
         retainContextWhenHidden: true,
       });
       if (this.webview) {
         this.webview.webview.onDidReceiveMessage(async (data) => {
+          // tslint:disable-next-line:no-unsafe-any
           switch (data.type) {
             case 'eclipse':
               await this.handleEclipseButton();
@@ -57,6 +58,7 @@ export class EclipseUpgrade extends WebViewBase {
               await this.handleNewProjectLoc();
               break;
             case 'upgradeproject':
+              // tslint:disable-next-line:no-unsafe-any
               await this.handleUpgrade(data.data);
               break;
             default:

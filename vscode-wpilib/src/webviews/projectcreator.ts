@@ -34,12 +34,13 @@ export class ProjectCreator extends WebViewBase {
     this.exampleTemplateApi = exampleTemplateApi;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.createNewProject', async () => {
-      await this.displayWebView(vscode.ViewColumn.Active, true, {
+      this.displayWebView(vscode.ViewColumn.Active, true, {
         enableScripts: true,
         retainContextWhenHidden: true,
       });
       if (this.webview) {
         this.webview.webview.onDidReceiveMessage(async (data) => {
+          // tslint:disable-next-line:no-unsafe-any
           switch (data.type) {
             case 'newproject':
               await this.handleNewProjectLoc();
@@ -48,12 +49,15 @@ export class ProjectCreator extends WebViewBase {
               await this.handleProjectType();
               break;
             case 'language':
+              // tslint:disable-next-line:no-unsafe-any
               await this.handleLanguage(data.data);
               break;
             case 'base':
+              // tslint:disable-next-line:no-unsafe-any
               await this.handleBase(data.data);
               break;
             case 'createproject':
+              // tslint:disable-next-line:no-unsafe-any
               await this.createProject(data.data);
               break;
             default:
