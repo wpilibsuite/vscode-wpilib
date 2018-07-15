@@ -117,3 +117,8 @@ export async function gradleRun(args: string, rootDir: string, workspace: vscode
   await setExecutePermissions(path.join(workspace.uri.fsPath, 'gradlew'));
   return executeApi.executeCommand(command, name, rootDir, workspace);
 }
+
+export let extensionContext: vscode.ExtensionContext;
+export function setExtensionContext(context: vscode.ExtensionContext): void {
+    extensionContext = context;
+}

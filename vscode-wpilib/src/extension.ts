@@ -6,15 +6,16 @@ import { BuildTestAPI } from './buildtestapi';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { DeployDebugAPI } from './deploydebugapi';
-import { EclipseUpgrade } from './eclipseupgrade';
 import { ExampleTemplateAPI } from './exampletemplateapi';
 import { ExecuteAPI } from './executor';
-import { Help } from './help';
 import { activateJava } from './java/java';
 import { PreferencesAPI } from './preferencesapi';
 import { IExternalAPI } from './shared/externalapi';
 import { ToolAPI } from './toolapi';
+import { setExtensionContext } from './utilities';
 import { createVsCommands } from './vscommands';
+import { EclipseUpgrade } from './webviews/eclipseupgrade';
+import { Help } from './webviews/help';
 
 class ExternalAPI extends IExternalAPI {
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
@@ -70,6 +71,7 @@ class ExternalAPI extends IExternalAPI {
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+  setExtensionContext(context);
 
   // Resources folder will be used for RioLog
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
@@ -81,11 +83,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   createVsCommands(context, externalApi);
 
-  const help = await Help.Create(extensionResourceLocation, externalApi.getPreferencesAPI());
+  const help = await Help.Create(externalApi.getPreferencesAPI());
+  const eclipseupgrade = await EclipseUpgrade.Create();
 
   context.subscriptions.push(help);
 
-  context.subscriptions.push(new EclipseUpgrade(extensionResourceLocation));
+  context.subscriptions.push(eclipseupgrade);
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated

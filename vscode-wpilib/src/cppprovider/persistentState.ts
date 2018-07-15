@@ -6,11 +6,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-
-export let extensionContext: vscode.ExtensionContext;
-export function setExtensionContext(context: vscode.ExtensionContext): void {
-    extensionContext = context;
-}
+import { extensionContext } from '../utilities';
 
 class PersistentStateBase<T> {
     private key: string;
