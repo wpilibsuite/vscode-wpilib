@@ -87,26 +87,10 @@ window.addEventListener('message', (event) => {
   }
 });
 
-function validatePackage() {
-  const elem = document.getElementById('packageinput');
-  const s = elem.value
-  const match = s.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$');
-  const pdiv = document.getElementById('packagenamediv');
-  if (match === null || match.length === 0) {
-    pdiv.innerText = 'Invalid Package Name';
-    pdiv.classList.add('error');
-    elem.classList.add('error');
-  } else {
-    pdiv.innerText = 'Enter a package name';
-    pdiv.classList.remove('error');
-    elem.classList.remove('error');
-  }
-}
-
 function validateProject() {
   const elem = document.getElementById('projectName');
   const s = elem.value
-  const match = s.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$');
+  const match = s.match(/\w[\w-]*$/gm);
   const pdiv = document.getElementById('projectnamediv');
   if (match === null || match.length === 0) {
     pdiv.innerText = 'Invalid Project Name';

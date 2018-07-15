@@ -43,7 +43,7 @@ window.addEventListener('message', (event) => {
 function validateProject() {
   const elem = document.getElementById('projectName');
   const s = elem.value
-  const match = s.match('^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$');
+  const match = s.match(/\w[\w-]*$/gm);
   const pdiv = document.getElementById('projectnamediv');
   if (match === null || match.length === 0) {
     pdiv.innerText = 'Invalid Project Name';

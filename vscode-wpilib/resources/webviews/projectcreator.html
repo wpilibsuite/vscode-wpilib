@@ -13,9 +13,6 @@
       border-color: red;
       border-width: 2px;
     };
-    .invisible {
-      visibility: hidden;
-    };
   </style>
 </head>
 
@@ -42,11 +39,6 @@
   <br/> <div id="projectnamediv">Enter a project name</div>
   <input id="projectName" oninput="validateProject();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
-
-  <div id="packagediv" style="visibility: hidden">
-    <br/> <div id="packagenamediv">Enter a package name</div>
-    <input id="packageinput" type="text" value='frc.robot' oninput="validatePackage();" style="width: 100%; margin-top: 10px; margin-bottom: 10px"/>
-  </div>
 
   <button id="generateProject" onclick="generateProject()">Generate Project</button>
 </body>

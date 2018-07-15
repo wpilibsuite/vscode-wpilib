@@ -69,7 +69,8 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async createProject(data: ICreateProjectData) {
-    await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder, data.projectName);
+    await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,
+                                                data.projectName);
   }
 
   private async handleProjectType() {
