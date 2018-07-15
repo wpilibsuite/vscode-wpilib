@@ -10,7 +10,7 @@ function projectSelectButtonClick() {
   vscode.postMessage({type: 'newproject'});
 }
 
-function updateProjectButtonClick() {
+function upgradeProjectButtonClick() {
   vscode.postMessage({
     type: 'upgradeproject',
     data: {

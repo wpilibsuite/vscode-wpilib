@@ -57,7 +57,7 @@ export class EclipseUpgrade extends WebViewBase {
               await this.handleNewProjectLoc();
               break;
             case 'upgradeproject':
-              await this.handleUpdate(data.data);
+              await this.handleUpgrade(data.data);
               break;
             default:
               break;
@@ -118,7 +118,7 @@ export class EclipseUpgrade extends WebViewBase {
     }
   }
 
-  private async handleUpdate(data: IUpgradeProject) {
+  private async handleUpgrade(data: IUpgradeProject) {
     const oldProjectPath =  path.dirname(data.fromProps);
 
     const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
