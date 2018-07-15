@@ -63,7 +63,9 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
     },
   });
 
-  await Promise.all([src, gradle, setExecutePermissions(path.join(toFolder, 'gradlew'))]);
+  await Promise.all([src, gradle]);
+
+  await setExecutePermissions(path.join(toFolder, 'gradlew'));
 
   return true;
 }
