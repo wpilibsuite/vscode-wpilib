@@ -16,6 +16,7 @@ import { setExtensionContext } from './utilities';
 import { createVsCommands } from './vscommands';
 import { EclipseUpgrade } from './webviews/eclipseupgrade';
 import { Help } from './webviews/help';
+import { ProjectCreator } from './webviews/projectcreator';
 
 class ExternalAPI extends IExternalAPI {
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
@@ -89,6 +90,8 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(help);
 
   context.subscriptions.push(eclipseupgrade);
+
+  context.subscriptions.push(await ProjectCreator.Create(externalApi.getExampleTemplateAPI()));
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated

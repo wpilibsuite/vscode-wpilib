@@ -44,8 +44,10 @@ export function getExampleTemplateAPIExpectedVersion(): number {
 export abstract class IExampleTemplateAPI implements IVersionable {
   public abstract addTemplateProvider(provider: IExampleTemplateCreator): void;
   public abstract addExampleProvider(provider: IExampleTemplateCreator): void;
-  public abstract createExample(): Promise<boolean>;
-  public abstract createTemplate(): Promise<boolean>;
+  public abstract getLanguages(template: boolean): string[];
+  public abstract getBases(template: boolean, language: string): string[];
+  public abstract createProject(template: boolean, language: string, base: string,
+                                toFolder: string, newFolder: boolean, projectName: string): Promise<boolean>;
   public getVersion(): number {
     return exampleTemplateAPIExpectedVersion;
   }

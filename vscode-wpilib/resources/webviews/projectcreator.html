@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WPILib Project Create</title>
+  <script>
+    replacescript
+  </script>
+</head>
+
+<body>
+  <img src="replaceresource/resources/wpilib.svg" width="100" />
+
+  <h1>Welcome to WPILib New Project Creator</h1>
+
+  <button id="projectType" onclick="selectProjectType()">Select a project type (Example or Template)</button>
+
+  <button id="language" onclick="selectLanguage()" disabled>Select a language</button>
+
+  <button id="projectBase" onclick="selectProjectBase()" disabled>Select a project base</button>
+  <br/>
+  <br/> Select a folder to place the new project into.
+  <br/>
+  <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <button onclick="selectProjectFolder();">Select a new project folder</button>
+  <br/>
+  <br/> Create new folder? Highly recommended to be checked
+  <input id="newFolderCB" type="checkbox" checked/>
+  <br/>
+  <br/> Enter a project name
+  <input id="projectName" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"/>
+  <br/>
+
+  <button id="generateProject" onclick="generateProject()">Generate Project</button>
+</body>

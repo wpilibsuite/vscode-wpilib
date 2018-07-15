@@ -1,6 +1,9 @@
 'use scrict';
+
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from './shared/externalapi';
+import { promisifyMkdirp } from './shared/generator';
 
 interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
@@ -66,12 +69,40 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
     });
   }
 
-  public createExample(): Promise<boolean> {
-    return this.getSelection('Example', this.examples);
+  public getLanguages(template: boolean): string[] {
+    const retSet: Set<string> = new Set();
+    if (template) {
+      for (const t of this.templates) {
+        retSet.add(t.label);
+      }
+    } else {
+      for (const t of this.examples) {
+        retSet.add(t.label);
+      }
+    }
+    return Array.from(retSet);
   }
 
-  public createTemplate(): Promise<boolean> {
-    return this.getSelection('Template', this.templates);
+  public getBases(template: boolean, language: string): string[] {
+    const retSet: Set<string> = new Set();
+    if (template) {
+      for (const t of this.templates) {
+        if (t.label === language) {
+          for (const c of t.creators) {
+            retSet.add(c.label);
+          }
+        }
+      }
+    } else {
+      for (const t of this.examples) {
+        if (t.label === language) {
+          for (const c of t.creators) {
+            retSet.add(c.label);
+          }
+        }
+      }
+    }
+    return Array.from(retSet);
   }
 
   public dispose() {
@@ -80,69 +111,63 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
     }
   }
 
-  private async getSelection(type: string, langs: ILanguageQuickPick[]): Promise<boolean> {
-    if (langs.length === 0) {
-      vscode.window.showInformationMessage(`No ${type.toLowerCase()} providers found`);
-      return false;
-    } else if (langs.length === 1) {
-      return this.runSelection(langs[0], type);
-    } else {
-      const selection = await vscode.window.showQuickPick(langs, { placeHolder: 'Pick a language' });
-      if (selection === undefined) {
-        await vscode.window.showInformationMessage('Langauge not picked, cancelling.');
-        return false;
-      }
-      return this.runSelection(selection, type);
-    }
-  }
-
-  private async runSelection(lang: ILanguageQuickPick, type: string): Promise<boolean> {
-    const selection = await vscode.window.showQuickPick(lang.creators, { placeHolder: `Pick an ${type.toLowerCase()}` });
-    if (selection === undefined) {
-      await vscode.window.showInformationMessage('Invalid selection');
-      return false;
-    }
-    // Ask user for a folder
-    const open: vscode.OpenDialogOptions = {
-      canSelectFiles: false,
-      canSelectFolders: true,
-      canSelectMany: false,
-      openLabel: 'Select Folder',
-    };
-    const result = await vscode.window.showOpenDialog(open);
-    if (result === undefined) {
-      await vscode.window.showInformationMessage('cancelled');
-      return false;
-    }
-    // TODO: Check if folder is empty
-
-    if (result.length !== 1) {
-      console.log('weird');
-      return false;
-    }
-
-    const success = await selection.creator.generate(result[0]);
-    if (success) {
-      // Search workspaces
-      const workspaces = vscode.workspace.workspaceFolders;
-      if (workspaces !== undefined && workspaces.length > 0) {
-        for (const w of workspaces) {
-          if (w.uri === result[0]) {
-            return true;
+  public async createProject(template: boolean, language: string, base: string,
+                             toFolder: string, newFolder: boolean, projectName: string): Promise<boolean> {
+    if (template) {
+      for (const t of this.templates) {
+        if (t.label === language) {
+          for (const c of t.creators) {
+            if (c.label === base) {
+              return this.handleGenerate(c.creator, toFolder, newFolder, projectName);
+            }
           }
         }
       }
-      const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-                                                                       'Yes (Current Window)', 'Yes (New Window)', 'No');
-      if (openSelection === undefined) {
-        return true;
-      } else if (openSelection === 'Yes (Current Window)') {
-        await vscode.commands.executeCommand('vscode.openFolder', result[0], false);
-      } else if (openSelection === 'Yes (New Window)') {
-        await vscode.commands.executeCommand('vscode.openFolder', result[0], true);
-      } else {
-        return true;
+    } else {
+      for (const t of this.examples) {
+        if (t.label === language) {
+          for (const c of t.creators) {
+            if (c.label === base) {
+              return this.handleGenerate(c.creator, toFolder, newFolder, projectName);
+            }
+          }
+        }
       }
+    }
+    return false;
+  }
+
+  private async handleGenerate(creator: IExampleTemplateCreator, toFolderOrig: string, newFolder: boolean,
+                               projectName: string): Promise<boolean> {
+    let toFolder = toFolderOrig;
+
+    if (newFolder) {
+      toFolder = path.join(toFolderOrig, projectName);
+    }
+
+    try {
+      await promisifyMkdirp(toFolder);
+    } catch {
+      //
+    }
+    const toFolderUri = vscode.Uri.file(toFolder);
+
+    const success = await creator.generate(toFolderUri);
+
+    if (!success) {
+      return false;
+    }
+
+    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
+        'Yes (Current Window)', 'Yes (New Window)', 'No');
+    if (openSelection === undefined) {
+      return true;
+    } else if (openSelection === 'Yes (Current Window)') {
+      await vscode.commands.executeCommand('vscode.openFolder', toFolderUri, false);
+    } else if (openSelection === 'Yes (New Window)') {
+      await vscode.commands.executeCommand('vscode.openFolder', toFolderUri, true);
+    } else {
+      return true;
     }
     return true;
   }

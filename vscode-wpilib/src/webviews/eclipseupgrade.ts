@@ -34,9 +34,9 @@ interface IUpgradeProject {
 
 export class EclipseUpgrade extends WebViewBase {
   public static async Create(): Promise<EclipseUpgrade> {
-    const help = new EclipseUpgrade();
-    await help.asyncInitialize();
-    return help;
+    const upgrade = new EclipseUpgrade();
+    await upgrade.asyncInitialize();
+    return upgrade;
   }
 
   private constructor() {

@@ -36,7 +36,8 @@
         "onCommand:wpilibcore.createTemplate",
         "onCommand:wpilibcore.cancelTasks",
         "onCommand:wpilibcore.help",
-        "onCommand:wpilibcore.upgradeEclipseProject"
+        "onCommand:wpilibcore.upgradeEclipseProject",
+        "onCommand:wpilibcore.createNewProject"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -192,16 +193,6 @@
                 "category": "WPILib"
             },
             {
-                "command": "wpilibcore.createExample",
-                "title": "Create new project from an example",
-                "category": "WPILib"
-            },
-            {
-                "command": "wpilibcore.createTemplate",
-                "title": "Create new project from a template",
-                "category": "WPILib"
-            },
-            {
                 "command": "wpilibcore.createCommand",
                 "title": "Create a new class/command",
                 "category": "WPILib",
@@ -238,6 +229,11 @@
             {
                 "command": "wpilibcore.upgradeEclipseProject",
                 "title": "Upgrade a WPILib Eclipse project",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.createNewProject",
+                "title": "Create a new project",
                 "category": "WPILib"
             }
         ],

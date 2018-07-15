@@ -235,14 +235,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await preferences.setAutoStartRioLog(result === 'Yes', request === 'Globally');
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createExample', async () => {
-    await externalApi.getExampleTemplateAPI().createExample();
-  }));
-
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createTemplate', async () => {
-    await externalApi.getExampleTemplateAPI().createTemplate();
-  }));
-
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.cancelTasks', async () => {
     await externalApi.getExecuteAPI().cancelCommands();
   }));
