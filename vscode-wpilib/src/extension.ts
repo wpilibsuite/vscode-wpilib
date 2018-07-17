@@ -9,6 +9,7 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
+import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
 import { IExternalAPI } from './shared/externalapi';
 import { ToolAPI } from './toolapi';
@@ -92,6 +93,20 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(eclipseupgrade);
 
   context.subscriptions.push(await ProjectCreator.Create(externalApi.getExampleTemplateAPI()));
+
+  const wp = vscode.workspace.workspaceFolders;
+  if (wp) {
+    for (const w of wp) {
+      if (externalApi.getPreferencesAPI().getPreferences(w).getIsWPILibProject()) {
+        const persistentState = new PersistentFolderState('wpilib.newProjectHelp', false, w.uri.fsPath);
+        if (persistentState.Value === false) {
+          persistentState.Value = true;
+          help.displayHelp();
+          break;
+        }
+      }
+    }
+  }
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated

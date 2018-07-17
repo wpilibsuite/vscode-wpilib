@@ -6,7 +6,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { extensionContext } from '../utilities';
+import { extensionContext } from './utilities';
 
 class PersistentStateBase<T> {
     private key: string;

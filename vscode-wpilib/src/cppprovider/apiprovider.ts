@@ -4,10 +4,10 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem } from 'vscode-cpptools';
+import { PersistentFolderState } from '../persistentState';
 import { IExecuteAPI, IExternalAPI, IPreferences } from '../shared/externalapi';
 import { gradleRun, promisifyReadFile } from '../utilities';
 import { IToolChain } from './jsonformats';
-import { PersistentFolderState } from './persistentState';
 
 const isWindows = (process.platform === 'win32');
 
