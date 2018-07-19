@@ -20,7 +20,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
   }
 
   public resolveDebugConfiguration(_workspace: vscode.WorkspaceFolder | undefined,
-                                   config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
+                                   _: vscode.DebugConfiguration, __?: vscode.CancellationToken):
     vscode.ProviderResult<vscode.DebugConfiguration> {
     vscode.window.showInformationMessage('This functionality is disabled for the Alpha test.');
     return undefined;
