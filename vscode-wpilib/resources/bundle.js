@@ -7,6 +7,10 @@ function checkResize() {
     sharedscript_1.checkResizeImpl(document.documentElement);
 }
 exports.checkResize = checkResize;
+function scrollImpl() {
+    document.body.scrollTop = document.body.scrollHeight;
+}
+exports.scrollImpl = scrollImpl;
 function sendMessage(message) {
     // tslint:disable-next-line:no-unsafe-any
     vscode.postMessage(message, '*');
@@ -560,13 +564,13 @@ function handleMessage(data) {
     switch (data.type) {
         case interfaces_1.SendTypes.New:
             addMessage(data.message);
-            document.body.scrollTop = document.body.scrollHeight;
+            implscript_1.scrollImpl();
             break;
         case interfaces_1.SendTypes.Batch:
             for (const message of data.message) {
                 addMessage(message);
             }
-            document.body.scrollTop = document.body.scrollHeight;
+            implscript_1.scrollImpl();
             break;
         case interfaces_1.SendTypes.PauseUpdate:
             const pause = document.getElementById('pause');

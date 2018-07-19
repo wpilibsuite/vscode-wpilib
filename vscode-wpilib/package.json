@@ -5,6 +5,7 @@
     "version": "0.1.0",
     "publisher": "wpifirst",
     "license": "BSD-3-Clause",
+    "icon": "wpilib-128.png",
     "engines": {
         "vscode": "^1.25.0"
     },
