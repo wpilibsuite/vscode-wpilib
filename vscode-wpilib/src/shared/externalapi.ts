@@ -9,6 +9,10 @@ export interface IPreferencesChangedPair {
   preference: IPreferences;
 }
 
+export interface ICreatorQuickPick extends vscode.QuickPickItem {
+  creator: IExampleTemplateCreator;
+}
+
 export interface IVersionable {
   getVersion(): number;
 }
@@ -45,7 +49,7 @@ export abstract class IExampleTemplateAPI implements IVersionable {
   public abstract addTemplateProvider(provider: IExampleTemplateCreator): void;
   public abstract addExampleProvider(provider: IExampleTemplateCreator): void;
   public abstract getLanguages(template: boolean): string[];
-  public abstract getBases(template: boolean, language: string): string[];
+  public abstract getBases(template: boolean, language: string): ICreatorQuickPick[];
   public abstract createProject(template: boolean, language: string, base: string,
                                 toFolder: string, newFolder: boolean, projectName: string): Promise<boolean>;
   public getVersion(): number {

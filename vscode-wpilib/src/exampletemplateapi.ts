@@ -9,100 +9,58 @@ interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
 }
 
-interface ILanguageQuickPick extends vscode.QuickPickItem {
-  creators: ICreatorQuickPick[];
-}
-
 export class ExampleTemplateAPI extends IExampleTemplateAPI {
   private disposables: vscode.Disposable[] = [];
-  private templates: ILanguageQuickPick[] = [];
-  private examples: ILanguageQuickPick[] = [];
+  private templates: ICreatorQuickPick[] = [];
+  private examples: ICreatorQuickPick[] = [];
 
   public addTemplateProvider(provider: IExampleTemplateCreator): void {
-    let lp: ILanguageQuickPick | undefined;
-    for (const p of this.templates) {
-      if (p.label === provider.getLanguage()) {
-        lp = p;
-        break;
-      }
-    }
-
-    if (lp === undefined) {
-      // Not found
-      lp = {
-        creators: [],
-        description: 'Choice of language',
-        label: provider.getLanguage(),
-      };
-      this.templates.push(lp);
-    }
-
-    lp.creators.push({
+    const lp: ICreatorQuickPick = {
       creator: provider,
       description: provider.getDescription(),
       label: provider.getDisplayName(),
-    });
+    };
+    this.templates.push(lp);
   }
   public addExampleProvider(provider: IExampleTemplateCreator): void {
-    let lp: ILanguageQuickPick | undefined;
-    for (const p of this.examples) {
-      if (p.label === provider.getLanguage()) {
-        lp = p;
-        break;
-      }
-    }
-
-    if (lp === undefined) {
-      // Not found
-      lp = {
-        creators: [],
-        description: 'Choice of language',
-        label: provider.getLanguage(),
-      };
-      this.examples.push(lp);
-    }
-
-    lp.creators.push({
+    const lp: ICreatorQuickPick = {
       creator: provider,
       description: provider.getDescription(),
       label: provider.getDisplayName(),
-    });
+    };
+    this.templates.push(lp);
   }
 
   public getLanguages(template: boolean): string[] {
     const retSet: Set<string> = new Set();
     if (template) {
       for (const t of this.templates) {
-        retSet.add(t.label);
+        retSet.add(t.creator.getLanguage());
       }
     } else {
       for (const t of this.examples) {
-        retSet.add(t.label);
+        retSet.add(t.creator.getLanguage());
       }
     }
     return Array.from(retSet);
   }
 
-  public getBases(template: boolean, language: string): string[] {
-    const retSet: Set<string> = new Set();
+  public getBases(template: boolean, language: string): ICreatorQuickPick[] {
+    const ret: ICreatorQuickPick[] = [];
     if (template) {
       for (const t of this.templates) {
-        if (t.label === language) {
-          for (const c of t.creators) {
-            retSet.add(c.label);
-          }
+        if (t.creator.getLanguage() === language) {
+          ret.push(t);
         }
       }
     } else {
       for (const t of this.examples) {
-        if (t.label === language) {
-          for (const c of t.creators) {
-            retSet.add(c.label);
-          }
+        if (t.creator.getLanguage() === language) {
+          ret.push(t);
         }
       }
     }
-    return Array.from(retSet);
+    return ret;
   }
 
   public dispose() {
@@ -115,22 +73,14 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
                              toFolder: string, newFolder: boolean, projectName: string): Promise<boolean> {
     if (template) {
       for (const t of this.templates) {
-        if (t.label === language) {
-          for (const c of t.creators) {
-            if (c.label === base) {
-              return this.handleGenerate(c.creator, toFolder, newFolder, projectName);
-            }
-          }
+        if (t.creator.getLanguage() === language && t.label === base) {
+          return this.handleGenerate(t.creator, toFolder, newFolder, projectName);
         }
       }
     } else {
       for (const t of this.examples) {
-        if (t.label === language) {
-          for (const c of t.creators) {
-            if (c.label === base) {
-              return this.handleGenerate(c.creator, toFolder, newFolder, projectName);
-            }
-          }
+        if (t.creator.getLanguage() === language && t.label === base) {
+          return this.handleGenerate(t.creator, toFolder, newFolder, projectName);
         }
       }
     }
