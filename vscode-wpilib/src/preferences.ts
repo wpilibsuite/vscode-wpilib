@@ -30,13 +30,16 @@ export async function requestTeamNumber(): Promise<number> {
   return parseInt(teamNumber, 10);
 }
 
+// Stores the preferences for a specific workspace
 export class Preferences implements IPreferences {
+  // Create for a specific workspace
   public static async Create(workspace: vscode.WorkspaceFolder): Promise<Preferences> {
     const prefs = new Preferences(workspace);
     await prefs.asyncInitialize();
     return prefs;
   }
 
+  // Workspace these preferences are assigned to.
   public workspace: vscode.WorkspaceFolder;
 
   private preferencesFile?: vscode.Uri;

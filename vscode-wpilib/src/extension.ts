@@ -19,7 +19,9 @@ import { EclipseUpgrade } from './webviews/eclipseupgrade';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 
+// External API class to implement the IExternalAPI interface
 class ExternalAPI extends IExternalAPI {
+  // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
     const deployDebugApi = await DeployDebugAPI.Create(resourceFolder, preferencesApi);
@@ -75,25 +77,39 @@ class ExternalAPI extends IExternalAPI {
 export async function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
 
-  // Resources folder will be used for RioLog
+  // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
+  // The external API can be used by other extensions that want to use our
+  // functionality. Its definition is provided in shared/externalapi.ts.
+  // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
+  // Activate the C++ parts of the extension
   await activateCpp(context, externalApi);
+  // Active the java parts of the extension
   await activateJava(context, externalApi);
 
+  // Create all of our commands that the extension runs
   createVsCommands(context, externalApi);
 
+  // Create the help window provider
   const help = await Help.Create(externalApi.getPreferencesAPI());
+
+  // Create the eclipse upgrade provider
   const eclipseupgrade = await EclipseUpgrade.Create();
 
+  // Create the new project creator provider
+  const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI());
+
+  // Anything pushed into context.subscriptions will get disposed when VS Code closes.
   context.subscriptions.push(help);
 
   context.subscriptions.push(eclipseupgrade);
 
-  context.subscriptions.push(await ProjectCreator.Create(externalApi.getExampleTemplateAPI()));
+  context.subscriptions.push(projectcreator);
 
+  // Detect if we are a new WPILib project, and if so display the WPILib help window.
   const wp = vscode.workspace.workspaceFolders;
   if (wp) {
     for (const w of wp) {
@@ -108,8 +124,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
+  // Log our extension is active
   console.log('Congratulations, your extension "vscode-wpilib" is now active!');
 
   return externalApi;

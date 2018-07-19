@@ -3,14 +3,19 @@ import * as vscode from 'vscode';
 import { Preferences } from './preferences';
 import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from './shared/externalapi';
 
+// Stores the preferences provider for WPILib
+// Each workspace can have its own preferences, so this provides for each workspace
 export class PreferencesAPI extends IPreferencesAPI {
+  // Async create to allow asynchronous initialization
   public static async Create(): Promise<PreferencesAPI> {
     const prefs = new PreferencesAPI();
     await prefs.asyncInitialize();
     return prefs;
   }
 
+  // Event fires when the workspace folders change and new preferences are loaded
   public onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+
   private preferences: Preferences[] = [];
   private preferencesEmitter: vscode.EventEmitter<IPreferencesChangedPair[]> = new vscode.EventEmitter<IPreferencesChangedPair[]>();
   private disposables: vscode.Disposable[] = [];
@@ -20,6 +25,7 @@ export class PreferencesAPI extends IPreferencesAPI {
     this.onDidPreferencesFolderChanged = this.preferencesEmitter.event;
   }
 
+  // Get the preferences for a specific workspace
   public getPreferences(workspace: vscode.WorkspaceFolder): IPreferences {
     for (const p of this.preferences) {
       if (p.workspace.uri === workspace.uri) {
@@ -29,6 +35,7 @@ export class PreferencesAPI extends IPreferencesAPI {
     return this.preferences[0];
   }
 
+  // Get the first workspace if there is only one, or ask for a workspace and provide it.
   public async getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined> {
     const wp = vscode.workspace.workspaceFolders;
     if (wp === undefined) {

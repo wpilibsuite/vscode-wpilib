@@ -6,6 +6,8 @@ import * as vscode from 'vscode';
 import { IExecuteAPI } from './shared/externalapi';
 import { setExecutePermissions } from './shared/permissions';
 
+// General utilites usable by multiple classes
+
 export function getIsWindows(): boolean {
   const nodePlatform: NodeJS.Platform = process.platform;
   return nodePlatform === 'win32';

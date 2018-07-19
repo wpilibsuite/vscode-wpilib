@@ -6,6 +6,7 @@ interface IToolQuickPick extends vscode.QuickPickItem {
   runner: IToolRunner;
 }
 
+// The tools API provider. Lists tools added to it in a quick pick to select.
 export class ToolAPI extends IToolAPI {
   private tools: IToolQuickPick[] = [];
   private disposables: vscode.Disposable[] = [];

@@ -4,6 +4,11 @@ import * as vscode from 'vscode';
 import { requestTeamNumber } from './preferences';
 import { IExternalAPI } from './shared/externalapi';
 
+// Most of our commands are created here.
+// To create a command, use vscode.commands.registerCommand with the name of the command
+// and a function to call. This function can either take nothing, or a vscode.Uri if
+// the command is expected to be called on a context menu.
+// Make sure to push the created command into context.subscriptions
 export function createVsCommands(context: vscode.ExtensionContext, externalApi: IExternalAPI) {
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startRioLog', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
