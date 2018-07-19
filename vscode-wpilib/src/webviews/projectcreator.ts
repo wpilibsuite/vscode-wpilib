@@ -103,7 +103,7 @@ export class ProjectCreator extends WebViewBase {
     });
     if (result && this.webview) {
       this.webview.webview.postMessage({
-        data: result,
+        data: result.label,
         type: 'base',
       });
     }

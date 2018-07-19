@@ -28,7 +28,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
       description: provider.getDescription(),
       label: provider.getDisplayName(),
     };
-    this.templates.push(lp);
+    this.examples.push(lp);
   }
 
   public getLanguages(template: boolean): string[] {

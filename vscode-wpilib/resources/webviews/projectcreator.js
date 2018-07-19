@@ -7,10 +7,12 @@ let language = '';
 let base = '';
 
 function selectProjectType() {
+  document.activeElement.blur();
   vscode.postMessage({type: 'projecttype'})
 }
 
 function selectLanguage() {
+  document.activeElement.blur();
   vscode.postMessage({
     type: 'language',
     data: {
@@ -21,6 +23,7 @@ function selectLanguage() {
 }
 
 function selectProjectBase() {
+  document.activeElement.blur();
   vscode.postMessage({
       type: 'base',
       data: {
@@ -31,10 +34,12 @@ function selectProjectBase() {
 }
 
 function selectProjectFolder() {
+  document.activeElement.blur();
   vscode.postMessage({type: 'newproject'});
 }
 
 function generateProject() {
+  document.activeElement.blur();
   console.log(language + ' lang');
   console.log(base + ' base');
   vscode.postMessage({

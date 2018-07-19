@@ -3,14 +3,17 @@
 const vscode = acquireVsCodeApi();
 
 function eclipseSelectButtonClick() {
+  document.activeElement.blur();
   vscode.postMessage({type: 'eclipse'});
 }
 
 function projectSelectButtonClick() {
+  document.activeElement.blur();
   vscode.postMessage({type: 'newproject'});
 }
 
 function upgradeProjectButtonClick() {
+  document.activeElement.blur();
   vscode.postMessage({
     type: 'upgradeproject',
     data: {
