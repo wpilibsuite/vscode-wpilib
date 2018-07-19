@@ -74,7 +74,9 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleProjectType() {
-    const result = await vscode.window.showQuickPick(['Template', 'Example']);
+    const result = await vscode.window.showQuickPick(['Template', 'Example'], {
+      placeHolder: 'Select a project type.',
+    });
     if (result && this.webview) {
       this.webview.webview.postMessage({
         data: result === 'Template',
@@ -84,7 +86,9 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleLanguage(data: ISelectorData) {
-    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getLanguages(data.template));
+    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getLanguages(data.template), {
+      placeHolder: 'Select a language',
+    });
     if (result && this.webview) {
       this.webview.webview.postMessage({
         data: result,
@@ -94,7 +98,9 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleBase(data: ISelectorData) {
-    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getBases(data.template, data.language));
+    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getBases(data.template, data.language), {
+      placeHolder: 'Select a project base',
+    });
     if (result && this.webview) {
       this.webview.webview.postMessage({
         data: result,
