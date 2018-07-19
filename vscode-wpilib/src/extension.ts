@@ -21,27 +21,30 @@ import { ProjectCreator } from './webviews/projectcreator';
 
 class ExternalAPI extends IExternalAPI {
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
-    const externalApi = new ExternalAPI();
-    externalApi.preferencesApi = await PreferencesAPI.Create();
-    externalApi.deployDebugApi = await DeployDebugAPI.Create(resourceFolder, externalApi.preferencesApi);
-    externalApi.buildTestApi = new BuildTestAPI(externalApi.preferencesApi);
+    const preferencesApi = await PreferencesAPI.Create();
+    const deployDebugApi = await DeployDebugAPI.Create(resourceFolder, preferencesApi);
+    const buildTestApi = new BuildTestAPI(preferencesApi);
+    const externalApi = new ExternalAPI(preferencesApi, deployDebugApi, buildTestApi);
     return externalApi;
   }
 
-  private toolApi: ToolAPI;
-  private deployDebugApi: DeployDebugAPI | undefined;
-  private buildTestApi: BuildTestAPI | undefined;
-  private preferencesApi: PreferencesAPI | undefined;
-  private exampleTemplateApi: ExampleTemplateAPI;
-  private commandApi: CommandAPI;
-  private executeApi: ExecuteAPI;
+  private readonly toolApi: ToolAPI;
+  private readonly deployDebugApi: DeployDebugAPI;
+  private readonly buildTestApi: BuildTestAPI;
+  private readonly preferencesApi: PreferencesAPI;
+  private readonly exampleTemplateApi: ExampleTemplateAPI;
+  private readonly commandApi: CommandAPI;
+  private readonly executeApi: ExecuteAPI;
 
-  private constructor() {
+  private constructor(preferencesApi: PreferencesAPI, deployDebugApi: DeployDebugAPI, buildTestApi: BuildTestAPI) {
     super();
     this.toolApi = new ToolAPI();
     this.exampleTemplateApi = new ExampleTemplateAPI();
     this.commandApi = new CommandAPI();
     this.executeApi = new ExecuteAPI();
+    this.preferencesApi = preferencesApi;
+    this.deployDebugApi = deployDebugApi;
+    this.buildTestApi = buildTestApi;
   }
 
   public getToolAPI(): ToolAPI {
@@ -51,19 +54,16 @@ class ExternalAPI extends IExternalAPI {
     return this.exampleTemplateApi;
   }
   public getDeployDebugAPI(): DeployDebugAPI {
-    // tslint:disable-next-line:no-non-null-assertion
-    return this.deployDebugApi!;
+    return this.deployDebugApi;
   }
   public getPreferencesAPI(): PreferencesAPI {
-    // tslint:disable-next-line:no-non-null-assertion
-    return this.preferencesApi!;
+    return this.preferencesApi;
   }
   public getCommandAPI(): CommandAPI {
     return this.commandApi;
   }
   public getBuildTestAPI(): BuildTestAPI {
-    // tslint:disable-next-line:no-non-null-assertion
-    return this.buildTestApi!;
+    return this.buildTestApi;
   }
   public getExecuteAPI(): ExecuteAPI {
     return this.executeApi;
@@ -116,6 +116,6 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-// tslint:disable-next-line:no-empty
 export function deactivate() {
+  //
 }

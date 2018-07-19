@@ -247,8 +247,7 @@ export class DeployDebug {
     }
   }
 
-  // tslint:disable-next-line:no-empty
   public dispose() {
-
+    //
   }
 }

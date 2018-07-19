@@ -3,8 +3,11 @@
 import { IIPCReceiveMessage, IIPCSendMessage } from '../shared/interfaces';
 import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
 
-// tslint:disable-next-line:no-any
-declare function acquireVsCodeApi(): any;
+interface IVsCodeApi {
+  postMessage(message: IIPCReceiveMessage, to: string): void;
+}
+
+declare function acquireVsCodeApi(): IVsCodeApi;
 
 const vscode = acquireVsCodeApi();
 
@@ -17,7 +20,6 @@ export function scrollImpl() {
 }
 
 export function sendMessage(message: IIPCReceiveMessage) {
-  // tslint:disable-next-line:no-unsafe-any
   vscode.postMessage(message, '*');
 }
 

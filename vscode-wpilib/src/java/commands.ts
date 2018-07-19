@@ -146,8 +146,7 @@ export class Commands {
     });
   }
 
-  // tslint:disable-next-line:no-empty
   public dispose() {
-
+    //
   }
 }

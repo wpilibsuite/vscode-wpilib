@@ -158,12 +158,7 @@ export class RioLogWindow {
       return;
     }
     if (data.type === ReceiveTypes.Discard) {
-      // tslint:disable-next-line:prefer-conditional-expression
-      if (data.message as boolean === false) {
-        this.rioConsole.discard = false;
-      } else {
-        this.rioConsole.discard = true;
-      }
+      this.rioConsole.discard = data.message as boolean;
     } else if (data.type === ReceiveTypes.Pause) {
       const old = this.paused;
       this.paused = data.message as boolean;

@@ -85,8 +85,7 @@ export class BuildTest {
     buildTestApi.registerCodeTest(this.test);
   }
 
-  // tslint:disable-next-line:no-empty
   public dispose() {
-
+    //
   }
 }

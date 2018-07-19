@@ -99,9 +99,11 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   }
 
   public async startRioLog(teamNumber: number, _: boolean): Promise<boolean> {
-    // tslint:disable-next-line:no-non-null-assertion
-    this.liveWindow!.start(teamNumber);
-    return true;
+    if (this.liveWindow) {
+      this.liveWindow.start(teamNumber);
+      return true;
+    }
+    return false;
   }
   public registerCodeDeploy(deployer: ICodeDeployer): void {
     const qpi: ICodeDeployerQuickPick = {
