@@ -3,6 +3,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { IPreferencesJson } from '../preferences';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
 import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
 import { WebViewBase } from './webviewbase';
@@ -165,7 +166,7 @@ export class EclipseUpgrade extends WebViewBase {
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath));
+    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath)) as IPreferencesJson;
     parsed.teamNumber = parseInt(data.teamNumber, 10);
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 

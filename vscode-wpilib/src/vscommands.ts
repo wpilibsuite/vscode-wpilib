@@ -32,11 +32,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
-    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
-    if (request === undefined) {
-      return;
-    }
-    await preferences.setTeamNumber(await requestTeamNumber(), request === 'Globally');
+    await preferences.setTeamNumber(await requestTeamNumber());
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startTool', async () => {

@@ -94,12 +94,6 @@
                     "description": "Always ask for a team number, even if set",
                     "scope": "resource"
                 },
-                "wpilib.teamNumber": {
-                    "type": "integer",
-                    "default": -1,
-                    "description": "Team number to use",
-                    "scope": "resource"
-                },
                 "wpilib.online": {
                     "type": "boolean",
                     "default": false,

@@ -135,7 +135,7 @@ export abstract class IExternalAPI implements IVersionable {
 
 export interface IPreferences {
   getTeamNumber(): Promise<number>;
-  setTeamNumber(teamNumber: number, global: boolean): Promise<void>;
+  setTeamNumber(teamNumber: number): Promise<void>;
   getCurrentLanguage(): string;
   setCurrentLanguage(language: string): Promise<void>;
   getAutoStartRioLog(): boolean;

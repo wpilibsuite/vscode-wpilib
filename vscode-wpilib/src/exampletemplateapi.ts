@@ -2,6 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { IPreferencesJson } from './preferences';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from './shared/externalapi';
 import { promisifyMkdirp } from './shared/generator';
 import { promisifyReadFile, promisifyWriteFile } from './utilities';
@@ -111,7 +112,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath));
+    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath)) as IPreferencesJson;
     parsed.teamNumber = teamNumber;
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 

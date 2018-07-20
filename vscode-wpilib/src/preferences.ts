@@ -5,19 +5,21 @@ import * as vscode from 'vscode';
 import { IPreferences } from './shared/externalapi';
 import { promisifyExists, promisifyMkDir, promisifyReadFile, promisifyWriteFile } from './utilities';
 
-interface IPreferencesJson {
+export interface IPreferencesJson {
   currentLanguage: string;
+  teamNumber: number;
 }
 
 const defaultPreferences: IPreferencesJson = {
   currentLanguage: 'none',
+  teamNumber: -1,
 };
 
 export async function requestTeamNumber(): Promise<number> {
   const teamNumber = await vscode.window.showInputBox({
     prompt: 'Enter your team number',
     validateInput: (v) => {
-      const match = v.match(/^\d{0,5}$/gm);
+      const match = v.match(/^\d{1,5}$/gm);
       if (match === null || match.length === 0) {
         return 'Invalid team number';
       }
@@ -89,23 +91,15 @@ export class Preferences implements IPreferences {
     if (alwaysAsk !== undefined && alwaysAsk === true) {
       return requestTeamNumber();
     }
-    const res = this.getConfiguration().get<number>('teamNumber');
-    if (res === undefined || res < 0) {
+    if (this.preferencesJson.teamNumber < 0) {
       return this.noTeamNumberLogic();
     }
-    return res;
+    return this.preferencesJson.teamNumber;
   }
 
-  public async setTeamNumber(teamNumber: number, global: boolean): Promise<void> {
-    try {
-      if (global) {
-        await this.getConfiguration().update('teamNumber', teamNumber, vscode.ConfigurationTarget.Global);
-      } else {
-        await this.getConfiguration().update('teamNumber', teamNumber, vscode.ConfigurationTarget.WorkspaceFolder);
-      }
-    } catch (err) {
-      console.log('error setting team number', err);
-    }
+  public async setTeamNumber(teamNumber: number): Promise<void> {
+    this.preferencesJson.teamNumber = teamNumber;
+    await this.writePreferences();
   }
 
   public getCurrentLanguage(): string {
@@ -243,19 +237,15 @@ export class Preferences implements IPreferences {
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?',
-      'Yes (Globally)', 'Yes (Workspace)', 'No');
+    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes', 'No');
     if (teamRequest === undefined) {
       return -1;
     }
     const teamNumber = await requestTeamNumber();
     if (teamRequest === 'No') {
       return teamNumber;
-    }
-    if (teamNumber !== -1 && teamRequest === 'Yes (Globally)') {
-      await this.setTeamNumber(teamNumber, true);
-    } else if (teamNumber !== -1 && teamRequest === 'Yes (Workspace)') {
-      await this.setTeamNumber(teamNumber, false);
+    } else if (teamNumber !== -1) {
+      await this.setTeamNumber(teamNumber);
     }
     return teamNumber;
   }
