@@ -79,12 +79,6 @@ window.addEventListener('message', (event) => {
       lang.innerText = language;
       baseButton.disabled = false;
       baseButton.innerText = 'Select a project base'
-      const pdiv = document.getElementById('packagediv');
-      if (language === 'java') {
-        pdiv.style.visibility = 'visible';
-      } else {
-        pdiv.style.visibility = 'hidden';
-      }
       break;
     case 'base':
       base = data.data
