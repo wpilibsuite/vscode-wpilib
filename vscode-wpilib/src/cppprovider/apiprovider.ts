@@ -198,8 +198,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   }
 
   public runGradleRefresh(): Promise<number> {
-    const online = this.preferences.getOnline();
-    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, online, 'C++ Configuration', this.executeApi);
+    return gradleRun('generateVsCodeConfig', this.workspace.uri.fsPath, this.workspace, 'C++ Configuration', this.executeApi, this.preferences);
   }
 
   public dispose() {

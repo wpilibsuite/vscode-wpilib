@@ -60,8 +60,8 @@ class DebugCodeDeployer implements ICodeDeployer {
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
       command += ' -Xcheck';
     }
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Debug', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Debug', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
@@ -128,8 +128,8 @@ class DeployCodeDeployer implements ICodeDeployer {
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
       command += ' -Xcheck';
     }
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Deploy', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Deploy', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
@@ -160,8 +160,8 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'simulateExternalJava';
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'Java Simulate', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Simulate', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }

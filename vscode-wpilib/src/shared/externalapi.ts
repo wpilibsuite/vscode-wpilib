@@ -146,7 +146,7 @@ export interface IPreferences {
   getOnline(): boolean;
   getSkipTests(): boolean;
   getStopSimulationOnEntry(): boolean;
-
+  getAdditionalGradleArguments(): string;
   setOnline(value: boolean, global: boolean): Promise<void>;
   setSkipTests(value: boolean, global: boolean): Promise<void>;
   setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;

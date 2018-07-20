@@ -76,6 +76,12 @@
             "type": "object",
             "title": "WPILib configuration",
             "properties": {
+                "wpilib.additionalGradleArguments": {
+                    "type": "string",
+                    "default": "",
+                    "description": "For debugging only, passes extra arguments to gradle invokations",
+                    "scope": "resource"
+                },
                 "wpilib.autoSaveOnDeploy": {
                     "type": "boolean",
                     "default": true,

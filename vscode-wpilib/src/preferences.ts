@@ -167,6 +167,14 @@ export class Preferences implements IPreferences {
     return this.getConfiguration().update('autoSaveOnDeploy', autoSave, target);
   }
 
+  public getAdditionalGradleArguments(): string {
+    const res = this.getConfiguration().get<string>('additionalGradleArguments');
+    if (res === undefined) {
+      return '';
+    }
+    return res;
+  }
+
   public getOnline(): boolean {
     const res = this.getConfiguration().get<boolean>('online');
     if (res === undefined) {

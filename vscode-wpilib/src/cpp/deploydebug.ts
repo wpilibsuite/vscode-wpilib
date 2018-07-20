@@ -58,8 +58,8 @@ class DebugCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Debug', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Debug', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
@@ -141,8 +141,8 @@ class DeployCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'deploy -PteamNumber=' + teamNumber;
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Deploy', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Deploy', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
@@ -173,8 +173,8 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'simulateExternalCpp';
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Simulate', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Simulate', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }

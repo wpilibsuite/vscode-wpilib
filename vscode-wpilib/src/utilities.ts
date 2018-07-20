@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as timers from 'timers';
 import * as vscode from 'vscode';
-import { IExecuteAPI } from './shared/externalapi';
+import { IExecuteAPI, IPreferences } from './shared/externalapi';
 import { setExecutePermissions } from './shared/permissions';
 
 // General utilites usable by multiple classes
@@ -110,9 +110,9 @@ export function promisifyTimer(time: number): Promise<void> {
 }
 
 export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
-                                online: boolean, name: string, executeApi: IExecuteAPI): Promise<number> {
-  let command = './gradlew ' + args;
-  if (!online) {
+                                name: string, executeApi: IExecuteAPI, preferences: IPreferences): Promise<number> {
+  let command = './gradlew ' + args + ' ' + preferences.getAdditionalGradleArguments();
+  if (!preferences.getOnline()) {
     command += ' --offline';
   }
 

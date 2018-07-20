@@ -21,8 +21,8 @@ class CodeBuilder implements ICodeBuilder {
 
   public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'assemble';
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Build', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Build', this.executeApi, prefs);
     console.log(result);
     return true;
   }
@@ -53,8 +53,8 @@ class CodeTester implements ICodeBuilder {
 
   public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
     const command = 'test';
-    const online = this.preferences.getPreferences(workspace).getOnline();
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, online, 'C++ Test', this.executeApi);
+    const prefs = this.preferences.getPreferences(workspace);
+    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Test', this.executeApi, prefs);
 
     console.log(result);
     return true;
