@@ -7,6 +7,7 @@ import { getIsWindows } from './utilities';
 interface ITaskRunner {
   execution: vscode.TaskExecution;
   condition: PromiseCondition<number>;
+  cancelled: boolean;
 }
 
 interface ITaskRunnerQuickPick {
@@ -25,7 +26,11 @@ export class ExecuteAPI extends IExecuteAPI {
           continue;
         }
         if (e.execution === this.runners[i].execution) {
-          this.runners[i].condition.set(e.exitCode);
+          if (this.runners[i].cancelled) {
+            this.runners[i].condition.set(-1);
+          } else {
+            this.runners[i].condition.set(e.exitCode);
+          }
           this.runners.splice(i, 1);
           break;
         }
@@ -52,8 +57,10 @@ export class ExecuteAPI extends IExecuteAPI {
     const task = new vscode.Task({ type: 'wpilibgradle' }, workspace, name, 'wpilib', shell);
     const execution = await vscode.tasks.executeTask(task);
     const runner: ITaskRunner = {
+      cancelled: false,
       condition: new PromiseCondition(-1),
       execution,
+
     };
     this.runners.push(runner);
     return runner.condition.wait();
@@ -78,6 +85,7 @@ export class ExecuteAPI extends IExecuteAPI {
       return 0;
     }
     for (const r of result) {
+      r.taskRunner.cancelled = true;
       r.taskRunner.execution.terminate();
     }
     return result.length;
