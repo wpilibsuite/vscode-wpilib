@@ -117,7 +117,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-        'Yes (Current Window)', 'Yes (New Window)', 'No');
+      'Yes (Current Window)', 'Yes (New Window)', 'No');
     if (openSelection === undefined) {
       return true;
     } else if (openSelection === 'Yes (Current Window)') {

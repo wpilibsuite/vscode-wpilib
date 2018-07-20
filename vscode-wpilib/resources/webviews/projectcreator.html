@@ -12,7 +12,9 @@
       color: red;
       border-color: red;
       border-width: 2px;
-    };
+    }
+
+    ;
   </style>
 </head>
 
@@ -36,10 +38,14 @@
   <br/> Create new folder? Highly recommended to be checked
   <input id="newFolderCB" type="checkbox" checked/>
   <br/>
-  <br/> <div id="projectnamediv">Enter a project name</div>
-  <input id="projectName" oninput="validateProject();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
-  <br/> <div id="teamnumberdiv">Enter a team number</div>
-  <input id="teamNumber" oninput="validateTeamNumber();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <div id="projectnamediv">Enter a project name</div>
+  <input id="projectName" oninput="validateProject();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
+  <br/>
+  <div id="teamnumberdiv">Enter a team number</div>
+  <input id="teamNumber" oninput="validateTeamNumber();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
   <br/>
 
   <button id="generateProject" onclick="generateProject()">Generate Project</button>

@@ -16,7 +16,7 @@ function promisifyProperties(file: string): Promise<any> {
   // tslint:disable-next-line:no-any
   return new Promise<any>((resolve, reject) => {
     // tslint:disable-next-line:no-any no-unsafe-any
-    properties.parse(file, { path: true, variables: true}, (err: any, obj: any) => {
+    properties.parse(file, { path: true, variables: true }, (err: any, obj: any) => {
       if (err) {
         reject(err);
       } else {
@@ -88,7 +88,7 @@ export class EclipseUpgrade extends WebViewBase {
       return;
     }
 
-    const oldProjectPath =  path.dirname(oldProject[0].fsPath);
+    const oldProjectPath = path.dirname(oldProject[0].fsPath);
     if (this.webview) {
       await this.webview.webview.postMessage({
         data: oldProject[0].fsPath,
@@ -123,7 +123,7 @@ export class EclipseUpgrade extends WebViewBase {
   }
 
   private async handleUpgrade(data: IUpgradeProject) {
-    const oldProjectPath =  path.dirname(data.fromProps);
+    const oldProjectPath = path.dirname(data.fromProps);
 
     const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
 
@@ -171,7 +171,7 @@ export class EclipseUpgrade extends WebViewBase {
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-                                                                         'Yes (Current Window)', 'Yes (New Window)', 'No');
+      'Yes (Current Window)', 'Yes (New Window)', 'No');
     if (openSelection === undefined) {
       return;
     } else if (openSelection === 'Yes (Current Window)') {
@@ -185,6 +185,6 @@ export class EclipseUpgrade extends WebViewBase {
 
   private async asyncInitialize() {
     await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseupgrade.html'),
-                           path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseupgrade.js'));
+      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseupgrade.js'));
   }
 }

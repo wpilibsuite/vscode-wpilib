@@ -20,7 +20,7 @@ class PersistentStateBase<T> {
     }
 
     public get Value(): T {
-         return this.state.get<T>(this.key, this.defaultvalue);
+        return this.state.get<T>(this.key, this.defaultvalue);
     }
 
     public set Value(newValue: T) {

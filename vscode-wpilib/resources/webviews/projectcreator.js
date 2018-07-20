@@ -8,7 +8,7 @@ let base = '';
 
 function selectProjectType() {
   document.activeElement.blur();
-  vscode.postMessage({type: 'projecttype'})
+  vscode.postMessage({ type: 'projecttype' });
 }
 
 function selectLanguage() {
@@ -17,25 +17,25 @@ function selectLanguage() {
     type: 'language',
     data: {
       template,
-      language
+      language,
     },
-  })
+  });
 }
 
 function selectProjectBase() {
   document.activeElement.blur();
   vscode.postMessage({
-      type: 'base',
-      data: {
-        template,
-        language
-      }
-    })
+    type: 'base',
+    data: {
+      template,
+      language,
+    },
+  });
 }
 
 function selectProjectFolder() {
   document.activeElement.blur();
-  vscode.postMessage({type: 'newproject'});
+  vscode.postMessage({ type: 'newproject' });
 }
 
 function generateProject() {
@@ -52,7 +52,7 @@ function generateProject() {
       projectName: document.getElementById('projectName').value,
       newFolder: document.getElementById('newFolderCB').checked,
       teamNumber: document.getElementById('teamNumber').value,
-    }
+    },
   });
 }
 
@@ -61,7 +61,7 @@ window.addEventListener('message', (event) => {
   const pType = document.getElementById('projectType');
   const lang = document.getElementById('language');
   const baseButton = document.getElementById('projectBase');
-  switch(data.type) {
+  switch (data.type) {
     case 'newproject':
       const elem = document.getElementById('projectFolder');
       elem.value = data.data;
@@ -70,31 +70,30 @@ window.addEventListener('message', (event) => {
       template = data.data;
       pType.innerText = template ? 'template' : 'example';
       lang.disabled = false;
-      lang.innerText = 'Select a language'
+      lang.innerText = 'Select a language';
       baseButton.disabled = true;
-      baseButton.innerText = 'Select a project base'
+      baseButton.innerText = 'Select a project base';
       break;
     case 'language':
       language = data.data;
       lang.innerText = language;
       baseButton.disabled = false;
-      baseButton.innerText = 'Select a project base'
+      baseButton.innerText = 'Select a project base';
       break;
     case 'base':
-      base = data.data
-      baseButton.innerText = base
+      base = data.data;
+      baseButton.innerText = base;
       break;
   }
 });
 
 function validateProject() {
   const elem = document.getElementById('projectName');
-  const s = elem.value
+  const s = elem.value;
   const match = s.match(/\w[\w-]*$/gm);
   const pdiv = document.getElementById('projectnamediv');
   if (match === null || match.length === 0) {
     pdiv.innerText = 'Invalid Project Name';
-
     pdiv.classList.add('error');
     elem.classList.add('error');
   } else {
@@ -106,12 +105,11 @@ function validateProject() {
 
 function validateTeamNumber() {
   const elem = document.getElementById('teamNumber');
-  const s = elem.value
+  const s = elem.value;
   const match = s.match(/^\d{1,5}$/gm);
   const pdiv = document.getElementById('teamnumberdiv');
   if ((match === null || match.length === 0)) {
     pdiv.innerText = 'Invalid Team Number';
-
     pdiv.classList.add('error');
     elem.classList.add('error');
   } else {

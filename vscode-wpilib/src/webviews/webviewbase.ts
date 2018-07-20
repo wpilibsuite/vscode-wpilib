@@ -26,7 +26,7 @@ export abstract class WebViewBase {
     this.html = this.html.replace(/replaceresource/g, replacePath.toString());
   }
 
-  public displayWebView(showOptions: vscode.ViewColumn | {preserveFocus: boolean, viewColumn: vscode.ViewColumn},
+  public displayWebView(showOptions: vscode.ViewColumn | { preserveFocus: boolean, viewColumn: vscode.ViewColumn },
                         reveal?: boolean, options?: vscode.WebviewPanelOptions & vscode.WebviewOptions) {
     if (this.webview === undefined) {
       this.webview = vscode.window.createWebviewPanel(this.veiwType, this.title, showOptions, options);

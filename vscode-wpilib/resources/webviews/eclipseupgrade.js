@@ -4,12 +4,12 @@ const vscode = acquireVsCodeApi();
 
 function eclipseSelectButtonClick() {
   document.activeElement.blur();
-  vscode.postMessage({type: 'eclipse'});
+  vscode.postMessage({ type: 'eclipse' });
 }
 
 function projectSelectButtonClick() {
   document.activeElement.blur();
-  vscode.postMessage({type: 'newproject'});
+  vscode.postMessage({ type: 'newproject' });
 }
 
 function upgradeProjectButtonClick() {
@@ -22,13 +22,13 @@ function upgradeProjectButtonClick() {
       projectName: document.getElementById('projectName').value,
       newFolder: document.getElementById('newFolderCB').checked,
       teamNumber: document.getElementById('teamNumber').value,
-    }
-  })
+    },
+  });
 }
 
 window.addEventListener('message', (event) => {
   const data = event.data;
-  switch(data.type) {
+  switch (data.type) {
     case 'eclipse':
       document.getElementById('eclipseInput').value = data.data;
       break;
@@ -46,12 +46,11 @@ window.addEventListener('message', (event) => {
 
 function validateProject() {
   const elem = document.getElementById('projectName');
-  const s = elem.value
+  const s = elem.value;
   const match = s.match(/\w[\w-]*$/gm);
   const pdiv = document.getElementById('projectnamediv');
   if (match === null || match.length === 0) {
     pdiv.innerText = 'Invalid Project Name';
-
     pdiv.classList.add('error');
     elem.classList.add('error');
   } else {
@@ -63,7 +62,7 @@ function validateProject() {
 
 function validateTeamNumber() {
   const elem = document.getElementById('teamNumber');
-  const s = elem.value
+  const s = elem.value;
   const match = s.match(/^\d{1,5}$/gm);
   const pdiv = document.getElementById('teamnumberdiv');
   if ((match === null || match.length === 0)) {

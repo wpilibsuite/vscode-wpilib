@@ -122,5 +122,5 @@ export async function gradleRun(args: string, rootDir: string, workspace: vscode
 
 export let extensionContext: vscode.ExtensionContext;
 export function setExtensionContext(context: vscode.ExtensionContext): void {
-    extensionContext = context;
+  extensionContext = context;
 }

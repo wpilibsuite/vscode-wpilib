@@ -74,7 +74,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       if (!found) {
         if (this.preferences.getCurrentLanguage() === 'cpp') {
           const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
-                                                                          'Yes', 'No');
+            'Yes', 'No');
           if (configResult === 'Yes') {
             await this.runGradleRefresh();
           }
