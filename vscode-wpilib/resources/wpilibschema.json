@@ -4,6 +4,9 @@
   "properties": {
     "currentLanguage": {
       "type": "string"
+    },
+    "teamNumber": {
+      "type": "integer"
     }
   }
 }

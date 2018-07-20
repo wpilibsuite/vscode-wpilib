@@ -21,6 +21,7 @@ function upgradeProjectButtonClick() {
       toFolder: document.getElementById('projectFolder').value,
       projectName: document.getElementById('projectName').value,
       newFolder: document.getElementById('newFolderCB').checked,
+      teamNumber: document.getElementById('teamNumber').value,
     }
   })
 }
@@ -55,6 +56,23 @@ function validateProject() {
     elem.classList.add('error');
   } else {
     pdiv.innerText = 'Enter a project name';
+    pdiv.classList.remove('error');
+    elem.classList.remove('error');
+  }
+}
+
+function validateTeamNumber() {
+  const elem = document.getElementById('teamNumber');
+  const s = elem.value
+  const match = s.match(/^\d{1,5}$/gm);
+  const pdiv = document.getElementById('teamnumberdiv');
+  if ((match === null || match.length === 0)) {
+    pdiv.innerText = 'Invalid Team Number';
+
+    pdiv.classList.add('error');
+    elem.classList.add('error');
+  } else {
+    pdiv.innerText = 'Enter a team number';
     pdiv.classList.remove('error');
     elem.classList.remove('error');
   }

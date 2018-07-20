@@ -50,8 +50,8 @@ export abstract class IExampleTemplateAPI implements IVersionable {
   public abstract addExampleProvider(provider: IExampleTemplateCreator): void;
   public abstract getLanguages(template: boolean): string[];
   public abstract getBases(template: boolean, language: string): ICreatorQuickPick[];
-  public abstract createProject(template: boolean, language: string, base: string,
-                                toFolder: string, newFolder: boolean, projectName: string): Promise<boolean>;
+  public abstract createProject(template: boolean, language: string, base: string, toFolder: string,
+                                newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean>;
   public getVersion(): number {
     return exampleTemplateAPIExpectedVersion;
   }

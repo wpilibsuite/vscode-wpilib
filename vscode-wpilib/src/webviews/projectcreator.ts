@@ -18,6 +18,7 @@ interface ICreateProjectData {
   toFolder: string;
   newFolder: boolean;
   projectName: string;
+  teamNumber: string;
 }
 
 export class ProjectCreator extends WebViewBase {
@@ -70,7 +71,7 @@ export class ProjectCreator extends WebViewBase {
 
   private async createProject(data: ICreateProjectData) {
     await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,
-                                                data.projectName);
+                                                data.projectName, parseInt(data.teamNumber, 10));
   }
 
   private async handleProjectType() {

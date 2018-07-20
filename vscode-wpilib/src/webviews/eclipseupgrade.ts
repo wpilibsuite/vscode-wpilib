@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
-import { extensionContext, promisifyExists } from '../utilities';
+import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
 import { WebViewBase } from './webviewbase';
 
 // tslint:disable-next-line:no-var-requires
@@ -30,6 +30,7 @@ interface IUpgradeProject {
   toFolder: string;
   projectName: string;
   newFolder: boolean;
+  teamNumber: string;
 }
 
 export class EclipseUpgrade extends WebViewBase {
@@ -161,6 +162,12 @@ export class EclipseUpgrade extends WebViewBase {
     if (!success) {
       return;
     }
+
+    const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
+
+    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath));
+    parsed.teamNumber = parseInt(data.teamNumber, 10);
+    await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
                                                                          'Yes (Current Window)', 'Yes (New Window)', 'No');

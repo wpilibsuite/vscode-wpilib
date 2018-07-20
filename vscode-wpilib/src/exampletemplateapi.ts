@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from './shared/externalapi';
 import { promisifyMkdirp } from './shared/generator';
+import { promisifyReadFile, promisifyWriteFile } from './utilities';
 
 interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
@@ -69,18 +70,18 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
     }
   }
 
-  public async createProject(template: boolean, language: string, base: string,
-                             toFolder: string, newFolder: boolean, projectName: string): Promise<boolean> {
+  public async createProject(template: boolean, language: string, base: string, toFolder: string,
+                             newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean> {
     if (template) {
       for (const t of this.templates) {
         if (t.creator.getLanguage() === language && t.label === base) {
-          return this.handleGenerate(t.creator, toFolder, newFolder, projectName);
+          return this.handleGenerate(t.creator, toFolder, newFolder, projectName, teamNumber);
         }
       }
     } else {
       for (const t of this.examples) {
         if (t.creator.getLanguage() === language && t.label === base) {
-          return this.handleGenerate(t.creator, toFolder, newFolder, projectName);
+          return this.handleGenerate(t.creator, toFolder, newFolder, projectName, teamNumber);
         }
       }
     }
@@ -88,7 +89,7 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
   }
 
   private async handleGenerate(creator: IExampleTemplateCreator, toFolderOrig: string, newFolder: boolean,
-                               projectName: string): Promise<boolean> {
+                               projectName: string, teamNumber: number): Promise<boolean> {
     let toFolder = toFolderOrig;
 
     if (newFolder) {
@@ -107,6 +108,12 @@ export class ExampleTemplateAPI extends IExampleTemplateAPI {
     if (!success) {
       return false;
     }
+
+    const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
+
+    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath));
+    parsed.teamNumber = teamNumber;
+    await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
         'Yes (Current Window)', 'Yes (New Window)', 'No');
