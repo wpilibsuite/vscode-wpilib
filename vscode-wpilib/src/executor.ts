@@ -66,7 +66,7 @@ export class ExecuteAPI extends IExecuteAPI {
     const arr: ITaskRunnerQuickPick[] = [];
     for (const t of this.runners) {
       arr.push({
-        label: 'todo',
+        label: t.execution.task.name,
         taskRunner: t,
       });
     }
