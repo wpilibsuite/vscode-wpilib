@@ -11,37 +11,40 @@ interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
 
 class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   private disposables: vscode.Disposable[] = [];
-  // private deployDebugAPI: IDeployDebugAPI;
+  private deployDebugAPI: IDeployDebugAPI;
 
-  constructor(_ddApi: IDeployDebugAPI) {
-    // this.deployDebugAPI = ddApi;
+  constructor(ddApi: IDeployDebugAPI) {
+    this.deployDebugAPI = ddApi;
     const regProv = vscode.debug.registerDebugConfigurationProvider('wpilib', this);
     this.disposables.push(regProv);
   }
 
-  public resolveDebugConfiguration(_workspace: vscode.WorkspaceFolder | undefined,
-                                   _config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
+  public resolveDebugConfiguration(workspace: vscode.WorkspaceFolder | undefined,
+                                   config: vscode.DebugConfiguration, __?: vscode.CancellationToken):
     vscode.ProviderResult<vscode.DebugConfiguration> {
-    vscode.window.showInformationMessage('This functionality is disabled for the Alpha test.');
-    return undefined;
+    if (workspace === undefined) {
+      return undefined;
+    }
+    let desktop = false;
+    if ('desktop' in config) {
+      desktop = config.desktop as boolean;
+    } else {
+      console.log('debugger has no desktop argument. Assuming roboRIO');
+    }
 
-    // if (workspace === undefined) {
-    //   return undefined;
-    // }
-    // let desktop = false;
-    // if ('desktop' in config) {
-    //   desktop = config.desktop as boolean;
-    // } else {
-    //   console.log('debugger has no desktop argument. Assuming roboRIO');
-    // }
-    // return new Promise<undefined>(async (resolve) => {
-    //   if (desktop) {
-    //     await this.deployDebugAPI.simulateCode(workspace, undefined);
-    //   } else {
-    //     await this.deployDebugAPI.debugCode(workspace, undefined);
-    //   }
-    //   resolve();
-    // });
+    if (desktop) {
+      vscode.window.showInformationMessage('This functionality is disabled for the Alpha test.');
+      return undefined;
+    }
+
+    return new Promise<undefined>(async (resolve) => {
+      if (desktop) {
+        await this.deployDebugAPI.simulateCode(workspace, undefined);
+      } else {
+        await this.deployDebugAPI.debugCode(workspace, undefined);
+      }
+      resolve();
+    });
   }
 
   public provideDebugConfigurations(_workspace: vscode.WorkspaceFolder | undefined,
