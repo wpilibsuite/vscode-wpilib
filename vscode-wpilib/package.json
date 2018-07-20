@@ -1,6 +1,6 @@
 {
     "name": "vscode-wpilib",
-    "displayName": "vscode-wpilib",
+    "displayName": "WPILib",
     "description": "VSCode extension for WPILib Team Use",
     "version": "0.1.0",
     "publisher": "wpifirst",
