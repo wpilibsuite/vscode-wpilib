@@ -295,6 +295,7 @@
         }
     },
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
+    "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
         "vscode:prepublish": "npm run compile && npm run compileBundle && npm run lint",
         "clean": "rmdir-cli out",
