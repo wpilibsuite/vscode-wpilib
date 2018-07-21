@@ -1,18 +1,19 @@
 plugins {
     id "cpp"
-    id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-2"
+    id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-3"
     id "edu.wpi.first.GradleVsCode" version "0.3.0"
 }
-
-def TEAM = 9999
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
     targets {
         target("roborio", edu.wpi.first.gradlerio.frc.RoboRIO) {
-            // Team can be overridden by command line, for use with VSCode
-            team = getTeamOrDefault(TEAM)
+            // Team number is loaded either from the .wpilib/wpilib_preferences.json
+            // or from command line. If not found an exception will be thrown.
+            // You can use getTeamOrDefault(team) instead of getTeamNumber if you
+            // want to store a team number in this file.
+            team = getTeamNumber()
         }
     }
     artifacts {
@@ -52,6 +53,6 @@ model {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.8'
+wrapper {
+    gradleVersion = '4.8.1'
 }
