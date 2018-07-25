@@ -1,6 +1,7 @@
 {
     "name": "vscode-wpilib",
     "displayName": "WPILib",
+    "author": "WPI/FIRST",
     "description": "VSCode extension for WPILib Team Use",
     "version": "0.1.0",
     "publisher": "wpifirst",
