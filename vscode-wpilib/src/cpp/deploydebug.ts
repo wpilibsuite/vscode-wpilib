@@ -24,7 +24,7 @@ interface ICppDebugCommand {
   sysroot: string | null;
   srcpaths: string[];
   headerpaths: string[];
-  sofiles: string[];
+  libfiles: string[];
   libsrcpaths: string[];
 }
 
@@ -87,7 +87,7 @@ class DebugCodeDeployer implements ICodeDeployer {
     const targetReadInfo = await readFileAsync(debugPath);
     const targetInfoParsed: ICppDebugCommand = jsonc.parse(targetReadInfo) as ICppDebugCommand;
 
-    const set = new Set<string>(targetInfoParsed.sofiles);
+    const set = new Set<string>(targetInfoParsed.libfiles);
 
     let soPath = '';
 
@@ -103,11 +103,16 @@ class DebugCodeDeployer implements ICodeDeployer {
       sysroot = targetInfoParsed.sysroot;
     }
 
+    const srcArrs = [];
+    srcArrs.push(...targetInfoParsed.srcpaths);
+    srcArrs.push(...targetInfoParsed.headerpaths);
+    srcArrs.push(...targetInfoParsed.libsrcpaths);
+
     const config: IDebugCommands = {
       executablePath: targetInfoParsed.launchfile,
       gdbPath: targetInfoParsed.gdb,
       soLibPath: soPath,
-      srcPaths: new Set<string>(targetInfoParsed.srcpaths),
+      srcPaths: new Set<string>(srcArrs),
       sysroot,
       target: targetInfoParsed.target,
       workspace,
@@ -222,7 +227,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     if (!getIsWindows()) {
-      const set = new Set<string>(targetSimulateInfo.sofiles);
+      const set = new Set<string>(targetSimulateInfo.libfiles);
 
       let soPath = '';
 
