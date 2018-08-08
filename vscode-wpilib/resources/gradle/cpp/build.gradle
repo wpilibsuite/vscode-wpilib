@@ -26,6 +26,12 @@ deploy {
     }
 }
 
+// Set this to true to include the src folder in the include directories passed
+// to the compiler. Some eclipse project upgrades depend on this behavior.
+// We recommend leaving this disabled if possible. Note for eclipse project
+// upgrades this is enabled by default. For new projects, its disabled
+def includeSrcInIncludeRoot = false
+
 model {
     components {
         frcUserProgram(NativeExecutableSpec) {
@@ -43,6 +49,9 @@ model {
                 }
                 exportedHeaders {
                     srcDir 'src/main/include'
+                    if (includeSrcInIncludeRoot) {
+                        srcDir 'src/main/cpp'
+                    }
                 }
             }
 

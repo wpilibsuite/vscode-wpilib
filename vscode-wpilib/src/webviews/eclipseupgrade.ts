@@ -1,5 +1,6 @@
 'use strict';
 
+import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -163,6 +164,25 @@ export class EclipseUpgrade extends WebViewBase {
     if (!success) {
       return;
     }
+
+    const buildgradle = path.join(toFolder, 'build.gradle');
+
+    await new Promise<void>((resolve, reject) => {
+      fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
+        if (err) {
+          resolve();
+        } else {
+          const dataOut = dataIn.replace(new RegExp('def includeSrcInIncludeRoot = false', 'g'), 'def includeSrcInIncludeRoot = true');
+          fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
+            if (err1) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }
+      });
+    });
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
