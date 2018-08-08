@@ -1,7 +1,7 @@
 plugins {
     id "cpp"
     id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-3"
-    id "edu.wpi.first.GradleVsCode" version "0.4.1"
+    id "edu.wpi.first.GradleVsCode" version "0.4.2"
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
