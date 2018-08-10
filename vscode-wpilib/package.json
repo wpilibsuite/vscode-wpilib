@@ -321,11 +321,11 @@
         "@types/mkdirp": "^0.5.2",
         "@types/ncp": "^2.0.1",
         "glob": "^7.1.2",
+        "java-properties": "^0.2.10",
         "jsonc-parser": "^2.0.1",
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
         "vscode-cpptools": "1.2.2",
-        "vscode-jsonrpc": "^3.6.2",
-        "properties": "^1.2.1"
+        "vscode-jsonrpc": "^3.6.2"
     }
 }

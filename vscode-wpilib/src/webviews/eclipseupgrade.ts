@@ -10,22 +10,7 @@ import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFil
 import { WebViewBase } from './webviewbase';
 
 // tslint:disable-next-line:no-var-requires
-const properties = require('properties');
-
-// tslint:disable-next-line:no-any
-function promisifyProperties(file: string): Promise<any> {
-  // tslint:disable-next-line:no-any
-  return new Promise<any>((resolve, reject) => {
-    // tslint:disable-next-line:no-any no-unsafe-any
-    properties.parse(file, { path: true, variables: true }, (err: any, obj: any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(obj);
-      }
-    });
-  });
-}
+const javaProperties = require('java-properties');
 
 interface IUpgradeProject {
   fromProps: string;
@@ -128,15 +113,11 @@ export class EclipseUpgrade extends WebViewBase {
 
     const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
 
-    const props = await promisifyProperties(data.fromProps);
-
-    let javaRobotClass = '';
+    // tslint:disable-next-line:no-unsafe-any
+    const values = javaProperties.of(data.fromProps);
 
     // tslint:disable-next-line:no-unsafe-any
-    if ('robot.class' in props) {
-      // tslint:disable-next-line:no-unsafe-any
-      javaRobotClass = props['robot.class'];
-    }
+    const javaRobotClass: string = values.get('robot.class', '');
 
     let toFolder = data.toFolder;
 
