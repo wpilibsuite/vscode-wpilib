@@ -23,6 +23,14 @@ deploy {
             // Debug can be overridden by command line, for use with VSCode
             debug = getDebugOrDefault(false)
         }
+        // Built in artifact to deploy arbitrary files to the roboRIO.
+        fileTreeArtifact('frcStaticFileDeploy') {
+            // The directory below is the local directory to deploy
+            files = fileTree(dir: 'src/main/deploy')
+            // Deploy to RoboRIO target, into /home/lvuser/deploy
+            targets << "roborio"
+            directory = 'deploy'
+        }
     }
 }
 

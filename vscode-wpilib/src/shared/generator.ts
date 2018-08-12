@@ -3,6 +3,7 @@ import * as glob from 'glob';
 import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';
 import * as path from 'path';
+import { promisifyWriteFile } from '../utilities';
 import { setExecutePermissions } from './permissions';
 
 export function promisifyMkdirp(dest: string): Promise<void> {
@@ -66,6 +67,12 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
   await Promise.all([src, gradle]);
 
   await setExecutePermissions(path.join(toFolder, 'gradlew'));
+
+  await promisifyWriteFile(path.join(toFolder, 'src', 'main', 'deploy', 'example.txt'),
+`Files placed in this directory will be deployed to the RoboRIO into the
+'deploy' directory in the home folder. Use the 'frc::GetFilePath' function from
+the 'frc/FileUtilities.h' header to get a proper path relative to the deploy
+directory.`);
 
   return true;
 }
@@ -155,6 +162,11 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
       }
     });
   });
+
+  await promisifyWriteFile(path.join(toFolder, 'src', 'main', 'deploy', 'example.txt'),
+`Files placed in this directory will be deployed to the RoboRIO into the
+'deploy' directory in the home folder. Use the 'FileUtilities.getFilePath' wpilib function
+to get a proper path relative to the deploy directory.`);
 
   return true;
 }
