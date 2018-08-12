@@ -29,6 +29,7 @@
     "@types/mkdirp": "^0.5.2",
     "@types/ncp": "^2.0.1",
     "glob": "^7.1.2",
+    "java-properties": "^0.2.10",
     "jsonc-parser": "^2.0.0",
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0"

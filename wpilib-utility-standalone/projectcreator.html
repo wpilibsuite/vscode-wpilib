@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WPILib Project Create</title>
+  <script>
+    const exports = require('./out/projectcreator.js');
+    const validators = require('./out/validators.js');
+  </script>
+
+  <style>
+    .error {
+      color: red;
+      border-color: red;
+      border-width: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <img src="./wpilib.svg" width="100" />
+
+  <h1>Welcome to WPILib New Project Creator</h1>
+
+  <button id="projectType" onclick="exports.projectTypeButton();" disabled>Select a project base</button>
+
+  <select id="projectTypeSelect" style="display: none" onchange="exports.selectProjectType();">
+    <option value="example">Examples</option>
+    <option value="template">Templates</option>
+  </select>
+
+
+
+  <button id="language" onclick="exports.selectLanguage()" disabled>Select a language</button>
+
+  <select id="languageSelect" style="display: none" onchange="exports.selectLanguage();">
+  </select>
+
+  <button id="projectBase" onclick="exports.selectProjectBase()" disabled>Select a project base</button>
+
+  <select id="projectBaseSelect" style="display: none" onchange="exports.selectProjectBase();">
+  </select>
+
+  <br/>
+  <br/> Select a folder to place the new project into.
+  <br/>
+  <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <button onclick="exports.selectProjectFolder();">Select a new project folder</button>
+  <br/>
+  <br/> Create new folder? Highly recommended to be checked
+  <input id="newFolderCB" type="checkbox" checked/>
+  <br/>
+  <br/>
+  <div id="projectnamediv">Enter a project name</div>
+  <input id="projectName" oninput="validators.validateProject(document.getElementById('projectName'), document.getElementById('projectnamediv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
+  <br/>
+  <div id="teamnumberdiv">Enter a team number</div>
+  <input id="teamNumber" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
+  <br/>
+
+  <button id="generateProject" onclick="exports.generateProject()">Generate Project</button>
+</body>

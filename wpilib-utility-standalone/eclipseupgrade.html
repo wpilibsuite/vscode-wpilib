@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WPILib Project Upgrade</title>
+  <script>
+    const exports = require('./out/eclipseupgrade.js');
+    const validators = require('./out/validators.js');
+  </script>
+
+  <style>
+    .error {
+      color: red;
+      border-color: red;
+      border-width: 2px;
+    }
+    body {
+        color: white;
+        background-color: #2e2c29;
+      }
+  </style>
+</head>
+
+<body>
+  <img src="./wpilib.svg" width="100" />
+
+  <h1>Welcome to WPILib Eclipse Project Upgrade</h1>
+
+  Select an eclipse project. Use the build.properties file in the project.
+  <br/>
+  <input id="eclipseInput" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <button onclick="exports.eclipseSelectButtonClick();">Select an eclipse project.</button>
+  <br/>
+  <br/> Select a folder to place the new project into.
+  <br/>
+  <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <button onclick="exports.projectSelectButtonClick();">Select a new project folder</button>
+  <br/>
+  <br/> Create new folder? Highly recommended to be checked
+  <input id="newFolderCB" type="checkbox" checked/>
+  <br/>
+  <br/>
+  <div id="projectnamediv">The following will be the project name. When you select an eclipse project above, it will insert the project name.</div>
+  <input id="projectName" oninput="validators.validateProject(document.getElementById('projectName'), document.getElementById('projectnamediv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" disabled/>
+  <br/>
+  <div id="teamnumberdiv">Enter a team number</div>
+  <input id="teamNumber" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
+  <br/>
+  <button id="upgradeProject" onclick="exports.upgradeProjectButtonClick();">Upgrade Project</button>
+
+</body>
+
+</html>

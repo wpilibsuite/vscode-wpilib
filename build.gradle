@@ -67,7 +67,7 @@ task copyFromVsCodeToStandaloneResources(type: Copy) {
     from ('vscode-wpilib/resources/cpp') {
         into 'cpp'
     }
-        from ('vscode-wpilib/resources/gradle') {
+    from ('vscode-wpilib/resources/gradle') {
         into 'gradle'
     }
     into 'wpilib-utility-standalone/resources'

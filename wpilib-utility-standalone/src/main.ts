@@ -8,7 +8,7 @@ function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     backgroundColor: '#2e2c29',
-    height: 150,
+    height: 250,
     title: 'WPILib Utility',
     width: 350,
   });
