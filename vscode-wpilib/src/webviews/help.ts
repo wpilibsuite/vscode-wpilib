@@ -6,8 +6,8 @@ import { extensionContext } from '../utilities';
 import { WebViewBase } from './webviewbase';
 
 export class Help extends WebViewBase {
-  public static async Create(preferences: IPreferencesAPI): Promise<Help> {
-    const help = new Help(preferences);
+  public static async Create(preferences: IPreferencesAPI, resourceRoot: string): Promise<Help> {
+    const help = new Help(preferences, resourceRoot);
     await help.asyncInitialize();
     return help;
   }
@@ -15,8 +15,8 @@ export class Help extends WebViewBase {
   private statusBar: vscode.StatusBarItem;
   private preferences: IPreferencesAPI;
 
-  private constructor(preferences: IPreferencesAPI) {
-    super('wpilibhelp', 'WPILib Help');
+  private constructor(preferences: IPreferencesAPI, resourceRoot: string) {
+    super('wpilibhelp', 'WPILib Help', resourceRoot);
     this.preferences = preferences;
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
     this.statusBar.text = 'WPILib';

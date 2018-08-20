@@ -22,16 +22,16 @@ interface ICreateProjectData {
 }
 
 export class ProjectCreator extends WebViewBase {
-  public static async Create(exampleTemplateApi: IExampleTemplateAPI): Promise<ProjectCreator> {
-    const te = new ProjectCreator(exampleTemplateApi);
+  public static async Create(exampleTemplateApi: IExampleTemplateAPI, resourceRoot: string): Promise<ProjectCreator> {
+    const te = new ProjectCreator(exampleTemplateApi, resourceRoot);
     await te.asyncInitialize();
     return te;
   }
 
   private exampleTemplateApi: IExampleTemplateAPI;
 
-  private constructor(exampleTemplateApi: IExampleTemplateAPI) {
-    super('wpilibprojectcreator', 'WPILib Project Creator');
+  private constructor(exampleTemplateApi: IExampleTemplateAPI, resourceRoot: string) {
+    super('wpilibprojectcreator', 'WPILib Project Creator', resourceRoot);
     this.exampleTemplateApi = exampleTemplateApi;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.createNewProject', async () => {

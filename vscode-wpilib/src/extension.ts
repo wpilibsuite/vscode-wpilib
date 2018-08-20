@@ -1,6 +1,7 @@
 'use strict';
 
 import * as path from 'path';
+import * as util from 'util';
 import * as vscode from 'vscode';
 import { BuildTestAPI } from './buildtestapi';
 import { CommandAPI } from './commandapi';
@@ -94,13 +95,13 @@ export async function activate(context: vscode.ExtensionContext) {
   createVsCommands(context, externalApi);
 
   // Create the help window provider
-  const help = await Help.Create(externalApi.getPreferencesAPI());
+  const help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
 
   // Create the eclipse upgrade provider
-  const eclipseupgrade = await EclipseUpgrade.Create();
+  const eclipseupgrade = await EclipseUpgrade.Create(extensionResourceLocation);
 
   // Create the new project creator provider
-  const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI());
+  const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
 
   // Anything pushed into context.subscriptions will get disposed when VS Code closes.
   context.subscriptions.push(help);

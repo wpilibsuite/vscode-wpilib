@@ -1,5 +1,6 @@
 'use strict';
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { extensionContext, promisifyReadFile } from '../utilities';
 
@@ -9,10 +10,12 @@ export abstract class WebViewBase {
   protected disposables: vscode.Disposable[] = [];
   protected veiwType: string;
   protected title: string;
+  protected resourceRoot: string;
 
-  protected constructor(viewType: string, title: string) {
+  protected constructor(viewType: string, title: string, resourceRoot: string) {
     this.veiwType = viewType;
     this.title = title;
+    this.resourceRoot = resourceRoot;
   }
 
   public async loadWebpage(htmlPath: string, scriptPath?: string): Promise<void> {
@@ -30,6 +33,7 @@ export abstract class WebViewBase {
                         reveal?: boolean, options?: vscode.WebviewPanelOptions & vscode.WebviewOptions) {
     if (this.webview === undefined) {
       this.webview = vscode.window.createWebviewPanel(this.veiwType, this.title, showOptions, options);
+      this.webview.iconPath = vscode.Uri.file(path.join(this.resourceRoot, 'wpilib-128.png'));
       this.webview.webview.html = this.html;
       this.webview.onDidDispose(() => {
         this.webview = undefined;

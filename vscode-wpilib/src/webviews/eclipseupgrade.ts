@@ -21,14 +21,14 @@ interface IUpgradeProject {
 }
 
 export class EclipseUpgrade extends WebViewBase {
-  public static async Create(): Promise<EclipseUpgrade> {
-    const upgrade = new EclipseUpgrade();
+  public static async Create(resourceRoot: string): Promise<EclipseUpgrade> {
+    const upgrade = new EclipseUpgrade(resourceRoot);
     await upgrade.asyncInitialize();
     return upgrade;
   }
 
-  private constructor() {
-    super('wpilibeclipseupgrade', 'WPILib Eclipse Upgrade');
+  private constructor(resourceRoot: string) {
+    super('wpilibeclipseupgrade', 'WPILib Eclipse Upgrade', resourceRoot);
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.upgradeEclipseProject', async () => {
       this.displayWebView(vscode.ViewColumn.Active, true, {
