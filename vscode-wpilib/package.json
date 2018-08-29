@@ -124,118 +124,118 @@
         "commands": [
             {
                 "command": "wpilibcore.startRioLog",
-                "title": "Start RioLog",
+                "title": "%wpilibcore.startRioLog.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setTeamNumber",
-                "title": "Set Team Number",
+                "title": "%wpilibcore.setTeamNumber.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.startTool",
-                "title": "Start Tool",
+                "title": "%wpilibcore.startTool.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.buildCode",
-                "title": "Build Robot Code",
+                "title": "%wpilibcore.buildCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.testCode",
-                "title": "Test Robot Code",
+                "title": "%wpilibcore.testCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.deployCode",
-                "title": "Deploy Robot Code",
+                "title": "%wpilibcore.deployCode.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.debugCode",
-                "title": "Debug Robot Code",
+                "title": "%wpilibcore.debugCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.simulateCode",
-                "title": "Simulate Robot Code on Desktop",
+                "title": "%wpilibcore.simulateCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setLanguage",
-                "title": "Set Language",
+                "title": "%wpilibcore.setLanguage.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setAutoSave",
-                "title": "Set Auto Save On Deploy",
+                "title": "%wpilibcore.setAutoSave.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setSkipTests",
-                "title": "Set Skip Tests",
+                "title": "%wpilibcore.setSkipTests.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setOnline",
-                "title": "Set Run Commands in Online Mode",
+                "title": "%wpilibcore.setOnline.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setStopSimulationOnEntry",
-                "title": "Set Stop Simulation on Entry",
+                "title": "%wpilibcore.setStopSimulationOnEntry.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setStartRioLog",
-                "title": "Set Auto Start RioLog on Deploy",
+                "title": "%wpilibcore.setStartRioLog.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createCommand",
-                "title": "Create a new class/command",
+                "title": "%wpilibcore.createCommand.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.cancelTasks",
-                "title": "Cancel currently running tasks",
+                "title": "%wpilibcore.cancelTasks.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.help",
-                "title": "Open WPILib Help",
+                "title": "%wpilibcore.help.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.openCommandPalette",
-                "title": "Open WPILib Command Palette",
+                "title": "%wpilibcore.openCommandPalette.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.refreshCppProperties",
-                "title": "Refresh Gradle C++ Properties",
+                "title": "%wpilibcore.refreshCppProperties.title%",
                 "category": "WPILib C++"
             },
             {
                 "command": "wpilibcore.selectCppToolchain",
-                "title": "Select Current C++ Toolchain",
+                "title": "%wpilibcore.selectCppToolchain.title%",
                 "category": "WPILib C++"
             },
             {
                 "command": "wpilibcore.upgradeEclipseProject",
-                "title": "Upgrade a WPILib Eclipse project",
+                "title": "%wpilibcore.upgradeEclipseProject.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createNewProject",
-                "title": "Create a new project",
+                "title": "%wpilibcore.createNewProject.title%",
                 "category": "WPILib"
             }
         ],
