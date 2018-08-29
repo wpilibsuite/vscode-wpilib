@@ -306,7 +306,8 @@
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
-		"gulp": "gulp"
+        "gulp": "gulp",
+        "vscePackage": "vsce package"
     },
     "devDependencies": {
         "@types/mocha": "^5.2.5",

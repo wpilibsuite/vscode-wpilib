@@ -12,7 +12,6 @@ function scrollImpl() {
 }
 exports.scrollImpl = scrollImpl;
 function sendMessage(message) {
-    // tslint:disable-next-line:no-unsafe-any
     vscode.postMessage(message, '*');
 }
 exports.sendMessage = sendMessage;
@@ -43,7 +42,6 @@ var ReceiveTypes;
 },{}],3:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-/* tslint:disable:prefer-conditional-expression */
 var MessageType;
 (function (MessageType) {
     MessageType[MessageType["Error"] = 0] = "Error";
@@ -86,12 +84,7 @@ class ErrorMessage {
         this.callStack = tmp.data;
         count += tmp.byteLength;
         // tslint:disable-next-line:no-bitwise
-        if ((this.flags & 1) !== 0) {
-            this.messageType = MessageType.Error;
-        }
-        else {
-            this.messageType = MessageType.Warning;
-        }
+        this.messageType = (this.flags & 1) !== 0 ? MessageType.Error : MessageType.Warning;
     }
     getSizedString(data, start) {
         const size = data.readUInt16BE(start);

@@ -12,9 +12,6 @@ environment:
   nodejs_version: 8
 install:
 - ps: >-
-    npm install vsce -g
-
-
     If (Test-Path Env:APPVEYOR_REPO_TAG_NAME) {
         ./gradlew clean -PjenkinsBuild -PreleaseType=OFFICIAL --continue --no-daemon
     } Else {
@@ -53,7 +50,13 @@ build_script:
         throw ("Exec: " + $errorMessage)
     }
 
-    vsce package
+    npm run gulp
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
+    npm run vscePackage
 
     if ($lastexitcode -eq 0) {
         echo $lastexitcode
