@@ -1,7 +1,6 @@
 'use strict';
 
 import * as path from 'path';
-import * as util from 'util';
 import * as vscode from 'vscode';
 import { BuildTestAPI } from './buildtestapi';
 import { CommandAPI } from './commandapi';
