@@ -22,7 +22,7 @@ const outDest = 'out';
 // If all VS Code langaues are support you can use nls.coreLanguages
 const languages = [{
 	id: 'zh-CN'
-}]; 
+}];
 
 gulp.task('default', function(callback) {
 	runSequence('build', callback);
