@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 const gulp = require('gulp');
-const path = require('path');
 
 const ts = require('gulp-typescript');
 const typescript = require('typescript');
@@ -12,7 +11,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const del = require('del');
 const runSequence = require('run-sequence');
 const es = require('event-stream');
-const vsce = require('vsce');
 const nls = require('vscode-nls-dev');
 
 const tsProject = ts.createProject('./tsconfig.json', { typescript });
@@ -38,16 +36,8 @@ gulp.task('build', function(callback) {
 	runSequence('clean', 'internal-nls-compile', 'add-i18n', callback);
 });
 
-gulp.task('publish', function(callback) {
-	runSequence('build', 'vsce:publish', callback);
-});
-
-gulp.task('package', function(callback) {
-	runSequence('build', 'vsce:package', callback);
-});
-
 gulp.task('clean', function() {
-	return del(['out/**', 'package.nls.*.json', 'i18n-sample*.vsix']);
+	return del(['out/**', 'package.nls.*.json', 'vscode-wpilib*.vsix']);
 })
 
 //---- internal
@@ -85,12 +75,4 @@ gulp.task('add-i18n', function() {
 	return gulp.src(['package.nls.json'])
 		.pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
 		.pipe(gulp.dest('.'));
-});
-
-gulp.task('vsce:publish', function() {
-	return vsce.publish();
-});
-
-gulp.task('vsce:package', function() {
-	return vsce.createVSIX();
 });
