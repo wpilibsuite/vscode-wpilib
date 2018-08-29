@@ -315,7 +315,7 @@
         "browserify": "^16.2.2",
         "del": "^3.0.0",
         "event-stream": "^3.3.4",
-        "gulp": "^3.9.1",
+        "gulp": "^4.0.0",
         "gulp-filter": "^5.1.0",
         "gulp-typescript": "^5.0.0-alpha.3",
         "rmdir-cli": "^2.0.6",
