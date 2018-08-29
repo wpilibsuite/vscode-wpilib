@@ -124,118 +124,118 @@
         "commands": [
             {
                 "command": "wpilibcore.startRioLog",
-                "title": "Start RioLog",
+                "title": "%wpilibcore.startRioLog.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setTeamNumber",
-                "title": "Set Team Number",
+                "title": "%wpilibcore.setTeamNumber.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.startTool",
-                "title": "Start Tool",
+                "title": "%wpilibcore.startTool.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.buildCode",
-                "title": "Build Robot Code",
+                "title": "%wpilibcore.buildCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.testCode",
-                "title": "Test Robot Code",
+                "title": "%wpilibcore.testCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.deployCode",
-                "title": "Deploy Robot Code",
+                "title": "%wpilibcore.deployCode.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.debugCode",
-                "title": "Debug Robot Code",
+                "title": "%wpilibcore.debugCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.simulateCode",
-                "title": "Simulate Robot Code on Desktop",
+                "title": "%wpilibcore.simulateCode.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setLanguage",
-                "title": "Set Language",
+                "title": "%wpilibcore.setLanguage.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setAutoSave",
-                "title": "Set Auto Save On Deploy",
+                "title": "%wpilibcore.setAutoSave.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setSkipTests",
-                "title": "Set Skip Tests",
+                "title": "%wpilibcore.setSkipTests.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setOnline",
-                "title": "Set Run Commands in Online Mode",
+                "title": "%wpilibcore.setOnline.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setStopSimulationOnEntry",
-                "title": "Set Stop Simulation on Entry",
+                "title": "%wpilibcore.setStopSimulationOnEntry.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.setStartRioLog",
-                "title": "Set Auto Start RioLog on Deploy",
+                "title": "%wpilibcore.setStartRioLog.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createCommand",
-                "title": "Create a new class/command",
+                "title": "%wpilibcore.createCommand.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.cancelTasks",
-                "title": "Cancel currently running tasks",
+                "title": "%wpilibcore.cancelTasks.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.help",
-                "title": "Open WPILib Help",
+                "title": "%wpilibcore.help.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.openCommandPalette",
-                "title": "Open WPILib Command Palette",
+                "title": "%wpilibcore.openCommandPalette.title%",
                 "category": "WPILib",
                 "icon": "resources/wpilib.svg"
             },
             {
                 "command": "wpilibcore.refreshCppProperties",
-                "title": "Refresh Gradle C++ Properties",
+                "title": "%wpilibcore.refreshCppProperties.title%",
                 "category": "WPILib C++"
             },
             {
                 "command": "wpilibcore.selectCppToolchain",
-                "title": "Select Current C++ Toolchain",
+                "title": "%wpilibcore.selectCppToolchain.title%",
                 "category": "WPILib C++"
             },
             {
                 "command": "wpilibcore.upgradeEclipseProject",
-                "title": "Upgrade a WPILib Eclipse project",
+                "title": "%wpilibcore.upgradeEclipseProject.title%",
                 "category": "WPILib"
             },
             {
                 "command": "wpilibcore.createNewProject",
-                "title": "Create a new project",
+                "title": "%wpilibcore.createNewProject.title%",
                 "category": "WPILib"
             }
         ],
@@ -298,23 +298,32 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "npm run compile && npm run compileBundle && npm run lint",
+        "vscode:prepublish": "gulp build && npm run compile && npm run compileBundle && npm run lint",
         "clean": "rmdir-cli out",
         "compile": "tsc -p ./",
         "lint": "tslint -c tslint.json -p tsconfig.json",
         "compileBundle": "tsc -p ./ && browserify ./out/riolog/shared/sharedscript.js > ./resources/bundle.js",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"gulp": "gulp"
     },
     "devDependencies": {
         "@types/mocha": "^5.2.5",
         "@types/node": "^8.9.5",
         "browserify": "^16.2.2",
+        "del": "^3.0.0",
+        "event-stream": "^3.3.4",
+        "gulp": "^3.9.1",
+        "gulp-filter": "^5.1.0",
+        "gulp-typescript": "^5.0.0-alpha.3",
         "rmdir-cli": "^2.0.6",
+        "run-sequence": "^2.2.1",
         "tslint": "^5.11.0",
         "typescript": "^3.0.1",
-        "vscode": "^1.1.21"
+        "vsce": "^1.46.0",
+        "vscode": "^1.1.21",
+        "vscode-nls-dev": "^3.2.2"
     },
     "dependencies": {
         "@types/glob": "^5.0.35",
@@ -326,6 +335,7 @@
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
         "vscode-cpptools": "1.3.1",
-        "vscode-jsonrpc": "^3.6.2"
+        "vscode-jsonrpc": "^3.6.2",
+        "vscode-nls": "^3.2.5"
     }
 }
