@@ -3,10 +3,9 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
+         IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';
 import { promisifyReadFile } from '../utilities';
-import { IIPCReceiveMessage, IIPCSendMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView } from './shared/interfaces';
-import { IErrorMessage, IPrintMessage } from './shared/message';
-import { RioConsole } from './shared/rioconsole';
 
 interface IHTMLProvider {
   getHTML(): string;

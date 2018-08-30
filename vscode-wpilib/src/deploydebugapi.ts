@@ -1,7 +1,7 @@
 'use scrict';
 import * as vscode from 'vscode';
+import { RioLogWindow } from 'wpilib-riolog';
 import { PreferencesAPI } from './preferencesapi';
-import { RioLogWindow } from './riolog/shared/riologwindow';
 import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
 import { ICodeDeployer, IDeployDebugAPI } from './shared/externalapi';
 
