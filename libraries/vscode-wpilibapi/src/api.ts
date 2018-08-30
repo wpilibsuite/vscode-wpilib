@@ -157,15 +157,11 @@ export interface ICodeBuilder {
 }
 
 export async function getWPILibApi(): Promise<IExternalAPI | undefined> {
-  const wpilib: vscode.Extension<IExternalAPI> | undefined = vscode.extensions.getExtension('wpifirst.vscode-wpilib');
+  const wpilib: vscode.Extension<IExternalAPI> | undefined = vscode.extensions.getExtension('wpilibsuite.vscode-wpilib');
   let extension: IExternalAPI | undefined;
 
   if (wpilib) {
-    if (!wpilib.isActive) {
-      extension = await wpilib.activate();
-    } else {
-      extension = wpilib.exports;
-    }
+    extension = wpilib.isActive ? wpilib.exports : await wpilib.activate();
   }
   return extension;
 }

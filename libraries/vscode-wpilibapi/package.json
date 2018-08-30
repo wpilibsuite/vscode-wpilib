@@ -25,7 +25,7 @@
   ],
   "repository": "https://github.com/wpilibsuite/vscode-wpilib",
   "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
-  "author": "WPI/FIRST",
-  "publisher": "wpifirst",
+  "author": "WPILib Suite",
+  "publisher": "wpilibsuite",
   "license": "BSD-3-Clause"
 }
