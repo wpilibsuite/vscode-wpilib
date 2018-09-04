@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../shared/externalapi';
+import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from 'vscode-wpilibapi';
 import { gradleRun } from '../utilities';
 
 class CodeBuilder implements ICodeBuilder {

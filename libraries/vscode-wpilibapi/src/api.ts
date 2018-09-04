@@ -10,64 +10,64 @@ export interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
 }
 
-export abstract class IToolAPI {
-  public abstract startTool(): Promise<boolean>;
-  public abstract addTool(tool: IToolRunner): void;
+export interface IToolAPI {
+  startTool(): Promise<boolean>;
+  addTool(tool: IToolRunner): void;
 }
 
-export abstract class IExecuteAPI {
-  public abstract executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number>;
-  public abstract cancelCommands(): Promise<number>;
+export interface IExecuteAPI {
+  executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number>;
+  cancelCommands(): Promise<number>;
 }
 
-export abstract class IExampleTemplateAPI {
-  public abstract addTemplateProvider(provider: IExampleTemplateCreator): void;
-  public abstract addExampleProvider(provider: IExampleTemplateCreator): void;
-  public abstract getLanguages(template: boolean): string[];
-  public abstract getBases(template: boolean, language: string): ICreatorQuickPick[];
-  public abstract createProject(template: boolean, language: string, base: string, toFolder: string,
-                                newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean>;
+export interface IExampleTemplateAPI {
+  addTemplateProvider(provider: IExampleTemplateCreator): void;
+  addExampleProvider(provider: IExampleTemplateCreator): void;
+  getLanguages(template: boolean): string[];
+  getBases(template: boolean, language: string): ICreatorQuickPick[];
+  createProject(template: boolean, language: string, base: string, toFolder: string,
+                newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean>;
 }
 
-export abstract class ICommandAPI {
-  public abstract addCommandProvider(provider: ICommandCreator): void;
-  public abstract createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean>;
+export interface ICommandAPI {
+  addCommandProvider(provider: ICommandCreator): void;
+  createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean>;
 }
 
-export abstract class IDeployDebugAPI {
-  public abstract startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  public abstract deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
-  public abstract registerCodeDeploy(deployer: ICodeDeployer): void;
-  public abstract debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
-  public abstract registerCodeDebug(deployer: ICodeDeployer): void;
-  public abstract simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
-  public abstract registerCodeSimulate(deployer: ICodeDeployer): void;
-  public abstract addLanguageChoice(language: string): void;
-  public abstract getLanguageChoices(): string[];
+export interface IDeployDebugAPI {
+  startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
+  deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  registerCodeDeploy(deployer: ICodeDeployer): void;
+  debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  registerCodeDebug(deployer: ICodeDeployer): void;
+  simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  registerCodeSimulate(deployer: ICodeDeployer): void;
+  addLanguageChoice(language: string): void;
+  getLanguageChoices(): string[];
 }
 
-export abstract class IBuildTestAPI {
-  public abstract buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
-  public abstract registerCodeBuild(builder: ICodeBuilder): void;
-  public abstract testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
-  public abstract registerCodeTest(builder: ICodeBuilder): void;
-  public abstract addLanguageChoice(language: string): void;
+export interface IBuildTestAPI {
+  buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  registerCodeBuild(builder: ICodeBuilder): void;
+  testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  registerCodeTest(builder: ICodeBuilder): void;
+  addLanguageChoice(language: string): void;
 }
 
-export abstract class IPreferencesAPI {
-  public abstract onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
-  public abstract getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
-  public abstract getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
+export interface IPreferencesAPI {
+  onDidPreferencesFolderChanged: vscode.Event<IPreferencesChangedPair[]>;
+  getPreferences(workspace: vscode.WorkspaceFolder): IPreferences;
+  getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
 }
 
-export abstract class IExternalAPI {
-  public abstract getToolAPI(): IToolAPI;
-  public abstract getExampleTemplateAPI(): IExampleTemplateAPI;
-  public abstract getDeployDebugAPI(): IDeployDebugAPI;
-  public abstract getBuildTestAPI(): IBuildTestAPI;
-  public abstract getPreferencesAPI(): IPreferencesAPI;
-  public abstract getCommandAPI(): ICommandAPI;
-  public abstract getExecuteAPI(): IExecuteAPI;
+export interface IExternalAPI {
+  getToolAPI(): IToolAPI;
+  getExampleTemplateAPI(): IExampleTemplateAPI;
+  getDeployDebugAPI(): IDeployDebugAPI;
+  getBuildTestAPI(): IBuildTestAPI;
+  getPreferencesAPI(): IPreferencesAPI;
+  getCommandAPI(): ICommandAPI;
+  getExecuteAPI(): IExecuteAPI;
 }
 
 export interface IPreferences {

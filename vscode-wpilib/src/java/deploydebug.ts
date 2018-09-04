@@ -3,7 +3,7 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../shared/externalapi';
+import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from 'vscode-wpilibapi';
 import { gradleRun, readFileAsync } from '../utilities';
 import { IDebugCommands, startDebugging } from './debug';
 import { ISimulateCommands, startSimulation } from './simulate';

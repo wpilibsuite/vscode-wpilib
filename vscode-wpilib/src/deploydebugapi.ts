@@ -1,9 +1,9 @@
 'use scrict';
 import * as vscode from 'vscode';
+import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
 import { RioLogWindow } from 'wpilib-riolog';
 import { PreferencesAPI } from './preferencesapi';
 import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
-import { ICodeDeployer, IDeployDebugAPI } from './shared/externalapi';
 
 interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
   deployer: ICodeDeployer;
@@ -71,7 +71,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
   }
 }
 
-export class DeployDebugAPI extends IDeployDebugAPI {
+export class DeployDebugAPI implements IDeployDebugAPI {
   public static async Create(resourceFolder: string, preferences: PreferencesAPI): Promise<DeployDebugAPI> {
     const dda = new DeployDebugAPI(preferences);
     dda.rioLogWebViewProvider = await RioLogWebviewProvider.Create(resourceFolder);
@@ -92,7 +92,6 @@ export class DeployDebugAPI extends IDeployDebugAPI {
   private liveWindow: RioLogWindow | undefined;
 
   private constructor(preferences: PreferencesAPI) {
-    super();
     this.preferences = preferences;
 
     this.rioLogConsoleProvider = new LiveRioConsoleProvider();

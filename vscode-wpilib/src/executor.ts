@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { IExecuteAPI } from './shared/externalapi';
+import { IExecuteAPI } from 'vscode-wpilibapi';
 import { PromiseCondition } from './shared/promisecondition';
 import { getIsWindows } from './utilities';
 
@@ -15,11 +15,10 @@ interface ITaskRunnerQuickPick {
   taskRunner: ITaskRunner;
 }
 
-export class ExecuteAPI extends IExecuteAPI {
+export class ExecuteAPI implements IExecuteAPI {
   private runners: ITaskRunner[] = [];
 
   constructor() {
-    super();
     vscode.tasks.onDidEndTaskProcess((e) => {
       for (let i = 0; i < this.runners.length; i++) {
         if (this.runners[i].execution === undefined) {

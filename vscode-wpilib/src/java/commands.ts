@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../shared/externalapi';
+import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
 import { promisifyNcp } from '../shared/generator';
 import { getClassName, getPackageName } from '../utilities';
 

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as timers from 'timers';
 import * as vscode from 'vscode';
-import { IExecuteAPI, IPreferences } from './shared/externalapi';
+import { IExecuteAPI, IPreferences } from 'vscode-wpilibapi';
 import { setExecutePermissions } from './shared/permissions';
 
 // General utilites usable by multiple classes

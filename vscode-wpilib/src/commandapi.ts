@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { ICommandAPI, ICommandCreator } from './shared/externalapi';
+import { ICommandAPI, ICommandCreator } from 'vscode-wpilibapi';
 
 interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: ICommandCreator;
@@ -10,13 +10,9 @@ interface ILanguageQuickPick extends vscode.QuickPickItem {
   creators: ICreatorQuickPick[];
 }
 
-export class CommandAPI extends ICommandAPI {
+export class CommandAPI implements ICommandAPI {
   private disposables: vscode.Disposable[] = [];
   private creators: ILanguageQuickPick[] = [];
-
-  public constructor() {
-    super();
-  }
 
   public addCommandProvider(provider: ICommandCreator): void {
     let lp: ILanguageQuickPick | undefined;

@@ -1,14 +1,14 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { IBuildTestAPI, ICodeBuilder } from 'vscode-wpilibapi';
 import { PreferencesAPI } from './preferencesapi';
-import { IBuildTestAPI, ICodeBuilder } from './shared/externalapi';
 
 interface ICodeBuilderQuickPick extends vscode.QuickPickItem {
   builder: ICodeBuilder;
 }
 
-export class BuildTestAPI extends IBuildTestAPI {
+export class BuildTestAPI implements IBuildTestAPI {
   private languageChoices: string[] = [];
   private builders: ICodeBuilderQuickPick[] = [];
   private testers: ICodeBuilderQuickPick[] = [];
@@ -16,7 +16,6 @@ export class BuildTestAPI extends IBuildTestAPI {
   private preferences: PreferencesAPI;
 
   constructor(preferences: PreferencesAPI) {
-    super();
     this.preferences = preferences;
   }
 

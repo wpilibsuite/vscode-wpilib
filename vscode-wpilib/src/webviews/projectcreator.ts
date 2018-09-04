@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI } from '../shared/externalapi';
+import { IExampleTemplateAPI } from 'vscode-wpilibapi';
 import { extensionContext } from '../utilities';
 import { WebViewBase } from './webviewbase';
 

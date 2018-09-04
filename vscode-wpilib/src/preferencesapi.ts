@@ -1,11 +1,11 @@
 'use strict';
 import * as vscode from 'vscode';
+import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from 'vscode-wpilibapi';
 import { Preferences } from './preferences';
-import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from './shared/externalapi';
 
 // Stores the preferences provider for WPILib
 // Each workspace can have its own preferences, so this provides for each workspace
-export class PreferencesAPI extends IPreferencesAPI {
+export class PreferencesAPI implements IPreferencesAPI {
   // Async create to allow asynchronous initialization
   public static async Create(): Promise<PreferencesAPI> {
     const prefs = new PreferencesAPI();
@@ -21,7 +21,6 @@ export class PreferencesAPI extends IPreferencesAPI {
   private disposables: vscode.Disposable[] = [];
 
   private constructor() {
-    super();
     this.onDidPreferencesFolderChanged = this.preferencesEmitter.event;
   }
 

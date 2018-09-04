@@ -2,7 +2,7 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IPreferences } from './shared/externalapi';
+import { IPreferences } from 'vscode-wpilibapi';
 import { promisifyExists, promisifyMkDir, promisifyReadFile, promisifyWriteFile } from './utilities';
 
 export interface IPreferencesJson {

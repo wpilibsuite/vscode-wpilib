@@ -1,7 +1,7 @@
 'use strict';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IPreferencesAPI } from '../shared/externalapi';
+import { IPreferencesAPI } from 'vscode-wpilibapi';
 import { extensionContext } from '../utilities';
 import { WebViewBase } from './webviewbase';
 

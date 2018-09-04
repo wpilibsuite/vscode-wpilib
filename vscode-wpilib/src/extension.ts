@@ -2,6 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { IExternalAPI } from 'vscode-wpilibapi';
 import { BuildTestAPI } from './buildtestapi';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
@@ -11,7 +12,6 @@ import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
-import { IExternalAPI } from './shared/externalapi';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext } from './utilities';
 import { createVsCommands } from './vscommands';
@@ -20,7 +20,7 @@ import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 
 // External API class to implement the IExternalAPI interface
-class ExternalAPI extends IExternalAPI {
+class ExternalAPI implements IExternalAPI {
   // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
@@ -39,7 +39,6 @@ class ExternalAPI extends IExternalAPI {
   private readonly executeApi: ExecuteAPI;
 
   private constructor(preferencesApi: PreferencesAPI, deployDebugApi: DeployDebugAPI, buildTestApi: BuildTestAPI) {
-    super();
     this.toolApi = new ToolAPI();
     this.exampleTemplateApi = new ExampleTemplateAPI();
     this.commandApi = new CommandAPI();

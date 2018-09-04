@@ -1,8 +1,8 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { IExternalAPI } from 'vscode-wpilibapi';
 import { requestTeamNumber } from './preferences';
-import { IExternalAPI } from './shared/externalapi';
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command

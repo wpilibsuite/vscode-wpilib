@@ -2,8 +2,8 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from 'vscode-wpilibapi';
 import { IPreferencesJson } from './preferences';
-import { IExampleTemplateAPI, IExampleTemplateCreator } from './shared/externalapi';
 import { promisifyMkdirp } from './shared/generator';
 import { promisifyReadFile, promisifyWriteFile } from './utilities';
 
@@ -11,7 +11,7 @@ interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
 }
 
-export class ExampleTemplateAPI extends IExampleTemplateAPI {
+export class ExampleTemplateAPI implements IExampleTemplateAPI {
   private disposables: vscode.Disposable[] = [];
   private templates: ICreatorQuickPick[] = [];
   private examples: ICreatorQuickPick[] = [];

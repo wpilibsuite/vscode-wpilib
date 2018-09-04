@@ -3,7 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { getCppToolsApi, Version } from 'vscode-cpptools';
-import { IExternalAPI } from '../shared/externalapi';
+import { IExternalAPI } from 'vscode-wpilibapi';
 import { ApiProvider } from './apiprovider';
 import { createCommands } from './vscommands';
 
