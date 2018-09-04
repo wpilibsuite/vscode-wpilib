@@ -1,6 +1,5 @@
 'use strict';
 
-import * as jsonc from 'jsonc-parser';
 import * as net from 'net';
 import * as timers from 'timers';
 
@@ -93,7 +92,7 @@ function getSocketFromDS(port: number): ISocketPromisePair {
   const retVal = new DSSocketPromisePair(s, ds, new Promise((resolve, reject) => {
     // First connect to ds, and wait for data
     ds.on('data', (data) => {
-      const parsed: IDriverStationData = jsonc.parse(data.toString()) as IDriverStationData;
+      const parsed: IDriverStationData = JSON.parse(data.toString()) as IDriverStationData;
       if (parsed.robotIP === 0) {
         ds.end();
         ds.destroy();

@@ -32,6 +32,7 @@
     "java-properties": "^0.2.10",
     "jsonc-parser": "^2.0.0",
     "mkdirp": "^0.5.1",
-    "ncp": "^2.0.0"
+    "ncp": "^2.0.0",
+    "wpilib-riolog": "^0.1.0"
   }
 }

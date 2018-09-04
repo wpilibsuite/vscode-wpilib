@@ -1,6 +1,6 @@
 'use strict';
 
-import { IIPCReceiveMessage, IIPCSendMessage } from '../shared/interfaces';
+import { IIPCReceiveMessage, IIPCSendMessage } from 'wpilib-riolog';
 import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
 
 interface IVsCodeApi {

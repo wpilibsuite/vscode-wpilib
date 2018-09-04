@@ -2,9 +2,8 @@
 import * as electron from 'electron';
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
-import { IIPCReceiveMessage, IIPCSendMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView } from './shared/interfaces';
-import { IErrorMessage, IPrintMessage } from './shared/message';
-import { RioConsole } from './shared/rioconsole';
+import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
+         IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';
 
 const dialog = electron.remote.dialog;
 

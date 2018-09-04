@@ -1,0 +1,26 @@
+{
+  "name": "wpilib-riolog",
+  "version": "0.1.0",
+  "description": "RIOLog for FRC",
+  "typings": "./out/index.d.ts",
+  "main": "./out/index.js",
+  "devDependencies": {
+    "@types/node": "^8.0.46",
+    "typescript": "^3.0.1",
+    "tslint": "^5.11.0"
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
+  },
+  "keywords": [
+    "wpilib",
+    "frc",
+    "riolog"
+  ],
+  "repository": "https://github.com/wpilibsuite/vscode-wpilib",
+  "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
+  "author": "WPILib Suite",
+  "publisher": "wpilibsuite",
+  "license": "BSD-3-Clause"
+}

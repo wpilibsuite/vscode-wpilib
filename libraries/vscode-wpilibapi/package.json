@@ -1,0 +1,30 @@
+{
+  "name": "vscode-wpilibapi",
+  "version": "2019.0.0",
+  "description": "Public API for vscode-wpilib",
+  "typings": "./out/api.d.ts",
+  "main": "./out/api.js",
+  "engines": {
+    "vscode": "^1.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.46",
+    "typescript": "^3.0.1",
+    "tslint": "^5.11.0",
+    "vscode": "^1.1.21"
+  },
+  "scripts": {
+    "compile": "node ./node_modules/vscode/bin/install && tsc -p ./",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
+  },
+  "keywords": [
+    "vscode",
+    "wpilib",
+    "frc"
+  ],
+  "repository": "https://github.com/wpilibsuite/vscode-wpilib",
+  "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
+  "author": "WPILib Suite",
+  "publisher": "wpilibsuite",
+  "license": "BSD-3-Clause"
+}

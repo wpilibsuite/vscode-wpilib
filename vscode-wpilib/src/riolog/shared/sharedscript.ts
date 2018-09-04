@@ -1,9 +1,8 @@
 'use strict';
 
 /* tslint:disable:prefer-conditional-expression */
+import { IErrorMessage, IIPCSendMessage, IPrintMessage, MessageType, ReceiveTypes, SendTypes } from 'wpilib-riolog';
 import { checkResize, scrollImpl, sendMessage } from '../script/implscript';
-import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
-import { IErrorMessage, IPrintMessage, MessageType } from './message';
 
 let paused = false;
 export function onPause() {
