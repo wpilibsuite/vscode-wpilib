@@ -73,12 +73,14 @@ window.addEventListener('message', (event) => {
       lang.innerText = 'Select a language';
       baseButton.disabled = true;
       baseButton.innerText = 'Select a project base';
+      selectLanguage();
       break;
     case 'language':
       language = data.data;
       lang.innerText = language;
       baseButton.disabled = false;
       baseButton.innerText = 'Select a project base';
+      selectProjectBase();
       break;
     case 'base':
       base = data.data;
