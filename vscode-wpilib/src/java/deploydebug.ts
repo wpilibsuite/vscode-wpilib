@@ -58,7 +58,7 @@ class DebugCodeDeployer implements ICodeDeployer {
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
-      command += ' -Xcheck';
+      command += ' -xcheck';
     }
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Debug', this.executeApi, prefs);
@@ -126,7 +126,7 @@ class DeployCodeDeployer implements ICodeDeployer {
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     let command = 'deploy -PteamNumber=' + teamNumber;
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
-      command += ' -Xcheck';
+      command += ' -xcheck';
     }
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Deploy', this.executeApi, prefs);
