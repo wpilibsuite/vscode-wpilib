@@ -20,7 +20,7 @@ class CodeBuilder implements ICodeBuilder {
   }
 
   public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'assemble';
+    const command = 'build';
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Build', this.executeApi, prefs);
     console.log(result);
