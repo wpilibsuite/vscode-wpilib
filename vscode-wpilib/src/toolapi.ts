@@ -24,7 +24,11 @@ export class ToolAPI implements IToolAPI {
       return false;
     }
 
-    return result.runner.runTool();
+    const ret =  result.runner.runTool();
+    if (!ret) {
+      await vscode.window.showInformationMessage(`Failed to start tool: ${result.runner.getDisplayName()}`);
+    }
+    return ret;
   }
   public addTool(tool: IToolRunner): void {
     const qpi: IToolQuickPick = {

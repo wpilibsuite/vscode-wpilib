@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { BuildTestAPI } from './buildtestapi';
+import { BuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { DeployDebugAPI } from './deploydebugapi';
@@ -107,6 +108,9 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(eclipseupgrade);
 
   context.subscriptions.push(projectcreator);
+
+  // Add built in tools
+  await BuiltinTools.Create('2018', externalApi);
 
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
   const wp = vscode.workspace.workspaceFolders;
