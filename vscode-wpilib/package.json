@@ -235,6 +235,11 @@
                 "command": "wpilibcore.createNewProject",
                 "title": "%wpilibcore.createNewProject.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.manageVendorLibs",
+                "title": "%wpilibcore.manageVendorLibs.title%",
+                "category": "WPILib"
             }
         ],
         "keybindings": [
@@ -283,6 +288,11 @@
                 {
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.testCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.manageVendorLibs",
                     "group": "wpilib"
                 },
                 {

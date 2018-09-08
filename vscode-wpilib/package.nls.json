@@ -20,5 +20,6 @@
 	"wpilibcore.refreshCppProperties.title": "Refresh Gradle C++ Properties",
 	"wpilibcore.selectCppToolchain.title": "Select Current C++ Toolchain",
 	"wpilibcore.upgradeEclipseProject.title": "Upgrade a WPILib Eclipse project",
-	"wpilibcore.createNewProject.title": "Create a new project"
+	"wpilibcore.createNewProject.title": "Create a new project",
+	"wpilibcore.manageVendorLibs": "Manage Vendor Libraries"
 }
