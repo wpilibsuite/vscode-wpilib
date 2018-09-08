@@ -8,6 +8,7 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const typescript = require('typescript');
 const sourcemaps = require('gulp-sourcemaps');
+const jsontransform = require('gulp-json-transform');
 const del = require('del');
 const es = require('event-stream');
 const nls = require('vscode-nls-dev');
@@ -23,7 +24,28 @@ const languages = [{
 	id: 'zh-CN'
 }];
 
+const defaultActivationEvents = [
+	"workspaceContains:.wpilib/wpilib_preferences.json",
+	"workspaceContains:build/vscodeconfig.json"
+]
+
 //---- internal
+
+function updateActivationCommands() {
+	return gulp.src(['./package.json'])
+		.pipe(jsontransform((data) => {
+			const activationEvents = [];
+			for (const evnt of defaultActivationEvents) {
+				activationEvents.push(evnt);
+			}
+			for (const cmd of data.contributes.commands) {
+				activationEvents.push(cmd.command);
+			}
+			data.activationEvents = activationEvents;
+			return data;
+		}, 4))
+		.pipe(gulp.dest('./'));
+}
 
 function compile(buildNls) {
 	var r = tsProject.src()
@@ -45,6 +67,10 @@ function compile(buildNls) {
 
 	return r.pipe(gulp.dest(outDest));
 }
+
+gulp.task('update-activation', () => {
+	return updateActivationCommands();
+});
 
 gulp.task('internal-compile', function() {
 	return compile(false);
