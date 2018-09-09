@@ -39,7 +39,7 @@ function updateActivationCommands() {
 				activationEvents.push(evnt);
 			}
 			for (const cmd of data.contributes.commands) {
-				activationEvents.push(cmd.command);
+				activationEvents.push(`onCommand:${cmd.command}`);
 			}
 			data.activationEvents = activationEvents;
 			return data;
