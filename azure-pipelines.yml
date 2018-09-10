@@ -26,6 +26,7 @@ steps:
     options: '-PjenkinsBuild'
 
 - script: |
+    echo "Hmmm"
     npm install
     npm run compile
     echo "Compiled"
