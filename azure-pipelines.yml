@@ -49,3 +49,10 @@ steps:
     npm run vscePackage
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm package'
+  
+- task: CopyFiles@2
+  inputs:
+    contents: **\*.vsix
+    targetFolder: $(Build.ArtifactStagingDirectory)
+  
+- task: PublishBuildArtifacts@1
