@@ -29,7 +29,9 @@ steps:
     cd vscode-wpilib
     npm install
     npm run compile
+    echo "Compiled"
     npm run lint
     npm run gulp
     npm run vscePackage
-  displayName: 'npm install and build'
+    echo "Finished"
+  displayName: 'npm install compile ling gulp vsce'
