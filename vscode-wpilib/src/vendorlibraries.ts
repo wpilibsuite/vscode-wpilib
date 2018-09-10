@@ -12,6 +12,7 @@ interface IJsonDependency {
   version: string;
   uuid: string;
   jsonUrl: string;
+  fileName: string;
 }
 
 class OptionQuickPick implements vscode.QuickPickItem {
@@ -126,8 +127,6 @@ export class VendorLibraries {
             }
           }
         }
-      } else {
-        // TODO
       }
     } else {
       await vscode.window.showInformationMessage('No dependencies installed');
@@ -161,8 +160,6 @@ export class VendorLibraries {
           for (const ti of toUpdate) {
             await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           }
-        } else {
-          // TODO
         }
       } else {
         await vscode.window.showInformationMessage('No updates available');
@@ -202,8 +199,6 @@ export class VendorLibraries {
           for (const ti of toUpdate) {
             await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           }
-        } else {
-          // TODO
         }
       } else {
         await vscode.window.showInformationMessage('No updates available');
@@ -242,8 +237,6 @@ export class VendorLibraries {
           for (const ti of toInstall) {
             await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           }
-        } else {
-          // TODO
         }
       } else {
         await vscode.window.showInformationMessage('No new dependencies available');
@@ -324,7 +317,7 @@ export class VendorLibraries {
     if (!dirExists) {
       await promisifyMkdirp(url);
       // Directly write file
-      await promisifyWriteFile(path.join(url, dep.uuid + '.json'), JSON.stringify(dep, null, 4));
+      await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
       return true;
     }
 
@@ -345,7 +338,7 @@ export class VendorLibraries {
       }
     }
 
-    await promisifyWriteFile(path.join(url, dep.uuid + '.json'), JSON.stringify(dep, null, 4));
+    await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
     return true;
   }
 
@@ -375,7 +368,6 @@ export class VendorLibraries {
       return results.filter((x) => x !== undefined) as IJsonDependency[];
     } catch (err) {
       return [];
-      //
     }
   }
 }
