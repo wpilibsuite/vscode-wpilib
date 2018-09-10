@@ -26,7 +26,6 @@ steps:
     options: '-PjenkinsBuild'
 
 - script: |
-    cd vscode-wpilib
     npm install
     npm run compile
     echo "Compiled"
@@ -34,4 +33,5 @@ steps:
     npm run gulp
     npm run vscePackage
     echo "Finished"
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm install compile ling gulp vsce'
