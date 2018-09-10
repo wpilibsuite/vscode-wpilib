@@ -56,3 +56,4 @@ steps:
     targetFolder: $(Build.ArtifactStagingDirectory)
   
 - task: PublishBuildArtifacts@1
+  artifactName: 'VSIX'
