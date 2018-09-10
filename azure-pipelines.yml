@@ -26,14 +26,26 @@ steps:
     options: '-PjenkinsBuild'
 
 - script: |
-    echo "Hmmm"
     npm install
-    npm run compile
-    echo "Compiled"
-    npm run lint
-    npm run gulp
-    npm run vscePackage
-    echo "Finished"
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
-  failOnStderr: false
-  displayName: 'npm install compile ling gulp vsce'
+  displayName: 'npm install'
+  
+  - script: |
+    npm run compile
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm compile'
+  
+  - script: |
+    npm run lint
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm lint'
+  
+  - script: |
+    npm run gulp
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm gulp'
+  
+ - script: |
+    npm run vscePackage
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm package'
