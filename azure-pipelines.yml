@@ -35,4 +35,5 @@ steps:
     npm run vscePackage
     echo "Finished"
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  failOnStderr: false
   displayName: 'npm install compile ling gulp vsce'
