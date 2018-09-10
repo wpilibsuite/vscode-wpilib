@@ -1,10 +1,9 @@
 'use strict';
 
 import * as cp from 'child_process';
-import * as os from 'os';
 import * as path from 'path';
 import { IExternalAPI, IToolRunner } from 'vscode-wpilibapi';
-import { getIsWindows, promisifyExists, promisifyReadFile } from './utilities';
+import { getHomeDir, getIsWindows, promisifyExists, promisifyReadFile } from './utilities';
 
 interface ITool {
   name: string;
@@ -86,25 +85,8 @@ export class BuiltinTools {
     this.year = year;
   }
 
-  private getHomeDir(): string {
-    const frcHome = process.env[`FRC_${this.year}_HOME`];
-    if (frcHome) {
-      return frcHome;
-    } else {
-      if (getIsWindows()) {
-        // Windows, search public home
-        return '';
-      } else {
-        // Unix, search user home
-        const dir = os.homedir();
-        const wpilibhome = path.join(dir, `wpilib${this.year}`);
-        return wpilibhome;
-      }
-    }
-  }
-
   private async enumerateHomeTools(): Promise<IEnumerateResult> {
-    const homeDir = this.getHomeDir();
+    const homeDir = getHomeDir(this.year);
     const toolsDir = path.join(homeDir, 'tools');
 
     const toolsJson = path.join(toolsDir, 'tools.json');
