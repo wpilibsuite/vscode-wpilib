@@ -52,7 +52,7 @@ steps:
   
 - task: CopyFiles@2
   inputs:
-    contents: **\*.vsix
+    contents: '**\*.vsix'
     targetFolder: $(Build.ArtifactStagingDirectory)
   
 - task: PublishBuildArtifacts@1
