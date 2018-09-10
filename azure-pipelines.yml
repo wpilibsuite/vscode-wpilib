@@ -1,0 +1,60 @@
+# Node.js
+# Build a general Node.js application with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/vsts/pipelines/languages/javascript
+
+pool:
+  vmImage: 'vs2017-win2017'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '8.x'
+  displayName: 'Install Node.js'
+
+- task: Gradle@2
+  inputs:
+    workingDirectory: ''
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.8'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: false
+    testResultsFiles: '**/TEST-*.xml'
+    tasks: 'build updateVersions updateAllDependencies'
+    options: '-PjenkinsBuild'
+
+- script: |
+    npm install
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm install'
+  
+- script: |
+    npm run compile
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm compile'
+  
+- script: |
+    npm run lint
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm lint'
+  
+- script: |
+    npm run gulp
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm gulp'
+  
+- script: |
+    npm run vscePackage
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm package'
+  
+- task: CopyFiles@2
+  inputs:
+    contents: '**\*.vsix'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+  
+- task: PublishBuildArtifacts@1
+  inputs:
+    artifactName: 'VSIX'
