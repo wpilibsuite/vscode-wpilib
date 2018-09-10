@@ -15,6 +15,7 @@ import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext } from './utilities';
+import { VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { EclipseUpgrade } from './webviews/eclipseupgrade';
 import { Help } from './webviews/help';
@@ -111,6 +112,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Add built in tools
   await BuiltinTools.Create('2018', externalApi);
+
+  const vendorLibs = new VendorLibraries('2018', externalApi);
+
+  context.subscriptions.push(vendorLibs);
 
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
   const wp = vscode.workspace.workspaceFolders;

@@ -1,10 +1,11 @@
 'use scrict';
 
+import fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { promisifyReadDir } from './shared/generator';
-import { promisifyReadFile } from './utilities';
+import { promisifyMkdirp, promisifyReadDir } from './shared/generator';
+import { getHomeDir, promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
 
 interface IJsonDependency {
   name: string;
@@ -13,13 +14,28 @@ interface IJsonDependency {
   jsonUrl: string;
 }
 
-class LibraryQuickPick implements vscode.QuickPickItem {
+class OptionQuickPick implements vscode.QuickPickItem {
   public label: string;
-  public func: () => Promise<void>;
+  public func: (workspace: vscode.WorkspaceFolder) => Promise<void>;
 
-  constructor(name: string, func: () => Promise<void>) {
+  constructor(name: string, func: (workspace: vscode.WorkspaceFolder) => Promise<void>) {
     this.label = name;
     this.func = func;
+  }
+}
+
+class LibraryQuickPick implements vscode.QuickPickItem {
+  public label: string;
+  public dep: IJsonDependency;
+  public description: string;
+
+  constructor(dep: IJsonDependency, oldVersion?: string) {
+    this.label = dep.name;
+    this.description = dep.version;
+    if (oldVersion !== undefined) {
+      this.description += ` (Old Version: ${oldVersion})`;
+    }
+    this.dep = dep;
   }
 }
 
@@ -32,63 +48,305 @@ function isJsonDependency(arg: any): arg is IJsonDependency {
 }
 
 export class VendorLibraries {
+  private year: string;
   private externalApi: IExternalAPI;
-  private userHomeFolder: string;
   private disposables: vscode.Disposable[] = [];
 
-  constructor(externalApi: IExternalAPI, userHomeFolder: string) {
+  constructor(year: string, externalApi: IExternalAPI) {
     this.externalApi = externalApi;
-    this.userHomeFolder = userHomeFolder;
+    this.year = year;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.manageVendorLibs',
                           this.manageVendorLibraries, this));
   }
 
-  public async manageVendorLibraries(): Promise<void> {
+  public dispose() {
+    for (const d of this.disposables) {
+      d.dispose();
+    }
+  }
+
+  public async manageVendorLibraries(_uri: vscode.Uri | undefined): Promise<void> {
     const prefsApi = this.externalApi.getPreferencesAPI();
     const workspace = await prefsApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
       return;
     }
 
-    const qpArr: LibraryQuickPick[] = [];
+    const qpArr: OptionQuickPick[] = [];
 
-    qpArr.push(new LibraryQuickPick('Manage current libraries', this.manageCurrentLibraries));
+    qpArr.push(new OptionQuickPick('Manage current libraries', async (wp) => {
+      await this.manageCurrentLibraries(wp);
+    }));
+    qpArr.push(new OptionQuickPick('Check for updates (offline)', async (wp) => {
+      await this.offlineUpdates(wp);
+    }));
+    qpArr.push(new OptionQuickPick('Check for updates (online)', async (wp) => {
+      await this.onlineUpdates(wp);
+    }));
+    qpArr.push(new OptionQuickPick('Install new libraries (offline)', async (wp) => {
+      await this.offlineNew(wp);
+    }));
+    qpArr.push(new OptionQuickPick('Install new library (online)', async (wp) => {
+      await this.onlineNew(wp);
+    }));
 
-    await vscode.window.showQuickPick(['Manage current libraries', 'Check for updates (offline)', 'Check for updates (online)',
-                                       'Install new libraries (offline)', 'Install a new library (online)']);
+    const result = await vscode.window.showQuickPick(qpArr, {
+      placeHolder: 'Select an option',
+    });
+
+    if (result) {
+      await result.func(workspace);
+    }
   }
 
-  private async manageCurrentLibraries(): Promise<void> {
-    //
+  private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
+    const installedDeps = await this.getInstalledDependencies(workspace);
+
+    if (installedDeps.length !== 0) {
+      const arr = installedDeps.map((jdep) => {
+        return new LibraryQuickPick(jdep);
+      });
+      const toRemove = await vscode.window.showQuickPick(arr, {
+        canPickMany: true,
+        placeHolder: 'Check to uninstall',
+      });
+
+      if (toRemove !== undefined) {
+        const url = this.getWpVendorFolder(workspace);
+        const files = await promisifyReadDir(url);
+        for (const file of files) {
+          const fullPath = path.join(url, file);
+          const result = await this.readFile(fullPath);
+          if (result !== undefined) {
+            for (const ti of toRemove) {
+              if (ti.dep.uuid === result.uuid) {
+                await promisifyDeleteFile(fullPath);
+              }
+            }
+          }
+        }
+      } else {
+        // TODO
+      }
+    } else {
+      await vscode.window.showInformationMessage('No dependencies installed');
+    }
+  }
+
+  private async offlineUpdates(workspace: vscode.WorkspaceFolder): Promise<void> {
+    const installedDeps = await this.getInstalledDependencies(workspace);
+
+    if (installedDeps.length !== 0) {
+      const availableDeps = await this.getHomeDirDeps();
+      const updatableDeps = [];
+      for (const ad of availableDeps) {
+        for (const id of installedDeps) {
+          if (id.uuid === ad.uuid) {
+            // Maybe update available
+            if (ad.version > id.version) {
+              updatableDeps.push(new LibraryQuickPick(ad));
+            }
+            continue;
+          }
+        }
+      }
+      if (updatableDeps.length !== 0) {
+        const toUpdate = await vscode.window.showQuickPick(updatableDeps, {
+          canPickMany: true,
+          placeHolder: 'Check to update',
+        });
+
+        if (toUpdate !== undefined) {
+          for (const ti of toUpdate) {
+            await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+          }
+        } else {
+          // TODO
+        }
+      } else {
+        await vscode.window.showInformationMessage('No updates available');
+      }
+    } else {
+      await vscode.window.showInformationMessage('No dependencies installed');
+    }
+  }
+
+  private async onlineUpdates(workspace: vscode.WorkspaceFolder): Promise<void> {
+    const installedDeps = await this.getInstalledDependencies(workspace);
+
+    if (installedDeps.length !== 0) {
+      const promises = installedDeps.map((dep) => {
+        return this.loadFileFromUrl(dep.jsonUrl);
+      });
+      const results = (await Promise.all(promises)).filter((x) => x !== undefined) as IJsonDependency[];
+      const updatable = [];
+      for (const newDep of results) {
+        for (const oldDep of installedDeps) {
+          if (newDep.uuid === oldDep.uuid) {
+            if (newDep.version > oldDep.version) {
+              updatable.push(new LibraryQuickPick(newDep, oldDep.version));
+            }
+            break;
+          }
+        }
+      }
+
+      if (updatable.length !== 0) {
+        const toUpdate = await vscode.window.showQuickPick(updatable, {
+          canPickMany: true,
+          placeHolder: 'Check to update',
+        });
+
+        if (toUpdate !== undefined) {
+          for (const ti of toUpdate) {
+            await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+          }
+        } else {
+          // TODO
+        }
+      } else {
+        await vscode.window.showInformationMessage('No updates available');
+      }
+
+    } else {
+      await vscode.window.showInformationMessage('No dependencies installed');
+    }
+  }
+
+  private async offlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
+    const installedDeps = await this.getInstalledDependencies(workspace);
+
+    if (installedDeps.length !== 0) {
+      const availableDeps = await this.getHomeDirDeps();
+      const updatableDeps = [];
+      for (const ad of availableDeps) {
+        let foundDep = false;
+        for (const id of installedDeps) {
+          if (id.uuid === ad.uuid) {
+            foundDep = true;
+            continue;
+          }
+        }
+        if (!foundDep) {
+          updatableDeps.push(new LibraryQuickPick(ad));
+        }
+      }
+      if (updatableDeps.length !== 0) {
+        const toInstall = await vscode.window.showQuickPick(updatableDeps, {
+          canPickMany: true,
+          placeHolder: 'Check to install',
+        });
+
+        if (toInstall !== undefined) {
+          for (const ti of toInstall) {
+            await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+          }
+        } else {
+          // TODO
+        }
+      } else {
+        await vscode.window.showInformationMessage('No new dependencies available');
+      }
+    } else {
+      await vscode.window.showInformationMessage('No dependencies installed');
+    }
+  }
+
+  private async onlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
+    const result = await vscode.window.showInputBox({
+      ignoreFocusOut: true,
+      placeHolder: 'Enter a vendor file URL (get from vendor)',
+      prompt: 'Enter a vendor file URL (get from vendor)',
+    });
+
+    if (result) {
+      const file = await this.loadFileFromUrl(result);
+      if (file !== undefined) {
+        // Load existing libraries
+        const existing = await this.getInstalledDependencies(workspace);
+
+        for (const dep of existing) {
+          if (dep.uuid === file.uuid) {
+            await vscode.window.showWarningMessage('Library already installed');
+            return;
+          }
+        }
+
+        await this.installDependency(file, this.getWpVendorFolder(workspace), true);
+      }
+    }
+  }
+
+  private async loadFileFromUrl(url: string): Promise<IJsonDependency | undefined> {
+    try {
+      const response = await fetch(url, {
+        timeout: 5000,
+      });
+      if (response === undefined) {
+        return undefined;
+      }
+      if (response.status >= 200 && response.status <= 300) {
+        try {
+          const text = await response.text();
+          const json = JSON.parse(text);
+          if (isJsonDependency(json)) {
+            return json;
+          } else {
+            return undefined;
+          }
+        } catch {
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+    } catch {
+      return undefined;
+    }
+  }
+
+  private getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
+    return path.join(workspace.uri.fsPath, 'vendordeps');
   }
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
-    return this.getDependencies(path.join(workspace.uri.fsPath, 'vendordeps'));
+    return this.getDependencies(this.getWpVendorFolder(workspace));
   }
 
-  private async getAvailableOfflineDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
-    const availableDeps = await this.getDependencies(path.join(this.userHomeFolder, 'vendordeps'));
-    const installedDeps = await this.getInstalledDependencies(workspace);
+  private getHomeDirDeps(): Promise<IJsonDependency[]> {
+    return this.getDependencies(path.join(getHomeDir(this.year), 'vendordeps'));
+  }
 
-    const retDeps: IJsonDependency[] = [];
+  private async installDependency(dep: IJsonDependency, url: string, override: boolean): Promise<boolean> {
+    const dirExists = await promisifyExists(url);
 
-    for (const ad of availableDeps) {
-      let foundGreater = false;
-      for (const id of installedDeps) {
-        if (ad.uuid === id.uuid) {
-          if (ad.version <= id.version) {
-            foundGreater = true;
+    if (!dirExists) {
+      await promisifyMkdirp(url);
+      // Directly write file
+      await promisifyWriteFile(path.join(url, dep.uuid + '.json'), JSON.stringify(dep, null, 4));
+      return true;
+    }
+
+    const files = await promisifyReadDir(url);
+
+    for (const file of files) {
+      const fullPath = path.join(url, file);
+      const result = await this.readFile(fullPath);
+      if (result !== undefined) {
+        if (result.uuid === dep.uuid) {
+          if (override) {
+            await promisifyDeleteFile(fullPath);
+            break;
+          } else {
+            return false;
           }
-          break;
         }
-      }
-      if (!foundGreater) {
-        retDeps.push(ad);
       }
     }
 
-    return retDeps;
+    await promisifyWriteFile(path.join(url, dep.uuid + '.json'), JSON.stringify(dep, null, 4));
+    return true;
   }
 
   private async readFile(file: string): Promise<IJsonDependency | undefined> {
@@ -103,22 +361,21 @@ export class VendorLibraries {
   }
 
   private async getDependencies(dir: string): Promise<IJsonDependency[]> {
-    const files = await promisifyReadDir(dir);
+    try {
+      const files = await promisifyReadDir(dir);
 
-    const promises: Array<Promise<IJsonDependency | undefined>> = [];
+      const promises: Array<Promise<IJsonDependency | undefined>> = [];
 
-    for (const file of files) {
-      promises.push(this.readFile(file));
-    }
+      for (const file of files) {
+        promises.push(this.readFile(path.join(dir, file)));
+      }
 
-    const results = await Promise.all(promises);
+      const results = await Promise.all(promises);
 
-    return results.filter((x) => x !== undefined) as IJsonDependency[];
-  }
-
-  private dispose() {
-    for (const d of this.disposables) {
-      d.dispose();
+      return results.filter((x) => x !== undefined) as IJsonDependency[];
+    } catch (err) {
+      return [];
+      //
     }
   }
 }

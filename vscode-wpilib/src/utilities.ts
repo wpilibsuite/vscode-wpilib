@@ -1,5 +1,6 @@
 'use strict';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as timers from 'timers';
 import * as vscode from 'vscode';
@@ -109,6 +110,18 @@ export function promisifyTimer(time: number): Promise<void> {
   });
 }
 
+export function promisifyDeleteFile(file: string): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
+    fs.unlink(file, (err) => {
+      if (err) {
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
+  });
+}
+
 export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
                                 name: string, executeApi: IExecuteAPI, preferences: IPreferences): Promise<number> {
   let command = './gradlew ' + args + ' ' + preferences.getAdditionalGradleArguments();
@@ -123,4 +136,21 @@ export async function gradleRun(args: string, rootDir: string, workspace: vscode
 export let extensionContext: vscode.ExtensionContext;
 export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;
+}
+
+export function getHomeDir(year: string): string {
+  const frcHome = process.env[`FRC_${year}_HOME`];
+  if (frcHome) {
+    return frcHome;
+  } else {
+    if (getIsWindows()) {
+      // Windows, search public home
+      return '';
+    } else {
+      // Unix, search user home
+      const dir = os.homedir();
+      const wpilibhome = path.join(dir, `wpilib${year}`);
+      return wpilibhome;
+    }
+  }
 }
