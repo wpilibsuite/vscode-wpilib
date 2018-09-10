@@ -11,6 +11,7 @@ steps:
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
+
 - task: Gradle@2
       inputs:
         workingDirectory: ''
