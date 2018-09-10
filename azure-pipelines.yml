@@ -30,22 +30,22 @@ steps:
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm install'
   
-  - script: |
+- script: |
     npm run compile
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm compile'
   
-  - script: |
+- script: |
     npm run lint
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm lint'
   
-  - script: |
+- script: |
     npm run gulp
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm gulp'
   
- - script: |
+- script: |
     npm run vscePackage
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm package'
