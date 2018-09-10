@@ -57,8 +57,9 @@ export class VendorLibraries {
     this.externalApi = externalApi;
     this.year = year;
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.manageVendorLibs',
-                          this.manageVendorLibraries, this));
+    this.disposables.push(vscode.commands.registerCommand('wpilibcore.manageVendorLibs', (uri: vscode.Uri | undefined) => {
+      return this.manageVendorLibraries(uri);
+    }, this));
   }
 
   public dispose() {
@@ -67,11 +68,18 @@ export class VendorLibraries {
     }
   }
 
-  public async manageVendorLibraries(_uri: vscode.Uri | undefined): Promise<void> {
-    const prefsApi = this.externalApi.getPreferencesAPI();
-    const workspace = await prefsApi.getFirstOrSelectedWorkspace();
+  public async manageVendorLibraries(uri: vscode.Uri | undefined): Promise<void> {
+    let workspace: vscode.WorkspaceFolder | undefined ;
+    if (uri !== undefined) {
+      workspace = vscode.workspace.getWorkspaceFolder(uri);
+    }
+
     if (workspace === undefined) {
-      return;
+      const prefsApi = this.externalApi.getPreferencesAPI();
+      workspace = await prefsApi.getFirstOrSelectedWorkspace();
+      if (workspace === undefined) {
+        return;
+      }
     }
 
     const qpArr: OptionQuickPick[] = [];
