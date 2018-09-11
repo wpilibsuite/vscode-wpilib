@@ -129,6 +129,10 @@ export async function gradleRun(args: string, rootDir: string, workspace: vscode
     command += ' --offline';
   }
 
+  if (javaHome !== '') {
+    command += ` -Dorg.gradle.java.home="${javaHome}"`;
+  }
+
   await setExecutePermissions(path.join(workspace.uri.fsPath, 'gradlew'));
   return executeApi.executeCommand(command, name, rootDir, workspace);
 }
@@ -136,6 +140,11 @@ export async function gradleRun(args: string, rootDir: string, workspace: vscode
 export let extensionContext: vscode.ExtensionContext;
 export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;
+}
+
+export let javaHome: string;
+export function setJavaHome(jhome: string): void {
+  javaHome = jhome;
 }
 
 export function getHomeDir(year: string): string {

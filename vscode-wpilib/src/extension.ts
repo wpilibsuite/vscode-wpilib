@@ -11,10 +11,11 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExampleTemplateAPI } from './exampletemplateapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
+import { findJdkPath } from './jdkdetector';
 import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
 import { ToolAPI } from './toolapi';
-import { setExtensionContext } from './utilities';
+import { setExtensionContext, setJavaHome } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { EclipseUpgrade } from './webviews/eclipseupgrade';
@@ -78,6 +79,16 @@ class ExternalAPI implements IExternalAPI {
 export async function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
 
+  const frcYear = '2018';
+
+  const jdkLoc = await findJdkPath(frcYear);
+
+  if (jdkLoc !== undefined) {
+    setJavaHome(jdkLoc);
+  } else {
+    await vscode.window.showErrorMessage('Java not found. Might have compilation errors');
+  }
+
   // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
@@ -111,9 +122,9 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(projectcreator);
 
   // Add built in tools
-  await BuiltinTools.Create('2018', externalApi);
+  await BuiltinTools.Create(frcYear, externalApi);
 
-  const vendorLibs = new VendorLibraries('2018', externalApi);
+  const vendorLibs = new VendorLibraries(frcYear, externalApi);
 
   context.subscriptions.push(vendorLibs);
 

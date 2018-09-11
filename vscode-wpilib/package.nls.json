@@ -21,5 +21,6 @@
 	"wpilibcore.selectCppToolchain.title": "Select Current C++ Toolchain",
 	"wpilibcore.upgradeEclipseProject.title": "Upgrade a WPILib Eclipse project",
 	"wpilibcore.createNewProject.title": "Create a new project",
-	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries"
+	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",
+	"wpilibcore.setJavaHome.title": "Set Java Home"
 }

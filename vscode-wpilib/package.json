@@ -38,7 +38,8 @@
         "onCommand:wpilibcore.selectCppToolchain",
         "onCommand:wpilibcore.upgradeEclipseProject",
         "onCommand:wpilibcore.createNewProject",
-        "onCommand:wpilibcore.manageVendorLibs"
+        "onCommand:wpilibcore.manageVendorLibs",
+        "onCommand:wpilibcore.setJavaHome"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -240,6 +241,11 @@
             {
                 "command": "wpilibcore.manageVendorLibs",
                 "title": "%wpilibcore.manageVendorLibs.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.setJavaHome",
+                "title": "%wpilibcore.setJavaHome.title%",
                 "category": "WPILib"
             }
         ],
