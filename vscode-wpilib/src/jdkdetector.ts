@@ -47,7 +47,7 @@ export async function findJdkPath(year: string): Promise<string | undefined> {
   }
 
   // Check for jdk home
-  const jdkHome = process.env.JAVA_HOME;
+  const jdkHome = process.env.JDK_HOME;
   if (jdkHome !== undefined) {
     let jdkHomeJavac = path.join(jdkHome, 'bin', 'javac');
     jdkHomeJavac = getIsWindows() ? jdkHomeJavac + '.exe' : jdkHomeJavac;
