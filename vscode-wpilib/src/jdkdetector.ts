@@ -22,7 +22,20 @@ function getJavacIs11(command: string): Promise<boolean> {
 }
 
 export async function findJdkPath(year: string): Promise<string | undefined> {
-  // First look for jdk in FRC Home
+  // Check for java property, as thats easily user settable, and we want it to win
+  const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
+  if (vscodeJavaHome) {
+    let javaHomeJavac = path.join(vscodeJavaHome, 'bin', 'javac');
+    javaHomeJavac = getIsWindows() ? javaHomeJavac + '.exe' : javaHomeJavac;
+    if (await promisifyExists(javaHomeJavac)) {
+      const isJava11 = await getJavacIs11(javaHomeJavac);
+      if (isJava11) {
+        return vscodeJavaHome;
+      }
+    }
+  }
+
+  // Then check the FRC home directory for the FRC jdk
   const frcHome = getHomeDir(year);
   let frcHomeJavac = path.join(frcHome, 'jdk', 'bin', 'javac');
   frcHomeJavac = getIsWindows() ? frcHomeJavac + '.exe' : frcHomeJavac;
@@ -55,19 +68,6 @@ export async function findJdkPath(year: string): Promise<string | undefined> {
       const isJava11 = await getJavacIs11(jdkHomeJavac);
       if (isJava11) {
         return jdkHome;
-      }
-    }
-  }
-
-  // Check for java property
-  const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
-  if (vscodeJavaHome) {
-    let javaHomeJavac = path.join(vscodeJavaHome, 'bin', 'javac');
-    javaHomeJavac = getIsWindows() ? javaHomeJavac + '.exe' : javaHomeJavac;
-    if (await promisifyExists(javaHomeJavac)) {
-      const isJava11 = await getJavacIs11(javaHomeJavac);
-      if (isJava11) {
-        return vscodeJavaHome;
       }
     }
   }
