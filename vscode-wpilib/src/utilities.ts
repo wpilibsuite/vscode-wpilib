@@ -122,6 +122,11 @@ export function promisifyDeleteFile(file: string): Promise<boolean> {
   });
 }
 
+export let javaHome: string;
+export function setJavaHome(jhome: string): void {
+  javaHome = jhome;
+}
+
 export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
                                 name: string, executeApi: IExecuteAPI, preferences: IPreferences): Promise<number> {
   let command = './gradlew ' + args + ' ' + preferences.getAdditionalGradleArguments();
@@ -140,11 +145,6 @@ export async function gradleRun(args: string, rootDir: string, workspace: vscode
 export let extensionContext: vscode.ExtensionContext;
 export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;
-}
-
-export let javaHome: string;
-export function setJavaHome(jhome: string): void {
-  javaHome = jhome;
 }
 
 export function getHomeDir(year: string): string {

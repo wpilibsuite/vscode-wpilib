@@ -21,6 +21,7 @@ import { createVsCommands } from './vscommands';
 import { EclipseUpgrade } from './webviews/eclipseupgrade';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
+import { WPILibUpdates } from './wpilibupdates';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
@@ -127,6 +128,8 @@ export async function activate(context: vscode.ExtensionContext) {
   const vendorLibs = new VendorLibraries(frcYear, externalApi);
 
   context.subscriptions.push(vendorLibs);
+
+  context.subscriptions.push(new WPILibUpdates(externalApi));
 
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
   const wp = vscode.workspace.workspaceFolders;

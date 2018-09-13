@@ -22,5 +22,6 @@
 	"wpilibcore.upgradeEclipseProject.title": "Upgrade a WPILib Eclipse project",
 	"wpilibcore.createNewProject.title": "Create a new project",
 	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",
-	"wpilibcore.setJavaHome.title": "Set Java Home"
+	"wpilibcore.setJavaHome.title": "Set Java Home",
+	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates"
 }

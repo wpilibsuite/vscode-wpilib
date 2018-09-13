@@ -39,7 +39,8 @@
         "onCommand:wpilibcore.upgradeEclipseProject",
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
-        "onCommand:wpilibcore.setJavaHome"
+        "onCommand:wpilibcore.setJavaHome",
+        "onCommand:wpilibcore.checkForUpdates"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -246,6 +247,11 @@
             {
                 "command": "wpilibcore.setJavaHome",
                 "title": "%wpilibcore.setJavaHome.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.checkForUpdates",
+                "title": "%wpilibcore.checkForUpdates.title%",
                 "category": "WPILib"
             }
         ],
