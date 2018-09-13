@@ -1,6 +1,7 @@
 'use scrict';
 import * as vscode from 'vscode';
-import { IToolAPI, IToolRunner } from 'vscode-wpilibapi';
+import { IExternalAPI, IToolAPI, IToolRunner } from 'vscode-wpilibapi';
+import { gradleRun } from './utilities';
 
 interface IToolQuickPick extends vscode.QuickPickItem {
   runner: IToolRunner;
@@ -8,12 +9,42 @@ interface IToolQuickPick extends vscode.QuickPickItem {
 
 // The tools API provider. Lists tools added to it in a quick pick to select.
 export class ToolAPI implements IToolAPI {
+  public static async InstallToolsFromGradle(workspace: vscode.WorkspaceFolder, externalApi: IExternalAPI): Promise<void> {
+    const grResult = await gradleRun('installAllTools', workspace.uri.fsPath, workspace, 'ToolInstall', externalApi.getExecuteAPI(),
+                                     externalApi.getPreferencesAPI().getPreferences(workspace));
+
+    if (grResult === 0) {
+      const result = await vscode.window.showInformationMessage('Restart required for new tools. Restart now?', 'Yes', 'No');
+      if (result !== undefined && result === 'Yes') {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+      }
+    } else {
+      console.log(grResult);
+      await vscode.window.showInformationMessage('Tool install failed');
+      return;
+    }
+  }
+
   private tools: IToolQuickPick[] = [];
   private disposables: vscode.Disposable[] = [];
+  private externalApi: IExternalAPI;
+
+  public constructor(externalApi: IExternalAPI) {
+    this.externalApi = externalApi;
+  }
 
   public async startTool(): Promise<boolean> {
     if (this.tools.length <= 0) {
-      vscode.window.showErrorMessage('No tools found. Please install some');
+      const grResult = await vscode.window.showErrorMessage('No tools found. Would you like to use Gradle to grab some?', 'Yes', 'No');
+      if (grResult !== undefined && grResult === 'Yes') {
+        const preferencesApi = this.externalApi.getPreferencesAPI();
+        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+        if (workspace === undefined) {
+          vscode.window.showInformationMessage('Cannot install gradle tools with an empty workspace');
+          return false;
+        }
+        ToolAPI.InstallToolsFromGradle(workspace, this.externalApi);
+      }
       return false;
     }
 

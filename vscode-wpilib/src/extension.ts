@@ -45,7 +45,6 @@ class ExternalAPI implements IExternalAPI {
   private readonly utilitiesApi: UtilitiesAPI;
 
   private constructor(preferencesApi: PreferencesAPI, deployDebugApi: DeployDebugAPI, buildTestApi: BuildTestAPI) {
-    this.toolApi = new ToolAPI();
     this.exampleTemplateApi = new ExampleTemplateAPI();
     this.commandApi = new CommandAPI();
     this.executeApi = new ExecuteAPI();
@@ -53,6 +52,7 @@ class ExternalAPI implements IExternalAPI {
     this.deployDebugApi = deployDebugApi;
     this.buildTestApi = buildTestApi;
     this.utilitiesApi = new UtilitiesAPI();
+    this.toolApi = new ToolAPI(this);
   }
 
   public getToolAPI(): ToolAPI {

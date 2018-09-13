@@ -40,7 +40,8 @@
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
-        "onCommand:wpilibcore.checkForUpdates"
+        "onCommand:wpilibcore.checkForUpdates",
+        "onCommand:wpilibcore.installGradleTools"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -252,6 +253,11 @@
             {
                 "command": "wpilibcore.checkForUpdates",
                 "title": "%wpilibcore.checkForUpdates.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.installGradleTools",
+                "title": "%wpilibcore.installGradleTools.title%",
                 "category": "WPILib"
             }
         ],

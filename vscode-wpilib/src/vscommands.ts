@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { requestTeamNumber } from './preferences';
+import { ToolAPI } from './toolapi';
 import { javaHome } from './utilities';
 
 // Most of our commands are created here.
@@ -260,5 +261,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
       }
     }
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot install gradle tools with an empty workspace');
+      return;
+    }
+    await ToolAPI.InstallToolsFromGradle(workspace, externalApi);
   }));
 }

@@ -23,5 +23,6 @@
 	"wpilibcore.createNewProject.title": "创建一个新项目",
 	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries", // TODO: Needs to be translated
 	"wpilibcore.setJavaHome.title": "Set Java Home", // TODO: Needs to be translated
-	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates" // TODO: Needs to be translated
+	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates", // TODO: Needs to be translated
+	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO" // TODO: Needs to be translated
 }
