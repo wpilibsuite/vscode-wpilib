@@ -10,7 +10,7 @@ interface IToolQuickPick extends vscode.QuickPickItem {
 // The tools API provider. Lists tools added to it in a quick pick to select.
 export class ToolAPI implements IToolAPI {
   public static async InstallToolsFromGradle(workspace: vscode.WorkspaceFolder, externalApi: IExternalAPI): Promise<void> {
-    const grResult = await gradleRun('installAllTools', workspace.uri.fsPath, workspace, 'ToolInstall', externalApi.getExecuteAPI(),
+    const grResult = await gradleRun('InstallAllTools', workspace.uri.fsPath, workspace, 'ToolInstall', externalApi.getExecuteAPI(),
                                      externalApi.getPreferencesAPI().getPreferences(workspace));
 
     if (grResult === 0) {
