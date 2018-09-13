@@ -3,7 +3,8 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { getHomeDir, getIsWindows, promisifyExists } from './utilities';
+import { IExternalAPI } from 'vscode-wpilibapi';
+import { getIsWindows, promisifyExists } from './utilities';
 
 function getJavacIs11(command: string): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
@@ -21,7 +22,7 @@ function getJavacIs11(command: string): Promise<boolean> {
   });
 }
 
-export async function findJdkPath(year: string): Promise<string | undefined> {
+export async function findJdkPath(api: IExternalAPI): Promise<string | undefined> {
   // Check for java property, as thats easily user settable, and we want it to win
   const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
   if (vscodeJavaHome) {
@@ -36,7 +37,7 @@ export async function findJdkPath(year: string): Promise<string | undefined> {
   }
 
   // Then check the FRC home directory for the FRC jdk
-  const frcHome = getHomeDir(year);
+  const frcHome = api.getUtilitiesAPI().getWPILibHomeDir();
   let frcHomeJavac = path.join(frcHome, 'jdk', 'bin', 'javac');
   frcHomeJavac = getIsWindows() ? frcHomeJavac + '.exe' : frcHomeJavac;
   if (await promisifyExists(frcHomeJavac)) {

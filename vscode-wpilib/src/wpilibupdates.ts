@@ -27,6 +27,7 @@ export class WPILibUpdates {
       console.log('gradlerio version not found');
       return false;
     }
+    await this.checkForLocalGradleRIOUpdate();
 
     return true;
   }
@@ -54,6 +55,10 @@ export class WPILibUpdates {
       console.log(err);
       return;
     }
+  }
+
+  private async checkForLocalGradleRIOUpdate() {
+    //
   }
 
   private async getGradleRIOVersion(): Promise<string | undefined> {

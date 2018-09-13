@@ -60,6 +60,11 @@ export interface IPreferencesAPI {
   getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined>;
 }
 
+export interface IUtilitiesAPI {
+  getFrcYear(): string;
+  getWPILibHomeDir(): string;
+}
+
 export interface IExternalAPI {
   getToolAPI(): IToolAPI;
   getExampleTemplateAPI(): IExampleTemplateAPI;
@@ -68,6 +73,7 @@ export interface IExternalAPI {
   getPreferencesAPI(): IPreferencesAPI;
   getCommandAPI(): ICommandAPI;
   getExecuteAPI(): IExecuteAPI;
+  getUtilitiesAPI(): IUtilitiesAPI;
 }
 
 export interface IPreferences {

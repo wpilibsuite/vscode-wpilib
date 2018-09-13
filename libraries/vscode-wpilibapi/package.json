@@ -1,6 +1,6 @@
 {
   "name": "vscode-wpilibapi",
-  "version": "2019.0.2",
+  "version": "2019.0.3",
   "description": "Public API for vscode-wpilib",
   "typings": "./out/api.d.ts",
   "main": "./out/api.js",
@@ -14,6 +14,7 @@
     "vscode": "^1.1.21"
   },
   "scripts": {
+    "prepublishOnly": "npm run compile && npm run lint",
     "compile": "node ./node_modules/vscode/bin/install && tsc -p ./",
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },

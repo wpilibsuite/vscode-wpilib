@@ -16,6 +16,7 @@ import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
+import { UtilitiesAPI } from './utilitiesapi';
 import { VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { EclipseUpgrade } from './webviews/eclipseupgrade';
@@ -41,6 +42,7 @@ class ExternalAPI implements IExternalAPI {
   private readonly exampleTemplateApi: ExampleTemplateAPI;
   private readonly commandApi: CommandAPI;
   private readonly executeApi: ExecuteAPI;
+  private readonly utilitiesApi: UtilitiesAPI;
 
   private constructor(preferencesApi: PreferencesAPI, deployDebugApi: DeployDebugAPI, buildTestApi: BuildTestAPI) {
     this.toolApi = new ToolAPI();
@@ -50,6 +52,7 @@ class ExternalAPI implements IExternalAPI {
     this.preferencesApi = preferencesApi;
     this.deployDebugApi = deployDebugApi;
     this.buildTestApi = buildTestApi;
+    this.utilitiesApi = new UtilitiesAPI();
   }
 
   public getToolAPI(): ToolAPI {
@@ -73,22 +76,15 @@ class ExternalAPI implements IExternalAPI {
   public getExecuteAPI(): ExecuteAPI {
     return this.executeApi;
   }
+  public getUtilitiesAPI(): UtilitiesAPI {
+    return this.utilitiesApi;
+  }
 }
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
-
-  const frcYear = '2018';
-
-  const jdkLoc = await findJdkPath(frcYear);
-
-  if (jdkLoc !== undefined) {
-    setJavaHome(jdkLoc);
-  } else {
-    await vscode.window.showErrorMessage('Java not found. Might have compilation errors');
-  }
 
   // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
@@ -97,6 +93,14 @@ export async function activate(context: vscode.ExtensionContext) {
   // functionality. Its definition is provided in shared/externalapi.ts.
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
+
+  const jdkLoc = await findJdkPath(externalApi);
+
+  if (jdkLoc !== undefined) {
+    setJavaHome(jdkLoc);
+  } else {
+    await vscode.window.showErrorMessage('Java not found. Might have compilation errors');
+  }
 
   // Activate the C++ parts of the extension
   await activateCpp(context, externalApi);
@@ -123,9 +127,9 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(projectcreator);
 
   // Add built in tools
-  await BuiltinTools.Create(frcYear, externalApi);
+  await BuiltinTools.Create(externalApi);
 
-  const vendorLibs = new VendorLibraries(frcYear, externalApi);
+  const vendorLibs = new VendorLibraries(externalApi);
 
   context.subscriptions.push(vendorLibs);
 

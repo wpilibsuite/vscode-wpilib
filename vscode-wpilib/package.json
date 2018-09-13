@@ -363,7 +363,7 @@
         "vscode-cpptools": "1.3.1",
         "vscode-jsonrpc": "^3.6.2",
         "vscode-nls": "^3.2.5",
-        "vscode-wpilibapi": "^2019.0.2",
+        "vscode-wpilibapi": "^2019.0.3",
         "wpilib-riolog": "^0.1.0"
     }
 }

@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { promisifyMkdirp, promisifyReadDir } from './shared/generator';
-import { getHomeDir, promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
+import { promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
 
 interface IJsonDependency {
   name: string;
@@ -49,13 +49,11 @@ function isJsonDependency(arg: any): arg is IJsonDependency {
 }
 
 export class VendorLibraries {
-  private year: string;
   private externalApi: IExternalAPI;
   private disposables: vscode.Disposable[] = [];
 
-  constructor(year: string, externalApi: IExternalAPI) {
+  constructor(externalApi: IExternalAPI) {
     this.externalApi = externalApi;
-    this.year = year;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.manageVendorLibs', (uri: vscode.Uri | undefined) => {
       return this.manageVendorLibraries(uri);
@@ -316,7 +314,7 @@ export class VendorLibraries {
   }
 
   private getHomeDirDeps(): Promise<IJsonDependency[]> {
-    return this.getDependencies(path.join(getHomeDir(this.year), 'vendordeps'));
+    return this.getDependencies(path.join(this.externalApi.getUtilitiesAPI().getWPILibHomeDir(), 'vendordeps'));
   }
 
   private async installDependency(dep: IJsonDependency, url: string, override: boolean): Promise<boolean> {

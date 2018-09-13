@@ -2,8 +2,8 @@
 
 import * as cp from 'child_process';
 import * as path from 'path';
-import { IExternalAPI, IToolRunner } from 'vscode-wpilibapi';
-import { getHomeDir, getIsWindows, promisifyExists, promisifyReadFile } from './utilities';
+import { IExternalAPI, IToolRunner, IUtilitiesAPI } from 'vscode-wpilibapi';
+import { getIsWindows, promisifyExists, promisifyReadFile } from './utilities';
 
 interface ITool {
   name: string;
@@ -56,8 +56,8 @@ class VbsToolRunner implements IToolRunner {
 }
 
 export class BuiltinTools {
-  public static async Create(year: string, api: IExternalAPI): Promise<BuiltinTools> {
-    const bt = new BuiltinTools(year);
+  public static async Create(api: IExternalAPI): Promise<BuiltinTools> {
+    const bt = new BuiltinTools(api.getUtilitiesAPI());
     const toolApi = api.getToolAPI();
     const homeTools = await bt.enumerateHomeTools();
     const isWindows = getIsWindows();
@@ -79,14 +79,14 @@ export class BuiltinTools {
     return bt;
   }
 
-  private readonly year: string;
+  private utilities: IUtilitiesAPI;
 
-  private constructor(year: string) {
-    this.year = year;
+  private constructor(utilities: IUtilitiesAPI) {
+    this.utilities = utilities;
   }
 
   private async enumerateHomeTools(): Promise<IEnumerateResult> {
-    const homeDir = getHomeDir(this.year);
+    const homeDir = this.utilities.getWPILibHomeDir();
     const toolsDir = path.join(homeDir, 'tools');
 
     const toolsJson = path.join(toolsDir, 'tools.json');
