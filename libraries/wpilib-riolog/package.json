@@ -10,6 +10,7 @@
     "tslint": "^5.11.0"
   },
   "scripts": {
+    "prepublishOnly": "npm run compile && npm run lint",
     "compile": "tsc -p ./",
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },
