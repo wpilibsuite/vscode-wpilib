@@ -1,6 +1,7 @@
 'use strict';
 
 import { TransformableInfo } from 'logform';
+import * as path from 'path';
 import { MESSAGE } from 'triple-beam';
 import * as vscode from 'vscode';
 import * as winston from 'winston';
@@ -56,10 +57,16 @@ export function closeLogger() {
   winstonLogger.close();
 }
 
+let mainLogFile: string = '';
+export function getMainLogFile(): string {
+  return mainLogFile;
+}
+
 export function setLoggerDirectory(dirname: string) {
+  mainLogFile = path.join(dirname, 'wpiliblog.txt');
   winstonLogger.add(new winston.transports.File({
     dirname,
-    filename: 'log.txt',
+    filename: 'wpiliblog.txt',
     level: 'verbose',
     maxFiles: 3,
     maxsize: 1000000,

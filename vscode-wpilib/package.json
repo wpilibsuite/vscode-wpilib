@@ -41,7 +41,8 @@
         "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
         "onCommand:wpilibcore.checkForUpdates",
-        "onCommand:wpilibcore.installGradleTools"
+        "onCommand:wpilibcore.installGradleTools",
+        "onCommand:wpilibcore.showLogFolder"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -259,6 +260,11 @@
                 "command": "wpilibcore.installGradleTools",
                 "title": "%wpilibcore.installGradleTools.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.showLogFolder",
+                "title": "%wpilibcore.showLogFolder.title%",
+                "category": "WPILib"
             }
         ],
         "keybindings": [
@@ -345,6 +351,7 @@
         "@types/ncp": "^2.0.1",
         "@types/node-fetch": "^2.1.2",
         "@types/xml2js": "^0.4.3",
+        "@types/triple-beam": "^1.3.0",
         "browserify": "^16.2.2",
         "del": "^3.0.0",
         "event-stream": "^3.3.4",
@@ -361,7 +368,6 @@
         "vscode-nls-dev": "^3.2.2"
     },
     "dependencies": {
-        "@types/triple-beam": "^1.3.0",
         "glob": "^7.1.2",
         "java-properties": "^0.2.10",
         "jsonc-parser": "^2.0.1",

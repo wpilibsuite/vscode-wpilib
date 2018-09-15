@@ -1,11 +1,12 @@
 'use strict';
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { logger } from './logger';
+import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
-import { javaHome } from './utilities';
+import { javaHome, promisifyExists } from './utilities';
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command
@@ -272,5 +273,13 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
     await ToolAPI.InstallToolsFromGradle(workspace, externalApi);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.showLogFolder', async () => {
+    let mainLog = getMainLogFile();
+    if (!await promisifyExists(mainLog)) {
+      mainLog = path.dirname(mainLog);
+    }
+    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
   }));
 }

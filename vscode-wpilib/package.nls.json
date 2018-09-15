@@ -24,5 +24,6 @@
 	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",
 	"wpilibcore.setJavaHome.title": "Set Java Home",
 	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates",
-	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO"
+	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO",
+	"wpilibcore.showLogFolder.title": "Show Log Folder"
 }
