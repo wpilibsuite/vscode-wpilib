@@ -37,7 +37,7 @@ class VbsToolRunner implements IToolRunner {
         });
       } else {
         // Unix, run as javaw
-        cp.exec(`javaw -jar ${this.toolScript}`, (err) => {
+        cp.exec(`java -jar ${this.toolScript}`, (err) => {
           if (err) {
             resolve(false);
           } else {
