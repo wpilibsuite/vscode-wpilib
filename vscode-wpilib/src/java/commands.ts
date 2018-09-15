@@ -57,19 +57,19 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
 
   await Promise.all(promiseArray);
 
-  const movePromiseArray: Array<Promise<void>> = [];
+  const movePromiseArray: Array<Promise<string>> = [];
   for (const f of copiedFiles) {
     const file = path.join(folder.fsPath, f);
     const bname = path.basename(file);
     const dirname = path.dirname(file);
     if (path.basename(file).indexOf(command.replacename) > -1) {
       const newname = path.join(dirname, bname.replace(new RegExp(command.replacename, 'g'), replaceName));
-      movePromiseArray.push(new Promise<void>((resolve, reject) => {
+      movePromiseArray.push(new Promise<string>((resolve, reject) => {
         fs.rename(file, newname, (err) => {
           if (err) {
             reject(err);
           } else {
-            resolve();
+            resolve(newname);
           }
         });
       }));
@@ -77,7 +77,16 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
   }
 
   if (movePromiseArray.length > 0) {
-    await Promise.all(movePromiseArray);
+    const renamedCopiedFiles = await Promise.all(movePromiseArray);
+    for (const file of renamedCopiedFiles) {
+      const uri = vscode.Uri.file(file);
+      try {
+        const td = await vscode.workspace.openTextDocument(uri);
+        await vscode.window.showTextDocument(td);
+      } catch (err) {
+        logger.warn('Failed to open copied file: ' + file, err);
+      }
+    }
   }
 
   return true;
