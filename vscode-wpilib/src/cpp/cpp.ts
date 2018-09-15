@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { activateCppProvider } from '../cppprovider/cppprovider';
 import { Examples } from '../examples';
+import { logger } from '../logger';
 import { Templates } from '../templates';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
@@ -15,7 +16,7 @@ import { DeployDebug } from './deploydebug';
 // your extension is activated the very first time the command is executed
 export async function activateCpp(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
 
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
+  // Use the console to output diagnostic information (logger.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
 
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'cpp');
@@ -29,7 +30,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
   if (cppExtension === undefined) {
     // TODO: Make this a visible warning message when project detected is cpp
-    console.log('Could not find cpptools C++ extension. Debugging is disabled.');
+    logger.log('Could not find cpptools C++ extension. Debugging is disabled.');
     allowDebug = false;
   }
 

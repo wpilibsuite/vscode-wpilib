@@ -119,7 +119,6 @@ class DebugCodeDeployer implements ICodeDeployer {
     };
 
     await startDebugging(config);
-    console.log(result);
     return true;
   }
   public getDisplayName(): string {
@@ -151,7 +150,6 @@ class DeployCodeDeployer implements ICodeDeployer {
     if (result !== 0) {
       return false;
     }
-    console.log(result);
     return true;
   }
   public getDisplayName(): string {

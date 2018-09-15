@@ -12,6 +12,7 @@ import { ExampleTemplateAPI } from './exampletemplateapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
+import { logger, setLogDir } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
 import { ToolAPI } from './toolapi';
@@ -86,6 +87,8 @@ class ExternalAPI implements IExternalAPI {
 export async function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
 
+  setLogDir(context.logPath);
+
   // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
@@ -151,7 +154,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   // Log our extension is active
-  console.log('Congratulations, your extension "vscode-wpilib" is now active!');
+  logger.log('Congratulations, your extension "vscode-wpilib" is now active!');
 
   return externalApi;
 }

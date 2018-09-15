@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
+import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
 import { javaHome } from './utilities';
@@ -143,7 +144,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const result = await vscode.window.showInformationMessage('Skip tests on deploy?', 'Yes', 'No');
     if (result === undefined) {
-      console.log('Invalid selection for settting skip tests');
+      logger.log('Invalid selection for settting skip tests');
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
@@ -164,7 +165,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const result = await vscode.window.showInformationMessage('Run commands in Online mode?', 'Yes', 'No');
     if (result === undefined) {
-      console.log('Invalid selection for settting online');
+      logger.log('Invalid selection for settting online');
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
@@ -185,7 +186,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const result = await vscode.window.showInformationMessage('Stop simulation debugging on entry?', 'Yes', 'No');
     if (result === undefined) {
-      console.log('Invalid selection for settting stop simulation on entry');
+      logger.log('Invalid selection for settting stop simulation on entry');
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
@@ -206,7 +207,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const result = await vscode.window.showInformationMessage('Automatically save on deploy?', 'Yes', 'No');
     if (result === undefined) {
-      console.log('failed to set automatically save on deploy');
+      logger.log('failed to set automatically save on deploy');
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
@@ -227,7 +228,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const result = await vscode.window.showInformationMessage('Automatically start RioLog on deploy?', 'Yes', 'No');
     if (result === undefined) {
-      console.log('Invalid selection for riolog on deploy');
+      logger.log('Invalid selection for riolog on deploy');
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);

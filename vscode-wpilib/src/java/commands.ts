@@ -4,6 +4,7 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
+import { logger } from '../logger';
 import { promisifyNcp } from '../shared/generator';
 import { getClassName, getPackageName } from '../utilities';
 
@@ -90,7 +91,7 @@ export class Commands {
     const resourceFile = path.join(commandFolder, this.commandResourceName);
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
-        console.log(err);
+        logger.log(JSON.stringify(err, null, 4));
         return;
       }
       const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];
@@ -123,7 +124,7 @@ export class Commands {
               if (packageslash.length !== 0) {
                 javaPackage = packageslash.substring(1).replace(/\//g, '.');
               }
-              console.log(packageslash);
+              logger.log(packageslash);
             } else {
               // Coult not root path, ask for one
               const res = await getPackageName();

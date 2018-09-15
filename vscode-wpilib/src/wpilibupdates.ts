@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import * as xml2js from 'xml2js';
+import { logger } from './logger';
 import { promisifyReadDir } from './shared/generator';
 import { promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
 
@@ -27,12 +28,12 @@ export class WPILibUpdates {
   public async checkForUpdates(): Promise<boolean> {
     const grVersion = await this.getGradleRIOVersion();
     if (grVersion === undefined) {
-      console.log('gradlerio version not found');
+      logger.log('gradlerio version not found');
       return false;
     }
     const newVersion = await this.checkForGradleRIOUpdate(grVersion);
     if (newVersion === undefined) {
-      console.log('no update found');
+      logger.log('no update found');
       await vscode.window.showInformationMessage('No GradleRIO Update Found');
     } else {
       const result = await vscode.window.showInformationMessage
@@ -54,7 +55,7 @@ export class WPILibUpdates {
   private async setGradleRIOVersion(version: string): Promise<void> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
     if (wp === undefined) {
-      console.log('no workspace');
+      logger.log('no workspace');
       return;
     }
     try {
@@ -65,7 +66,7 @@ export class WPILibUpdates {
 
       await promisifyWriteFile(buildFile, newgFile);
     } catch (err) {
-      console.log(err);
+      logger.log(JSON.stringify(err, null, 4));
       return;
     }
   }
@@ -110,11 +111,11 @@ export class WPILibUpdates {
         }
         return undefined;
       } else {
-        console.log('bad status: ', response.status);
+        logger.log('bad status: ' + response.status.toString());
         return undefined;
       }
     } catch (err) {
-      console.log(err);
+      logger.log(JSON.stringify(err, null, 4));
       return undefined;
     }
   }
@@ -140,7 +141,7 @@ export class WPILibUpdates {
       }
       return newVersion;
     } catch (err) {
-      console.log(err);
+      logger.log(JSON.stringify(err, null, 4));
       return undefined;
     }
   }
@@ -148,7 +149,7 @@ export class WPILibUpdates {
   private async getGradleRIOVersion(): Promise<string | undefined> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
     if (wp === undefined) {
-      console.log('no workspace');
+      logger.log('no workspace');
       return undefined;
     }
 
@@ -158,18 +159,18 @@ export class WPILibUpdates {
       const matchRes = getGradleRioRegex().exec(gradleBuildFile);
 
       if (matchRes === null) {
-        console.log('matching error');
+        logger.log('matching error');
         return undefined;
       }
 
       if (matchRes.length !== 4) {
-        console.log('matching length not correct');
+        logger.log('matching length not correct');
         return undefined;
       }
 
       return matchRes[2];
     } catch (err) {
-      console.log(err);
+      logger.log(JSON.stringify(err, null, 4));
       return undefined;
     }
   }

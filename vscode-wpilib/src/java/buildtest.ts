@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from 'vscode-wpilibapi';
+import { logger } from '../logger';
 import { gradleRun } from '../utilities';
 
 class CodeBuilder implements ICodeBuilder {
@@ -23,7 +24,7 @@ class CodeBuilder implements ICodeBuilder {
     const command = 'build';
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Build', this.executeApi, prefs);
-    console.log(result);
+    logger.log(result.toString());
     return true;
   }
 
@@ -56,7 +57,7 @@ class CodeTester implements ICodeBuilder {
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Test', this.executeApi, prefs);
 
-    console.log(result);
+    logger.log(result.toString());
     return true;
   }
 

@@ -1,6 +1,7 @@
 'use scrict';
 import * as vscode from 'vscode';
 import { IExternalAPI, IToolAPI, IToolRunner } from 'vscode-wpilibapi';
+import { logger } from './logger';
 import { gradleRun } from './utilities';
 
 interface IToolQuickPick extends vscode.QuickPickItem {
@@ -19,7 +20,7 @@ export class ToolAPI implements IToolAPI {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
     } else {
-      console.log(grResult);
+      logger.log(grResult.toString());
       await vscode.window.showInformationMessage('Tool install failed');
       return;
     }
@@ -43,7 +44,7 @@ export class ToolAPI implements IToolAPI {
           vscode.window.showInformationMessage('Cannot install gradle tools with an empty workspace');
           return false;
         }
-        ToolAPI.InstallToolsFromGradle(workspace, this.externalApi);
+        await ToolAPI.InstallToolsFromGradle(workspace, this.externalApi);
       }
       return false;
     }

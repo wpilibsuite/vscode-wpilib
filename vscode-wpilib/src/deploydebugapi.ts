@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
 import { RioLogWindow } from 'wpilib-riolog';
+import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';
 import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
 
@@ -29,7 +30,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     if ('desktop' in config) {
       desktop = config.desktop as boolean;
     } else {
-      console.log('debugger has no desktop argument. Assuming roboRIO');
+      logger.log('debugger has no desktop argument. Assuming roboRIO');
     }
 
     if (desktop) {
@@ -205,7 +206,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
       return true;
     } catch (err) {
       await vscode.window.showErrorMessage('Unknown error occured. See output window or console log for more information.');
-      console.log(err);
+      logger.log(JSON.stringify(err, null, 4));
       return false;
     }
   }

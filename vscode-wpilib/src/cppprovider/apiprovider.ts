@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem } from 'vscode-cpptools';
 import { IExecuteAPI, IExternalAPI, IPreferences } from 'vscode-wpilibapi';
+import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
 import { gradleRun, promisifyReadFile } from '../utilities';
 import { IToolChain } from './jsonformats';
@@ -82,8 +83,8 @@ export class ApiProvider implements CustomConfigurationProvider {
         }
       }
     }).catch((err) => {
-      console.log('Rejected load?');
-      console.log(err);
+      logger.log('Rejected load?');
+      logger.log(JSON.stringify(err, null, 4));
     });
   }
 
@@ -226,7 +227,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       }
     }
 
-    console.log(`Searching for Binary for ${uriPath}`);
+    logger.log(`Searching for Binary for ${uriPath}`);
 
     const normalizedPath = normalizeDriveLetter(uri.fsPath);
 
@@ -235,7 +236,7 @@ export class ApiProvider implements CustomConfigurationProvider {
         for (const sb of tc.sourceBinaries) {
           for (const source of sb.source.srcDirs) {
             if (normalizedPath.startsWith(source)) {
-              console.log(`Found Binary for ${uriPath}`);
+              logger.log(`Found Binary for ${uriPath}`);
               // Found, find binary
               const index: number = tc.nameBinaryMap[sb.componentName];
               if (index >= 0) {
@@ -293,7 +294,7 @@ export class ApiProvider implements CustomConfigurationProvider {
         }
         for (const alf of tc.allLibFiles) {
           if (normalizedPath.startsWith(alf)) {
-            console.log(`Found global lib for ${uriPath}`);
+            logger.log(`Found global lib for ${uriPath}`);
             const args: string[] = [];
             args.push(...tc.systemCppArgs);
             const macros: string[] = [];
@@ -315,7 +316,7 @@ export class ApiProvider implements CustomConfigurationProvider {
         }
       }
     }
-    console.log(`Did not find provider for ${uriPath}`);
+    logger.log(`Did not find provider for ${uriPath}`);
     return false;
   }
 }

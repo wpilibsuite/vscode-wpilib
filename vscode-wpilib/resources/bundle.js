@@ -928,10 +928,10 @@ async function properRace(promises) {
     }
     catch (index) {
         // The promise has rejected, remove it from the list of promises and just continue the race.
-        console.log('reject promise');
+        logger.log('reject promise');
         // tslint:disable-next-line:no-unsafe-any
         const p = promises.splice(index, 1)[0];
-        p.catch((e) => console.log('A promise has been rejected, but awaiting others', e));
+        p.catch((e) => logger.log('A promise has been rejected, but awaiting others', e));
         return properRace(promises);
     }
 }
@@ -956,7 +956,7 @@ function timerPromise(ms) {
             if (timer === undefined) {
                 return;
             }
-            console.log('cancelled timer');
+            logger.log('cancelled timer');
             timers.clearTimeout(timer);
         },
     };
@@ -997,28 +997,28 @@ function getSocketFromDS(port) {
             // tslint:disable-next-line:no-bitwise
             ipAddr += (ip & 0xff);
             s.on('error', (_) => {
-                console.log('failed connection to ' + ip + ' at ' + port);
+                logger.log('failed connection to ' + ip + ' at ' + port);
                 s.end();
                 s.destroy();
                 s.removeAllListeners();
                 reject();
             });
             s.on('timeout', () => {
-                console.log('failed connection to ' + ip + ' at ' + port);
+                logger.log('failed connection to ' + ip + ' at ' + port);
                 s.end();
                 s.destroy();
                 s.removeAllListeners();
                 reject();
             });
             s.on('close', () => {
-                console.log('failed connection to ' + ip + ' at ' + port);
+                logger.log('failed connection to ' + ip + ' at ' + port);
                 s.end();
                 s.destroy();
                 s.removeAllListeners();
                 reject();
             });
             s.on('dispose', () => {
-                console.log('disposed ds connected');
+                logger.log('disposed ds connected');
                 reject();
                 s.end();
                 s.destroy();
@@ -1036,7 +1036,7 @@ function getSocketFromDS(port) {
             reject();
         });
         ds.on('dispose', () => {
-            console.log('disposed ds');
+            logger.log('disposed ds');
             reject();
             ds.end();
             ds.destroy();
@@ -1059,14 +1059,14 @@ function getSocketFromIP(port, ip) {
     const s = new net.Socket();
     return new RawSocketPromisePair(s, new Promise((resolve, reject) => {
         s.on('error', (_) => {
-            console.log('failed connection to ' + ip + ' at ' + port);
+            logger.log('failed connection to ' + ip + ' at ' + port);
             s.end();
             s.destroy();
             s.removeAllListeners();
             reject();
         });
         s.on('timeout', () => {
-            console.log('failed connection to ' + ip + ' at ' + port);
+            logger.log('failed connection to ' + ip + ' at ' + port);
             s.end();
             s.destroy();
             s.removeAllListeners();
@@ -1079,7 +1079,7 @@ function getSocketFromIP(port, ip) {
             reject();
         });
         s.on('dispose', () => {
-            console.log('disposed', ip);
+            logger.log('disposed', ip);
             reject();
             s.end();
             s.destroy();
@@ -1182,7 +1182,7 @@ class RioConsole extends events_1.EventEmitter {
                 }
                 await this.runFunction(this.teamNumber);
             }
-            console.log('finished loop');
+            logger.log('finished loop');
         };
         this.promise = asyncFunction();
     }
@@ -1241,12 +1241,12 @@ class RioConsole extends events_1.EventEmitter {
     async runFunction(teamNumber) {
         const socket = await this.connect(teamNumber);
         if (socket === undefined) {
-            console.log('bad socket');
+            logger.log('bad socket');
             return;
         }
         this.connected = true;
         this.emit('connectionChanged', true);
-        console.log('succesfully connected');
+        logger.log('succesfully connected');
         socket.on('data', (data) => {
             this.handleData(data);
         });
@@ -1262,17 +1262,17 @@ class RioConsole extends events_1.EventEmitter {
                 socket.destroy();
                 socket.removeAllListeners();
                 resolve();
-                console.log('closed locally');
+                logger.log('closed locally');
             };
             socket.on('close', () => {
                 socket.removeAllListeners();
                 resolve();
-                console.log('closed remotely (close)');
+                logger.log('closed remotely (close)');
             });
             socket.on('end', () => {
                 socket.removeAllListeners();
                 resolve();
-                console.log('closed remotely (end)');
+                logger.log('closed remotely (end)');
             });
         });
         this.connected = false;
@@ -1455,7 +1455,7 @@ class RioLogWindow {
         }
         else if (data.type === interfaces_1.ReceiveTypes.ChangeNumber) {
             const number = data.message;
-            console.log('setting team number');
+            logger.log('setting team number');
             this.rioConsole.setTeamNumber(number);
         }
     }
@@ -1999,16 +1999,16 @@ function createButton(id, text, callback) {
 }
 function onChangeTeamNumber() {
     const newNumber = document.getElementById('teamNumber');
-    console.log('finding team number');
+    logger.log('finding team number');
     if (newNumber === null) {
         return;
     }
-    console.log('sending message');
+    logger.log('sending message');
     implscript_1.sendMessage({
         message: parseInt(newNumber.value, 10),
         type: wpilib_riolog_1.ReceiveTypes.ChangeNumber,
     });
-    console.log('sent message');
+    logger.log('sent message');
 }
 function setLivePage() {
     const mdv = document.getElementById('mainDiv');
