@@ -7,10 +7,14 @@ import * as winston from 'winston';
 import * as Transport from 'winston-transport';
 
 export interface ILogger {
-  error(message: string, ...meta: Array<unknown>): void;
-  warn(message: string, ...meta: Array<unknown>): void;
-  info(message: string, ...meta: Array<unknown>): void;
-  log(message: string, ...meta: Array<unknown>): void;
+  // tslint:disable-next-line:no-any
+  error(message: string, ...meta: any[]): void;
+  // tslint:disable-next-line:no-any
+  warn(message: string, ...meta: any[]): void;
+  // tslint:disable-next-line:no-any
+  info(message: string, ...meta: any[]): void;
+  // tslint:disable-next-line:no-any
+  log(message: string, ...meta: any[]): void;
 }
 
 const myFormat = winston.format.printf((info) => {
@@ -29,7 +33,7 @@ class OutputTransport extends Transport {
       this.emit('logged', info);
     });
 
-    this.outputChannel.appendLine(info[MESSAGE]);
+    this.outputChannel.appendLine(info[MESSAGE] as string);
 
     next();
   }
@@ -64,16 +68,20 @@ export function setLoggerDirectory(dirname: string) {
 }
 
 class LoggerImpl implements ILogger {
-  public error(message: string, ...meta: Array<unknown>): void {
+  // tslint:disable-next-line:no-any
+  public error(message: string, ...meta: any[]): void {
     winstonLogger.log('error', message, meta);
   }
-  public warn(message: string, ...meta: Array<unknown>): void {
+  // tslint:disable-next-line:no-any
+  public warn(message: string, ...meta: any[]): void {
     winstonLogger.log('warn', message, meta);
   }
-  public info(message: string, ...meta: Array<unknown>): void {
+  // tslint:disable-next-line:no-any
+  public info(message: string, ...meta: any[]): void {
     winstonLogger.log('info', message, meta);
   }
-  public log(message: string, ...meta: Array<unknown>): void {
+  // tslint:disable-next-line:no-any
+  public log(message: string, ...meta: any[]): void {
     winstonLogger.log('verbose', message, meta);
   }
 }
