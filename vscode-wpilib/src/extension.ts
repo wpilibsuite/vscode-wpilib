@@ -12,9 +12,10 @@ import { ExampleTemplateAPI } from './exampletemplateapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
-import { logger, setLogDir } from './logger';
+import { closeLogger, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
+import { promisifyMkdirp } from './shared/generator';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
 import { UtilitiesAPI } from './utilitiesapi';
@@ -87,8 +88,6 @@ class ExternalAPI implements IExternalAPI {
 export async function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
 
-  setLogDir(context.logPath);
-
   // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
@@ -96,6 +95,16 @@ export async function activate(context: vscode.ExtensionContext) {
   // functionality. Its definition is provided in shared/externalapi.ts.
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
+
+  const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+
+  const logPath = path.join(frcHomeDir, 'logs');
+  try {
+    await promisifyMkdirp(logPath);
+    setLoggerDirectory(logPath);
+  } catch (err) {
+    logger.error('Error creating logger', err);
+  }
 
   const jdkLoc = await findJdkPath(externalApi);
 
@@ -161,5 +170,5 @@ export async function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-  //
+  closeLogger();
 }
