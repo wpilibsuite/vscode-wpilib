@@ -85,6 +85,10 @@ export class BuiltinTools {
     this.utilities = utilities;
   }
 
+  public dispose()  {
+    //
+  }
+
   private async enumerateHomeTools(): Promise<IEnumerateResult> {
     const homeDir = this.utilities.getWPILibHomeDir();
     const toolsDir = path.join(homeDir, 'tools');

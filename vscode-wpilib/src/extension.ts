@@ -139,7 +139,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(projectcreator);
 
   // Add built in tools
-  await BuiltinTools.Create(externalApi);
+  context.subscriptions.push(await BuiltinTools.Create(externalApi));
 
   const vendorLibs = new VendorLibraries(externalApi);
 
