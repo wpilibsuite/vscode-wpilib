@@ -25,8 +25,28 @@ export class WPILibUpdates {
     }, this));
   }
 
+  public async checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<void> {
+    const grVersion = await this.getGradleRIOVersion(wp);
+    if (grVersion === undefined) {
+      return;
+    }
+    const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
+    if (newVersion !== undefined) {
+      const result = await vscode.window.showInformationMessage
+                           (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
+      if (result !== undefined && result === 'Yes') {
+        await this.setGradleRIOVersion(newVersion, wp);
+      }
+    }
+  }
+
   public async checkForUpdates(): Promise<boolean> {
-    const grVersion = await this.getGradleRIOVersion();
+    const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
+    if (wp === undefined) {
+      logger.log('no workspace');
+      return false;
+    }
+    const grVersion = await this.getGradleRIOVersion(wp);
     if (grVersion === undefined) {
       logger.log('gradlerio version not found');
       return false;
@@ -39,7 +59,7 @@ export class WPILibUpdates {
       const result = await vscode.window.showInformationMessage
                            (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
-        await this.setGradleRIOVersion(newVersion);
+        await this.setGradleRIOVersion(newVersion, wp);
       }
     }
 
@@ -52,12 +72,7 @@ export class WPILibUpdates {
     }
   }
 
-  private async setGradleRIOVersion(version: string): Promise<void> {
-    const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
-      logger.log('no workspace');
-      return;
-    }
+  private async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
     try {
       const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
       const gradleBuildFile = await promisifyReadFile(buildFile);
@@ -146,12 +161,7 @@ export class WPILibUpdates {
     }
   }
 
-  private async getGradleRIOVersion(): Promise<string | undefined> {
-    const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
-      logger.log('no workspace');
-      return undefined;
-    }
+  private async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
 
     try {
       const gradleBuildFile = await promisifyReadFile(path.join(wp.uri.fsPath, 'build.gradle'));

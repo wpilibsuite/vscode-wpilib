@@ -145,13 +145,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(vendorLibs);
 
-  context.subscriptions.push(new WPILibUpdates(externalApi));
+  const wpilibUpdate = new WPILibUpdates(externalApi);
+
+  context.subscriptions.push(wpilibUpdate);
 
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
+  // Also check for local GradleRIO update
   const wp = vscode.workspace.workspaceFolders;
   if (wp) {
     for (const w of wp) {
       if (externalApi.getPreferencesAPI().getPreferences(w).getIsWPILibProject()) {
+        await wpilibUpdate.checkForInitialUpdate(w);
         const persistentState = new PersistentFolderState('wpilib.newProjectHelp', false, w.uri.fsPath);
         if (persistentState.Value === false) {
           persistentState.Value = true;
