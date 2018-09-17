@@ -3,6 +3,7 @@ import * as glob from 'glob';
 import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';
 import * as path from 'path';
+import { logger } from '../logger';
 import { promisifyWriteFile } from '../utilities';
 import { setExecutePermissions } from './permissions';
 
@@ -46,6 +47,7 @@ export function promisifyReadDir(pth: string): Promise<string[]> {
 export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string, addCpp: boolean): Promise<boolean> {
   const existingFiles = await promisifyReadDir(toFolder);
   if (existingFiles.length > 0) {
+    logger.warn('folder not empty');
     return false;
   }
 
@@ -68,7 +70,11 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
 
   await setExecutePermissions(path.join(toFolder, 'gradlew'));
 
-  await promisifyWriteFile(path.join(toFolder, 'src', 'main', 'deploy', 'example.txt'),
+  const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
+
+  await promisifyMkdirp(deployDir);
+
+  await promisifyWriteFile(path.join(deployDir, 'example.txt'),
 `Files placed in this directory will be deployed to the RoboRIO into the
 'deploy' directory in the home folder. Use the 'frc::GetFilePath' function from
 the 'frc/FileUtilities.h' header to get a proper path relative to the deploy
