@@ -40,8 +40,6 @@ function selectProjectFolder() {
 
 function generateProject() {
   document.activeElement.blur();
-  logger.log(language + ' lang');
-  logger.log(base + ' base');
   vscode.postMessage({
     type: 'createproject',
     data: {
