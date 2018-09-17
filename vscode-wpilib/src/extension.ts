@@ -109,7 +109,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await promisifyMkdirp(logPath);
     setLoggerDirectory(logPath);
   } catch (err) {
-    logger.error(localize('extension.errorCreatingLogger', 'Error creating logger'), err);
+    logger.error('Error creating logger', err);
   }
 
   const jdkLoc = await findJdkPath(externalApi);
