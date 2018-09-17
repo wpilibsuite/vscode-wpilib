@@ -1,4 +1,5 @@
 out
+!i18n/*/out
 node_modules
 .vscode-test/
 *.vsix

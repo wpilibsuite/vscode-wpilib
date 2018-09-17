@@ -1,5 +1,11 @@
 'use strict';
 
+// These must be in the files to translate
+// This cannot be placed in a library.
+import * as nls from 'vscode-nls';
+const config = JSON.parse(process.env.VSCODE_NLS_CONFIG as string);
+const localize = nls.config(config as nls.Options)();
+
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
@@ -103,7 +109,7 @@ export async function activate(context: vscode.ExtensionContext) {
     await promisifyMkdirp(logPath);
     setLoggerDirectory(logPath);
   } catch (err) {
-    logger.error('Error creating logger', err);
+    logger.error(localize('extension.errorCreatingLogger', 'Error creating logger'), err);
   }
 
   const jdkLoc = await findJdkPath(externalApi);
@@ -111,7 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
   if (jdkLoc !== undefined) {
     setJavaHome(jdkLoc);
   } else {
-    await vscode.window.showErrorMessage('Java not found. Might have compilation errors');
+    await vscode.window.showErrorMessage(localize('extension.noJava', 'Java not found. Might have compilation errors'));
   }
 
   // Activate the C++ parts of the extension
