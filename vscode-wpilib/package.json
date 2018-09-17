@@ -36,7 +36,7 @@
         "onCommand:wpilibcore.openCommandPalette",
         "onCommand:wpilibcore.refreshCppProperties",
         "onCommand:wpilibcore.selectCppToolchain",
-        "onCommand:wpilibcore.upgradeEclipseProject",
+        "onCommand:wpilibcore.importEclipseProject",
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
@@ -236,8 +236,8 @@
                 "category": "WPILib C++"
             },
             {
-                "command": "wpilibcore.upgradeEclipseProject",
-                "title": "%wpilibcore.upgradeEclipseProject.title%",
+                "command": "wpilibcore.importEclipseProject",
+                "title": "%wpilibcore.importEclipseProject.title%",
                 "category": "WPILib"
             },
             {

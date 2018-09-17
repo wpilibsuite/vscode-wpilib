@@ -67,7 +67,7 @@ export function projectSelectButtonClick() {
   });
 }
 
-interface IUpgradeProject {
+interface IImportProject {
   fromProps: string;
   toFolder: string;
   projectName: string;
@@ -75,9 +75,9 @@ interface IUpgradeProject {
   teamNumber: string;
 }
 
-export async function upgradeProjectButtonClick() {
+export async function importProjectButtonClick() {
   (document.activeElement as HTMLElement).blur();
-  const data: IUpgradeProject = {
+  const data: IImportProject = {
     fromProps: (document.getElementById('eclipseInput') as HTMLInputElement).value,
     newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
     projectName: (document.getElementById('projectName') as HTMLInputElement).value,

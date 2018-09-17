@@ -12,10 +12,10 @@ function projectSelectButtonClick() {
   vscode.postMessage({ type: 'newproject' });
 }
 
-function upgradeProjectButtonClick() {
+function importProjectButtonClick() {
   document.activeElement.blur();
   vscode.postMessage({
-    type: 'upgradeproject',
+    type: 'importproject',
     data: {
       fromProps: document.getElementById('eclipseInput').value,
       toFolder: document.getElementById('projectFolder').value,

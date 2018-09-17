@@ -12,7 +12,7 @@ import { WebViewBase } from './webviewbase';
 // tslint:disable-next-line:no-var-requires
 const javaProperties = require('java-properties');
 
-interface IUpgradeProject {
+interface IImportProject {
   fromProps: string;
   toFolder: string;
   projectName: string;
@@ -20,17 +20,17 @@ interface IUpgradeProject {
   teamNumber: string;
 }
 
-export class EclipseUpgrade extends WebViewBase {
-  public static async Create(resourceRoot: string): Promise<EclipseUpgrade> {
-    const upgrade = new EclipseUpgrade(resourceRoot);
-    await upgrade.asyncInitialize();
-    return upgrade;
+export class EclipseImport extends WebViewBase {
+  public static async Create(resourceRoot: string): Promise<EclipseImport> {
+    const cimport = new EclipseImport(resourceRoot);
+    await cimport.asyncInitialize();
+    return cimport;
   }
 
   private constructor(resourceRoot: string) {
-    super('wpilibeclipseupgrade', 'WPILib Eclipse Upgrade', resourceRoot);
+    super('wpilibeclipseimport', 'WPILib Eclipse Import', resourceRoot);
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.upgradeEclipseProject', async () => {
+    this.disposables.push(vscode.commands.registerCommand('wpilibcore.importEclipseProject', async () => {
       this.displayWebView(vscode.ViewColumn.Active, true, {
         enableScripts: true,
         retainContextWhenHidden: true,
@@ -45,9 +45,9 @@ export class EclipseUpgrade extends WebViewBase {
             case 'newproject':
               await this.handleNewProjectLoc();
               break;
-            case 'upgradeproject':
+            case 'importproject':
               // tslint:disable-next-line:no-unsafe-any
-              await this.handleUpgrade(data.data);
+              await this.handleImport(data.data);
               break;
             default:
               break;
@@ -108,7 +108,7 @@ export class EclipseUpgrade extends WebViewBase {
     }
   }
 
-  private async handleUpgrade(data: IUpgradeProject) {
+  private async handleImport(data: IImportProject) {
     const oldProjectPath = path.dirname(data.fromProps);
 
     const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
@@ -185,7 +185,7 @@ export class EclipseUpgrade extends WebViewBase {
   }
 
   private async asyncInitialize() {
-    await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseupgrade.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseupgrade.js'));
+    await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseimport.html'),
+      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseimport.js'));
   }
 }

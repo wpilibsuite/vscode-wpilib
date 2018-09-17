@@ -2,9 +2,9 @@
 <html>
 
 <head>
-  <title>WPILib Project Upgrade</title>
+  <title>WPILib Project Import</title>
   <script>
-    const exports = require('./out/eclipseupgrade.js');
+    const exports = require('./out/eclipseimport.js');
     const validators = require('./out/validators.js');
   </script>
 
@@ -24,7 +24,7 @@
 <body>
   <img src="./wpilib.svg" width="100" />
 
-  <h1>Welcome to WPILib Eclipse Project Upgrade</h1>
+  <h1>Welcome to WPILib Eclipse Project Importer</h1>
 
   Select an eclipse project. Use the build.properties file in the project.
   <br/>
@@ -48,7 +48,7 @@
   <input id="teamNumber" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
-  <button id="upgradeProject" onclick="exports.upgradeProjectButtonClick();">Upgrade Project</button>
+  <button id="importProject" onclick="exports.importProjectButtonClick();">Import Project</button>
 
 </body>
 

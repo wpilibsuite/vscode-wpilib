@@ -19,7 +19,7 @@
 	"wpilibcore.openCommandPalette.title": "Open WPILib Command Palette",
 	"wpilibcore.refreshCppProperties.title": "Refresh Gradle C++ Properties",
 	"wpilibcore.selectCppToolchain.title": "Select Current C++ Toolchain",
-	"wpilibcore.upgradeEclipseProject.title": "Upgrade a WPILib Eclipse project",
+	"wpilibcore.importEclipseProject.title": "Import a WPILib Eclipse project",
 	"wpilibcore.createNewProject.title": "Create a new project",
 	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",
 	"wpilibcore.setJavaHome.title": "Set Java Home",

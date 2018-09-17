@@ -21,7 +21,7 @@ import { setExtensionContext, setJavaHome } from './utilities';
 import { UtilitiesAPI } from './utilitiesapi';
 import { VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
-import { EclipseUpgrade } from './webviews/eclipseupgrade';
+import { EclipseImport } from './webviews/eclipseimport';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
@@ -125,8 +125,8 @@ export async function activate(context: vscode.ExtensionContext) {
   // Create the help window provider
   const help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
 
-  // Create the eclipse upgrade provider
-  const eclipseupgrade = await EclipseUpgrade.Create(extensionResourceLocation);
+  // Create the eclipse import provider
+  const eclipseimport = await EclipseImport.Create(extensionResourceLocation);
 
   // Create the new project creator provider
   const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
@@ -134,7 +134,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Anything pushed into context.subscriptions will get disposed when VS Code closes.
   context.subscriptions.push(help);
 
-  context.subscriptions.push(eclipseupgrade);
+  context.subscriptions.push(eclipseimport);
 
   context.subscriptions.push(projectcreator);
 

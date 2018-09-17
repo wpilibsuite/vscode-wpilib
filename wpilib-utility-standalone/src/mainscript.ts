@@ -48,14 +48,14 @@ window.addEventListener('load', () => {
   mainDiv.appendChild(document.createElement('br'));
 
   const eclipseButton = document.createElement('button');
-  eclipseButton.appendChild(document.createTextNode('Start Eclipse Upgrader'));
+  eclipseButton.appendChild(document.createTextNode('Start Eclipse Importer'));
   eclipseButton.addEventListener('click', () => {
     const bWindow = remote.getCurrentWindow();
 
     bWindow.setSize(800, 600);
-    bWindow.setTitle('Eclipse Upgrader');
+    bWindow.setTitle('Eclipse Importer');
 
-    bWindow.loadFile('eclipseupgrade.html');
+    bWindow.loadFile('eclipseimport.html');
   });
   eclipseButton.style.marginTop = '5px';
   mainDiv.appendChild(eclipseButton);
