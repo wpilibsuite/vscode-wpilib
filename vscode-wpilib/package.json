@@ -74,6 +74,10 @@
             {
                 "fileMatch": "wpilib_preferences.json",
                 "url": "./resources/wpilibschema.json"
+            },
+            {
+                "fileMatch": "vendordeps/*.json",
+                "url": "./resources/vendorschema.json"
             }
         ],
         "configuration": {

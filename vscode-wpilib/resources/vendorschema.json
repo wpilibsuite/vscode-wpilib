@@ -1,0 +1,168 @@
+{
+  "title": "WPILib Vendor JSON Definition",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "uuid": {
+      "type": "string"
+    },
+    "mavenUrls": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "jsonUrl": {
+      "type": "string"
+    },
+    "javaDependencies": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "groupId": {
+              "type": "string"
+            },
+            "artifactId": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "groupId",
+            "artifactId",
+            "version"
+          ]
+        }
+      ]
+    },
+    "jniDependencies": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "groupId": {
+              "type": "string"
+            },
+            "artifactId": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "skipOnUnknownClassifier": {
+              "type": "boolean"
+            },
+            "isJar": {
+              "type": "boolean"
+            },
+            "validClassifiers": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": [
+            "groupId",
+            "artifactId",
+            "version",
+            "skipOnUnknownClassifier",
+            "isJar",
+            "validClassifiers"
+          ]
+        }
+      ]
+    },
+    "cppDependencies": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "groupId": {
+              "type": "string"
+            },
+            "artifactId": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "isHeaderOnly": {
+              "type": "boolean"
+            },
+            "headerClassifier": {
+              "type": "string"
+            },
+            "hasSources": {
+              "type": "boolean"
+            },
+            "sourcesClassifier": {
+              "type": "string"
+            },
+            "sharedLibrary": {
+              "type": "boolean"
+            },
+            "libName": {
+              "type": "string"
+            },
+            "skipOnUnknownClassifier": {
+              "type": "boolean"
+            },
+            "validClassifiers": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": [
+            "groupId",
+            "artifactId",
+            "version",
+            "isHeaderOnly",
+            "headerClassifier",
+            "hasSources",
+            "sourcesClassifier",
+            "sharedLibrary",
+            "libName",
+            "skipOnUnknownClassifier",
+            "validClassifiers"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "uuid",
+    "mavenUrls",
+    "jsonUrl",
+    "javaDependencies",
+    "jniDependencies",
+    "cppDependencies"
+  ]
+}
