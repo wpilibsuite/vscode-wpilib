@@ -83,8 +83,7 @@ export class ApiProvider implements CustomConfigurationProvider {
         }
       }
     }).catch((err) => {
-      logger.log('Rejected load?');
-      logger.log(JSON.stringify(err, null, 4));
+      logger.error('Rejected load?', err);
     });
   }
 
@@ -236,11 +235,11 @@ export class ApiProvider implements CustomConfigurationProvider {
         for (const sb of tc.sourceBinaries) {
           for (const source of sb.source.srcDirs) {
             if (normalizedPath.startsWith(source)) {
-              logger.log(`Found Binary for ${uriPath}`);
               // Found, find binary
               const index: number = tc.nameBinaryMap[sb.componentName];
               if (index >= 0) {
                 const bin = tc.binaries[index];
+                logger.log(`Found Binary for ${uriPath}`, bin);
                 if (sb.cpp) {
                   const args: string[] = [];
                   args.push(...tc.systemCppArgs);

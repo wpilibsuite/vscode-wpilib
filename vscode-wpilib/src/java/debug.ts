@@ -1,5 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
+import { logger } from '../logger';
 
 export interface IDebugCommands {
   serverAddress: string;
@@ -18,6 +19,8 @@ export async function startDebugging(commands: IDebugCommands): Promise<void> {
     request: 'attach',
     type: 'java',
   };
+
+  logger.log('Java debug config: ', config);
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

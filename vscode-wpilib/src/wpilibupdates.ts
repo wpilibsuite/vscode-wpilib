@@ -21,7 +21,9 @@ export class WPILibUpdates {
     this.externalApi = externalApi;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.checkForUpdates', async () => {
-       await this.checkForUpdates();
+       if (!await this.checkForUpdates()) {
+         logger.log('no update installed');
+       }
     }, this));
   }
 
@@ -43,18 +45,18 @@ export class WPILibUpdates {
   public async checkForUpdates(): Promise<boolean> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
     if (wp === undefined) {
-      logger.log('no workspace');
+      logger.warn('no workspace');
       return false;
     }
     const grVersion = await this.getGradleRIOVersion(wp);
     if (grVersion === undefined) {
-      logger.log('gradlerio version not found');
       return false;
     }
     const newVersion = await this.checkForGradleRIOUpdate(grVersion);
     if (newVersion === undefined) {
       logger.log('no update found');
       await vscode.window.showInformationMessage('No GradleRIO Update Found');
+      return false;
     } else {
       const result = await vscode.window.showInformationMessage
                            (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
@@ -81,7 +83,7 @@ export class WPILibUpdates {
 
       await promisifyWriteFile(buildFile, newgFile);
     } catch (err) {
-      logger.log(JSON.stringify(err, null, 4));
+      logger.error('error setting gradlerio version', err);
       return;
     }
   }
@@ -104,6 +106,7 @@ export class WPILibUpdates {
         timeout: 5000,
       });
       if (response === undefined) {
+        logger.warn('failed to fetch URL: ' + metaDataUrl);
         return undefined;
       }
       if (response.status >= 200 && response.status <= 300) {
@@ -119,6 +122,7 @@ export class WPILibUpdates {
           });
         });
         if (release === undefined) {
+          logger.warn('parse failure');
           return undefined;
         }
         if (release > currentVersion) {
@@ -126,11 +130,11 @@ export class WPILibUpdates {
         }
         return undefined;
       } else {
-        logger.log('bad status: ' + response.status.toString());
+        logger.warn('bad status: ' + response.status.toString());
         return undefined;
       }
     } catch (err) {
-      logger.log(JSON.stringify(err, null, 4));
+      logger.warn('remote gradlerio exception', err);
       return undefined;
     }
   }
@@ -156,7 +160,7 @@ export class WPILibUpdates {
       }
       return newVersion;
     } catch (err) {
-      logger.log(JSON.stringify(err, null, 4));
+      logger.warn('local gradlerio exception', err);
       return undefined;
     }
   }
@@ -169,18 +173,20 @@ export class WPILibUpdates {
       const matchRes = getGradleRioRegex().exec(gradleBuildFile);
 
       if (matchRes === null) {
-        logger.log('matching error');
+        logger.warn('matching error');
         return undefined;
       }
 
       if (matchRes.length !== 4) {
-        logger.log('matching length not correct');
+        logger.warn('matching length not correct');
         return undefined;
       }
 
+      logger.log('Local GradleRIO Version ' + matchRes[2]);
+
       return matchRes[2];
     } catch (err) {
-      logger.log(JSON.stringify(err, null, 4));
+      logger.warn('local gradlerio version exception', err);
       return undefined;
     }
   }

@@ -1,5 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
+import { logger } from '../logger';
 
 export interface IUnixSimulateCommands {
   executablePath: string;
@@ -40,6 +41,8 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
       text: 'dir ' + a,
     });
   }
+
+  logger.log('C++ Unix Simulation: ', config);
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

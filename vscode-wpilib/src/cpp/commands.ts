@@ -162,7 +162,7 @@ export class Commands {
     const resourceFile = path.join(commandFolder, this.commandResourceName);
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
-        logger.log(JSON.stringify(err, null, 4));
+        logger.log('Command error: ', err);
         return;
       }
       const commands: ICppJsonLayout[] = jsonc.parse(data) as ICppJsonLayout[];

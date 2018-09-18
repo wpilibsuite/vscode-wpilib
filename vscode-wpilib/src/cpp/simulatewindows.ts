@@ -1,5 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
+import { logger } from '../logger';
 
 export interface IWindowsSimulateCommands {
   extensions: string;
@@ -21,6 +22,8 @@ export async function startWindowsSimulation(commands: IWindowsSimulateCommands)
     stopAtEntry: commands.stopAtEntry,
     type: 'cppvsdbg',
   };
+
+  logger.log('C++ Windows Simulation: ', config);
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

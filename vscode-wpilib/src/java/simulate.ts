@@ -1,5 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
+import { logger } from '../logger';
 
 export interface ISimulateCommands {
   extensions: string;
@@ -26,6 +27,8 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     type: 'java',
     vmArgs: `-Djava.library.path="${commands.librarydir}"`,
   };
+
+  logger.log('Java Simulation: ', config);
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

@@ -100,7 +100,7 @@ export class Commands {
     const resourceFile = path.join(commandFolder, this.commandResourceName);
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
-        logger.log(JSON.stringify(err, null, 4));
+        logger.error('Command file error: ', err);
         return;
       }
       const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];

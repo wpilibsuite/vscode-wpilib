@@ -24,7 +24,7 @@ export class Examples {
     const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
-        logger.log(JSON.stringify(err, null, 4));
+        logger.log('Example Error error: ', err);
         return;
       }
       const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
@@ -55,7 +55,7 @@ export class Examples {
                 }
               }
             } catch (err) {
-              logger.log(JSON.stringify(err, null, 4));
+              logger.error('Example generation error: ', err);
               return false;
             }
             return true;

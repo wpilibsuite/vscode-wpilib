@@ -24,7 +24,7 @@ export class Templates {
     const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
-        logger.log(JSON.stringify(err, null, 4));
+        logger.log('Template error: ', err);
         return;
       }
       const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
@@ -55,7 +55,7 @@ export class Templates {
                 }
               }
             } catch (err) {
-              logger.log(JSON.stringify(err, null, 4));
+              logger.error('template creation error', err);
               return false;
             }
             return true;

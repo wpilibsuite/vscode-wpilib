@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { IExecuteAPI } from 'vscode-wpilibapi';
+import { logger } from './logger';
 import { PromiseCondition } from './shared/promisecondition';
 import { getIsWindows } from './utilities';
 
@@ -52,6 +53,8 @@ export class ExecuteAPI implements IExecuteAPI {
         shell.options.shellArgs = ['/d', '/c'];
       }
     }
+
+    logger.log('executing command: ', shell);
 
     const task = new vscode.Task({ type: 'wpilibgradle' }, workspace, name, 'wpilib', shell);
     const execution = await vscode.tasks.executeTask(task);

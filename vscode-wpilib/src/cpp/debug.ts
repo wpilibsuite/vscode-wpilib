@@ -1,5 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
+import { logger } from '../logger';
 
 export interface IDebugCommands {
   target: string;
@@ -41,6 +42,8 @@ export async function startDebugging(commands: IDebugCommands): Promise<void> {
       text: 'dir ' + a,
     });
   }
+
+  logger.log('cpp debug config: ', config);
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

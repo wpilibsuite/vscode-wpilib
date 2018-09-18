@@ -206,7 +206,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
       return true;
     } catch (err) {
       await vscode.window.showErrorMessage('Unknown error occured. See output window or console log for more information.');
-      logger.log(JSON.stringify(err, null, 4));
+      logger.error('Debug error', err);
       return false;
     }
   }
