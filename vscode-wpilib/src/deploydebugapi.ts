@@ -33,11 +33,6 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       logger.log('debugger has no desktop argument. Assuming roboRIO');
     }
 
-    if (desktop) {
-      vscode.window.showInformationMessage('This functionality is disabled for the Alpha test.');
-      return undefined;
-    }
-
     return new Promise<undefined>(async (resolve) => {
       if (desktop) {
         await this.deployDebugAPI.simulateCode(workspace, undefined);
