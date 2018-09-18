@@ -42,10 +42,10 @@ export function getMainLogFile(): string {
 }
 
 export function setLoggerDirectory(dirname: string) {
-  mainLogFile = path.join(dirname, 'wpiliblog.txt');
+  mainLogFile = path.join(dirname, 'wpilibtoollog.txt');
   winstonLogger.add(new winston.transports.File({
     dirname,
-    filename: 'wpiliblog.txt',
+    filename: 'wpilibtoollog.txt',
     level: 'verbose',
     maxFiles: 3,
     maxsize: 1000000,
