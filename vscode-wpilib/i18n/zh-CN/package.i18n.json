@@ -24,6 +24,6 @@
 	"wpilibcore.manageVendorLibs.title": "管理外部库", 
 	"wpilibcore.setJavaHome.title": "设置Java地址 ",
 	"wpilibcore.checkForUpdates.title": "从 WPILib 检查更新",
-	"wpilibcore.installGradleTools.title": "从 GradleRIO 安装工具链",
+	"wpilibcore.installGradleTools.title": "从 GradleRIO 安装工具",
 	"wpilibcore.showLogFolder.title": "显示 Log 文件夹"
 }
