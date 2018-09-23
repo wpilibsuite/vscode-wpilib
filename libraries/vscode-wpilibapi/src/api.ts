@@ -86,6 +86,7 @@ export interface IPreferences {
   getAutoSaveOnDeploy(): boolean;
   setAutoSaveOnDeploy(autoSave: boolean, global: boolean): Promise<void>;
   getIsWPILibProject(): boolean;
+  getCppIntellisense(): boolean;
   getOnline(): boolean;
   getSkipTests(): boolean;
   getStopSimulationOnEntry(): boolean;

@@ -7,6 +7,9 @@
     },
     "teamNumber": {
       "type": "integer"
+    },
+    "cppIntellisense": {
+      "type": "boolean"
     }
   }
 }

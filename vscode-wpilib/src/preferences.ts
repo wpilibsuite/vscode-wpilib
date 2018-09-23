@@ -8,9 +8,11 @@ import { promisifyExists, promisifyMkDir, promisifyReadFile, promisifyWriteFile 
 export interface IPreferencesJson {
   currentLanguage: string;
   teamNumber: number;
+  cppIntellisense?: boolean;
 }
 
 const defaultPreferences: IPreferencesJson = {
+  cppIntellisense: false,
   currentLanguage: 'none',
   teamNumber: -1,
 };
@@ -104,6 +106,13 @@ export class Preferences implements IPreferences {
 
   public getCurrentLanguage(): string {
     return this.preferencesJson.currentLanguage;
+  }
+
+  public getCppIntellisense(): boolean {
+    if (this.preferencesJson.cppIntellisense) {
+      return this.preferencesJson.cppIntellisense;
+    }
+    return false;
   }
 
   public async setCurrentLanguage(language: string): Promise<void> {

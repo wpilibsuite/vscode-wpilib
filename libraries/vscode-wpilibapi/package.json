@@ -1,6 +1,6 @@
 {
   "name": "vscode-wpilibapi",
-  "version": "2019.0.3",
+  "version": "2019.0.4",
   "description": "Public API for vscode-wpilib",
   "typings": "./out/api.d.ts",
   "main": "./out/api.js",

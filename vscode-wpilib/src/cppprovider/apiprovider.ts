@@ -42,6 +42,10 @@ export class ApiProvider implements CustomConfigurationProvider {
   private readonly configFile: string = 'vscodeconfig.json';
   private configRelativePattern: vscode.RelativePattern;
   private configWatcher: vscode.FileSystemWatcher;
+
+  private gradleWatcher: vscode.FileSystemWatcher | undefined;
+  private vendorDepsWatcher: vscode.FileSystemWatcher | undefined;
+
   private executeApi: IExecuteAPI;
 
   constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI) {
@@ -70,6 +74,10 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange, this));
     // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
+
+    if (this.preferences.getCppIntellisense()) {
+      this.setupWatchers();
+    }
 
     this.loadConfigs().then(async (found) => {
       if (!found) {
@@ -178,7 +186,8 @@ export class ApiProvider implements CustomConfigurationProvider {
       selections.push(c.name);
     }
     if (selections.length === 0) {
-      const configResult = await vscode.window.showInformationMessage('No configuration. Would you like to refresh the configurations?', 'Yes', 'No');
+      const configResult = await vscode.window.showInformationMessage('No intellisense configured. Would you like to enable intellisense?',
+                                                                      'Yes', 'No');
       if (configResult === 'Yes') {
         await this.runGradleRefresh();
       }
@@ -211,10 +220,48 @@ export class ApiProvider implements CustomConfigurationProvider {
     await this.loadConfigs();
   }
 
+  private setupWatchers() {
+    if (this.gradleWatcher === undefined) {
+      const gradlePattern = new vscode.RelativePattern(this.workspace, '**/*.gradle');
+      const vendorDepsPattern = new vscode.RelativePattern(path.join(this.workspace.uri.fsPath, 'vendordeps'), '**/*.json');
+
+      this.gradleWatcher = vscode.workspace.createFileSystemWatcher(gradlePattern);
+      this.disposables.push(this.gradleWatcher);
+
+      this.vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
+      this.disposables.push(this.vendorDepsWatcher);
+
+      // tslint:disable-next-line:no-unbound-method
+      this.gradleWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
+
+      // tslint:disable-next-line:no-unbound-method
+      this.gradleWatcher.onDidCreate(this.couldBeUpdated, this, this.disposables);
+
+      // tslint:disable-next-line:no-unbound-method
+      this.gradleWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
+
+      // tslint:disable-next-line:no-unbound-method
+      this.vendorDepsWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
+
+      // tslint:disable-next-line:no-unbound-method
+      this.vendorDepsWatcher.onDidCreate(this.couldBeUpdated, this, this.disposables);
+
+      // tslint:disable-next-line:no-unbound-method
+      this.vendorDepsWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
+    }
+  }
+
   private onDelete() {
     this.statusBar.text = 'none';
     this.foundFiles = [];
     this.toolchains = [];
+  }
+
+  private async couldBeUpdated(): Promise<void> {
+    const result = await vscode.window.showInformationMessage('Intellisense configurations might have been updated. Refresh them now?', 'Yes', 'No');
+    if (result && result === 'Yes') {
+      await this.runGradleRefresh();
+    }
   }
 
   private async findMatchingBinary(uri: vscode.Uri): Promise<boolean> {
