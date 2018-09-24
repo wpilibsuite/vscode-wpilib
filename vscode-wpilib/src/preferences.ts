@@ -8,12 +8,14 @@ import { promisifyExists, promisifyMkDir, promisifyReadFile, promisifyWriteFile 
 export interface IPreferencesJson {
   currentLanguage: string;
   teamNumber: number;
-  cppIntellisense?: boolean;
+  enableCppIntellisense: boolean;
+  projectYear: string;
 }
 
 const defaultPreferences: IPreferencesJson = {
-  cppIntellisense: false,
   currentLanguage: 'none',
+  enableCppIntellisense: false,
+  projectYear: 'none',
   teamNumber: -1,
 };
 
@@ -108,11 +110,22 @@ export class Preferences implements IPreferences {
     return this.preferencesJson.currentLanguage;
   }
 
-  public getCppIntellisense(): boolean {
-    if (this.preferencesJson.cppIntellisense) {
-      return this.preferencesJson.cppIntellisense;
-    }
-    return false;
+  public getEnableCppIntellisense(): boolean {
+    return this.preferencesJson.enableCppIntellisense;
+  }
+
+  public async setEnableCppIntellisense(set: boolean): Promise<void> {
+    this.preferencesJson.enableCppIntellisense = set;
+    await this.writePreferences();
+  }
+
+  public getProjectYear(): string {
+    return this.preferencesJson.projectYear;
+  }
+
+  public async setProjectYear(year: string): Promise<void> {
+    this.preferencesJson.projectYear = year;
+    await this.writePreferences();
   }
 
   public async setCurrentLanguage(language: string): Promise<void> {

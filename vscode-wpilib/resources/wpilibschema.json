@@ -8,7 +8,10 @@
     "teamNumber": {
       "type": "integer"
     },
-    "cppIntellisense": {
+    "projectYear": {
+      "type": "string"
+    },
+    "enableCppIntellisense": {
       "type": "boolean"
     }
   }

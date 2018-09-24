@@ -160,7 +160,13 @@ export async function activate(context: vscode.ExtensionContext) {
   const wp = vscode.workspace.workspaceFolders;
   if (wp) {
     for (const w of wp) {
-      if (externalApi.getPreferencesAPI().getPreferences(w).getIsWPILibProject()) {
+      const prefs = externalApi.getPreferencesAPI().getPreferences(w);
+      if (prefs.getIsWPILibProject()) {
+        if (prefs.getProjectYear() !== 'Beta2019') {
+          await vscode.window
+                      .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
+          continue;
+        }
         await wpilibUpdate.checkForInitialUpdate(w);
         const persistentState = new PersistentFolderState('wpilib.newProjectHelp', false, w.uri.fsPath);
         if (persistentState.Value === false) {

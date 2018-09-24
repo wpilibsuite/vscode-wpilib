@@ -75,7 +75,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
 
-    if (this.preferences.getCppIntellisense()) {
+    if (this.preferences.getEnableCppIntellisense()) {
       this.setupWatchers();
     }
 
