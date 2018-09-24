@@ -162,6 +162,22 @@ export async function activate(context: vscode.ExtensionContext) {
     for (const w of wp) {
       const prefs = externalApi.getPreferencesAPI().getPreferences(w);
       if (prefs.getIsWPILibProject()) {
+        const vendorDepsPattern = new vscode.RelativePattern(path.join(w.uri.fsPath, 'vendordeps'), '**/*.json');
+        const vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
+        context.subscriptions.push(vendorDepsWatcher);
+
+        vendorDepsWatcher.onDidChange(async () => {
+          // TODO: Figure out what to do here
+        }, null, context.subscriptions);
+
+        vendorDepsWatcher.onDidCreate(async () => {
+          // TODO: Figure out what to do here
+        }, null, context.subscriptions);
+
+        vendorDepsWatcher.onDidDelete(async () => {
+          // TODO: Figure out what to do here
+        }, null, context.subscriptions);
+
         if (prefs.getProjectYear() !== 'Beta2019') {
           await vscode.window
                       .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');

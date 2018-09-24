@@ -44,7 +44,6 @@ export class ApiProvider implements CustomConfigurationProvider {
   private configWatcher: vscode.FileSystemWatcher;
 
   private gradleWatcher: vscode.FileSystemWatcher | undefined;
-  private vendorDepsWatcher: vscode.FileSystemWatcher | undefined;
 
   private executeApi: IExecuteAPI;
 
@@ -223,13 +222,9 @@ export class ApiProvider implements CustomConfigurationProvider {
   private setupWatchers() {
     if (this.gradleWatcher === undefined) {
       const gradlePattern = new vscode.RelativePattern(this.workspace, '**/*.gradle');
-      const vendorDepsPattern = new vscode.RelativePattern(path.join(this.workspace.uri.fsPath, 'vendordeps'), '**/*.json');
 
       this.gradleWatcher = vscode.workspace.createFileSystemWatcher(gradlePattern);
       this.disposables.push(this.gradleWatcher);
-
-      this.vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
-      this.disposables.push(this.vendorDepsWatcher);
 
       // tslint:disable-next-line:no-unbound-method
       this.gradleWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
@@ -239,15 +234,6 @@ export class ApiProvider implements CustomConfigurationProvider {
 
       // tslint:disable-next-line:no-unbound-method
       this.gradleWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
-
-      // tslint:disable-next-line:no-unbound-method
-      this.vendorDepsWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
-
-      // tslint:disable-next-line:no-unbound-method
-      this.vendorDepsWatcher.onDidCreate(this.couldBeUpdated, this, this.disposables);
-
-      // tslint:disable-next-line:no-unbound-method
-      this.vendorDepsWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
     }
   }
 
