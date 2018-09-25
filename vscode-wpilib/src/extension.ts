@@ -25,7 +25,7 @@ import { promisifyMkdirp } from './shared/generator';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
 import { UtilitiesAPI } from './utilitiesapi';
-import { VendorLibraries } from './vendorlibraries';
+import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { EclipseImport } from './webviews/eclipseimport';
 import { Help } from './webviews/help';
@@ -165,18 +165,17 @@ export async function activate(context: vscode.ExtensionContext) {
         const vendorDepsPattern = new vscode.RelativePattern(path.join(w.uri.fsPath, 'vendordeps'), '**/*.json');
         const vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
         context.subscriptions.push(vendorDepsWatcher);
+        const localW = w;
 
-        vendorDepsWatcher.onDidChange(async () => {
-          // TODO: Figure out what to do here
-        }, null, context.subscriptions);
+        const fireEvent = () => {
+          fireVendorDepsChanged(localW);
+        };
 
-        vendorDepsWatcher.onDidCreate(async () => {
-          // TODO: Figure out what to do here
-        }, null, context.subscriptions);
+        vendorDepsWatcher.onDidChange(fireEvent, null, context.subscriptions);
 
-        vendorDepsWatcher.onDidDelete(async () => {
-          // TODO: Figure out what to do here
-        }, null, context.subscriptions);
+        vendorDepsWatcher.onDidCreate(fireEvent, null, context.subscriptions);
+
+        vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
         if (prefs.getProjectYear() !== 'Beta2019') {
           await vscode.window

@@ -10,6 +10,8 @@ import { Templates } from '../templates';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
+import { onVendorDepsChanged } from '../vendorlibraries';
+import { promisifyExists } from '../utilities';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -23,8 +25,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   let allowDebug = true;
 
-  const javaExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
-  if (javaExtension === undefined) {
+  const javaDebugExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
+  if (javaDebugExtension === undefined) {
     // TODO: Make this a visible warning message when project detected is java
     logger.log('Could not find java extension. Debugging is disabled.');
     allowDebug = false;
@@ -49,4 +51,26 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   context.subscriptions.push(examples);
   const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
   context.subscriptions.push(templates);
+
+  if (vscode.extensions.getExtension('redhat.java') !== undefined) {
+    // Add handlers for each workspace if java is installed
+    const wp = vscode.workspace.workspaceFolders;
+    if (wp) {
+      for (const w of wp) {
+        const prefs = coreExports.getPreferencesAPI().getPreferences(w);
+        if (prefs.getIsWPILibProject()) {
+          const localW = w;
+          const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
+          if (await promisifyExists(buildGradle)) {
+            const buildGradleUri = vscode.Uri.file(buildGradle);
+            onVendorDepsChanged(async (workspace) => {
+              if (workspace.index === localW.index) {
+                await vscode.commands.executeCommand('java.projectConfiguration.update', buildGradleUri);
+              }
+            }, null, context.subscriptions);
+          }
+        }
+      }
+    }
+  }
 }

@@ -377,3 +377,9 @@ export class VendorLibraries {
     }
   }
 }
+
+const eventListener: vscode.EventEmitter<vscode.WorkspaceFolder> = new vscode.EventEmitter<vscode.WorkspaceFolder>();
+export const onVendorDepsChanged: vscode.Event<vscode.WorkspaceFolder> = eventListener.event;
+export function fireVendorDepsChanged(workspace: vscode.WorkspaceFolder): void {
+  eventListener.fire(workspace);
+}

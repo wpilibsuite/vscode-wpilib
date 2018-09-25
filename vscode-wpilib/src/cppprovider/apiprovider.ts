@@ -8,6 +8,7 @@ import { IExecuteAPI, IExternalAPI, IPreferences } from 'vscode-wpilibapi';
 import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
 import { gradleRun, promisifyReadFile } from '../utilities';
+import { onVendorDepsChanged } from '../vendorlibraries';
 import { IToolChain } from './jsonformats';
 
 const isWindows = (process.platform === 'win32');
@@ -80,7 +81,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.loadConfigs().then(async (found) => {
       if (!found) {
-        if (this.preferences.getCurrentLanguage() === 'cpp') {
+        if (this.preferences.getEnableCppIntellisense()) {
           const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
             'Yes', 'No');
           if (configResult === 'Yes') {
@@ -234,6 +235,13 @@ export class ApiProvider implements CustomConfigurationProvider {
 
       // tslint:disable-next-line:no-unbound-method
       this.gradleWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
+
+      // tslint:disable-next-line:no-unbound-method
+      onVendorDepsChanged(async (wp) => {
+        if (wp.index === this.workspace.index) {
+          await this.couldBeUpdated();
+        }
+      }, this, this.disposables);
     }
   }
 
