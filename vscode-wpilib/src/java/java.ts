@@ -7,11 +7,11 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { Examples } from '../examples';
 import { logger } from '../logger';
 import { Templates } from '../templates';
+import { promisifyExists } from '../utilities';
+import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
-import { onVendorDepsChanged } from '../vendorlibraries';
-import { promisifyExists } from '../utilities';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
