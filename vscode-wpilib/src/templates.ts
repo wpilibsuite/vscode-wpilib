@@ -43,7 +43,7 @@ export class Templates {
             try {
               if (java) {
                 if (!await generateCopyJava(path.join(templatesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Robot', path.join('frc', 'robot'))) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'))) {
                   await vscode.window.showErrorMessage('Cannot create into non empty folder');
                   return false;
                 }

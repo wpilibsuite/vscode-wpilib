@@ -13,7 +13,7 @@ environment:
 install:
 - ps: >-
     If (Test-Path Env:APPVEYOR_REPO_TAG_NAME) {
-        ./gradlew clean -PjenkinsBuild -PreleaseType=OFFICIAL --continue --no-daemon
+        ./gradlew clean -PjenkinsBuild -PreleaseType=DEV --continue --no-daemon
     } Else {
         ./gradlew clean -PjenkinsBuild --continue --no-daemon
     }
@@ -21,7 +21,7 @@ cache: C:\Users\appveyor\.gradle
 build_script:
 - ps: >-
     If (Test-Path Env:APPVEYOR_REPO_TAG_NAME) {
-        ./gradlew build updateVersions updateAllDependencies -PjenkinsBuild -PreleaseType=OFFICIAL --continue --no-daemon
+        ./gradlew build updateVersions updateAllDependencies -PjenkinsBuild -PreleaseType=DEV --continue --no-daemon
     } Else {
         ./gradlew build updateVersions updateAllDependencies -PjenkinsBuild --continue --no-daemon
     }

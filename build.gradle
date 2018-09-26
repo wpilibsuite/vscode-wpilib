@@ -1,26 +1,7 @@
 plugins {
     id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.0"
-    id 'io.pry.gradle.offline_dependencies' version '0.3'
     id "base"
 }
-
-repositories {
-  maven {
-    url offlineRepositoryRoot
-  }
-}
-
-/*
-offlineDependencies {
-    includeBuildscriptDependencies false
-    repositories {
-        maven {
-            url "${System.getProperty('user.home')}/releases/maven/development"
-
-        }
-    }
-}
-*/
 
 configurations {
     cppSource

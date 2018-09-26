@@ -1,15 +1,15 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-3"
+    id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-4-pre2"
 }
 
-def ROBOT_CLASS = "###ROBOTCLASSREPLACE###"
+def ROBOT_MAIN_CLASS = "###ROBOTCLASSREPLACE###"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
 deploy {
     targets {
-        target("roborio", edu.wpi.first.gradlerio.frc.RoboRIO) {
+        roboRIO("roborio") {
             // Team number is loaded either from the .wpilib/wpilib_preferences.json
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
@@ -18,7 +18,7 @@ deploy {
         }
     }
     artifacts {
-        artifact('frcJava', edu.wpi.first.gradlerio.frc.FRCJavaArtifact) {
+        frcJavaArtifact('frcJava') {
             targets << "roborio"
             // Debug can be overridden by command line, for use with VSCode
             debug = getDebugOrDefault(false)
@@ -38,8 +38,10 @@ deploy {
 // and NavX.
 dependencies {
     compile wpilib()
-    compile ctre()
-    compile navx()
+    compile javaVendorLibraries()
+    nativeZip jniRoboRIOVendorLibraries()
+    nativeDesktopZip jniDesktopVendorLibraries()
+    testCompile 'junit:junit:4.12'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
@@ -47,16 +49,11 @@ dependencies {
 // knows where to look for our Robot Class.
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
-}
-
-// Force Java 8 Compatibility mode for deployed code, in case the develoment
-// system is using Java 10.
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 }
 
 wrapper {
     gradleVersion = '4.9'
+    distributionPath = 'permwrappers/dists'
+    archivePath = 'permwrappers/dists'
 }
