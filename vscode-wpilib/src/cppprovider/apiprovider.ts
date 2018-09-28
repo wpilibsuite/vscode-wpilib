@@ -3,7 +3,7 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem } from 'vscode-cpptools';
+import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem, WorkspaceBrowseConfiguration } from 'vscode-cpptools';
 import { IExecuteAPI, IExternalAPI, IPreferences } from 'vscode-wpilibapi';
 import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
@@ -53,6 +53,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.workspace = workspace;
     this.cppToolsApi = cppToolsApi;
     this.executeApi = externalApi.getExecuteAPI();
+    this.cppToolsApi.registerCustomConfigurationProvider(this);
 
     const fsPath = workspace.uri.fsPath;
 
@@ -93,6 +94,35 @@ export class ApiProvider implements CustomConfigurationProvider {
     }).catch((err) => {
       logger.error('Rejected load?', err);
     });
+  }
+
+  public async canProvideBrowseConfiguration(_?: vscode.CancellationToken | undefined): Promise<boolean> {
+    return true;
+  }
+  public async provideBrowseConfiguration(_?: vscode.CancellationToken | undefined): Promise<WorkspaceBrowseConfiguration> {
+    const browsePath: string[] = [];
+    let compilerPath;
+    for (const tc of this.toolchains) {
+      if (tc.name === this.selectedName.Value) {
+        // Found our TC
+        compilerPath = tc.cppPath;
+        browsePath.push(...tc.allLibFiles);
+      }
+    }
+    if (compilerPath === undefined) {
+      const config: WorkspaceBrowseConfiguration = {
+        browsePath,
+        standard: 'c++14',
+      };
+      return config;
+    } else {
+      const config: WorkspaceBrowseConfiguration = {
+        browsePath,
+        compilerPath,
+        standard: 'c++14',
+      };
+      return config;
+    }
   }
 
   public async canProvideConfiguration(uri: vscode.Uri, _: vscode.CancellationToken | undefined): Promise<boolean> {
@@ -170,11 +200,11 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.foundFiles = [];
 
     if (!this.registered) {
-      this.cppToolsApi.registerCustomConfigurationProvider(this);
       this.registered = true;
+      this.cppToolsApi.notifyReady(this);
+    } else {
+      this.cppToolsApi.didChangeCustomConfiguration(this);
     }
-
-    this.cppToolsApi.didChangeCustomConfiguration(this);
 
     this.statusBar.show();
     return true;
