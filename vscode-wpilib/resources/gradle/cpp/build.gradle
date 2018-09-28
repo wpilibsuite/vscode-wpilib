@@ -1,8 +1,7 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO" version "2019.0.0-alpha-4-pre2"
-    id "edu.wpi.first.GradleVsCode" version "0.4.2"
+    id "edu.wpi.first.GradleRIO" version "2019.0.0-beta0-pre1"
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
