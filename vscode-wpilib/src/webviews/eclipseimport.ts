@@ -118,7 +118,12 @@ export class EclipseImport extends WebViewBase {
     const values = javaProperties.of(data.fromProps);
 
     // tslint:disable-next-line:no-unsafe-any
-    const javaRobotClass: string = values.get('robot.class', '');
+    const javaPackageRobotClass: string = values.get('robot.class', '');
+
+    // tslint:disable-next-line:no-unsafe-any
+    const javaRobotPackage: string = values.get('package', '');
+
+    const javaRobotClass = javaPackageRobotClass.substr(javaRobotPackage.length + 1);
 
     let toFolder = data.toFolder;
 
@@ -140,7 +145,7 @@ export class EclipseImport extends WebViewBase {
       success = await generateCopyCpp(path.join(oldProjectPath, 'src'), gradlePath, toFolder, true);
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
-      success = await generateCopyJava(path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotClass, '');
+      success = await generateCopyJava(path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage + '.Main', '');
     }
 
     if (!success) {
@@ -165,6 +170,13 @@ export class EclipseImport extends WebViewBase {
         }
       });
     });
+
+    let mainFile = await promisifyReadFile(path.join(this.resourceRoot, 'eclipseprojectmain.java'));
+    mainFile = mainFile.replace(new RegExp('insertnewpackagehere', 'g'), javaRobotPackage)
+                       .replace(new RegExp('ROBOTCLASSNAMEHERE', 'g'), javaRobotClass);
+
+    const filePath = path.join(toFolder, 'src', 'main', 'java', ...javaRobotPackage.split('.'), 'Main.java');
+    await promisifyWriteFile(filePath, mainFile);
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 

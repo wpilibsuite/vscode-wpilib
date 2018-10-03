@@ -4,23 +4,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "vscode-watch",
-      "identifier": "vscode-watch",
-      "group": "build",
-      "isBackground": false,
-      "presentation": {
-          "reveal": "never",
-      },
-      "problemMatcher": [],
-      "dependsOn": ["vscode-main-watch", "vscode-web-watch"]
-    },
-    {
       "type": "npm",
-      "identifier": "vscode-main-watch",
-      "script": "compile",
+      "identifier": "vscode-watch",
+      "script": "watch",
       "problemMatcher": "$tsc-watch",
       "path": "vscode-wpilib/",
-      "isBackground": false,
+      "isBackground": true,
       "presentation": {
         "reveal": "never"
       },
@@ -32,16 +21,17 @@
     {
       "type": "npm",
       "identifier": "vscode-web-watch",
-      "script": "webpack",
+      "script": "webpack-watch",
       "path": "vscode-wpilib/",
-      "isBackground": false,
+      "isBackground": true,
       "presentation": {
         "reveal": "never"
       },
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "problemMatcher": []
     },
     {
       "type": "npm",
