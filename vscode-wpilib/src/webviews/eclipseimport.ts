@@ -7,18 +7,11 @@ import * as vscode from 'vscode';
 import { IPreferencesJson } from '../preferences';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
 import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpage';
 import { WebViewBase } from './webviewbase';
 
 // tslint:disable-next-line:no-var-requires
 const javaProperties = require('java-properties');
-
-interface IImportProject {
-  fromProps: string;
-  toFolder: string;
-  projectName: string;
-  newFolder: boolean;
-  teamNumber: string;
-}
 
 export class EclipseImport extends WebViewBase {
   public static async Create(resourceRoot: string): Promise<EclipseImport> {
@@ -36,8 +29,7 @@ export class EclipseImport extends WebViewBase {
         retainContextWhenHidden: true,
       });
       if (this.webview) {
-        this.webview.webview.onDidReceiveMessage(async (data) => {
-          // tslint:disable-next-line:no-unsafe-any
+        this.webview.webview.onDidReceiveMessage(async (data: IEclipseIPCReceive) => {
           switch (data.type) {
             case 'eclipse':
               await this.handleEclipseButton();
@@ -46,8 +38,9 @@ export class EclipseImport extends WebViewBase {
               await this.handleNewProjectLoc();
               break;
             case 'importproject':
-              // tslint:disable-next-line:no-unsafe-any
-              await this.handleImport(data.data);
+              if (data.data) {
+                await this.handleImport(data.data);
+              }
               break;
             default:
               break;
@@ -55,6 +48,14 @@ export class EclipseImport extends WebViewBase {
         }, undefined, this.disposables);
       }
     }));
+  }
+
+  private async postMessage(data: IEclipseIPCSend): Promise<boolean> {
+    if (this.webview) {
+      return this.webview.webview.postMessage(data);
+    } else {
+      return false;
+    }
   }
 
   private async handleEclipseButton() {
@@ -76,11 +77,11 @@ export class EclipseImport extends WebViewBase {
 
     const oldProjectPath = path.dirname(oldProject[0].fsPath);
     if (this.webview) {
-      await this.webview.webview.postMessage({
+      await this.postMessage({
         data: oldProject[0].fsPath,
         type: 'eclipse',
       });
-      await this.webview.webview.postMessage({
+      await this.postMessage({
         data: path.basename(oldProjectPath),
         type: 'projectname',
       });
@@ -101,14 +102,14 @@ export class EclipseImport extends WebViewBase {
     }
 
     if (this.webview) {
-      await this.webview.webview.postMessage({
+      await this.postMessage({
         data: result[0].fsPath,
         type: 'newproject',
       });
     }
   }
 
-  private async handleImport(data: IImportProject) {
+  private async handleImport(data: IEclipseIPCData) {
     const oldProjectPath = path.dirname(data.fromProps);
 
     const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
@@ -186,6 +187,6 @@ export class EclipseImport extends WebViewBase {
 
   private async asyncInitialize() {
     await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseimport.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'eclipseimport.js'));
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'eclipseimportpage.js'));
   }
 }

@@ -23,30 +23,30 @@
 
   <h1>Welcome to WPILib New Project Creator</h1>
 
-  <button id="projectType" onclick="selectProjectType()">Select a project type (Example or Template)</button>
+  <button id="projectType" >Select a project type (Example or Template)</button>
 
-  <button id="language" onclick="selectLanguage()" disabled>Select a language</button>
+  <button id="language" disabled>Select a language</button>
 
-  <button id="projectBase" onclick="selectProjectBase()" disabled>Select a project base</button>
+  <button id="projectBase" disabled>Select a project base</button>
   <br/>
   <br/> Select a folder to place the new project into.
   <br/>
   <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
-  <button onclick="selectProjectFolder();">Select a new project folder</button>
+  <button id="projectSelectButton" >Select a new project folder</button>
   <br/>
   <br/> Create new folder? Highly recommended to be checked
   <input id="newFolderCB" type="checkbox" checked/>
   <br/>
   <br/>
   <div id="projectnamediv">Enter a project name</div>
-  <input id="projectName" oninput="validateProject();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  <input id="projectName" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
   <div id="teamnumberdiv">Enter a team number</div>
-  <input id="teamNumber" oninput="validateTeamNumber();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  <input id="teamNumber" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
 
-  <button id="generateProject" onclick="generateProject()">Generate Project</button>
+  <button id="generateProject" >Generate Project</button>
 </body>

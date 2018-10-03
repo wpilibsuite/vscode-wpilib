@@ -63,8 +63,8 @@
         {
             "name": "Standalone: All",
             "configurations": [
-                "Electron: Main",
-                "Electron: Renderer"
+                "Standalone: Main",
+                "Standalone: Renderer"
             ]
         }
     ]

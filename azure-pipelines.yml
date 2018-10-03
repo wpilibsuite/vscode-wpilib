@@ -29,32 +29,37 @@ steps:
     npm install
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm install'
-  
+
 - script: |
     npm run compile
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm compile'
-  
+
 - script: |
     npm run lint
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm lint'
-  
+
 - script: |
     npm run gulp
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm gulp'
-  
+
+- script: |
+    npm run webpack
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm webpack'
+
 - script: |
     npm run vscePackage
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm package'
-  
+
 - task: CopyFiles@2
   inputs:
     contents: '**\*.vsix'
     targetFolder: $(Build.ArtifactStagingDirectory)
-  
+
 - task: PublishBuildArtifacts@1
   inputs:
     artifactName: 'VSIX'

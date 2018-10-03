@@ -4,22 +4,8 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from 'vscode-wpilibapi';
 import { extensionContext } from '../utilities';
+import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend } from './pages/projectcreatorpage';
 import { WebViewBase } from './webviewbase';
-
-interface ISelectorData {
-  template: boolean;
-  language: string;
-}
-
-interface ICreateProjectData {
-  template: boolean;
-  language: string;
-  base: string;
-  toFolder: string;
-  newFolder: boolean;
-  projectName: string;
-  teamNumber: string;
-}
 
 export class ProjectCreator extends WebViewBase {
   public static async Create(exampleTemplateApi: IExampleTemplateAPI, resourceRoot: string): Promise<ProjectCreator> {
@@ -40,8 +26,7 @@ export class ProjectCreator extends WebViewBase {
         retainContextWhenHidden: true,
       });
       if (this.webview) {
-        this.webview.webview.onDidReceiveMessage(async (data) => {
-          // tslint:disable-next-line:no-unsafe-any
+        this.webview.webview.onDidReceiveMessage(async (data: IProjectIPCReceive) => {
           switch (data.type) {
             case 'newproject':
               await this.handleNewProjectLoc();
@@ -50,16 +35,19 @@ export class ProjectCreator extends WebViewBase {
               await this.handleProjectType();
               break;
             case 'language':
-              // tslint:disable-next-line:no-unsafe-any
-              await this.handleLanguage(data.data);
+              if (data.data) {
+                await this.handleLanguage(data.data);
+              }
               break;
             case 'base':
-              // tslint:disable-next-line:no-unsafe-any
-              await this.handleBase(data.data);
+              if (data.data) {
+                await this.handleBase(data.data);
+              }
               break;
             case 'createproject':
-              // tslint:disable-next-line:no-unsafe-any
-              await this.createProject(data.data);
+              if (data.data) {
+                await this.createProject(data.data);
+              }
               break;
             default:
               break;
@@ -69,7 +57,15 @@ export class ProjectCreator extends WebViewBase {
     }));
   }
 
-  private async createProject(data: ICreateProjectData) {
+  private async postMessage(data: IProjectIPCSend): Promise<boolean> {
+    if (this.webview) {
+      return this.webview.webview.postMessage(data);
+    } else {
+      return false;
+    }
+  }
+
+  private async createProject(data: IProjectIPCData) {
     await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,
       data.projectName, parseInt(data.teamNumber, 10));
   }
@@ -78,32 +74,32 @@ export class ProjectCreator extends WebViewBase {
     const result = await vscode.window.showQuickPick(['Template', 'Example'], {
       placeHolder: 'Select a project type.',
     });
-    if (result && this.webview) {
-      this.webview.webview.postMessage({
+    if (result) {
+      await this.postMessage({
         data: result === 'Template',
         type: 'projecttype',
       });
     }
   }
 
-  private async handleLanguage(data: ISelectorData) {
+  private async handleLanguage(data: IProjectIPCData) {
     const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getLanguages(data.template), {
       placeHolder: 'Select a language',
     });
-    if (result && this.webview) {
-      this.webview.webview.postMessage({
+    if (result) {
+      await this.postMessage({
         data: result,
         type: 'language',
       });
     }
   }
 
-  private async handleBase(data: ISelectorData) {
+  private async handleBase(data: IProjectIPCData) {
     const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getBases(data.template, data.language), {
       placeHolder: 'Select a project base',
     });
-    if (result && this.webview) {
-      this.webview.webview.postMessage({
+    if (result) {
+      await this.postMessage({
         data: result.label,
         type: 'base',
       });
@@ -124,7 +120,7 @@ export class ProjectCreator extends WebViewBase {
     }
 
     if (this.webview) {
-      await this.webview.webview.postMessage({
+      await this.postMessage({
         data: result[0].fsPath,
         type: 'newproject',
       });
@@ -133,6 +129,6 @@ export class ProjectCreator extends WebViewBase {
 
   private async asyncInitialize() {
     await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'projectcreator.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'projectcreator.js'));
+      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'out', 'projectcreator.js'));
   }
 }

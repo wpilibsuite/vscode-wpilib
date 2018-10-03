@@ -3,10 +3,6 @@
 
 <head>
   <title>WPILib Project Import</title>
-  <script>
-    replacescript
-  </script>
-
   <style>
     .error {
       color: red;
@@ -26,13 +22,13 @@
   Select an eclipse project. Use the build.properties file in the project.
   <br/>
   <input id="eclipseInput" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
-  <button onclick="eclipseSelectButtonClick();">Select an eclipse project.</button>
+  <button id="eclipseSelectButton">Select an eclipse project.</button>
   <br/>
   <br/> Select a folder to place the new project into.
   <br/>
   <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
-  <button onclick="projectSelectButtonClick();">Select a new project folder</button>
+  <button id="projectSelectButton">Select a new project folder</button>
   <br/>
   <br/> Create new folder? Highly recommended to be checked
   <input id="newFolderCB" type="checkbox" checked/>
@@ -42,10 +38,10 @@
   <input id="projectName" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" disabled/>
   <br/>
   <div id="teamnumberdiv">Enter a team number</div>
-  <input id="teamNumber" oninput="validateTeamNumber();" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  <input id="teamNumber" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
-  <button id="importProject" onclick="importProjectButtonClick();">Import Project</button>
+  <button id="importProject">Import Project</button>
 
 </body>
 

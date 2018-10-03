@@ -21,8 +21,14 @@ export abstract class WebViewBase {
   public async loadWebpage(htmlPath: string, scriptPath?: string): Promise<void> {
     this.html = await promisifyReadFile(htmlPath);
     if (scriptPath) {
-      const script = await promisifyReadFile(scriptPath);
-      this.html = this.html.split('replacescript').join(script);
+      const scriptOnDisk = vscode.Uri.file(scriptPath);
+
+      // And get the special URI to use with the webview
+      const scriptResourcePath = scriptOnDisk.with({ scheme: 'vscode-resource' });
+      this.html += '\r\n<script src="';
+      this.html += scriptResourcePath.toString();
+      this.html += '">\r\n';
+      this.html += '\r\n</script>\r\n';
     }
     const onDiskPath = vscode.Uri.file(extensionContext.extensionPath);
     const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });

@@ -56,6 +56,12 @@ build_script:
         throw ("Exec: " + $errorMessage)
     }
 
+    npm run webpack
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
     npm run vscePackage
 
     if ($lastexitcode -eq 0) {

@@ -67,11 +67,16 @@ export class RioLogHTMLProvider implements IHTMLProvider {
   public static async Create(resourceRoot: string): Promise<RioLogHTMLProvider> {
     const provider = new RioLogHTMLProvider();
     const htmlFile = path.join(resourceRoot, 'live.html');
-    const scriptFile = path.join(resourceRoot, 'bundle.js');
+
+    const onDiskPath = vscode.Uri.file(path.join(resourceRoot, 'dist', 'riologpage.js'));
+
+    // And get the special URI to use with the webview
+    const scriptResourcePath = onDiskPath.with({ scheme: 'vscode-resource' });
 
     provider.html = await promisifyReadFile(htmlFile);
-    provider.html += '\r\n<script>\r\n';
-    provider.html += await promisifyReadFile(scriptFile);
+    provider.html += '\r\n<script src="';
+    provider.html += scriptResourcePath.toString();
+    provider.html += '">\r\n';
     provider.html += '\r\n</script>\r\n';
     return provider;
   }
