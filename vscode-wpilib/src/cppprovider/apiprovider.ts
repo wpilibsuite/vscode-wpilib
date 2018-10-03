@@ -76,20 +76,16 @@ export class ApiProvider implements CustomConfigurationProvider {
     // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
 
-    if (this.preferences.getEnableCppIntellisense()) {
-      this.setupWatchers();
-    }
+    this.setupWatchers();
 
     this.loadConfigs().then(async (found) => {
       if (!found) {
-        if (this.preferences.getEnableCppIntellisense()) {
-          const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
-            'Yes', 'No');
-          if (configResult === 'Yes') {
-            await this.runGradleRefresh();
-          }
-          return;
+        const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
+          'Yes', 'No');
+        if (configResult === 'Yes') {
+          await this.runGradleRefresh();
         }
+        return;
       }
     }).catch((err) => {
       logger.error('Rejected load?', err);

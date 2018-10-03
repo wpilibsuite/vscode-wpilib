@@ -22,9 +22,12 @@ export async function activateCppProvider(context: vscode.ExtensionContext, core
 
         if (workspaces !== undefined) {
             for (const wp of workspaces) {
-                const configLoader = new ApiProvider(wp, cppToolsApi, coreExports);
-                context.subscriptions.push(configLoader);
-                configLoaders.push(configLoader);
+                const prefs = coreExports.getPreferencesAPI().getPreferences(wp);
+                if (prefs.getIsWPILibProject() && prefs.getEnableCppIntellisense()) {
+                    const configLoader = new ApiProvider(wp, cppToolsApi, coreExports);
+                    context.subscriptions.push(configLoader);
+                    configLoaders.push(configLoader);
+                }
             }
         }
 
