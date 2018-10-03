@@ -1,5 +1,5 @@
 plugins {
-    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.0"
+    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.2"
     id "base"
 }
 
@@ -93,6 +93,6 @@ if (pubVersion == '') {
 
 apply from: 'versions.gradle'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.7'
+wrapper {
+    gradleVersion = '4.9'
 }
