@@ -6,6 +6,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "CodeLens (Launch) - Program",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "edu.wpi.first.tooling.Program",
+            "args": "",
+            "projectName": "gradle-tooling"
+        },
+        {
             "name": "Extension",
             "type": "extensionHost",
             "request": "launch",

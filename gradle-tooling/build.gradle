@@ -1,0 +1,21 @@
+plugins {
+  id 'java'
+  id 'application'
+  id "com.github.johnrengelman.shadow" version "4.0.1"
+}
+
+repositories {
+    maven { url 'https://repo.gradle.org/gradle/libs-releases' }
+    mavenLocal()
+}
+
+mainClassName = 'edu.wpi.first.tooling.Program'
+
+def toolingApiVersion = '4.10'
+
+dependencies {
+    compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
+    compile 'gradle.plugin.edu.wpi.first:GradleRIO:2019.0.0-beta0-pre3'
+    // The tooling API need an SLF4J implementation available at runtime, replace this with any other implementation
+    runtime 'org.slf4j:slf4j-simple:1.7.10'
+}
