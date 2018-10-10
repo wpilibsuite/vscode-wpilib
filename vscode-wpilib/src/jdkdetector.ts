@@ -4,6 +4,7 @@ import * as cp from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
+import { logger } from './logger';
 import { getIsWindows, promisifyExists } from './utilities';
 
 function getJavacIs11(command: string): Promise<boolean> {
@@ -12,9 +13,11 @@ function getJavacIs11(command: string): Promise<boolean> {
       if (err) {
         resolve(false);
       } else {
+        logger.info('Java Version', stdout);
         if (stdout.startsWith('javac 11')) {
           resolve(true);
         } else {
+
           resolve(false);
         }
       }

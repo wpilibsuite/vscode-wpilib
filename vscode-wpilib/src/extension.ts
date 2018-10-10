@@ -117,7 +117,8 @@ export async function activate(context: vscode.ExtensionContext) {
   if (jdkLoc !== undefined) {
     setJavaHome(jdkLoc);
   } else {
-    await vscode.window.showErrorMessage(localize('extension.noJava', 'Java not found. Might have compilation errors'));
+    await vscode.window.showErrorMessage(localize('extension.noJava',
+                                                  'Java 11 required, but not found. Might have compilation errors'));
   }
 
   // Activate the C++ parts of the extension
