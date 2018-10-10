@@ -5,8 +5,12 @@ plugins {
 }
 
 repositories {
+
     maven { url 'https://repo.gradle.org/gradle/libs-releases' }
     mavenLocal()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
 }
 
 mainClassName = 'edu.wpi.first.tooling.Program'
@@ -16,6 +20,9 @@ def toolingApiVersion = '4.10'
 dependencies {
     compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
     compile 'gradle.plugin.edu.wpi.first:GradleRIO:2019.0.0-beta0-pre3'
+    compile 'javax:javaee-api:8.0'
+    compile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.3'
+    compile 'gradle.plugin.edu.wpi.first:gradle-cpp-vscode:0.6.1'
     // The tooling API need an SLF4J implementation available at runtime, replace this with any other implementation
     runtime 'org.slf4j:slf4j-simple:1.7.10'
 }
