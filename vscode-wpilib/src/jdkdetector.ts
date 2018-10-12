@@ -5,22 +5,34 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { logger } from './logger';
-import { getIsWindows, promisifyExists } from './utilities';
 
-function getJavacIs11(command: string): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
-    cp.exec(command + ' -version', (err, stdout) => {
-      if (err) {
-        resolve(false);
-      } else {
-        logger.info('Java Version', stdout);
-        if (stdout.startsWith('javac 11')) {
-          resolve(true);
-        } else {
+function parseMajorVersion(content: string): number {
+  let regexp = /version "(.*)"/g;
+  let match = regexp.exec(content);
+  if (!match) {
+      return 0;
+  }
+  let version = match[1];
+  // Ignore '1.' prefix for legacy Java versions
+  if (version.startsWith('1.')) {
+      version = version.substring(2);
+  }
 
-          resolve(false);
-        }
-      }
+  // look into the interesting bits now
+  regexp = /\d+/g;
+  match = regexp.exec(version);
+  let javaVersion = 0;
+  if (match) {
+      javaVersion = parseInt(match[0], 10);
+  }
+  return javaVersion;
+}
+
+function getJavaVersion(javaHome: string): Promise<number> {
+  return new Promise((resolve) => {
+    cp.execFile(path.join(javaHome, 'bin', 'java'), ['-version'], {}, (_, __, stderr) => {
+      const javaVersion = parseMajorVersion(stderr);
+      resolve(javaVersion);
     });
   });
 }
@@ -29,58 +41,49 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   // Check for java property, as thats easily user settable, and we want it to win
   const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
   if (vscodeJavaHome) {
-    let javaHomeJavac = path.join(vscodeJavaHome, 'bin', 'javac');
-    javaHomeJavac = getIsWindows() ? javaHomeJavac + '.exe' : javaHomeJavac;
-    if (await promisifyExists(javaHomeJavac)) {
-      const isJava11 = await getJavacIs11(javaHomeJavac);
-      if (isJava11) {
-        return vscodeJavaHome;
-      }
+    const javaVersion = await getJavaVersion(vscodeJavaHome);
+    if (javaVersion >= 11) {
+      logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeJavaHome}`);
+      return vscodeJavaHome;
+    } else {
+      logger.info(`Bad Java version ${javaVersion} at ${vscodeJavaHome}`);
     }
   }
 
   // Then check the FRC home directory for the FRC jdk
   const frcHome = api.getUtilitiesAPI().getWPILibHomeDir();
-  let frcHomeJavac = path.join(frcHome, 'jdk', 'bin', 'javac');
-  frcHomeJavac = getIsWindows() ? frcHomeJavac + '.exe' : frcHomeJavac;
-  if (await promisifyExists(frcHomeJavac)) {
-    const isJava11 = await getJavacIs11(frcHomeJavac);
-    if (isJava11) {
-      return path.join(frcHome, 'jdk');
+  {
+    const frcHomeJava = path.join(frcHome, 'jdk');
+    const javaVersion = await getJavaVersion(frcHomeJava);
+    if (javaVersion >= 11) {
+      logger.log(`Found Java Home Version: ${javaVersion} at ${frcHomeJava}`);
+      return frcHomeJava;
+    } else {
+      logger.info(`Bad Java version ${javaVersion} at ${frcHomeJava}`);
     }
   }
 
   // Check for java home
   const javaHome = process.env.JAVA_HOME;
   if (javaHome !== undefined) {
-    let javaHomeJavac = path.join(javaHome, 'bin', 'javac');
-    javaHomeJavac = getIsWindows() ? javaHomeJavac + '.exe' : javaHomeJavac;
-    if (await promisifyExists(javaHomeJavac)) {
-      const isJava11 = await getJavacIs11(javaHomeJavac);
-      if (isJava11) {
-        return javaHome;
-      }
+    const javaVersion = await getJavaVersion(javaHome);
+    if (javaVersion >= 11) {
+      logger.log(`Found Java Home Version: ${javaVersion} at ${javaHome}`);
+      return javaHome;
+    } else {
+      logger.info(`Bad Java version ${javaVersion} at ${javaHome}`);
     }
   }
 
   // Check for jdk home
   const jdkHome = process.env.JDK_HOME;
   if (jdkHome !== undefined) {
-    let jdkHomeJavac = path.join(jdkHome, 'bin', 'javac');
-    jdkHomeJavac = getIsWindows() ? jdkHomeJavac + '.exe' : jdkHomeJavac;
-    if (await promisifyExists(jdkHomeJavac)) {
-      const isJava11 = await getJavacIs11(jdkHomeJavac);
-      if (isJava11) {
-        return jdkHome;
-      }
-    }
-  }
-
-  // Finally check path
-  {
-    const isJava11 = await getJavacIs11('javac');
-    if (isJava11) {
-      return '';
+    const javaVersion = await getJavaVersion(jdkHome);
+    if (javaVersion >= 11) {
+      logger.log(`Found Java Home Version: ${javaVersion} at ${jdkHome}`);
+      return jdkHome;
+    } else {
+      logger.info(`Bad Java version ${javaVersion} at ${jdkHome}`);
     }
   }
 
