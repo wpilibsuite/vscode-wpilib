@@ -66,6 +66,10 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async createProject(data: IProjectIPCData) {
+    if (!path.isAbsolute(data.toFolder)) {
+      await vscode.window.showErrorMessage('Can only extract to absolute path');
+      return;
+    }
     await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,
       data.projectName, parseInt(data.teamNumber, 10));
   }
@@ -129,6 +133,6 @@ export class ProjectCreator extends WebViewBase {
 
   private async asyncInitialize() {
     await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'projectcreator.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'out', 'projectcreator.js'));
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'projectcreatorpage.js'));
   }
 }
