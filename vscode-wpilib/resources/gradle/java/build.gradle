@@ -29,13 +29,13 @@ deploy {
             files = fileTree(dir: 'src/main/deploy')
             // Deploy to RoboRIO target, into /home/lvuser/deploy
             targets << "roborio"
-            directory = 'deploy'
+            directory = '/home/lvuser/deploy'
         }
     }
 }
 
-// Defining my dependencies. In this case, WPILib (+ friends), CTRE Toolsuite (Talon SRX)
-// and NavX.
+// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
+// Also defines JUnit 4.
 dependencies {
     compile wpilib()
     compile javaVendorLibraries()
@@ -54,6 +54,4 @@ jar {
 
 wrapper {
     gradleVersion = '4.9'
-    distributionPath = 'permwrappers/dists'
-    archivePath = 'permwrappers/dists'
 }

@@ -29,7 +29,7 @@ deploy {
             files = fileTree(dir: 'src/main/deploy')
             // Deploy to RoboRIO target, into /home/lvuser/deploy
             targets << "roborio"
-            directory = 'deploy'
+            directory = '/home/lvuser/deploy'
         }
     }
 }
@@ -58,7 +58,7 @@ model {
                 }
             }
 
-            // Defining my dependencies. In this case, WPILib (+ friends)
+            // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
             useLibrary(it, "wpilib")
             useCppVendorLibraries(it)
         }
@@ -82,6 +82,4 @@ model {
 
 wrapper {
     gradleVersion = '4.9'
-    distributionPath = 'permwrappers/dists'
-    archivePath = 'permwrappers/dists'
 }
