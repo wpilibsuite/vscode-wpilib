@@ -53,7 +53,7 @@ class CodeTester implements ICodeBuilder {
   }
 
   public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'test';
+    const command = 'check';
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Test', this.executeApi, prefs);
 

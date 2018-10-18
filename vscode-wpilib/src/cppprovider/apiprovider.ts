@@ -17,6 +17,10 @@ function hasDriveLetter(pth: string): boolean {
   return isWindows && pth[1] === ':';
 }
 
+function getToolchainName(toolchain: IToolChain): string {
+  return `${toolchain.name} (${toolchain.buildType})`;
+}
+
 function normalizeDriveLetter(pth: string): string {
   if (hasDriveLetter(pth)) {
     return pth.charAt(0).toUpperCase() + pth.slice(1);
@@ -177,7 +181,17 @@ export class ApiProvider implements CustomConfigurationProvider {
     }
 
     if (this.selectedName.Value === 'none') {
-      this.selectedName.Value = this.toolchains[0].name;
+      // Look for roborio release first
+      const c = this.toolchains[0];
+      let name = getToolchainName(c);
+      for (const t of this.toolchains) {
+        if (t.name === 'roborio' && t.buildType === 'release') {
+          name = getToolchainName(t);
+          break;
+        }
+      }
+
+      this.selectedName.Value = name;
       this.statusBar.text = this.selectedName.Value;
     }
 
@@ -189,7 +203,16 @@ export class ApiProvider implements CustomConfigurationProvider {
     }
 
     if (!found) {
-      this.selectedName.Value = this.toolchains[0].name;
+      // Look for roborio release first
+      const c = this.toolchains[0];
+      let name = getToolchainName(c);
+      for (const t of this.toolchains) {
+        if (t.name === 'roborio' && t.buildType === 'release') {
+          name = getToolchainName(t);
+          break;
+        }
+      }
+      this.selectedName.Value = name;
       this.statusBar.text = this.selectedName.Value;
     }
 
@@ -209,7 +232,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   public async selectToolChain(): Promise<void> {
     const selections: string[] = [];
     for (const c of this.toolchains) {
-      selections.push(c.name);
+      selections.push(`${c.name} (${c.buildType})`);
     }
     if (selections.length === 0) {
       const configResult = await vscode.window.showInformationMessage('No intellisense configured. Would you like to enable intellisense?',
@@ -298,7 +321,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     const normalizedPath = normalizeDriveLetter(uri.fsPath);
 
     for (const tc of this.toolchains) {
-      if (tc.name === this.selectedName.Value) {
+      if (getToolchainName(tc) === this.selectedName.Value) {
         for (const sb of tc.sourceBinaries) {
           for (const source of sb.source.srcDirs) {
             if (normalizedPath.startsWith(source)) {
