@@ -28,7 +28,7 @@ class VbsToolRunner implements IToolRunner {
     return new Promise<boolean>((resolve, _reject) => {
       if (getIsWindows()) {
         // If windows, run the vbs script
-        cp.exec(`wscript.exe ${this.toolScript} silent`, (err) => {
+        cp.exec(`wscript.exe ${this.toolScript}`, (err) => {
           if (err) {
             resolve(false);
           } else {
@@ -36,7 +36,7 @@ class VbsToolRunner implements IToolRunner {
           }
         });
       } else {
-        // Unix, run as javaw
+        // Unix, run as java
         cp.exec(`java -jar ${this.toolScript}`, (err) => {
           if (err) {
             resolve(false);
