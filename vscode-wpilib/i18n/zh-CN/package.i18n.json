@@ -25,5 +25,6 @@
 	"wpilibcore.setJavaHome.title": "Set Java Home", // TODO: Needs to be translated
 	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates", // TODO: Needs to be translated
 	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO", // TODO: Needs to be translated
-	"wpilibcore.showLogFolder.title": "Show Log Folder" // TODO: Needs to be translated
+	"wpilibcore.showLogFolder.title": "Show Log Folder", // TODO: Needs to be translated
+	"wpilibcore.runGradleCommand.title": "Run a command in Gradle" // TODO: Needs to be translated
 }

@@ -6,7 +6,7 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
-import { javaHome, promisifyExists } from './utilities';
+import { gradleRun, javaHome, promisifyExists } from './utilities';
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command
@@ -275,5 +275,25 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       mainLog = path.dirname(mainLog);
     }
     await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.runGradleCommand', async () => {
+    const command = await vscode.window.showInputBox({
+      placeHolder: 'command',
+      prompt: 'Enter Gradle command to run',
+    });
+    if (command === undefined) {
+      return;
+    }
+    const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
+    if (wp === undefined) {
+      vscode.window.showInformationMessage('Cannot run command on empty workspace');
+      return;
+    }
+    const prefs = externalApi.getPreferencesAPI().getPreferences(wp);
+    const result = await gradleRun(command, wp.uri.fsPath, wp, 'Gradle Command', externalApi.getExecuteAPI(), prefs);
+    if (result !== 0) {
+      vscode.window.showInformationMessage(`Command (${command}) returned code: ${result}`);
+    }
   }));
 }

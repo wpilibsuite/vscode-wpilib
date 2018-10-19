@@ -25,5 +25,6 @@
 	"wpilibcore.setJavaHome.title": "Set Java Home",
 	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates",
 	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO",
-	"wpilibcore.showLogFolder.title": "Show Log Folder"
+	"wpilibcore.showLogFolder.title": "Show Log Folder",
+	"wpilibcore.runGradleCommand.title": "Run a command in Gradle"
 }
