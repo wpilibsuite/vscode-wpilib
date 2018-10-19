@@ -218,37 +218,33 @@ export class VendorLibraries {
   private async offlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
 
-    if (installedDeps.length !== 0) {
-      const availableDeps = await this.getHomeDirDeps();
-      const updatableDeps = [];
-      for (const ad of availableDeps) {
-        let foundDep = false;
-        for (const id of installedDeps) {
-          if (id.uuid === ad.uuid) {
-            foundDep = true;
-            continue;
-          }
-        }
-        if (!foundDep) {
-          updatableDeps.push(new LibraryQuickPick(ad));
+    const availableDeps = await this.getHomeDirDeps();
+    const updatableDeps = [];
+    for (const ad of availableDeps) {
+      let foundDep = false;
+      for (const id of installedDeps) {
+        if (id.uuid === ad.uuid) {
+          foundDep = true;
+          continue;
         }
       }
-      if (updatableDeps.length !== 0) {
-        const toInstall = await vscode.window.showQuickPick(updatableDeps, {
-          canPickMany: true,
-          placeHolder: 'Check to install',
-        });
+      if (!foundDep) {
+        updatableDeps.push(new LibraryQuickPick(ad));
+      }
+    }
+    if (updatableDeps.length !== 0) {
+      const toInstall = await vscode.window.showQuickPick(updatableDeps, {
+        canPickMany: true,
+        placeHolder: 'Check to install',
+      });
 
-        if (toInstall !== undefined) {
-          for (const ti of toInstall) {
-            await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
-          }
+      if (toInstall !== undefined) {
+        for (const ti of toInstall) {
+          await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
         }
-      } else {
-        await vscode.window.showInformationMessage('No new dependencies available');
       }
     } else {
-      await vscode.window.showInformationMessage('No dependencies installed');
+      await vscode.window.showInformationMessage('No new dependencies available');
     }
   }
 
