@@ -16,7 +16,8 @@ export interface IToolAPI {
 }
 
 export interface IExecuteAPI {
-  executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number>;
+  executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder,
+                 env?: { [key: string]: string }): Promise<number>;
   cancelCommands(): Promise<number>;
 }
 
