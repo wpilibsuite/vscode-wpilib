@@ -24,7 +24,7 @@ export class UtilitiesAPI implements IUtilitiesAPI {
       this.wpilibHome = path.join(publicFolder, `frc${year}`);
     } else {
       const dir = os.homedir();
-      this.wpilibHome = path.join(dir, `frcd${year}`);
+      this.wpilibHome = path.join(dir, `frc${year}`);
     }
     return this.wpilibHome;
   }
