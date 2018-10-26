@@ -6,12 +6,12 @@
 	"wpilibcore.testCode.title": "测试机器人代码",
 	"wpilibcore.deployCode.title": "部署机器人代码",
 	"wpilibcore.debugCode.title": "调试机器人代码",
-	"wpilibcore.simulateCode.title": "在电脑上仿真运行机器人代码",
+	"wpilibcore.simulateCode.title": "在电脑上模拟运行机器人代码",
 	"wpilibcore.setLanguage.title": "设置语言",
 	"wpilibcore.setAutoSave.title": "设置部署时自动保存",
 	"wpilibcore.setSkipTests.title": "设置是否跳过测试",
-	"wpilibcore.setOnline.title": "设置是否在“在线模式”中运行命令", // TODO: needs to be improved
-	"wpilibcore.setStopSimulationOnEntry.title": "设置是否在进入时停止仿真", // TODO: needs to be improved
+	"wpilibcore.setOnline.title": "设置“模式”是否为“在线模式”",
+	"wpilibcore.setStopSimulationOnEntry.title": "设置是否在进入时停止模拟运行",
 	"wpilibcore.setStartRioLog.title": "设置是否在部署时启动 RioLog",
 	"wpilibcore.createCommand.title": "创建一个新的类/命令",
 	"wpilibcore.cancelTasks.title": "取消正在运行的任务",
@@ -21,10 +21,10 @@
 	"wpilibcore.selectCppToolchain.title": "选择当前的 C++ 工具链",
 	"wpilibcore.importEclipseProject.title": "将 Eclipse 项目迁移到 VSCode",
 	"wpilibcore.createNewProject.title": "创建一个新项目",
-	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries", // TODO: Needs to be translated
-	"wpilibcore.setJavaHome.title": "Set Java Home", // TODO: Needs to be translated
-	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates", // TODO: Needs to be translated
-	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO", // TODO: Needs to be translated
-	"wpilibcore.showLogFolder.title": "Show Log Folder", // TODO: Needs to be translated
-	"wpilibcore.runGradleCommand.title": "Run a command in Gradle" // TODO: Needs to be translated
+	"wpilibcore.manageVendorLibs.title": "管理外部供应商库",
+	"wpilibcore.setJavaHome.title": "设置 Java 环境",
+	"wpilibcore.checkForUpdates.title": "检查 WPILib 更新",
+	"wpilibcore.installGradleTools.title": "从 GradleRIO 安装工具",
+	"wpilibcore.showLogFolder.title": "显示目录文件夹",
+	"wpilibcore.runGradleCommand.title": "在 Gradle 中运行命令" 
 }
