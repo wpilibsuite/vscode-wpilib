@@ -27,6 +27,7 @@ import { setExtensionContext, setJavaHome } from './utilities';
 import { UtilitiesAPI } from './utilitiesapi';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
+import { AlphaError } from './webviews/alphaerror';
 import { EclipseImport } from './webviews/eclipseimport';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
@@ -96,6 +97,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(context.extensionPath, 'resources');
+
+  if (vscode.extensions.getExtension('wpifirst.vscode-wpilib') !== undefined) {
+    const alphaError = await AlphaError.Create(extensionResourceLocation);
+    alphaError.displayPage();
+    context.subscriptions.push(alphaError);
+    return;
+  }
 
   // The external API can be used by other extensions that want to use our
   // functionality. Its definition is provided in shared/externalapi.ts.
