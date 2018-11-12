@@ -34,11 +34,13 @@ export class WPILibUpdates {
     }
     const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
     if (newVersion !== undefined) {
-      const result = await vscode.window.showInformationMessage
-                           (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
-      if (result !== undefined && result === 'Yes') {
-        await this.setGradleRIOVersion(newVersion, wp);
-      }
+      vscode.window.showInformationMessage
+                    (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No')
+                    .then(async (result) => {
+                      if (result !== undefined && result === 'Yes') {
+                        await this.setGradleRIOVersion(newVersion, wp);
+                      }
+                    });
     }
   }
 

@@ -187,8 +187,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
         if (prefs.getProjectYear() !== 'Beta2019') {
-          await vscode.window
-                      .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
+          vscode.window
+                .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
           continue;
         }
         await wpilibUpdate.checkForInitialUpdate(w);
