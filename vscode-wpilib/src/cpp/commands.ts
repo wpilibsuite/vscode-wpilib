@@ -210,16 +210,16 @@ export class Commands {
               includeRoot = folder;
             } else if (rootSrc === 0) {
               const filePath = path.relative('cpp', workspaceRooted);
-              srcFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'cpp', filePath));
-              headerFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'include', filePath));
-              includeRoot = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'include'));
+              srcFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'main', 'cpp', filePath));
+              headerFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'main', 'include', filePath));
+              includeRoot = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'main', 'include'));
               // Current folder is src
 
             } else {
               const filePath = path.relative('include', workspaceRooted);
-              srcFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'cpp', filePath));
-              headerFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'include', filePath));
-              includeRoot = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'include'));
+              srcFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'main', 'cpp', filePath));
+              headerFolder = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'main', 'include', filePath));
+              includeRoot = vscode.Uri.file(path.join(workspace.uri.path, 'src', 'main', 'include'));
               // current folder is include
             }
             return performCopy(commandFolder, c, srcFolder, headerFolder, includeRoot, className);
