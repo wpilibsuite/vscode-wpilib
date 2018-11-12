@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
+import { logger } from './logger';
 import { promisifyMkdirp, promisifyReadDir } from './shared/generator';
 import { promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
 
@@ -345,14 +346,19 @@ export class VendorLibraries {
   }
 
   private async readFile(file: string): Promise<IJsonDependency | undefined> {
-    const jsonContents = await promisifyReadFile(file);
-    const dep = JSON.parse(jsonContents);
+    try {
+      const jsonContents = await promisifyReadFile(file);
+      const dep = JSON.parse(jsonContents);
 
-    if (isJsonDependency(dep)) {
-      return dep;
+      if (isJsonDependency(dep)) {
+        return dep;
+      }
+
+      return undefined;
+    } catch (err) {
+      logger.warn('JSON parse error', err);
+      return undefined;
     }
-
-    return undefined;
   }
 
   private async getDependencies(dir: string): Promise<IJsonDependency[]> {
