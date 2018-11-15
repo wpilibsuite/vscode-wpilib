@@ -16,7 +16,7 @@
             "outFiles": [
                 "${workspaceFolder}/vscode-wpilib/out/**/*.js"
             ],
-            "preLaunchTask": "vscode-watch"
+            "preLaunchTask": "vscode-web-watch"
         },
         {
             "name": "Extension Tests",
@@ -30,7 +30,7 @@
             "outFiles": [
                 "${workspaceFolder}/vscode-wpilib/out/test/**/*.js"
             ],
-            "preLaunchTask": "vscode-watch"
+            "preLaunchTask": "vscode-web-watch"
         },
         {
             "type": "node",

@@ -38,12 +38,6 @@ build_script:
         throw ("Exec: " + $errorMessage)
     }
 
-    npm run compile
-
-    if ($lastexitcode -ne 0) {
-        throw ("Exec: " + $errorMessage)
-    }
-
     npm run lint
 
     if ($lastexitcode -ne 0) {

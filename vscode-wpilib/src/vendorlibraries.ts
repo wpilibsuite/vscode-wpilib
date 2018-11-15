@@ -1,6 +1,6 @@
 'use scrict';
 
-import fetch from 'node-fetch';
+import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
