@@ -67,6 +67,8 @@ build_script:
 
     if ($lastexitcode -eq 0) {
         echo $lastexitcode
+    } else {
+        throw ("Exec: " + $errorMessage)
     }
 
     cd ..

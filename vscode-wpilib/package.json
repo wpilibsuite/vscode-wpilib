@@ -361,7 +361,7 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "gulp build update-activation && npm run lint && npm run webpack --mode production",
+        "vscode:prepublish": "gulp build update-activation && npm run lint && webpack --mode production",
         "clean": "rmdir-cli out",
         "lint": "tslint -c tslint.json -p tsconfig.json",
         "webpack": "webpack --mode development",
