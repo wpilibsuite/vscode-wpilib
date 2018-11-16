@@ -5,11 +5,24 @@
 
 const gulp = require('gulp');
 
+const ts = require('gulp-typescript');
+const typescript = require('typescript');
+const sourcemaps = require('gulp-sourcemaps');
 const jsontransform = require('gulp-json-transform');
+const del = require('del');
+const nls = require('vscode-nls-dev');
+
+// If all VS Code langaues are support you can use nls.coreLanguages
+const languages = [{
+	id: 'zh-CN'
+}];
+
 const defaultActivationEvents = [
 	"workspaceContains:.wpilib/wpilib_preferences.json",
 	"workspaceContains:build/vscodeconfig.json"
 ]
+
+//---- internal
 
 function updateActivationCommands() {
 	return gulp.src(['./package.json'])
@@ -30,3 +43,17 @@ function updateActivationCommands() {
 gulp.task('update-activation', () => {
 	return updateActivationCommands();
 });
+
+gulp.task('add-i18n', function() {
+	return gulp.src(['package.nls.json'])
+		.pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
+		.pipe(gulp.dest('.'));
+});
+
+gulp.task('clean', function() {
+	return del(['package.nls.*.json', 'vscode-wpilib*.vsix']);
+})
+
+gulp.task('build', gulp.series('clean', 'add-i18n', 'update-activation'));
+
+gulp.task('default', gulp.series('build'));
