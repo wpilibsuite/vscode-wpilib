@@ -57,11 +57,25 @@ module.exports = [{
         type: "javascript/auto",
       },
       {
-      test: /\.ts$/,
-      exclude: /node_modules/,
-      use: [{
-        loader: 'ts-loader',
-      }]
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: [{
+          // vscode-nls-dev loader:
+          // * rewrite nls-calls
+          loader: 'vscode-nls-dev/lib/webpack-loader',
+          options: {
+            base: path.join(__dirname, 'src')
+          }
+        }, {
+          // configure TypeScript loader:
+          // * enable sources maps for end-to-end source maps
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              "sourceMap": true,
+            }
+          }
+        }]
     }]
   },
 }

@@ -361,15 +361,15 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "gulp build update-activation && npm run lint && webpack --mode production",
+        "vscode:prepublish": "gulp update-activation && npm run lint && webpack --mode production",
         "clean": "rmdir-cli out",
         "lint": "tslint -c tslint.json -p tsconfig.json",
         "webpack": "webpack --mode development",
         "webpack-watch": "webpack --mode development --watch",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
         "gulp": "gulp",
+        "test": "npm run webpack && node ./node_modules/vscode/bin/test",
         "updateActivation": "gulp update-activation",
         "vscePackage": "vsce package"
     },
