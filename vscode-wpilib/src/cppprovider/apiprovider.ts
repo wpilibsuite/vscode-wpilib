@@ -9,6 +9,7 @@ import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
 import { gradleRun, promisifyReadFile } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
+import { HeaderExplorer } from './headertreeprovider';
 import { IToolChain } from './jsonformats';
 
 const isWindows = (process.platform === 'win32');
@@ -39,6 +40,8 @@ export class ApiProvider implements CustomConfigurationProvider {
   private cppToolsApi: CppToolsApi;
   private registered: boolean = false;
   private preferences: IPreferences;
+
+  private headerTreeProvider: HeaderExplorer = new HeaderExplorer();
 
   private toolchains: IToolChain[] = [];
   private foundFiles: SourceFileConfigurationItem[] = [];
@@ -82,6 +85,8 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.setupWatchers();
 
+    this.disposables.push(this.headerTreeProvider);
+
     this.loadConfigs().then(async (found) => {
       if (!found) {
         const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
@@ -103,7 +108,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     const browsePath: string[] = [];
     let compilerPath;
     for (const tc of this.toolchains) {
-      if (tc.name === this.selectedName.Value) {
+      if (getToolchainName(tc) === this.selectedName.Value) {
         // Found our TC
         compilerPath = tc.cppPath;
         browsePath.push(...tc.allLibFiles);
@@ -199,6 +204,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     for (const t of this.toolchains) {
       if (t.name === this.selectedName.Value) {
         found = true;
+        break;
       }
     }
 
@@ -221,12 +227,31 @@ export class ApiProvider implements CustomConfigurationProvider {
     if (!this.registered) {
       this.registered = true;
       this.cppToolsApi.notifyReady(this);
+      const currentToolChain = this.getCurrentToolChain();
+      if (currentToolChain) {
+        this.headerTreeProvider.updateToolChains(currentToolChain);
+      }
+      await vscode.commands.executeCommand('setContext', 'isWPILibProvidedCpp', true);
     } else {
+      const currentToolChain = this.getCurrentToolChain();
+      if (currentToolChain) {
+        this.headerTreeProvider.updateToolChains(currentToolChain);
+      }
       this.cppToolsApi.didChangeCustomConfiguration(this);
     }
 
     this.statusBar.show();
     return true;
+  }
+
+  public getCurrentToolChain(): IToolChain | undefined {
+    for (const tc of this.toolchains) {
+      if (getToolchainName(tc) === this.selectedName.Value) {
+        // Found our TC
+        return tc;
+      }
+    }
+    return undefined;
   }
 
   public async selectToolChain(): Promise<void> {
@@ -251,6 +276,10 @@ export class ApiProvider implements CustomConfigurationProvider {
       }
       this.selectedName.Value = result;
       this.statusBar.text = result;
+      const currentToolChain = this.getCurrentToolChain();
+      if (currentToolChain) {
+        this.headerTreeProvider.updateToolChains(currentToolChain);
+      }
       this.cppToolsApi.didChangeCustomConfiguration(this);
     }
   }
