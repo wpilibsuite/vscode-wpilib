@@ -277,6 +277,15 @@
                 "category": "WPILib"
             }
         ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "cppDependencies",
+                    "name": "C++ Dependencies",
+                    "when": "isWPILibProvidedCpp"
+                }
+            ]
+        },
         "keybindings": [
             {
                 "command": "wpilibcore.deployCode",
