@@ -99,17 +99,22 @@ export class FileStat implements vscode.FileStat {
 interface Entry {
   uri: vscode.Uri;
   type: vscode.FileType;
+  binaryName?: string;
+  binaryFiles?: string[];
 }
 
 //#endregion
 
 export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
 
-  private libRoots: string[] = [];
+  private toolchains: IToolChain | undefined;
 
   private _onDidChangeFile: vscode.EventEmitter<Entry | undefined | null>;
 
-  constructor() {
+  private wpilibIcon: vscode.Uri;
+
+  constructor(resourceRoot: string) {
+    this.wpilibIcon = vscode.Uri.file(path.join(resourceRoot, 'wpilib.svg'));
     this._onDidChangeFile = new vscode.EventEmitter<Entry | undefined | null>();
   }
 
@@ -118,53 +123,16 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
   }
 
   public updateToolChains(toolchains: IToolChain) {
-    this.libRoots = [];
-    for (const l of toolchains.allLibFiles) {
-      if (l.indexOf('-sources.zip') === -1) {
-        this.libRoots.push(l);
-      }
-    }
+    this.toolchains = toolchains;
     this._onDidChangeFile.fire(undefined);
   }
 
-  public async getChildren(element?: Entry): Promise<Entry[]> {
-
+  public getChildren(element?: Entry): Promise<Entry[]> {
     if (element) {
-      const dirChildren = await this.readDirectory(element.uri);
-      dirChildren.sort((a, b) => {
-        if (a[1] === b[1]) {
-          return a[0].localeCompare(b[0]);
-        }
-        return a[1] === vscode.FileType.Directory ? -1 : 1;
-      });
-      return dirChildren.map(([name, type]) => ({ uri: vscode.Uri.file(path.join(element.uri.fsPath, name)), type }));
+      return this.getChildrenElement(element);
+    } else {
+      return this.getChildrenRoot();
     }
-
-    const entries: Entry[] = [];
-
-    const children = [];
-
-    for (const root of this.libRoots) {
-      const dirRead = await this.readDirectory(vscode.Uri.file(root));
-      for (const d of dirRead) {
-        if (root.indexOf('wpilibc-cpp-') === -1) {
-          children.push({dir: d, root});
-        } else {
-          // TODO: Remove shim headers
-          children.push({dir: d, root});
-        }
-      }
-    }
-
-    children.sort((a, b) => {
-      if (a.dir[1] === b.dir[1]) {
-        return a.dir[0].localeCompare(b.dir[0]);
-      }
-      return a.dir[1] === vscode.FileType.Directory ? -1 : 1;
-    });
-    entries.push(...children.map(({dir, root}) => ({ uri: vscode.Uri.file(path.join(root, dir[0])), type: dir[1] })));
-
-    return entries;
   }
 
   public getTreeItem(element: Entry): vscode.TreeItem {
@@ -174,7 +142,71 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
       treeItem.command = { command: 'fileExplorer.openFile', title: 'Open File', arguments: [element.uri] };
       treeItem.contextValue = 'file';
     }
+    if (element.binaryName !== undefined) {
+      treeItem.label = element.binaryName;
+      treeItem.iconPath = this.wpilibIcon;
+      treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+    }
     return treeItem;
+  }
+
+  private async getChildrenElement(element: Entry): Promise<Entry[]> {
+    if (element.binaryFiles !== undefined) {
+      // Root
+      const entries: Entry[] = [];
+
+      const children = [];
+
+      for (const root of element.binaryFiles) {
+        const dirRead = await this.readDirectory(vscode.Uri.file(root));
+        for (const d of dirRead) {
+          if (root.indexOf('wpilibc-cpp-') === -1) {
+            children.push({dir: d, root});
+          } else {
+            // TODO: Remove shim headers
+            children.push({dir: d, root});
+          }
+        }
+      }
+
+      children.sort((a, b) => {
+        if (a.dir[1] === b.dir[1]) {
+          return a.dir[0].localeCompare(b.dir[0]);
+        }
+        return a.dir[1] === vscode.FileType.Directory ? -1 : 1;
+      });
+      entries.push(...children.map(({dir, root}) => ({ uri: vscode.Uri.file(path.join(root, dir[0])), type: dir[1] })));
+
+      return entries;
+    } else {
+      // Dir
+      const dirChildren = await this.readDirectory(element.uri);
+      dirChildren.sort((a, b) => {
+        if (a[1] === b[1]) {
+          return a[0].localeCompare(b[0]);
+        }
+        return a[1] === vscode.FileType.Directory ? -1 : 1;
+      });
+      return dirChildren.map(([name, type]) => ({ uri: vscode.Uri.file(path.join(element.uri.fsPath, name)), type }));
+    }
+  }
+
+  private async getChildrenRoot(): Promise<Entry[]>  {
+    const entries: Entry[] = [];
+
+    if (this.toolchains === undefined) {
+      return entries;
+    }
+
+    for (const bin of this.toolchains.binaries) {
+      entries.push({binaryFiles: bin.libHeaders, binaryName: bin.componentName, type: vscode.FileType.Unknown,
+                    uri: vscode.Uri.file(bin.componentName)});
+    }
+
+    entries.push({binaryFiles: this.toolchains.allLibFiles, binaryName: 'All Files',
+                  type: vscode.FileType.Unknown, uri: vscode.Uri.file('all')});
+
+    return entries;
   }
 
   private async _stat(pth: string): Promise<vscode.FileStat> {
@@ -201,10 +233,10 @@ export class HeaderExplorer {
   private fileExplorer: vscode.TreeView<Entry>;
   private treeDataProvider: HeaderTreeProvider;
 
-  constructor() {
-    this.treeDataProvider = new HeaderTreeProvider();
+  constructor(resourceRoot: string) {
+    this.treeDataProvider = new HeaderTreeProvider(resourceRoot);
     this.fileExplorer = vscode.window.createTreeView('cppHeaders', { treeDataProvider: this.treeDataProvider });
-    vscode.commands.registerCommand('fileExplorer.openFile', (resource) => this.openResource(resource));
+    vscode.commands.registerCommand('fileExplorer.openFile', (resource: vscode.Uri) => this.openResource(resource));
   }
 
   public updateToolChains(toolchains: IToolChain) {

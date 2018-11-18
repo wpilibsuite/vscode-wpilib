@@ -41,7 +41,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   private registered: boolean = false;
   private preferences: IPreferences;
 
-  private headerTreeProvider: HeaderExplorer = new HeaderExplorer();
+  private headerTreeProvider: HeaderExplorer;
 
   private toolchains: IToolChain[] = [];
   private foundFiles: SourceFileConfigurationItem[] = [];
@@ -55,12 +55,13 @@ export class ApiProvider implements CustomConfigurationProvider {
 
   private executeApi: IExecuteAPI;
 
-  constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI) {
+  constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI, resourceRoot: string) {
     this.preferences = externalApi.getPreferencesAPI().getPreferences(workspace);
     this.workspace = workspace;
     this.cppToolsApi = cppToolsApi;
     this.executeApi = externalApi.getExecuteAPI();
     this.cppToolsApi.registerCustomConfigurationProvider(this);
+    this.headerTreeProvider = new HeaderExplorer(resourceRoot);
 
     const fsPath = workspace.uri.fsPath;
 
