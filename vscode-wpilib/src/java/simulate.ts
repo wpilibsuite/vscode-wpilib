@@ -14,7 +14,7 @@ export interface ISimulateCommands {
 export async function startSimulation(commands: ISimulateCommands): Promise<void> {
   const config: vscode.DebugConfiguration = {
     args: commands.robotclass,
-    console: 'externalTerminal',
+    console: 'integratedTerminal',
     cwd: commands.workspace.uri.fsPath,
     env: {
       HALSIM_EXTENSIONS: commands.extensions,
