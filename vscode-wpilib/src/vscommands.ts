@@ -7,6 +7,7 @@ import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
 import { gradleRun, javaHome, promisifyExists } from './utilities';
+import { WPILibUpdates } from './wpilibupdates';
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command
@@ -295,5 +296,16 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     if (result !== 0) {
       vscode.window.showInformationMessage(`Command (${command}) returned code: ${result}`);
     }
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.resetAutoUpdate', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot reset auto update with an empty workspace');
+      return;
+    }
+    const persistState = WPILibUpdates.getUpdatePersistentState(workspace);
+    persistState.Value = false;
   }));
 }

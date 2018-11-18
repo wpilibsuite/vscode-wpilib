@@ -275,6 +275,11 @@
                 "command": "wpilibcore.runGradleCommand",
                 "title": "%wpilibcore.runGradleCommand.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.resetAutoUpdate",
+                "title": "%wpilibcore.resetAutoUpdate.title%",
+                "category": "WPILib"
             }
         ],
         "views": {

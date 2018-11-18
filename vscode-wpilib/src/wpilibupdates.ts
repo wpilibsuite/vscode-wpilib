@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import * as xml2js from 'xml2js';
 import { logger } from './logger';
+import { PersistentFolderState } from './persistentState';
 import { promisifyReadDir } from './shared/generator';
 import { promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
 
@@ -14,6 +15,10 @@ function getGradleRioRegex() {
 }
 
 export class WPILibUpdates {
+  public static getUpdatePersistentState(workspace: vscode.WorkspaceFolder): PersistentFolderState<boolean> {
+    return new PersistentFolderState('wpilib.projectUpdate', false, workspace.uri.fsPath);
+  }
+
   private externalApi: IExternalAPI;
   private disposables: vscode.Disposable[] = [];
 
@@ -33,12 +38,17 @@ export class WPILibUpdates {
       return;
     }
     const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
-    if (newVersion !== undefined) {
+    const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
+    if (newVersion !== undefined && persistentState.Value === false) {
       vscode.window.showInformationMessage
-                    (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No')
+                    (`WPILib update (${newVersion}) found, would you like to install it?`, {
+                      modal: true,
+                    }, 'Yes', 'No', 'No, Don\'t ask again')
                     .then(async (result) => {
                       if (result !== undefined && result === 'Yes') {
                         await this.setGradleRIOVersion(newVersion, wp);
+                      } else if (result !== undefined && result === 'No, Don\'t ask again') {
+                        persistentState.Value = true;
                       }
                     });
     }
@@ -57,11 +67,11 @@ export class WPILibUpdates {
     const newVersion = await this.checkForGradleRIOUpdate(grVersion);
     if (newVersion === undefined) {
       logger.log('no update found');
-      await vscode.window.showInformationMessage('No GradleRIO Update Found');
+      await vscode.window.showInformationMessage('No WPILib Update Found');
       return false;
     } else {
       const result = await vscode.window.showInformationMessage
-                           (`GradleRIO update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
+                           (`WPILib update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
         await this.setGradleRIOVersion(newVersion, wp);
       }
@@ -85,7 +95,7 @@ export class WPILibUpdates {
 
       await promisifyWriteFile(buildFile, newgFile);
     } catch (err) {
-      logger.error('error setting gradlerio version', err);
+      logger.error('error setting wpilib (gradlerio) version', err);
       return;
     }
   }

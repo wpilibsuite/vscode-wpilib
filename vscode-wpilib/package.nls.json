@@ -26,5 +26,6 @@
 	"wpilibcore.checkForUpdates.title": "Check for WPILib Updates",
 	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO",
 	"wpilibcore.showLogFolder.title": "Show Log Folder",
-	"wpilibcore.runGradleCommand.title": "Run a command in Gradle"
+	"wpilibcore.runGradleCommand.title": "Run a command in Gradle",
+	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates flag"
 }
