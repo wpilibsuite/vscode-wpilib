@@ -280,8 +280,8 @@
         "views": {
             "explorer": [
                 {
-                    "id": "cppHeaders",
-                    "name": "C++ Headers",
+                    "id": "cppDependencies",
+                    "name": "C++ Dependencies",
                     "when": "isWPILibProvidedCpp"
                 }
             ]

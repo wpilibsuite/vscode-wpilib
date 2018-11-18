@@ -235,7 +235,7 @@ export class HeaderExplorer {
 
   constructor(resourceRoot: string) {
     this.treeDataProvider = new HeaderTreeProvider(resourceRoot);
-    this.fileExplorer = vscode.window.createTreeView('cppHeaders', { treeDataProvider: this.treeDataProvider });
+    this.fileExplorer = vscode.window.createTreeView('cppDependencies', { treeDataProvider: this.treeDataProvider });
     vscode.commands.registerCommand('fileExplorer.openFile', (resource: vscode.Uri) => this.openResource(resource));
   }
 
