@@ -43,6 +43,13 @@
   <input id="teamNumber" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
+  <div id="desktopdiv">
+    This is needed for simulation and unit testing support, however there are some cases where this will do
+    some unexpected things during build. In addition, not all vendor libraries support desktop.
+    This option can be set with the command "WPILib: Set Desktop Support" at any time.
+    <input id="desktopCB" type="checkbox" />
+  </div>
+  <br/>
 
   <button id="generateProject" >Generate Project</button>
 </body>

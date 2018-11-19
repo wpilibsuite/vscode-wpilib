@@ -406,7 +406,7 @@
         "vscode-cpptools": "2.1.2",
         "vscode-jsonrpc": "^3.6.2",
         "vscode-nls": "^3.2.5",
-        "vscode-wpilibapi": "^2019.0.6",
+        "vscode-wpilibapi": "^2019.0.8",
         "winston": "^3.1.0",
         "winston-transport": "^4.2.0",
         "wpilib-riolog": "^0.1.0",

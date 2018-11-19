@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { ExampleTemplateAPI } from '../exampletemplateapi';
 import { IPreferencesJson } from '../preferences';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
 import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
@@ -163,7 +164,10 @@ export class EclipseImport extends WebViewBase {
         if (err) {
           resolve();
         } else {
-          const dataOut = dataIn.replace(new RegExp('def includeSrcInIncludeRoot = false', 'g'), 'def includeSrcInIncludeRoot = true');
+          let dataOut = dataIn.replace(new RegExp('def includeSrcInIncludeRoot = false', 'g'), 'def includeSrcInIncludeRoot = true');
+          if (data.desktop) {
+            dataOut = dataOut.replace(new RegExp('def includeDesktopSupport = false', 'g'), 'def includeDesktopSupport = true');
+          }
           fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
             if (err1) {
               reject(err);
@@ -188,17 +192,7 @@ export class EclipseImport extends WebViewBase {
     parsed.teamNumber = parseInt(data.teamNumber, 10);
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
-    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-      'Yes (Current Window)', 'Yes (New Window)', 'No');
-    if (openSelection === undefined) {
-      return;
-    } else if (openSelection === 'Yes (Current Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(toFolder), false);
-    } else if (openSelection === 'Yes (New Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(toFolder), true);
-    } else {
-      return;
-    }
+    await ExampleTemplateAPI.PromptForProjectOpen(vscode.Uri.file(toFolder));
   }
 
   private async asyncInitialize() {
