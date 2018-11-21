@@ -203,7 +203,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     let found = false;
     for (const t of this.toolchains) {
-      if (t.name === this.selectedName.Value) {
+      if (getToolchainName(t) === this.selectedName.Value) {
         found = true;
         break;
       }
