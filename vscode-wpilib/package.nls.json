@@ -27,5 +27,6 @@
 	"wpilibcore.installGradleTools.title": "Install tools from GradleRIO",
 	"wpilibcore.showLogFolder.title": "Show Log Folder",
 	"wpilibcore.runGradleCommand.title": "Run a command in Gradle",
-	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates flag"
+	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates Flag",
+	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Property"
 }

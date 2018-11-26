@@ -6,7 +6,7 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
-import { gradleRun, javaHome, promisifyExists } from './utilities';
+import { gradleRun, javaHome, promisifyExists, setDesktopEnabled } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
 
 // Most of our commands are created here.
@@ -307,5 +307,30 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     }
     const persistState = WPILibUpdates.getUpdatePersistentState(workspace);
     persistState.Value = false;
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.changeDesktop', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot change desktop with an empty workspace');
+      return;
+    }
+
+    const result = await vscode.window.showInformationMessage('Enable Desktop Support for Project?', 'Yes', 'No');
+    if (result === undefined) {
+      logger.log('Invalid selection for desktop project support');
+      return;
+    }
+
+    const selection = result === 'Yes';
+
+    const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
+
+    if (await promisifyExists(buildgradle)) {
+      await setDesktopEnabled(buildgradle, selection);
+    } else {
+      logger.log('build.gradle not found at: ', buildgradle);
+    }
   }));
 }

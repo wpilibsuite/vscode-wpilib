@@ -1,11 +1,10 @@
 'use strict';
 
-import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from 'vscode-wpilibapi';
 import { ExampleTemplateAPI } from '../exampletemplateapi';
-import { extensionContext } from '../utilities';
+import { extensionContext, setDesktopEnabled } from '../utilities';
 import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend } from './pages/projectcreatorpage';
 import { WebViewBase } from './webviewbase';
 
@@ -80,22 +79,7 @@ export class ProjectCreator extends WebViewBase {
     if (data.desktop) {
       const buildgradle = path.join(toFolder, 'build.gradle');
 
-      await new Promise<void>((resolve, reject) => {
-        fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
-          if (err) {
-            resolve();
-          } else {
-            const dataOut = dataIn.replace(new RegExp('def includeDesktopSupport = false', 'g'), 'def includeDesktopSupport = true');
-            fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      });
+      await setDesktopEnabled(buildgradle, true);
     }
 
     await ExampleTemplateAPI.PromptForProjectOpen(vscode.Uri.file(toFolder));

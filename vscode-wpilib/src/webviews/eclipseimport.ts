@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { ExampleTemplateAPI } from '../exampletemplateapi';
 import { IPreferencesJson } from '../preferences';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
-import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile, setDesktopEnabled } from '../utilities';
 import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpage';
 import { WebViewBase } from './webviewbase';
 
@@ -164,10 +164,7 @@ export class EclipseImport extends WebViewBase {
         if (err) {
           resolve();
         } else {
-          let dataOut = dataIn.replace(new RegExp('def includeSrcInIncludeRoot = false', 'g'), 'def includeSrcInIncludeRoot = true');
-          if (data.desktop) {
-            dataOut = dataOut.replace(new RegExp('def includeDesktopSupport = false', 'g'), 'def includeDesktopSupport = true');
-          }
+          const dataOut = dataIn.replace(new RegExp('def includeSrcInIncludeRoot = false', 'g'), 'def includeSrcInIncludeRoot = true');
           fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
             if (err1) {
               reject(err);
@@ -178,6 +175,8 @@ export class EclipseImport extends WebViewBase {
         }
       });
     });
+
+    await setDesktopEnabled(buildgradle, true);
 
     let mainFile = await promisifyReadFile(path.join(this.resourceRoot, 'eclipseprojectmain.java'));
     mainFile = mainFile.replace(new RegExp('insertnewpackagehere', 'g'), javaRobotPackage)
