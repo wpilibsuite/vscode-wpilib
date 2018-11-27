@@ -4,6 +4,7 @@ import { validateProject, validateTeamNumber } from './sharedpages';
 
 export interface IProjectIPCData {
   base: string;
+  desktop: boolean;
   template: boolean;
   language: string;
   toFolder: string;
@@ -44,6 +45,7 @@ function selectLanguage() {
   vscode.postMessage({
     data: {
       base: '',
+      desktop: false,
       language,
       newFolder: false,
       projectName: '',
@@ -60,6 +62,7 @@ function selectProjectBase() {
   vscode.postMessage({
     data: {
       base: '',
+      desktop: false,
       language,
       newFolder: false,
       projectName: '',
@@ -81,6 +84,7 @@ function generateProject() {
   vscode.postMessage({
     data: {
       base,
+      desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
       language,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,

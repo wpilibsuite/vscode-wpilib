@@ -55,8 +55,8 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
   if (addCpp) {
     codePath = path.join(codePath, 'cpp');
   }
-  const src = promisifyNcp(fromTemplateFolder, codePath);
-  const gradle = promisifyNcp(fromGradleFolder, toFolder, {
+  await promisifyNcp(fromTemplateFolder, codePath);
+  await promisifyNcp(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -65,8 +65,15 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
       return true;
     },
   });
-
-  await Promise.all([src, gradle]);
+  await promisifyNcp(path.join(path.dirname(fromGradleFolder), 'shared'), toFolder, {
+    filter: (cf): boolean => {
+      const rooted = path.relative(fromGradleFolder, cf);
+      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
+        return false;
+      }
+      return true;
+    },
+  });
 
   await setExecutePermissions(path.join(toFolder, 'gradlew'));
 
@@ -136,7 +143,7 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
     }));
   }
 
-  const ncpPromise = promisifyNcp(fromGradleFolder, toFolder, {
+  await promisifyNcp(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -145,8 +152,15 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
       return true;
     },
   });
-  promiseArray.push(ncpPromise);
-  await Promise.all(promiseArray);
+  await promisifyNcp(path.join(path.dirname(fromGradleFolder), 'shared'), toFolder, {
+    filter: (cf): boolean => {
+      const rooted = path.relative(fromGradleFolder, cf);
+      if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
+        return false;
+      }
+      return true;
+    },
+  });
 
   await setExecutePermissions(path.join(toFolder, 'gradlew'));
 

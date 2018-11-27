@@ -1,4 +1,5 @@
 plugins {
+    id "c"
     id "cpp"
     id "google-test-test-suite"
     id "edu.wpi.first.GradleRIO" version "2019.1.1-beta-2a"
@@ -59,6 +60,18 @@ model {
                     srcDir 'src/main/include'
                     if (includeSrcInIncludeRoot) {
                         srcDir 'src/main/cpp'
+                    }
+                }
+            }
+
+            sources.c {
+                source {
+                    srcDir 'src/main/c'
+                }
+                exportedHeaders {
+                    srcDir 'src/main/include'
+                    if (includeSrcInIncludeRoot) {
+                        srcDir 'src/main/c'
                     }
                 }
             }
