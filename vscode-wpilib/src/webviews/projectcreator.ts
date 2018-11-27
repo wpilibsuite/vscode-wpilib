@@ -68,7 +68,7 @@ export class ProjectCreator extends WebViewBase {
 
   private async createProject(data: IProjectIPCData) {
     if (!path.isAbsolute(data.toFolder)) {
-      await vscode.window.showErrorMessage('Can only extract to absolute path');
+      vscode.window.showErrorMessage('Can only extract to absolute path');
       return;
     }
     await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,

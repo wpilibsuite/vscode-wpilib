@@ -112,7 +112,7 @@ export class EclipseImport extends WebViewBase {
 
   private async handleImport(data: IEclipseIPCData) {
     if (!path.isAbsolute(data.toFolder)) {
-      await vscode.window.showErrorMessage('Can only extract to absolute path');
+      vscode.window.showErrorMessage('Can only extract to absolute path');
       return;
     }
     const oldProjectPath = path.dirname(data.fromProps);

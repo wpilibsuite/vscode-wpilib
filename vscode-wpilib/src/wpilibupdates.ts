@@ -67,11 +67,13 @@ export class WPILibUpdates {
     const newVersion = await this.checkForGradleRIOUpdate(grVersion);
     if (newVersion === undefined) {
       logger.log('no update found');
-      await vscode.window.showInformationMessage('No WPILib Update Found');
+      vscode.window.showInformationMessage('No WPILib Update Found');
       return false;
     } else {
       const result = await vscode.window.showInformationMessage
-                           (`WPILib update (${newVersion}) found, would you like to install it?`, 'Yes', 'No');
+                           (`WPILib update (${newVersion}) found, would you like to install it?`, {
+                             modal: true,
+                            },  'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
         await this.setGradleRIOVersion(newVersion, wp);
       }
@@ -101,7 +103,7 @@ export class WPILibUpdates {
   }
 
   private async checkForGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-    const qResult = await vscode.window.showInformationMessage('Check offline or online?', 'Online', 'Offline');
+    const qResult = await vscode.window.showInformationMessage('Check offline or online?', {modal: true}, 'Online', 'Offline');
     if (qResult === undefined) {
       return undefined;
     } else if (qResult === 'Online') {

@@ -13,8 +13,9 @@ interface ICreatorQuickPick extends vscode.QuickPickItem {
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
   public static async PromptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
-    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-    'Yes (Current Window)', 'Yes (New Window)', 'No');
+    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?', {
+      modal: true,
+    }, 'Yes (Current Window)', 'Yes (New Window)', 'No');
     if (openSelection === undefined) {
       return true;
     } else if (openSelection === 'Yes (Current Window)') {

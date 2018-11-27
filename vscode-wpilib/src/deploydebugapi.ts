@@ -183,7 +183,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
     } else {
       const selection = await vscode.window.showQuickPick(validDeployers, { placeHolder: 'Pick a language' });
       if (selection === undefined) {
-        await vscode.window.showInformationMessage('Selection exited. Cancelling');
+        vscode.window.showInformationMessage('Selection exited. Cancelling');
         return false;
       }
       langSelection = selection;
@@ -200,7 +200,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
       }
       return true;
     } catch (err) {
-      await vscode.window.showErrorMessage('Unknown error occurred. See output window or console log for more information.');
+      vscode.window.showErrorMessage('Unknown error occurred. See output window or console log for more information.');
       logger.error('Debug error', err);
       return false;
     }
