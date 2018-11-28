@@ -136,7 +136,7 @@ export class VendorLibraries {
         }
       }
     } else {
-      await vscode.window.showInformationMessage('No dependencies installed');
+      vscode.window.showInformationMessage('No dependencies installed');
     }
   }
 
@@ -169,10 +169,10 @@ export class VendorLibraries {
           }
         }
       } else {
-        await vscode.window.showInformationMessage('No updates available');
+        vscode.window.showInformationMessage('No updates available');
       }
     } else {
-      await vscode.window.showInformationMessage('No dependencies installed');
+      vscode.window.showInformationMessage('No dependencies installed');
     }
   }
 
@@ -208,11 +208,11 @@ export class VendorLibraries {
           }
         }
       } else {
-        await vscode.window.showInformationMessage('No updates available');
+        vscode.window.showInformationMessage('No updates available');
       }
 
     } else {
-      await vscode.window.showInformationMessage('No dependencies installed');
+      vscode.window.showInformationMessage('No dependencies installed');
     }
   }
 
@@ -245,7 +245,7 @@ export class VendorLibraries {
         }
       }
     } else {
-      await vscode.window.showInformationMessage('No new dependencies available');
+      vscode.window.showInformationMessage('No new dependencies available');
     }
   }
 
@@ -264,7 +264,7 @@ export class VendorLibraries {
 
         for (const dep of existing) {
           if (dep.uuid === file.uuid) {
-            await vscode.window.showWarningMessage('Library already installed');
+            vscode.window.showWarningMessage('Library already installed');
             return;
           }
         }

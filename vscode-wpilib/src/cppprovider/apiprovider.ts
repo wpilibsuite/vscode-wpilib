@@ -90,11 +90,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.loadConfigs().then(async (found) => {
       if (!found) {
-        const configResult = await vscode.window.showInformationMessage('No C++ configurations. Yes to refresh.',
-          'Yes', 'No');
-        if (configResult === 'Yes') {
-          await this.runGradleRefresh();
-        }
+        await this.runGradleRefresh();
         return;
       }
     }).catch((err) => {
@@ -261,8 +257,9 @@ export class ApiProvider implements CustomConfigurationProvider {
       selections.push(`${c.name} (${c.buildType})`);
     }
     if (selections.length === 0) {
-      const configResult = await vscode.window.showInformationMessage('No intellisense configured. Would you like to enable intellisense?',
-                                                                      'Yes', 'No');
+      const configResult = await vscode.window.showInformationMessage('No intellisense configured. Would you like to enable intellisense?', {
+        modal: true,
+      }, 'Yes', 'No');
       if (configResult === 'Yes') {
         await this.runGradleRefresh();
       }
