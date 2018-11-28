@@ -274,7 +274,7 @@ export class Preferences implements IPreferences {
     const teamNumber = await requestTeamNumber();
     if (teamRequest === 'No') {
       return teamNumber;
-    } else if (teamNumber !== -1) {
+    } else if (teamNumber >= 0) {
       await this.setTeamNumber(teamNumber);
     }
     return teamNumber;
