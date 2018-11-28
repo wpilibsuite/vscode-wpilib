@@ -37,7 +37,11 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
-    await preferences.setTeamNumber(await requestTeamNumber());
+    const teamNumber = await requestTeamNumber();
+    if (teamNumber < 0) {
+      return;
+    }
+    await preferences.setTeamNumber(teamNumber);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startTool', async () => {
