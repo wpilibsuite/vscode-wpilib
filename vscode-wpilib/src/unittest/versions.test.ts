@@ -41,5 +41,8 @@ suite('Version Tests', () => {
     test(`Version Test: a: ${x.a} b: ${x.b} result: ${x.result}`, () => {
       assert.strictEqual(isNewerVersion(x.a, x.b), x.result);
     });
+    test(`Negative Version Test: a: ${x.a} b: ${x.b} result: ${!x.result}`, () => {
+      assert.strictEqual(!isNewerVersion(x.a, x.b), !x.result);
+    });
   });
 });
