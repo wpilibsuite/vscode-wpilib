@@ -36,7 +36,7 @@ function parseVersion(version?: string): IVersion | undefined {
 }
 
 /** Checks to see if version1 is newer than version2. */
-function isNewerVersion(version1: IVersion | string, version2: IVersion | string): boolean {
+export function isNewerVersion(version1: IVersion | string, version2: IVersion | string): boolean {
   if (typeof version1 === 'string') {
     version1 = parseVersion(version1 as string) as IVersion;
   }
@@ -79,8 +79,4 @@ function isNewerVersion(version1: IVersion | string, version2: IVersion | string
 
   // If both have extra data, go alphanumeric
   return version1.else > version2.else;
-}
-
-export function versionGreaterThen(a: string, b: string): boolean {
-  return isNewerVersion(a, b);
 }

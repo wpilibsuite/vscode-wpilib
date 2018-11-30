@@ -9,6 +9,7 @@ import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { promisifyReadDir } from './shared/generator';
 import { promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
+import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
   return /(id\s*?[\"|\']edu\.wpi\.first\.GradleRIO[\"|\'].*?version\s*?[\"|\'])(.+?)([\"|\'])/g;
@@ -139,7 +140,7 @@ export class WPILibUpdates {
           logger.warn('parse failure');
           return undefined;
         }
-        if (release > currentVersion) {
+        if (isNewerVersion(release, currentVersion)) {
           return release;
         }
         return undefined;
@@ -168,7 +169,7 @@ export class WPILibUpdates {
       }
       let newVersion: string | undefined;
       for (const version of versions) {
-        if (version > currentVersion) {
+        if (isNewerVersion(version, currentVersion)) {
           newVersion = version;
         }
       }
