@@ -29,8 +29,8 @@ function parseVersion(version?: string): IVersion | undefined {
   return {
     else: dashParts.length === 2 ? dashParts[1] : undefined,
     major: parseInt(parts[0], 10),
-    minor: parts.length > 1 ? parseInt(parts[1], 10) : 0,
-    patch: parts.length > 2 ? parseInt(parts[2], 10) : 0,
+    minor: parts.length > 1 ? parseInt(parts[1], 10) : -1,
+    patch: parts.length > 2 ? parseInt(parts[2], 10) : -1,
     version,
   };
 }
