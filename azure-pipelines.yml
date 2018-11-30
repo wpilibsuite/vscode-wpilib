@@ -41,6 +41,11 @@ steps:
   displayName: 'npm lint'
 
 - script: |
+    npm run unittest
+  workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
+  displayName: 'npm unittest'
+
+- script: |
     npm run gulp
   workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
   displayName: 'npm gulp'
