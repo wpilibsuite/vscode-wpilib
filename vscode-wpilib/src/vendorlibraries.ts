@@ -7,6 +7,7 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { logger } from './logger';
 import { promisifyMkdirp, promisifyReadDir } from './shared/generator';
 import { promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
+import { isNewerVersion } from './versions';
 
 interface IJsonDependency {
   name: string;
@@ -150,7 +151,7 @@ export class VendorLibraries {
         for (const id of installedDeps) {
           if (id.uuid === ad.uuid) {
             // Maybe update available
-            if (ad.version > id.version) {
+            if (isNewerVersion(ad.version, id.version)) {
               updatableDeps.push(new LibraryQuickPick(ad));
             }
             continue;
@@ -188,7 +189,7 @@ export class VendorLibraries {
       for (const newDep of results) {
         for (const oldDep of installedDeps) {
           if (newDep.uuid === oldDep.uuid) {
-            if (newDep.version > oldDep.version) {
+            if (isNewerVersion(newDep.version, oldDep.version)) {
               updatable.push(new LibraryQuickPick(newDep, oldDep.version));
             }
             break;
