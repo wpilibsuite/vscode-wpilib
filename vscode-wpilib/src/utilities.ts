@@ -148,6 +148,23 @@ export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;
 }
 
+export function getDesktopEnabled(buildgradle: string): Promise<boolean | undefined> {
+  return new Promise<boolean | undefined>((resolve) => {
+    fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
+      if (err) {
+        resolve(undefined);
+      } else {
+        const dataOut = dataIn.match(/def\s+includeDesktopSupport\s*=\s*(true|false)/m);
+        if (dataOut === null) {
+          resolve(undefined);
+        } else {
+          resolve(dataOut[1] === 'true');
+        }
+      }
+    });
+  });
+}
+
 export function setDesktopEnabled(buildgradle: string, setting: boolean): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     fs.readFile(buildgradle, 'utf8', (err, dataIn) => {

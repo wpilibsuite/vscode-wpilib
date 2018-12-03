@@ -6,7 +6,7 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
-import { gradleRun, javaHome, promisifyExists, setDesktopEnabled } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome, promisifyExists, setDesktopEnabled } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
 
 interface IUpdatePair {
@@ -33,9 +33,14 @@ async function globalProjectSettingUpdate(message: string): Promise<IUpdatePair 
     new UpdatePair('Yes (Global)', true, true),
     new UpdatePair('No (Project)', false, false),
     new UpdatePair('No (Global)', false, true),
+    new UpdatePair('Cancel', false, false),
   ];
 
   const result = await vscode.window.showInformationMessage<UpdatePair>(message, {modal: true}, ...opts);
+
+  if (result !== undefined && result.title === 'Cancel') {
+    return undefined;
+  }
 
   return result;
 }
@@ -157,12 +162,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       vscode.window.showInformationMessage('No languages available to set');
       return;
     }
-    const result = await vscode.window.showQuickPick(deployDebugApi.getLanguageChoices(), { placeHolder: 'Pick a language' });
+
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await vscode.window.showQuickPick(deployDebugApi.getLanguageChoices(),
+      { placeHolder: `Pick a language (Currently ${preferences.getCurrentLanguage()})` });
     if (result === undefined) {
       return;
     }
 
-    const preferences = preferencesApi.getPreferences(workspace);
     await preferences.setCurrentLanguage(result);
   }));
 
@@ -174,12 +182,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await globalProjectSettingUpdate('Skip tests on deploy?');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Skip tests on deploy? Currently ${preferences.getSkipTests()}`);
     if (result === undefined) {
       logger.log('Invalid selection for settting skip tests');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
+
     await preferences.setSkipTests(result.yes, result.global);
   }));
 
@@ -191,12 +201,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await globalProjectSettingUpdate('Run commands in Online mode?');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Run commands in Online mode? Currently ${preferences.getOnline()}`);
     if (result === undefined) {
       logger.log('Invalid selection for settting online');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
+
     await preferences.setOnline(result.yes, result.global);
   }));
 
@@ -208,12 +220,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await globalProjectSettingUpdate('Stop simulation debugging on entry?');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Stop simulation debugging on entry? Currently ${preferences.getStopSimulationOnEntry()}`);
     if (result === undefined) {
       logger.log('Invalid selection for settting stop simulation on entry');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
+
     await preferences.setStopSimulationOnEntry(result.yes, result.global);
   }));
 
@@ -225,12 +239,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await globalProjectSettingUpdate('Automatically save on deploy?');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Automatically save on deploy? Currently ${preferences.getAutoSaveOnDeploy()}`);
     if (result === undefined) {
       logger.log('failed to set automatically save on deploy');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
+
     await preferences.setAutoSaveOnDeploy(result.yes, result.global);
   }));
 
@@ -242,12 +258,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await globalProjectSettingUpdate('Automatically start RioLog on deploy?');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Automatically start RioLog on deploy? Currently ${preferences.getAutoStartRioLog()}`);
     if (result === undefined) {
       logger.log('Invalid selection for riolog on deploy');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
+
     await preferences.setAutoStartRioLog(result.yes, result.global);
   }));
 
@@ -333,7 +351,22 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await vscode.window.showInformationMessage('Enable Desktop Support for Project?', {modal: true}, 'Yes', 'No');
+    const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
+
+    if (!await promisifyExists(buildgradle)) {
+      logger.log('build.gradle not found at: ', buildgradle);
+      return;
+    }
+
+    const isEnabled = await getDesktopEnabled(buildgradle);
+
+    if (isEnabled === undefined) {
+      vscode.window.showInformationMessage('Invalid project format to add or remove desktop support.');
+      return;
+    }
+
+    const result = await vscode.window.showInformationMessage(`Enable Desktop Support for Project? Currently ${isEnabled}`,
+      {modal: true}, 'Yes', 'No');
     if (result === undefined) {
       logger.log('Invalid selection for desktop project support');
       return;
@@ -341,12 +374,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const selection = result === 'Yes';
 
-    const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
-
-    if (await promisifyExists(buildgradle)) {
-      await setDesktopEnabled(buildgradle, selection);
-    } else {
-      logger.log('build.gradle not found at: ', buildgradle);
-    }
+    await setDesktopEnabled(buildgradle, selection);
   }));
 }
