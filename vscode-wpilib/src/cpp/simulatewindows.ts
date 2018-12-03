@@ -27,9 +27,10 @@ export async function startWindowsSimulation(commands: IWindowsSimulateCommands)
 
   const config: vscode.DebugConfiguration = {
     cwd: commands.workspace.uri.fsPath,
-    // environment: [{
-    //   HALSIM_EXTENSIONS: commands.extensions,
-    // }],
+    environment: [{
+      name: 'HALSIM_EXTENSIONS',
+      value: commands.extensions,
+    }],
     externalConsole: true,
     name: 'WPILib C++ Simulate',
     program: commands.launchfile,
