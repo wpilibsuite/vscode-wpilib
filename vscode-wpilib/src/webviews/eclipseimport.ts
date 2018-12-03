@@ -4,9 +4,10 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { ExampleTemplateAPI } from '../exampletemplateapi';
 import { IPreferencesJson } from '../preferences';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
-import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile, setDesktopEnabled } from '../utilities';
 import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpage';
 import { WebViewBase } from './webviewbase';
 
@@ -111,7 +112,7 @@ export class EclipseImport extends WebViewBase {
 
   private async handleImport(data: IEclipseIPCData) {
     if (!path.isAbsolute(data.toFolder)) {
-      await vscode.window.showErrorMessage('Can only extract to absolute path');
+      vscode.window.showErrorMessage('Can only extract to absolute path');
       return;
     }
     const oldProjectPath = path.dirname(data.fromProps);
@@ -175,6 +176,8 @@ export class EclipseImport extends WebViewBase {
       });
     });
 
+    await setDesktopEnabled(buildgradle, true);
+
     let mainFile = await promisifyReadFile(path.join(this.resourceRoot, 'eclipseprojectmain.java'));
     mainFile = mainFile.replace(new RegExp('insertnewpackagehere', 'g'), javaRobotPackage)
                        .replace(new RegExp('ROBOTCLASSNAMEHERE', 'g'), javaRobotClass);
@@ -188,17 +191,7 @@ export class EclipseImport extends WebViewBase {
     parsed.teamNumber = parseInt(data.teamNumber, 10);
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
-    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-      'Yes (Current Window)', 'Yes (New Window)', 'No');
-    if (openSelection === undefined) {
-      return;
-    } else if (openSelection === 'Yes (Current Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(toFolder), false);
-    } else if (openSelection === 'Yes (New Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(toFolder), true);
-    } else {
-      return;
-    }
+    await ExampleTemplateAPI.PromptForProjectOpen(vscode.Uri.file(toFolder));
   }
 
   private async asyncInitialize() {

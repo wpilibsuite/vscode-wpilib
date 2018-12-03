@@ -267,14 +267,16 @@ export class Preferences implements IPreferences {
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', 'Yes', 'No');
+    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', {
+      modal: true,
+    }, 'Yes', 'No');
     if (teamRequest === undefined) {
       return -1;
     }
     const teamNumber = await requestTeamNumber();
     if (teamRequest === 'No') {
       return teamNumber;
-    } else if (teamNumber !== -1) {
+    } else if (teamNumber >= 0) {
       await this.setTeamNumber(teamNumber);
     }
     return teamNumber;

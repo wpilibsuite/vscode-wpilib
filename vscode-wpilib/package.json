@@ -43,7 +43,8 @@
         "onCommand:wpilibcore.checkForUpdates",
         "onCommand:wpilibcore.installGradleTools",
         "onCommand:wpilibcore.showLogFolder",
-        "onCommand:wpilibcore.runGradleCommand"
+        "onCommand:wpilibcore.runGradleCommand",
+        "onCommand:wpilibcore.changeDesktop"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -280,6 +281,11 @@
                 "command": "wpilibcore.resetAutoUpdate",
                 "title": "%wpilibcore.resetAutoUpdate.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.changeDesktop",
+                "title": "%wpilibcore.changeDesktop.title%",
+                "category": "WPILib"
             }
         ],
         "views": {
@@ -364,6 +370,7 @@
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
         "gulp": "gulp",
         "updateActivation": "gulp update-activation",
         "vscePackage": "vsce package"
@@ -378,14 +385,16 @@
         "@types/triple-beam": "^1.3.0",
         "@types/xml2js": "^0.4.3",
         "del": "^3.0.0",
-        "event-stream": "^3.3.4",
+        "event-stream": "=3.3.4",
         "gulp": "^4.0.0",
         "gulp-filter": "^5.1.0",
         "gulp-json-transform": "^0.4.5",
         "gulp-typescript": "^5.0.0-alpha.3",
+        "mocha": "^5.2.0",
         "rmdir-cli": "^2.0.6",
         "run-sequence": "^2.2.1",
         "ts-loader": "^5.2.1",
+        "ts-node": "^7.0.1",
         "tslint": "^5.11.0",
         "typescript": "^3.0.1",
         "vsce": "^1.46.0",
@@ -406,7 +415,7 @@
         "vscode-cpptools": "2.1.2",
         "vscode-jsonrpc": "^3.6.2",
         "vscode-nls": "^3.2.5",
-        "vscode-wpilibapi": "^2019.0.6",
+        "vscode-wpilibapi": "^2019.0.8",
         "winston": "^3.1.0",
         "winston-transport": "^4.2.0",
         "wpilib-riolog": "^0.1.0",

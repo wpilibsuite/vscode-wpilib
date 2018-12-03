@@ -3,6 +3,7 @@
 import { validateTeamNumber } from './sharedpages';
 
 export interface IEclipseIPCData {
+  desktop: boolean;
   fromProps: string;
   toFolder: string;
   projectName: string;
@@ -42,6 +43,7 @@ function importProjectButtonClick() {
   (document.activeElement as HTMLElement).blur();
   vscode.postMessage({
     data: {
+      desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
       fromProps: (document.getElementById('eclipseInput') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,

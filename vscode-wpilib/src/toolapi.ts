@@ -15,13 +15,15 @@ export class ToolAPI implements IToolAPI {
                                      externalApi.getPreferencesAPI().getPreferences(workspace));
 
     if (grResult === 0) {
-      const result = await vscode.window.showInformationMessage('Restart required for new tools. Restart now?', 'Yes', 'No');
+      const result = await vscode.window.showInformationMessage('Restart required for new tools. Restart now?', {
+        modal: true,
+      }, 'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
     } else {
       logger.log(grResult.toString());
-      await vscode.window.showInformationMessage('Tool install failed');
+      vscode.window.showInformationMessage('Tool install failed');
       return;
     }
   }
@@ -36,7 +38,8 @@ export class ToolAPI implements IToolAPI {
 
   public async startTool(): Promise<boolean> {
     if (this.tools.length <= 0) {
-      const grResult = await vscode.window.showErrorMessage('No tools found. Would you like to use Gradle to grab some?', 'Yes', 'No');
+      const grResult = await vscode.window.showInformationMessage('No tools found. Would you like to use Gradle to grab some?',
+        {modal: true}, 'Yes', 'No');
       if (grResult !== undefined && grResult === 'Yes') {
         const preferencesApi = this.externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
@@ -58,7 +61,7 @@ export class ToolAPI implements IToolAPI {
 
     const ret =  result.runner.runTool();
     if (!ret) {
-      await vscode.window.showInformationMessage(`Failed to start tool: ${result.runner.getDisplayName()}`);
+      vscode.window.showInformationMessage(`Failed to start tool: ${result.runner.getDisplayName()}`);
     }
     return ret;
   }

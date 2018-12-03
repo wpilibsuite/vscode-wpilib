@@ -12,6 +12,22 @@ interface ICreatorQuickPick extends vscode.QuickPickItem {
 }
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
+  public static async PromptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
+    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?', {
+      modal: true,
+    }, 'Yes (Current Window)', 'Yes (New Window)', 'No');
+    if (openSelection === undefined) {
+      return true;
+    } else if (openSelection === 'Yes (Current Window)') {
+      await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
+    } else if (openSelection === 'Yes (New Window)') {
+      await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
+    } else {
+      return true;
+    }
+    return true;
+  }
+
   private disposables: vscode.Disposable[] = [];
   private templates: ICreatorQuickPick[] = [];
   private examples: ICreatorQuickPick[] = [];
@@ -116,17 +132,6 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
     parsed.teamNumber = teamNumber;
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
-    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?',
-      'Yes (Current Window)', 'Yes (New Window)', 'No');
-    if (openSelection === undefined) {
-      return true;
-    } else if (openSelection === 'Yes (Current Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', toFolderUri, false);
-    } else if (openSelection === 'Yes (New Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', toFolderUri, true);
-    } else {
-      return true;
-    }
     return true;
   }
 }

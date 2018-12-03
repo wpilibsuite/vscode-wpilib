@@ -6,8 +6,44 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
-import { gradleRun, javaHome, promisifyExists } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome, promisifyExists, setDesktopEnabled } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
+
+interface IUpdatePair {
+  yes: boolean;
+  global: boolean;
+}
+
+class UpdatePair implements IUpdatePair, vscode.MessageItem {
+  public title: string;
+  public isCloseAffordance: boolean = true;
+  public yes: boolean;
+  public global: boolean;
+
+  public constructor(title: string, yes: boolean, global: boolean) {
+    this.title = title;
+    this.yes = yes;
+    this.global = global;
+  }
+}
+
+async function globalProjectSettingUpdate(message: string): Promise<IUpdatePair | undefined> {
+  const opts: UpdatePair[] = [
+    new UpdatePair('Yes (Project)', true, false),
+    new UpdatePair('Yes (Global)', true, true),
+    new UpdatePair('No (Project)', false, false),
+    new UpdatePair('No (Global)', false, true),
+    new UpdatePair('Cancel', false, false),
+  ];
+
+  const result = await vscode.window.showInformationMessage<UpdatePair>(message, {modal: true}, ...opts);
+
+  if (result !== undefined && result.title === 'Cancel') {
+    return undefined;
+  }
+
+  return result;
+}
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command
@@ -37,7 +73,11 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
-    await preferences.setTeamNumber(await requestTeamNumber());
+    const teamNumber = await requestTeamNumber();
+    if (teamNumber < 0) {
+      return;
+    }
+    await preferences.setTeamNumber(teamNumber);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.startTool', async () => {
@@ -96,7 +136,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {
     if (arg === undefined) {
-      await vscode.window.showInformationMessage('Must select a folder to create a command');
+      vscode.window.showInformationMessage('Must select a folder to create a command');
       return;
     }
     const preferencesApi = externalApi.getPreferencesAPI();
@@ -112,21 +152,25 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      vscode.window.showInformationMessage('Cannot set language in an empty workspace');
       return;
     }
 
     const deployDebugApi = externalApi.getDeployDebugAPI();
 
     if (deployDebugApi.getLanguageChoices().length <= 0) {
-      await vscode.window.showInformationMessage('No languages available to add');
-    }
-    const result = await vscode.window.showQuickPick(deployDebugApi.getLanguageChoices(), { placeHolder: 'Pick a language' });
-    if (result === undefined) {
+      vscode.window.showInformationMessage('No languages available to set');
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await vscode.window.showQuickPick(deployDebugApi.getLanguageChoices(),
+      { placeHolder: `Pick a language (Currently ${preferences.getCurrentLanguage()})` });
+    if (result === undefined) {
+      return;
+    }
+
     await preferences.setCurrentLanguage(result);
   }));
 
@@ -138,17 +182,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await vscode.window.showInformationMessage('Skip tests on deploy?', 'Yes', 'No');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Skip tests on deploy? Currently ${preferences.getSkipTests()}`);
     if (result === undefined) {
       logger.log('Invalid selection for settting skip tests');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
-    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
-    if (request === undefined) {
-      return;
-    }
-    await preferences.setSkipTests(result === 'Yes', request === 'Globally');
+
+    await preferences.setSkipTests(result.yes, result.global);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setOnline', async () => {
@@ -159,17 +201,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await vscode.window.showInformationMessage('Run commands in Online mode?', 'Yes', 'No');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Run commands in Online mode? Currently ${preferences.getOnline()}`);
     if (result === undefined) {
       logger.log('Invalid selection for settting online');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
-    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
-    if (request === undefined) {
-      return;
-    }
-    await preferences.setOnline(result === 'Yes', request === 'Globally');
+
+    await preferences.setOnline(result.yes, result.global);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStopSimulationOnEntry', async () => {
@@ -180,17 +220,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await vscode.window.showInformationMessage('Stop simulation debugging on entry?', 'Yes', 'No');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Stop simulation debugging on entry? Currently ${preferences.getStopSimulationOnEntry()}`);
     if (result === undefined) {
       logger.log('Invalid selection for settting stop simulation on entry');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
-    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
-    if (request === undefined) {
-      return;
-    }
-    await preferences.setStopSimulationOnEntry(result === 'Yes', request === 'Globally');
+
+    await preferences.setStopSimulationOnEntry(result.yes, result.global);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setAutoSave', async () => {
@@ -201,17 +239,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await vscode.window.showInformationMessage('Automatically save on deploy?', 'Yes', 'No');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Automatically save on deploy? Currently ${preferences.getAutoSaveOnDeploy()}`);
     if (result === undefined) {
       logger.log('failed to set automatically save on deploy');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
-    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
-    if (request === undefined) {
-      return;
-    }
-    await preferences.setAutoSaveOnDeploy(result === 'Yes', request === 'Globally');
+
+    await preferences.setAutoSaveOnDeploy(result.yes, result.global);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStartRioLog', async () => {
@@ -222,17 +258,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
 
-    const result = await vscode.window.showInformationMessage('Automatically start RioLog on deploy?', 'Yes', 'No');
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Automatically start RioLog on deploy? Currently ${preferences.getAutoStartRioLog()}`);
     if (result === undefined) {
       logger.log('Invalid selection for riolog on deploy');
       return;
     }
-    const preferences = preferencesApi.getPreferences(workspace);
-    const request = await vscode.window.showInformationMessage('Save globally or project level?', 'Globally', 'Project');
-    if (request === undefined) {
-      return;
-    }
-    await preferences.setAutoStartRioLog(result === 'Yes', request === 'Globally');
+
+    await preferences.setAutoStartRioLog(result.yes, result.global);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.cancelTasks', async () => {
@@ -243,7 +277,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     if (javaHome === '') {
       return;
     }
-    const selection = await vscode.window.showInformationMessage('Set in project or globally?', 'Project', 'Global');
+    const selection = await vscode.window.showInformationMessage('Set in project or globally?', {modal: true}, 'Project', 'Global');
     if (selection !== undefined) {
       if (selection === 'Project') {
         const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
@@ -307,5 +341,39 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     }
     const persistState = WPILibUpdates.getUpdatePersistentState(workspace);
     persistState.Value = false;
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.changeDesktop', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot change desktop with an empty workspace');
+      return;
+    }
+
+    const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
+
+    if (!await promisifyExists(buildgradle)) {
+      logger.log('build.gradle not found at: ', buildgradle);
+      return;
+    }
+
+    const isEnabled = await getDesktopEnabled(buildgradle);
+
+    if (isEnabled === undefined) {
+      vscode.window.showInformationMessage('Invalid project format to add or remove desktop support.');
+      return;
+    }
+
+    const result = await vscode.window.showInformationMessage(`Enable Desktop Support for Project? Currently ${isEnabled}`,
+      {modal: true}, 'Yes', 'No');
+    if (result === undefined) {
+      logger.log('Invalid selection for desktop project support');
+      return;
+    }
+
+    const selection = result === 'Yes';
+
+    await setDesktopEnabled(buildgradle, selection);
   }));
 }

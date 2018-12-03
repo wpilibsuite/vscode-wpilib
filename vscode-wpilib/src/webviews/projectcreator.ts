@@ -3,7 +3,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from 'vscode-wpilibapi';
-import { extensionContext } from '../utilities';
+import { ExampleTemplateAPI } from '../exampletemplateapi';
+import { extensionContext, setDesktopEnabled } from '../utilities';
 import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend } from './pages/projectcreatorpage';
 import { WebViewBase } from './webviewbase';
 
@@ -67,11 +68,21 @@ export class ProjectCreator extends WebViewBase {
 
   private async createProject(data: IProjectIPCData) {
     if (!path.isAbsolute(data.toFolder)) {
-      await vscode.window.showErrorMessage('Can only extract to absolute path');
+      vscode.window.showErrorMessage('Can only extract to absolute path');
       return;
     }
     await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,
       data.projectName, parseInt(data.teamNumber, 10));
+
+    const toFolder = data.newFolder ? path.join(data.toFolder, data.projectName) : data.toFolder;
+
+    if (data.desktop) {
+      const buildgradle = path.join(toFolder, 'build.gradle');
+
+      await setDesktopEnabled(buildgradle, true);
+    }
+
+    await ExampleTemplateAPI.PromptForProjectOpen(vscode.Uri.file(toFolder));
   }
 
   private async handleProjectType() {

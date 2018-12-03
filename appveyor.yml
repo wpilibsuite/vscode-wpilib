@@ -50,6 +50,13 @@ build_script:
         throw ("Exec: " + $errorMessage)
     }
 
+    npm run unittest
+
+    if ($lastexitcode -ne 0) {
+        throw ("Exec: " + $errorMessage)
+    }
+
+
     npm run gulp
 
     if ($lastexitcode -ne 0) {
