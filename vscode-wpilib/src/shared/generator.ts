@@ -4,7 +4,7 @@ import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';
 import * as path from 'path';
 import { logger } from '../logger';
-import { promisifyWriteFile } from '../utilities';
+import { promisifyReadFile, promisifyWriteFile } from '../utilities';
 import { setExecutePermissions } from './permissions';
 
 export function promisifyMkdirp(dest: string): Promise<void> {
@@ -55,6 +55,15 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
   if (addCpp) {
     codePath = path.join(codePath, 'cpp');
   }
+
+  const gradleRioFrom = '###GRADLERIOREPLACE###';
+
+  const grRoot = path.dirname(fromGradleFolder);
+
+  const grVersionFile = path.join(grRoot, 'version.txt');
+
+  const grVersionTo = (await promisifyReadFile(grVersionFile)).trim();
+
   await promisifyNcp(fromTemplateFolder, codePath);
   await promisifyNcp(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
@@ -65,7 +74,7 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
       return true;
     },
   });
-  await promisifyNcp(path.join(path.dirname(fromGradleFolder), 'shared'), toFolder, {
+  await promisifyNcp(path.join(grRoot, 'shared'), toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -76,6 +85,25 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
   });
 
   await setExecutePermissions(path.join(toFolder, 'gradlew'));
+
+  const buildgradle = path.join(toFolder, 'build.gradle');
+
+  await new Promise<void>((resolve, reject) => {
+    fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
+      if (err) {
+        resolve();
+      } else {
+        const dataOut = dataIn.replace(new RegExp(gradleRioFrom, 'g'), grVersionTo);
+        fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
+          if (err1) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }
+    });
+  });
 
   const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
 
@@ -120,6 +148,13 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
   const replacePackageTo = 'frc.robot';
 
   const robotClassFrom = '###ROBOTCLASSREPLACE###';
+  const gradleRioFrom = '###GRADLERIOREPLACE###';
+
+  const grRoot = path.dirname(fromGradleFolder);
+
+  const grVersionFile = path.join(grRoot, 'version.txt');
+
+  const grVersionTo = (await promisifyReadFile(grVersionFile)).trim();
 
   const promiseArray: Array<Promise<void>> = [];
 
@@ -152,7 +187,7 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
       return true;
     },
   });
-  await promisifyNcp(path.join(path.dirname(fromGradleFolder), 'shared'), toFolder, {
+  await promisifyNcp(path.join(grRoot, 'shared'), toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -171,7 +206,8 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
       if (err) {
         resolve();
       } else {
-        const dataOut = dataIn.replace(new RegExp(robotClassFrom, 'g'), robotClassTo);
+        const dataOut = dataIn.replace(new RegExp(robotClassFrom, 'g'), robotClassTo)
+                              .replace(new RegExp(gradleRioFrom, 'g'), grVersionTo);
         fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
           if (err1) {
             reject(err);
