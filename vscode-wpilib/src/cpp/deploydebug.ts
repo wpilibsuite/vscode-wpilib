@@ -24,7 +24,8 @@ interface ICppDebugCommand {
   sysroot: string | null;
   srcpaths: string[];
   headerpaths: string[];
-  libfiles: string[];
+  libpaths: string[];
+  debugpaths: string[];
   libsrcpaths: string[];
 }
 
@@ -87,7 +88,7 @@ class DebugCodeDeployer implements ICodeDeployer {
     const targetReadInfo = await readFileAsync(debugPath);
     const targetInfoParsed: ICppDebugCommand = jsonc.parse(targetReadInfo) as ICppDebugCommand;
 
-    const set = new Set<string>(targetInfoParsed.libfiles);
+    const set = new Set<string>(targetInfoParsed.libpaths);
 
     let soPath = '';
 
@@ -225,7 +226,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     if (!getIsWindows()) {
-      const set = new Set<string>(targetSimulateInfo.libfiles);
+      const set = new Set<string>(targetSimulateInfo.debugpaths);
 
       let soPath = '';
 
@@ -249,8 +250,10 @@ class SimulateCodeDeployer implements ICodeDeployer {
       await startUnixSimulation(config);
     } else {
       const config: IWindowsSimulateCommands = {
+        debugPaths: targetSimulateInfo.debugpaths,
         extensions,
         launchfile: targetSimulateInfo.launchfile,
+        srcPaths: targetSimulateInfo.srcpaths,
         stopAtEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
         workspace,
       };
