@@ -9,7 +9,7 @@ import { promisifyMkdirp, promisifyReadDir } from './shared/generator';
 import { promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
 import { isNewerVersion } from './versions';
 
-interface IJsonDependency {
+export interface IJsonDependency {
   name: string;
   version: string;
   uuid: string;
@@ -68,6 +68,14 @@ export class VendorLibraries {
     }
   }
 
+  public async findForUUIDs(uuid: string[]): Promise<IJsonDependency[]> {
+    const homeDirDeps = await this.getHomeDirDeps();
+    const foundDeps = homeDirDeps.filter((value) => {
+      return uuid.indexOf(value.uuid) >= 0;
+    });
+    return foundDeps;
+  }
+
   public async manageVendorLibraries(uri: vscode.Uri | undefined): Promise<void> {
     let workspace: vscode.WorkspaceFolder | undefined ;
     if (uri !== undefined) {
@@ -107,6 +115,41 @@ export class VendorLibraries {
     if (result) {
       await result.func(workspace);
     }
+  }
+
+  public async installDependency(dep: IJsonDependency, url: string, override: boolean): Promise<boolean> {
+    const dirExists = await promisifyExists(url);
+
+    if (!dirExists) {
+      await promisifyMkdirp(url);
+      // Directly write file
+      await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+      return true;
+    }
+
+    const files = await promisifyReadDir(url);
+
+    for (const file of files) {
+      const fullPath = path.join(url, file);
+      const result = await this.readFile(fullPath);
+      if (result !== undefined) {
+        if (result.uuid === dep.uuid) {
+          if (override) {
+            await promisifyDeleteFile(fullPath);
+            break;
+          } else {
+            return false;
+          }
+        }
+      }
+    }
+
+    await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+    return true;
+  }
+
+  public getVendorFolder(root: string): string {
+    return path.join(root, 'vendordeps');
   }
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
@@ -304,7 +347,7 @@ export class VendorLibraries {
   }
 
   private getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
-    return path.join(workspace.uri.fsPath, 'vendordeps');
+    return this.getVendorFolder(workspace.uri.fsPath);
   }
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
@@ -313,37 +356,6 @@ export class VendorLibraries {
 
   private getHomeDirDeps(): Promise<IJsonDependency[]> {
     return this.getDependencies(path.join(this.externalApi.getUtilitiesAPI().getWPILibHomeDir(), 'vendordeps'));
-  }
-
-  private async installDependency(dep: IJsonDependency, url: string, override: boolean): Promise<boolean> {
-    const dirExists = await promisifyExists(url);
-
-    if (!dirExists) {
-      await promisifyMkdirp(url);
-      // Directly write file
-      await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-      return true;
-    }
-
-    const files = await promisifyReadDir(url);
-
-    for (const file of files) {
-      const fullPath = path.join(url, file);
-      const result = await this.readFile(fullPath);
-      if (result !== undefined) {
-        if (result.uuid === dep.uuid) {
-          if (override) {
-            await promisifyDeleteFile(fullPath);
-            break;
-          } else {
-            return false;
-          }
-        }
-      }
-    }
-
-    await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-    return true;
   }
 
   private async readFile(file: string): Promise<IJsonDependency | undefined> {
