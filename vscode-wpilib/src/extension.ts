@@ -25,6 +25,7 @@ import { promisifyMkdirp } from './shared/generator';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
 import { UtilitiesAPI } from './utilitiesapi';
+import { addVendorExamples } from './vendorexamples';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
@@ -161,6 +162,8 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vendorLibs);
 
   const wpilibUpdate = new WPILibUpdates(externalApi);
+
+  await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI(), externalApi.getUtilitiesAPI(), vendorLibs);
 
   context.subscriptions.push(wpilibUpdate);
 

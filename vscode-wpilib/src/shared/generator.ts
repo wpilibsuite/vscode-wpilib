@@ -44,7 +44,10 @@ export function promisifyReadDir(pth: string): Promise<string[]> {
   });
 }
 
-export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string, addCpp: boolean): Promise<boolean> {
+type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
+
+export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
+                                      addCpp: boolean): Promise<boolean> {
   const existingFiles = await promisifyReadDir(toFolder);
   if (existingFiles.length > 0) {
     logger.warn('folder not empty');
@@ -64,7 +67,11 @@ export async function generateCopyCpp(fromTemplateFolder: string, fromGradleFold
 
   const grVersionTo = (await promisifyReadFile(grVersionFile)).trim();
 
-  await promisifyNcp(fromTemplateFolder, codePath);
+  if (typeof fromTemplateFolder === 'string') {
+    await promisifyNcp(fromTemplateFolder, codePath);
+  } else {
+    await fromTemplateFolder(codePath, toFolder);
+  }
   await promisifyNcp(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
@@ -118,8 +125,8 @@ directory.`);
   return true;
 }
 
-export async function generateCopyJava(fromTemplateFolder: string, fromGradleFolder: string, toFolder: string,
-                                       robotClassTo: string, copyRoot: string): Promise<boolean> {
+export async function generateCopyJava(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
+                                       robotClassTo: string, copyRoot: string, packageReplaceString?: string | undefined): Promise<boolean> {
   const existingFiles = await promisifyReadDir(toFolder);
   if (existingFiles.length > 0) {
     return false;
@@ -127,7 +134,12 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
 
   const rootCodePath = path.join(toFolder, 'src', 'main', 'java');
   const codePath = path.join(rootCodePath, copyRoot);
-  await promisifyNcp(fromTemplateFolder, codePath);
+
+  if (typeof fromTemplateFolder === 'string') {
+    await promisifyNcp(fromTemplateFolder, codePath);
+  } else {
+    await fromTemplateFolder(codePath, toFolder);
+  }
 
   const files = await new Promise<string[]>((resolve, reject) => {
     glob('**/*', {
@@ -165,7 +177,10 @@ export async function generateCopyJava(fromTemplateFolder: string, fromGradleFol
         if (err) {
           reject(err);
         } else {
-          const dataOut = dataIn.replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo);
+          let dataOut = dataIn.replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo);
+          if (packageReplaceString !== undefined) {
+            dataOut = dataOut.replace(new RegExp(packageReplaceString, 'g'), replacePackageTo);
+          }
           fs.writeFile(file, dataOut, 'utf8', (err1) => {
             if (err1) {
               reject(err);
