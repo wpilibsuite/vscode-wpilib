@@ -138,34 +138,65 @@ export async function activate(context: vscode.ExtensionContext) {
   // Create all of our commands that the extension runs
   createVsCommands(context, externalApi);
 
+  let creationError: boolean = false;
+
+  let help: Help | undefined;
+
+  try {
   // Create the help window provider
-  const help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
+    help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
+    context.subscriptions.push(help);
+  } catch (err) {
+    logger.error('error creating help window provider', err);
+    creationError = true;
+  }
 
+  try {
   // Create the eclipse import provider
-  const eclipseimport = await EclipseImport.Create(extensionResourceLocation);
+    const eclipseimport = await EclipseImport.Create(extensionResourceLocation);
+    context.subscriptions.push(eclipseimport);
+  } catch (err) {
+    logger.error('error creating eclipse importer', err);
+    creationError = true;
+  }
 
+  try {
   // Create the new project creator provider
   const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
-
-  // Anything pushed into context.subscriptions will get disposed when VS Code closes.
-  context.subscriptions.push(help);
-
-  context.subscriptions.push(eclipseimport);
-
   context.subscriptions.push(projectcreator);
+  } catch (err) {
+    logger.error('error creating project creator', err);
+    creationError = true;
+  }
 
+  try {
   // Add built in tools
-  context.subscriptions.push(await BuiltinTools.Create(externalApi));
+    context.subscriptions.push(await BuiltinTools.Create(externalApi));
+  } catch (err) {
+    logger.error('error creating built in tool handler', err);
+    creationError = true;
+  }
 
-  const vendorLibs = new VendorLibraries(externalApi);
+  let vendorLibs: VendorLibraries | undefined;
 
-  context.subscriptions.push(vendorLibs);
+  try {
+    vendorLibs = new VendorLibraries(externalApi);
+    context.subscriptions.push(vendorLibs);
+    await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI(), externalApi.getUtilitiesAPI(), vendorLibs);
+  } catch (err) {
+    logger.error('error creating vendor lib utilities', err);
+    creationError = true;
+  }
 
-  const wpilibUpdate = new WPILibUpdates(externalApi);
+  let wpilibUpdate: WPILibUpdates | undefined;
 
-  await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI(), externalApi.getUtilitiesAPI(), vendorLibs);
-
-  context.subscriptions.push(wpilibUpdate);
+  try {
+    wpilibUpdate = new WPILibUpdates(externalApi);
+    context.subscriptions.push(wpilibUpdate);
+  } catch (err) {
+    logger.error('error creating wpilib updater', err);
+    creationError = true;
+  }
 
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
   // Also check for local GradleRIO update
@@ -194,15 +225,23 @@ export async function activate(context: vscode.ExtensionContext) {
                 .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
           continue;
         }
-        await wpilibUpdate.checkForInitialUpdate(w);
+        if (wpilibUpdate) {
+          await wpilibUpdate.checkForInitialUpdate(w);
+        }
         const persistentState = new PersistentFolderState('wpilib.newProjectHelp', false, w.uri.fsPath);
         if (persistentState.Value === false) {
           persistentState.Value = true;
-          help.displayHelp();
+          if (help) {
+            help.displayHelp();
+          }
           break;
         }
       }
     }
+  }
+
+  if (creationError) {
+    vscode.window.showErrorMessage('A portion of WPILib failed to initialize. See log for details');
   }
 
   // Log our extension is active
