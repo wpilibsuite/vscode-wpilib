@@ -8,7 +8,7 @@ import { ExampleTemplateAPI } from '../exampletemplateapi';
 import { IPreferencesJson } from '../preferences';
 import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
 import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile, setDesktopEnabled } from '../utilities';
-import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpage';
+import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpagetypes';
 import { WebViewBase } from './webviewbase';
 
 // tslint:disable-next-line:no-var-requires

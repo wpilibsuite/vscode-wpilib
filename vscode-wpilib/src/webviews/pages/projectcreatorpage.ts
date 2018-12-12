@@ -1,27 +1,7 @@
 'use strict';
 
+import { IProjectIPCReceive, IProjectIPCSend, ProjectType } from './projectcreatorpagetypes';
 import { validateProject, validateTeamNumber } from './sharedpages';
-
-export interface IProjectIPCData {
-  base: string;
-  desktop: boolean;
-  template: boolean;
-  language: string;
-  toFolder: string;
-  projectName: string;
-  newFolder: boolean;
-  teamNumber: string;
-}
-
-export interface IProjectIPCReceive {
-  type: string;
-  data?: IProjectIPCData;
-}
-
-export interface IProjectIPCSend {
-  type: string;
-  data: string | boolean;
-}
 
 interface IVsCodeApi {
   postMessage(message: IProjectIPCReceive): void;
@@ -31,7 +11,7 @@ declare function acquireVsCodeApi(): IVsCodeApi;
 
 const vscode = acquireVsCodeApi();
 
-let template = false;
+let projectType: ProjectType = ProjectType.Template;
 let language = '';
 let base = '';
 
@@ -49,8 +29,8 @@ function selectLanguage() {
       language,
       newFolder: false,
       projectName: '',
+      projectType,
       teamNumber: '',
-      template,
       toFolder: '',
     },
     type: 'language',
@@ -66,8 +46,8 @@ function selectProjectBase() {
       language,
       newFolder: false,
       projectName: '',
+      projectType,
       teamNumber: '',
-      template,
       toFolder: '',
     },
     type: 'base',
@@ -88,8 +68,8 @@ function generateProject() {
       language,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
+      projectType,
       teamNumber: (document.getElementById('teamNumber') as HTMLInputElement).value,
-      template,
       toFolder: (document.getElementById('projectFolder') as HTMLInputElement).value,
     },
     type: 'createproject',
@@ -107,12 +87,18 @@ window.addEventListener('message', (event) => {
       elem.value = data.data as string;
       break;
     case 'projecttype':
-      template = data.data as boolean;
-      pType.innerText = template ? 'template' : 'example';
+      projectType = data.data as ProjectType;
+      pType.innerText = ProjectType[projectType].toLowerCase();
       lang.disabled = false;
       lang.innerText = 'Select a language';
-      baseButton.disabled = true;
-      baseButton.innerText = 'Select a project base';
+      if (projectType === ProjectType.RobotBuilder) {
+        baseButton.style.visibility = 'hidden';
+        base = 'RobotBuilder';
+      } else {
+        baseButton.style.visibility = 'initial';
+        baseButton.disabled = true;
+        baseButton.innerText = 'Select a project base';
+      }
       selectLanguage();
       break;
     case 'language':
@@ -120,7 +106,9 @@ window.addEventListener('message', (event) => {
       lang.innerText = language;
       baseButton.disabled = false;
       baseButton.innerText = 'Select a project base';
-      selectProjectBase();
+      if (projectType !== ProjectType.RobotBuilder) {
+        selectProjectBase();
+      }
       break;
     case 'base':
       base = data.data as string;
