@@ -115,7 +115,7 @@ export class WPILibUpdates {
   }
 
   private async checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-    const metaDataUrl = 'https://plugins.gradle.org/m2/gradle/plugin/edu/wpi/first/GradleRIO/maven-metadata.xml';
+    const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
     try {
       const response = await fetch(metaDataUrl, {
         timeout: 5000,
@@ -126,22 +126,31 @@ export class WPILibUpdates {
       }
       if (response.status >= 200 && response.status <= 300) {
         const text = await response.text();
-        const release = await new Promise<string>((resolve, reject) => {
+        const versions = await new Promise<string[]>((resolve, reject) => {
           xml2js.parseString(text, (err, result) => {
             if (err) {
               reject(err);
             } else {
               // tslint:disable-next-line:no-unsafe-any
-              resolve(result.metadata.versioning[0].release[0]);
+              resolve(result.metadata.versioning[0].versions[0].version);
             }
           });
         });
-        if (release === undefined) {
+        if (versions === undefined) {
           logger.warn('parse failure');
           return undefined;
         }
-        if (isNewerVersion(release, currentVersion)) {
-          return release;
+        if (versions.length === 0) {
+          return undefined;
+        }
+        let newestVersion = versions[0];
+        for (const v of versions) {
+          if (isNewerVersion(v, newestVersion)) {
+            newestVersion = v;
+          }
+        }
+        if (isNewerVersion(newestVersion, currentVersion)) {
+          return newestVersion;
         }
         return undefined;
       } else {
@@ -156,7 +165,7 @@ export class WPILibUpdates {
 
   private async checkForLocalGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
     const frcHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
-    const gradleRioPath = path.join(frcHome, 'maven', 'gradle', 'plugin', 'edu', 'wpi', 'first', 'GradleRIO');
+    const gradleRioPath = path.join(frcHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
     try {
       const files = await promisifyReadDir(gradleRioPath);
       const versions = [];
@@ -167,13 +176,19 @@ export class WPILibUpdates {
           versions.push(file);
         }
       }
-      let newVersion: string | undefined;
-      for (const version of versions) {
-        if (isNewerVersion(version, currentVersion)) {
-          newVersion = version;
+      if (versions.length === 0) {
+        return undefined;
+      }
+      let newestVersion = versions[0];
+      for (const v of versions) {
+        if (isNewerVersion(v, newestVersion)) {
+          newestVersion = v;
         }
       }
-      return newVersion;
+      if (isNewerVersion(newestVersion, currentVersion)) {
+        return newestVersion;
+      }
+      return undefined;
     } catch (err) {
       logger.warn('local gradlerio exception', err);
       return undefined;
