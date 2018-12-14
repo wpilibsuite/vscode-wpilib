@@ -187,7 +187,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       const c = this.toolchains[0];
       let name = getToolchainName(c);
       for (const t of this.toolchains) {
-        if (t.name === 'roborio' && t.buildType === 'release') {
+        if (t.name === 'linuxathena' && t.buildType === 'release') {
           name = getToolchainName(t);
           break;
         }
@@ -210,7 +210,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       const c = this.toolchains[0];
       let name = getToolchainName(c);
       for (const t of this.toolchains) {
-        if (t.name === 'roborio' && t.buildType === 'release') {
+        if (t.name === 'linuxathena' && t.buildType === 'release') {
           name = getToolchainName(t);
           break;
         }
