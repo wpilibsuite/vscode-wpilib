@@ -21,6 +21,7 @@ import { findJdkPath } from './jdkdetector';
 import { closeLogger, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
+import { addRobotBuilderExamples } from './robotbuilder';
 import { promisifyMkdirp } from './shared/generator';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
@@ -185,6 +186,13 @@ export async function activate(context: vscode.ExtensionContext) {
     await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI(), externalApi.getUtilitiesAPI(), vendorLibs);
   } catch (err) {
     logger.error('error creating vendor lib utilities', err);
+    creationError = true;
+  }
+
+  try {
+    await addRobotBuilderExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI());
+  } catch (err) {
+    logger.error('error creating robotbuilder utilities', err);
     creationError = true;
   }
 

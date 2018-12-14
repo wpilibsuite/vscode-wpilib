@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from 'vscode-wpilibapi';
 import { ExampleTemplateAPI } from '../exampletemplateapi';
 import { extensionContext, setDesktopEnabled } from '../utilities';
-import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend } from './pages/projectcreatorpage';
+import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend, ProjectType } from './pages/projectcreatorpagetypes';
 import { WebViewBase } from './webviewbase';
 
 export class ProjectCreator extends WebViewBase {
@@ -71,7 +71,7 @@ export class ProjectCreator extends WebViewBase {
       vscode.window.showErrorMessage('Can only extract to absolute path');
       return;
     }
-    await this.exampleTemplateApi.createProject(data.template, data.language, data.base, data.toFolder, data.newFolder,
+    await this.exampleTemplateApi.createProject(data.projectType === ProjectType.Template, data.language, data.base, data.toFolder, data.newFolder,
       data.projectName, parseInt(data.teamNumber, 10));
 
     const toFolder = data.newFolder ? path.join(data.toFolder, data.projectName) : data.toFolder;
@@ -86,19 +86,30 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleProjectType() {
-    const result = await vscode.window.showQuickPick(['Template', 'Example'], {
+    const items = [];
+    items.push({label: 'Template', value: ProjectType.Template});
+    items.push({label: 'Example', value: ProjectType.Example});
+    items.push({label: 'RobotBuilder', value: ProjectType.RobotBuilder});
+    const result = await vscode.window.showQuickPick(items, {
       placeHolder: 'Select a project type.',
     });
     if (result) {
       await this.postMessage({
-        data: result === 'Template',
+        data: result.value,
         type: 'projecttype',
       });
     }
   }
 
   private async handleLanguage(data: IProjectIPCData) {
-    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getLanguages(data.template), {
+    let languages: string[] = [];
+    // tslint:disable-next-line:prefer-conditional-expression
+    if (data.projectType === ProjectType.RobotBuilder) {
+      languages = ['cpp', 'java'];
+    } else {
+      languages = this.exampleTemplateApi.getLanguages(data.projectType === ProjectType.Template);
+    }
+    const result = await vscode.window.showQuickPick(languages, {
       placeHolder: 'Select a language',
     });
     if (result) {
@@ -110,7 +121,7 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleBase(data: IProjectIPCData) {
-    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getBases(data.template, data.language), {
+    const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getBases(data.projectType === ProjectType.Template, data.language), {
       placeHolder: 'Select a project base',
     });
     if (result) {
