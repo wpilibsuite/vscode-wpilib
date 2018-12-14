@@ -44,8 +44,8 @@ Properties:
     name: Autonomous command parameters
     validators: null
     value: []
-  Java Package: !!robotbuilder.data.properties.StringProperty {default: frc.robot,
-    name: Java Package, validators: null, value: frc.robot}
+  Java Package: !!robotbuilder.data.properties.StringProperty {default: ###PACKAGEREPLACE###,
+    name: Java Package, validators: null, value: ###PACKAGEREPLACE###}
   Use Default Java Package: !!robotbuilder.data.properties.BooleanProperty {default: true,
     name: Use Default Java Package, validators: null, value: true}
   Team Number: !!robotbuilder.data.properties.IntegerProperty {default: 0, name: Team Number,
@@ -59,4 +59,4 @@ Properties:
   Export Directory: !!robotbuilder.data.properties.FileProperty {default: .,
     extension: null, folder: true, name: Export Directory, validators: null, value: .}
 Base: Robot
-Name: MyProjectName
+Name: ###PROJECTNAMEREPLACE###
