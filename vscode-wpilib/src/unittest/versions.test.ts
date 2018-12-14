@@ -31,6 +31,12 @@ const data = [
   new TestData('2019.1.1-beta-2', '2019.1.1-beta-1', true),
   new TestData('2019.1.1-beta-2b', '2019.1.1-beta-2', true),
   new TestData('2019.1.1-beta-2b', '2019.1.1-beta-2a', true),
+  new TestData('2019.1.1-beta-3', '2019.1.1-beta-2a', true),
+  new TestData('2019.1.1-beta-3a', '2019.1.1-beta-2a', true),
+  new TestData('2019.1.1-beta-3a', '2019.1.1-beta-3', true),
+  new TestData('2019.1.1-beta-3', '2019.1.1-beta-3-pre5', true),
+  new TestData('2019.1.1-beta-3-pre7', '2019.1.1-beta-3-pre6', true),
+  new TestData('2019.1.1-beta-3a', '2019.1.1-beta-3-pre1', true),
 ];
 
 suite('Version Tests', () => {

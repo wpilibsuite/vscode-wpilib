@@ -74,6 +74,22 @@ export function isNewerVersion(version1: IVersion | string, version2: IVersion |
     return false;
   }
 
-  // If both have extra data, go alphanumeric
-  return version1.else > version2.else;
+  // If both have extra data, check for pre,
+  // then go alphanumeric
+  const version1Pre = version1.else.indexOf('pre') >= 0;
+  const version2Pre = version2.else.indexOf('pre') >= 0;
+
+  if (version1Pre && version2Pre) {
+    // Both pre, return greatest
+    return version1.else > version2.else;
+  } else if (version1Pre) {
+    // False if 1 has pre
+    return false;
+  } else if (version2Pre) {
+    // True is 2 has pre
+    return true;
+  } else {
+    // Neither has pre, return greatest.
+    return version1.else > version2.else;
+  }
 }
