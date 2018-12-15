@@ -1,22 +1,130 @@
 'use strict';
-/*
+
 import * as electron from 'electron';
 import * as path from 'path';
-import { promisifyReadFile } from './utilities';
+import { Examples } from './shared/examples';
+import { ExampleTemplateAPI } from './shared/exampletemplateapi';
+import { setDesktopEnabled } from './shared/generator';
+import { addRobotBuilderExamples } from './shared/robotbuilder';
+import { Templates } from './shared/templates';
+import { UtilitiesAPI } from './shared/utilitiesapi';
+import { addVendorExamples } from './shared/vendorexamples';
+import { VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import { promptForProjectOpen } from './utilities';
+import * as vscode from './vscodeshim';
 
-// let template = false;
-// let language = '';
-// let base = '';
-
-// const dialog = electron.remote.dialog;
+const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
 
-interface IDisplayJSON {
-  name: string;
-  description: string;
-  tags: string[];
-  foldername: string;
-  gradlebase: string;
+let exampleTemplateApi: ExampleTemplateAPI;
+
+export function projectSelectButtonClick() {
+  (document.activeElement as HTMLElement).blur();
+  dialog.showOpenDialog(bWindow, {
+    buttonLabel: 'Select Folder',
+    defaultPath: electron.remote.app.getPath('documents'),
+    message: 'Select a folder to put the project in',
+    properties: [
+      'openDirectory',
+    ],
+    title: 'Select a folder to put the project in',
+  }, (paths) => {
+    if (paths && paths.length === 1) {
+      const input = document.getElementById('projectFolder') as HTMLInputElement;
+      input.value = paths[0];
+    } else {
+      // TODO
+    }
+  });
+}
+
+export function selectProjectType() {
+  const select = document.getElementById('projectTypeSelect') as HTMLSelectElement;
+  if (select.value !== 'base') {
+    // Not a base, enable lang
+    const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
+    const langSelect = document.getElementById('languageSelect') as HTMLSelectElement;
+    langSelect.disabled = false;
+    langSelect.value = 'base';
+    baseSelect.disabled = true;
+    baseSelect.value = 'base';
+  } else {
+    const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
+    const langSelect = document.getElementById('languageSelect') as HTMLSelectElement;
+    langSelect.disabled = true;
+    langSelect.value = 'base';
+    baseSelect.disabled = true;
+    baseSelect.value = 'base';
+  }
+}
+
+export function selectLanguage() {
+  const select = document.getElementById('languageSelect') as HTMLSelectElement;
+  if (select.value !== 'base') {
+    // Not a base, enable lang
+    const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
+    const typeSelect = document.getElementById('projectTypeSelect') as HTMLSelectElement;
+    if (typeSelect.value !== 'robotbuilder') {
+      setupBaseSelects(typeSelect.value === 'template', select.value);
+      baseSelect.disabled = false;
+    }
+  } else {
+    const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
+    baseSelect.disabled = true;
+    baseSelect.value = 'base';
+  }
+}
+
+export function selectRobotBase() {
+
+  //
+}
+
+export async function generateProjectButtonClick() {
+  const typeSelect = document.getElementById('projectTypeSelect') as HTMLSelectElement;
+  const langSelect = document.getElementById('languageSelect') as HTMLSelectElement;
+  const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
+
+  if (typeSelect.value === 'base' || langSelect.type === 'base') {
+    alert('project type or language not selected');
+    return;
+  }
+  if (typeSelect.value === 'robotbuilder') {
+    // RobotBuilder
+    await handleProjectGenerate(false, langSelect.value, 'RobotBuilder');
+  } else if (baseSelect.value === 'base') {
+    // No base selected, error
+    alert('project base not selected');
+    return;
+  } else {
+    await handleProjectGenerate(typeSelect.value === 'template', langSelect.value, baseSelect.value);
+  }
+}
+
+async function handleProjectGenerate(template: boolean, language: string, base: string) {
+  const projectFolder = (document.getElementById('projectFolder') as HTMLInputElement).value;
+  const projectName = (document.getElementById('projectName') as HTMLInputElement).value;
+  const newFolder = (document.getElementById('newFolderCB') as HTMLInputElement).checked;
+  const teamNumber = (document.getElementById('teamNumber') as HTMLInputElement).value;
+  const desktop = (document.getElementById('desktopCB') as HTMLInputElement).checked;
+
+  if (!path.isAbsolute(projectFolder)) {
+    alert('Can only extract to absolute path');
+    return;
+  }
+
+  await exampleTemplateApi.createProject(template, language, base, projectFolder, newFolder, projectName,
+                                          parseInt(teamNumber, 10));
+
+  const toFolder = newFolder ? path.join(projectFolder, projectName) : projectFolder;
+
+  if (desktop) {
+    const buildgradle = path.join(toFolder, 'build.gradle');
+
+    await setDesktopEnabled(buildgradle, true);
+  }
+
+  await promptForProjectOpen(vscode.Uri.file(toFolder));
 }
 
 const remote = electron.remote;
@@ -31,36 +139,36 @@ let resourceRoot = path.join(basepath, 'resources');
 if (basepath.indexOf('default_app.asar') >= 0) {
   resourceRoot = 'resources';
 }
-const examplesFileName = 'examples.json';
-const templatesFileName = 'templates.json';
-const cppRoot = path.join(resourceRoot, 'cpp', 'src');
-// const gradleRoot = path.join(resourceRoot, 'gradle');
-const cppTemplatesRoot = path.join(cppRoot, 'templates');
-const cppExamplesRoot = path.join(cppRoot, 'examples');
-const cppTemplatesFile = path.join(cppTemplatesRoot, templatesFileName);
-const cppExamplesFile = path.join(cppExamplesRoot, examplesFileName);
-const javaRoot = path.join(resourceRoot, 'java', 'src');
-const javaTemplatesRoot = path.join(javaRoot, 'templates');
-const javaExamplesRoot = path.join(javaRoot, 'examples');
-const javaTemplatesFile = path.join(javaTemplatesRoot, templatesFileName);
-const javaExamplesFile = path.join(javaExamplesRoot, examplesFileName);
+
+const cppRoot = path.join(resourceRoot, 'cpp');
+const gradleRoot = path.join(resourceRoot, 'gradle');
+const javaRoot = path.join(resourceRoot, 'java');
 
 let projectRootPath = app.getPath('home');
 if (process.platform === 'win32') {
   projectRootPath = app.getPath('documents');
 }
 
-// let javaTemplatesContents: IDisplayJSON[] = [];
-//  let javaExamplesContents: IDisplayJSON[] = [];
-let cppTemplatesContents: IDisplayJSON[] = [];
-let cppExamplesContents: IDisplayJSON[] = [];
+const disposables = [];
 
 window.addEventListener('load', async () => {
-  javaTemplatesContents = JSON.parse(await promisifyReadFile(javaTemplatesFile)) as IDisplayJSON[];
-  javaExamplesContents = JSON.parse(await promisifyReadFile(javaExamplesFile)) as IDisplayJSON[];
-  cppTemplatesContents = JSON.parse(await promisifyReadFile(cppTemplatesFile)) as IDisplayJSON[];
-  cppExamplesContents = JSON.parse(await promisifyReadFile(cppExamplesFile)) as IDisplayJSON[];
-  //
+  exampleTemplateApi = new ExampleTemplateAPI();
+  const utilitesApi = new UtilitiesAPI();
+  const vendorLibsBase = new VendorLibrariesBase(utilitesApi);
+  const cppExamples = new Examples(cppRoot, false, exampleTemplateApi);
+  const cppTemplates = new Templates(cppRoot, false, exampleTemplateApi);
+  const javaExamples = new Examples(javaRoot, true, exampleTemplateApi);
+  const javaTemplates = new Templates(javaRoot, true, exampleTemplateApi);
+  await addVendorExamples(resourceRoot, exampleTemplateApi, utilitesApi, vendorLibsBase);
+  await addRobotBuilderExamples(resourceRoot, exampleTemplateApi);
+
+  disposables.push(cppExamples);
+  disposables.push(cppTemplates);
+  disposables.push(javaExamples);
+  disposables.push(javaTemplates);
+
+  console.log(projectRootPath);
+  console.log(gradleRoot);
 });
 
 document.addEventListener('keydown', (e) => {
@@ -70,6 +178,24 @@ document.addEventListener('keydown', (e) => {
     location.reload();
   }
 });
+
+function setupBaseSelects(template: boolean, language: string) {
+  const select = document.getElementById('projectBaseSelect') as HTMLSelectElement;
+  select.options.length = 0;
+  const baseElement = document.createElement('option'); // new HTMLOptionElement();
+  baseElement.value = 'base';
+  baseElement.innerText = 'Select a project base';
+  select.add(baseElement);
+  const bases = exampleTemplateApi.getBases(template, language);
+  for (const base of bases) {
+    const newElement = document.createElement('option');
+    newElement.value = base.label;
+    newElement.innerText = base.label;
+    select.add(newElement);
+  }
+}
+
+/*
 
 export function projectTypeButton() {
   (document.getElementById('projectType') as HTMLButtonElement).style.display = 'none';

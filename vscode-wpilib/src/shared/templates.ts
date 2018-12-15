@@ -2,10 +2,10 @@
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator } from 'vscode-wpilibapi';
-import { logger } from './logger';
-import { generateCopyCpp, generateCopyJava } from './shared/generator';
+import { logger } from '../logger';
+import * as vscode from '../vscodeshim';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
+import { generateCopyCpp, generateCopyJava } from './generator';
 
 export interface ITemplateJsonLayout {
   name: string;

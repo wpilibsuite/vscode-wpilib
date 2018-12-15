@@ -3,14 +3,8 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IPreferences } from 'vscode-wpilibapi';
+import { IPreferencesJson } from './shared/preferencesjson';
 import { promisifyExists, promisifyMkDir, promisifyReadFile, promisifyWriteFile } from './utilities';
-
-export interface IPreferencesJson {
-  currentLanguage: string;
-  teamNumber: number;
-  enableCppIntellisense: boolean;
-  projectYear: string;
-}
 
 const defaultPreferences: IPreferencesJson = {
   currentLanguage: 'none',

@@ -5,8 +5,9 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
+import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
-import { getDesktopEnabled, gradleRun, javaHome, promisifyExists, setDesktopEnabled } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome, promisifyExists } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
 
 interface IUpdatePair {

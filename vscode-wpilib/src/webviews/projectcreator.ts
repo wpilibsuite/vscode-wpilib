@@ -3,8 +3,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from 'vscode-wpilibapi';
-import { ExampleTemplateAPI } from '../exampletemplateapi';
-import { extensionContext, setDesktopEnabled } from '../utilities';
+import { setDesktopEnabled } from '../shared/generator';
+import { extensionContext, promptForProjectOpen } from '../utilities';
 import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend, ProjectType } from './pages/projectcreatorpagetypes';
 import { WebViewBase } from './webviewbase';
 
@@ -82,7 +82,7 @@ export class ProjectCreator extends WebViewBase {
       await setDesktopEnabled(buildgradle, true);
     }
 
-    await ExampleTemplateAPI.PromptForProjectOpen(vscode.Uri.file(toFolder));
+    await promptForProjectOpen(vscode.Uri.file(toFolder));
   }
 
   private async handleProjectType() {
