@@ -16,6 +16,8 @@ import * as vscode from './vscodeshim';
 const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
 
+let exampleTemplateApi: ExampleTemplateAPI;
+
 export function projectSelectButtonClick() {
   (document.activeElement as HTMLElement).blur();
   dialog.showOpenDialog(bWindow, {
@@ -147,7 +149,6 @@ if (process.platform === 'win32') {
   projectRootPath = app.getPath('documents');
 }
 
-let exampleTemplateApi: ExampleTemplateAPI;
 const disposables = [];
 
 window.addEventListener('load', async () => {
@@ -158,8 +159,8 @@ window.addEventListener('load', async () => {
   const cppTemplates = new Templates(cppRoot, false, exampleTemplateApi);
   const javaExamples = new Examples(javaRoot, true, exampleTemplateApi);
   const javaTemplates = new Templates(javaRoot, true, exampleTemplateApi);
-  addVendorExamples(resourceRoot, exampleTemplateApi, utilitesApi, vendorLibsBase);
-  addRobotBuilderExamples(resourceRoot, exampleTemplateApi);
+  await addVendorExamples(resourceRoot, exampleTemplateApi, utilitesApi, vendorLibsBase);
+  await addRobotBuilderExamples(resourceRoot, exampleTemplateApi);
 
   disposables.push(cppExamples);
   disposables.push(cppTemplates);
