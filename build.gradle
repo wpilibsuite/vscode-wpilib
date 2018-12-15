@@ -1,7 +1,18 @@
 plugins {
-    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.2"
+    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.2" apply false
     id "base"
 }
+
+def azureRelease = System.getenv('BUILD_SOURCEBRANCH')
+if (azureRelease != null) {
+    println azureRelease
+    if (azureRelease.startsWith('refs/tags/')) {
+        project.ext.releaseType = 'OFFICIAL'
+        println 'tagged build'
+    }
+}
+
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
 configurations {
     cppSource
