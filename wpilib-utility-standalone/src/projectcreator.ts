@@ -2,7 +2,16 @@
 
 import * as electron from 'electron';
 import * as path from 'path';
-import { promisifyReadFile } from './utilities';
+import { Examples } from './shared/examples';
+import { ExampleTemplateAPI } from './shared/exampletemplateapi';
+import { setDesktopEnabled } from './shared/generator';
+import { addRobotBuilderExamples } from './shared/robotbuilder';
+import { Templates } from './shared/templates';
+import { UtilitiesAPI } from './shared/utilitiesapi';
+import { addVendorExamples } from './shared/vendorexamples';
+import { VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import { promptForProjectOpen } from './utilities';
+import * as vscode from './vscodeshim';
 
 const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
@@ -54,7 +63,7 @@ export function selectLanguage() {
     const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
     const typeSelect = document.getElementById('projectTypeSelect') as HTMLSelectElement;
     if (typeSelect.value !== 'robotbuilder') {
-      setupBaseSelects(typeSelect.value === 'template', select.value === 'java');
+      setupBaseSelects(typeSelect.value === 'template', select.value);
       baseSelect.disabled = false;
     }
   } else {
@@ -80,40 +89,40 @@ export async function generateProjectButtonClick() {
   }
   if (typeSelect.value === 'robotbuilder') {
     // RobotBuilder
-    await handleProjectGenerate(true, false, langSelect.value === 'java', '');
+    await handleProjectGenerate(false, langSelect.value, 'RobotBuilder');
   } else if (baseSelect.value === 'base') {
     // No base selected, error
     alert('project base not selected');
     return;
   } else {
-    await handleProjectGenerate(false, typeSelect.value === 'template', langSelect.value === 'java', baseSelect.value);
+    await handleProjectGenerate(typeSelect.value === 'template', langSelect.value, baseSelect.value);
   }
 }
 
-async function handleProjectGenerate(robotbuilder: boolean, _template: boolean, _java: boolean, _base: string) {
+async function handleProjectGenerate(template: boolean, language: string, base: string) {
   const projectFolder = (document.getElementById('projectFolder') as HTMLInputElement).value;
-  // const projectName = (document.getElementById('projectName') as HTMLInputElement).value;
-  // const newFolderCB = (document.getElementById('newFolderCB') as HTMLInputElement).checked;
-  // const teamNumber = (document.getElementById('teamNumber') as HTMLInputElement).value;
-  // const desktopCB = (document.getElementById('desktopCB') as HTMLInputElement).checked;
+  const projectName = (document.getElementById('projectName') as HTMLInputElement).value;
+  const newFolder = (document.getElementById('newFolderCB') as HTMLInputElement).checked;
+  const teamNumber = (document.getElementById('teamNumber') as HTMLInputElement).value;
+  const desktop = (document.getElementById('desktopCB') as HTMLInputElement).checked;
 
   if (!path.isAbsolute(projectFolder)) {
     alert('Can only extract to absolute path');
     return;
   }
 
-  if (robotbuilder) {
-    // Robot builder generation
+  await exampleTemplateApi.createProject(template, language, base, projectFolder, newFolder, projectName,
+                                          parseInt(teamNumber, 10));
 
+  const toFolder = newFolder ? path.join(projectFolder, projectName) : projectFolder;
+
+  if (desktop) {
+    const buildgradle = path.join(toFolder, 'build.gradle');
+
+    await setDesktopEnabled(buildgradle, true);
   }
-}
 
-interface IDisplayJSON {
-  name: string;
-  description: string;
-  tags: string[];
-  foldername: string;
-  gradlebase: string;
+  await promptForProjectOpen(vscode.Uri.file(toFolder));
 }
 
 const remote = electron.remote;
@@ -128,39 +137,35 @@ let resourceRoot = path.join(basepath, 'resources');
 if (basepath.indexOf('default_app.asar') >= 0) {
   resourceRoot = 'resources';
 }
-const examplesFileName = 'examples.json';
-const templatesFileName = 'templates.json';
-const cppRoot = path.join(resourceRoot, 'cpp', 'src');
+
+const cppRoot = path.join(resourceRoot, 'cpp');
 const gradleRoot = path.join(resourceRoot, 'gradle');
-const cppTemplatesRoot = path.join(cppRoot, 'templates');
-const cppExamplesRoot = path.join(cppRoot, 'examples');
-const cppTemplatesFile = path.join(cppTemplatesRoot, templatesFileName);
-const cppExamplesFile = path.join(cppExamplesRoot, examplesFileName);
-const javaRoot = path.join(resourceRoot, 'java', 'src');
-const javaTemplatesRoot = path.join(javaRoot, 'templates');
-const javaExamplesRoot = path.join(javaRoot, 'examples');
-const javaTemplatesFile = path.join(javaTemplatesRoot, templatesFileName);
-const javaExamplesFile = path.join(javaExamplesRoot, examplesFileName);
+const javaRoot = path.join(resourceRoot, 'java');
 
 let projectRootPath = app.getPath('home');
 if (process.platform === 'win32') {
   projectRootPath = app.getPath('documents');
 }
 
-let javaTemplatesContents: IDisplayJSON[] = [];
-let javaExamplesContents: IDisplayJSON[] = [];
-let cppTemplatesContents: IDisplayJSON[] = [];
-let cppExamplesContents: IDisplayJSON[] = [];
+let exampleTemplateApi: ExampleTemplateAPI;
+const disposables = [];
 
 window.addEventListener('load', async () => {
-  javaTemplatesContents = JSON.parse(await promisifyReadFile(javaTemplatesFile)) as IDisplayJSON[];
-  javaExamplesContents = JSON.parse(await promisifyReadFile(javaExamplesFile)) as IDisplayJSON[];
-  cppTemplatesContents = JSON.parse(await promisifyReadFile(cppTemplatesFile)) as IDisplayJSON[];
-  cppExamplesContents = JSON.parse(await promisifyReadFile(cppExamplesFile)) as IDisplayJSON[];
-  console.log(javaExamplesContents);
-  console.log(cppTemplatesContents);
-  console.log(cppExamplesContents);
-  console.log(javaTemplatesContents);
+  exampleTemplateApi = new ExampleTemplateAPI();
+  const utilitesApi = new UtilitiesAPI();
+  const vendorLibsBase = new VendorLibrariesBase(utilitesApi);
+  const cppExamples = new Examples(cppRoot, false, exampleTemplateApi);
+  const cppTemplates = new Templates(cppRoot, false, exampleTemplateApi);
+  const javaExamples = new Examples(javaRoot, true, exampleTemplateApi);
+  const javaTemplates = new Templates(javaRoot, true, exampleTemplateApi);
+  addVendorExamples(resourceRoot, exampleTemplateApi, utilitesApi, vendorLibsBase);
+  addRobotBuilderExamples(resourceRoot, exampleTemplateApi);
+
+  disposables.push(cppExamples);
+  disposables.push(cppTemplates);
+  disposables.push(javaExamples);
+  disposables.push(javaTemplates);
+
   console.log(projectRootPath);
   console.log(gradleRoot);
 });
@@ -173,45 +178,19 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-function setupBaseSelects(template: boolean, java: boolean) {
+function setupBaseSelects(template: boolean, language: string) {
   const select = document.getElementById('projectBaseSelect') as HTMLSelectElement;
   select.options.length = 0;
   const baseElement = document.createElement('option'); // new HTMLOptionElement();
   baseElement.value = 'base';
   baseElement.innerText = 'Select a project base';
   select.add(baseElement);
-  if (template && java) {
-    // java template
-    for (const item of javaTemplatesContents) {
-      const newElement = document.createElement('option');
-      newElement.value = item.name;
-      newElement.innerText = item.name;
-      select.add(newElement);
-    }
-  } else if (java) {
-    // java example
-    for (const item of javaExamplesContents) {
-      const newElement = document.createElement('option');
-      newElement.value = item.name;
-      newElement.innerText = item.name;
-      select.add(newElement);
-    }
-  } else if (template) {
-    // cpp template
-    for (const item of cppTemplatesContents) {
-      const newElement = document.createElement('option');
-      newElement.value = item.name;
-      newElement.innerText = item.name;
-      select.add(newElement);
-    }
-  } else {
-    // cpp example
-    for (const item of cppExamplesContents) {
-      const newElement = document.createElement('option');
-      newElement.value = item.name;
-      newElement.innerText = item.name;
-      select.add(newElement);
-    }
+  const bases = exampleTemplateApi.getBases(template, language);
+  for (const base of bases) {
+    const newElement = document.createElement('option');
+    newElement.value = base.label;
+    newElement.innerText = base.label;
+    select.add(newElement);
   }
 }
 

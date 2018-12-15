@@ -21,3 +21,7 @@ export interface IExampleTemplateAPI {
   createProject(template: boolean, language: string, base: string, toFolder: string,
                 newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean>;
 }
+
+export interface IUtilitiesAPI {
+  getWPILibHomeDir(): string;
+}

@@ -47,6 +47,9 @@ window.addEventListener('load', () => {
   mainDiv.appendChild(generatorButton);
   mainDiv.appendChild(document.createElement('br'));
 
+  return;
+  /*
+
   const eclipseButton = document.createElement('button');
   eclipseButton.appendChild(document.createTextNode('Start Eclipse Importer'));
   eclipseButton.addEventListener('click', () => {
@@ -59,4 +62,5 @@ window.addEventListener('load', () => {
   });
   eclipseButton.style.marginTop = '5px';
   mainDiv.appendChild(eclipseButton);
+  */
 });

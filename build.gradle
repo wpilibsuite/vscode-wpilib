@@ -51,6 +51,12 @@ task copyFromVsCodeToStandaloneResources(type: Copy) {
     from ('vscode-wpilib/resources/gradle') {
         into 'gradle'
     }
+    from ('vscode-wpilib/resources/robotbuilderbase.yaml') {
+        into '/'
+    }
+    from ('vscode-wpilib/resources/eclipseprojectmain.java') {
+        into '/'
+    }
     into 'wpilib-utility-standalone/resources'
 }
 

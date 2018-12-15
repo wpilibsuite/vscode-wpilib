@@ -2,12 +2,12 @@
 
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from 'vscode-wpilibapi';
-import { logger } from './logger';
-import { generateCopyCpp, generateCopyJava, promisifyMkdirp, promisifyReadDir } from './shared/generator';
-import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
-import { VendorLibraries } from './vendorlibraries';
+import { logger } from '../logger';
+import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import * as vscode from '../vscodeshim';
+import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../wpilibapishim';
+import { generateCopyCpp, generateCopyJava, promisifyMkdirp, promisifyReadDir } from './generator';
+import { VendorLibrariesBase } from './vendorlibrariesbase';
 
 export interface IFile {
   deployloc: string;
@@ -35,7 +35,7 @@ function isJsonExample(arg: any): arg is IJsonExample {
 }
 
 export async function addVendorExamples(resourceRoot: string, core: IExampleTemplateAPI, utilities: IUtilitiesAPI,
-                                        vendorlibs: VendorLibraries): Promise<void> {
+                                        vendorlibs: VendorLibrariesBase): Promise<void> {
   const storagePath = extensionContext.storagePath;
   if (storagePath === undefined) {
     return;

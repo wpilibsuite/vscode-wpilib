@@ -2,8 +2,8 @@
 
 import * as os from 'os';
 import * as path from 'path';
-import { IUtilitiesAPI } from 'vscode-wpilibapi';
-import { getIsWindows } from './utilities';
+import { getIsWindows } from '../utilities';
+import { IUtilitiesAPI } from '../wpilibapishim';
 
 export class UtilitiesAPI implements IUtilitiesAPI {
   private wpilibHome: string | undefined;
