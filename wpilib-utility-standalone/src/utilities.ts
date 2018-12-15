@@ -1,4 +1,7 @@
+'use strict';
+
 import * as fs from 'fs';
+import * as vscode from './vscodeshim';
 
 export function promisifyExists(filename: string): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
@@ -30,4 +33,13 @@ export function promisifyReadFile(filename: string): Promise<string> {
       }
     });
   });
+}
+
+export let extensionContext: vscode.ExtensionContext;
+export function setExtensionContext(context: vscode.ExtensionContext): void {
+  extensionContext = context;
+}
+
+export async function promptForProjectOpen(_toFolder: vscode.Uri): Promise<boolean> {
+  return true;
 }

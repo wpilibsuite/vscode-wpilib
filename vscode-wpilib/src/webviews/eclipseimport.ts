@@ -4,10 +4,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ExampleTemplateAPI } from '../exampletemplateapi';
-import { IPreferencesJson } from '../preferences';
-import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from '../shared/generator';
-import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile, setDesktopEnabled } from '../utilities';
+import { generateCopyCpp, generateCopyJava, promisifyMkdirp, setDesktopEnabled } from '../shared/generator';
+import { IPreferencesJson } from '../shared/preferencesjson';
+import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile, promptForProjectOpen } from '../utilities';
 import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpagetypes';
 import { WebViewBase } from './webviewbase';
 
@@ -191,7 +190,7 @@ export class EclipseImport extends WebViewBase {
     parsed.teamNumber = parseInt(data.teamNumber, 10);
     await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
-    await ExampleTemplateAPI.PromptForProjectOpen(vscode.Uri.file(toFolder));
+    await promptForProjectOpen(vscode.Uri.file(toFolder));
   }
 
   private async asyncInitialize() {

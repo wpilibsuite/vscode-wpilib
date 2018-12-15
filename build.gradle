@@ -58,10 +58,7 @@ task copyFromVsCodeToStandaloneSrc(type: Copy) {
     from ('vscode-wpilib/src/riolog/shared') {
         into 'riolog/shared'
     }
-    from ('vscode-wpilib/src/shared/generator.ts') {
-        into 'shared'
-    }
-    from ('vscode-wpilib/src/shared/permissions.ts') {
+    from ('vscode-wpilib/src/shared') {
         into 'shared'
     }
     into 'wpilib-utility-standalone/src'

@@ -4,9 +4,9 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { Examples } from '../examples';
 import { logger } from '../logger';
-import { Templates } from '../templates';
+import { Examples } from '../shared/examples';
+import { Templates } from '../shared/templates';
 import { promisifyExists } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
