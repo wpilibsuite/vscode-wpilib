@@ -1,34 +1,13 @@
 'use scrict';
 
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator } from 'vscode-wpilibapi';
-import { IPreferencesJson } from './preferences';
-import { promisifyMkdirp } from './shared/generator';
-import { promisifyReadFile, promisifyWriteFile } from './utilities';
-
-interface ICreatorQuickPick extends vscode.QuickPickItem {
-  creator: IExampleTemplateCreator;
-}
+import { promisifyReadFile, promisifyWriteFile } from '../utilities';
+import * as vscode from '../vscodeshim';
+import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
+import { promisifyMkdirp } from './generator';
+import { IPreferencesJson } from './preferencesjson';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
-  public static async PromptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
-    const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?', {
-      modal: true,
-    }, 'Yes (Current Window)', 'Yes (New Window)', 'No');
-    if (openSelection === undefined) {
-      return true;
-    } else if (openSelection === 'Yes (Current Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
-    } else if (openSelection === 'Yes (New Window)') {
-      await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
-    } else {
-      return true;
-    }
-    return true;
-  }
-
-  private disposables: vscode.Disposable[] = [];
   private templates: ICreatorQuickPick[] = [];
   private examples: ICreatorQuickPick[] = [];
 
@@ -82,9 +61,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
   }
 
   public dispose() {
-    for (const d of this.disposables) {
-      d.dispose();
-    }
+    //
   }
 
   public async createProject(template: boolean, language: string, base: string, toFolder: string,

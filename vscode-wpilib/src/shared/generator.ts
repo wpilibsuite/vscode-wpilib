@@ -245,3 +245,23 @@ to get a proper path relative to the deploy directory.`);
 
   return true;
 }
+
+export function setDesktopEnabled(buildgradle: string, setting: boolean): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
+      if (err) {
+        resolve();
+      } else {
+        const dataOut = dataIn.replace(/def\s+includeDesktopSupport\s*=\s*(true|false)/gm,
+                                       `def includeDesktopSupport = ${setting ? 'true' : 'false'}`);
+        fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
+          if (err1) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }
+    });
+  });
+}

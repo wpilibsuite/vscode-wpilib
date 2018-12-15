@@ -1,11 +1,11 @@
 'use scrict';
 
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator } from 'vscode-wpilibapi';
-import { logger } from './logger';
-import { generateCopyCpp, generateCopyJava } from './shared/generator';
-import { extensionContext, promisifyReadFile, promisifyWriteFile } from './utilities';
+import { logger } from '../logger';
+import { extensionContext, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import * as vscode from '../vscodeshim';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
+import { generateCopyCpp, generateCopyJava } from './generator';
 
 export async function addRobotBuilderExamples(resourceRoot: string, core: IExampleTemplateAPI) {
   const storagePath = extensionContext.storagePath;

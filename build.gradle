@@ -1,7 +1,18 @@
 plugins {
-    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.2"
+    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.2" apply false
     id "base"
 }
+
+def azureRelease = System.getenv('BUILD_SOURCEBRANCH')
+if (azureRelease != null) {
+    println azureRelease
+    if (azureRelease.startsWith('refs/tags/')) {
+        project.ext.releaseType = 'OFFICIAL'
+        println 'tagged build'
+    }
+}
+
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
 configurations {
     cppSource
@@ -51,6 +62,12 @@ task copyFromVsCodeToStandaloneResources(type: Copy) {
     from ('vscode-wpilib/resources/gradle') {
         into 'gradle'
     }
+    from ('vscode-wpilib/resources/robotbuilderbase.yaml') {
+        into '/'
+    }
+    from ('vscode-wpilib/resources/eclipseprojectmain.java') {
+        into '/'
+    }
     into 'wpilib-utility-standalone/resources'
 }
 
@@ -58,10 +75,7 @@ task copyFromVsCodeToStandaloneSrc(type: Copy) {
     from ('vscode-wpilib/src/riolog/shared') {
         into 'riolog/shared'
     }
-    from ('vscode-wpilib/src/shared/generator.ts') {
-        into 'shared'
-    }
-    from ('vscode-wpilib/src/shared/permissions.ts') {
+    from ('vscode-wpilib/src/shared') {
         into 'shared'
     }
     into 'wpilib-utility-standalone/src'

@@ -103,7 +103,7 @@ build_script:
         throw ("Exec: " + $errorMessage)
     }
 
-    7z a WPILibStandalone.zip $env:APPVEYOR_BUILD_FOLDER\\build\\wpilibutility-win32-ia32\\*
+    7z a WPILibStandalone.zip $env:APPVEYOR_BUILD_FOLDER\\wpilib-utility-standalone\\build\\wpilibutility-win32-ia32\\*
 
     if ($lastexitcode -ne 0) {
         throw ("Exec: " + $errorMessage)
@@ -115,10 +115,3 @@ artifacts:
   name: VSIX
 - path: '**/WPILibStandalone.zip'
   name: Standalone
-deploy:
-- provider: GitHub
-  auth_token:
-    secure: h4+50xyT4O2QudfUFvnjoUGSZUxNePY9WaYshTsaTzJctxhFFb21eERKx40qumep
-  artifact: /.*\.*/
-  on:
-    appveyor_repo_tag: true

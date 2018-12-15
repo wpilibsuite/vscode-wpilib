@@ -165,22 +165,18 @@ export function getDesktopEnabled(buildgradle: string): Promise<boolean | undefi
   });
 }
 
-export function setDesktopEnabled(buildgradle: string, setting: boolean): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
-      if (err) {
-        resolve();
-      } else {
-        const dataOut = dataIn.replace(/def\s+includeDesktopSupport\s*=\s*(true|false)/gm,
-                                       `def includeDesktopSupport = ${setting ? 'true' : 'false'}`);
-        fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
-          if (err1) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      }
-    });
-  });
+export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
+  const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?', {
+    modal: true,
+  }, 'Yes (Current Window)', 'Yes (New Window)', 'No');
+  if (openSelection === undefined) {
+    return true;
+  } else if (openSelection === 'Yes (Current Window)') {
+    await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
+  } else if (openSelection === 'Yes (New Window)') {
+    await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
+  } else {
+    return true;
+  }
+  return true;
 }

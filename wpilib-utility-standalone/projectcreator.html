@@ -14,6 +14,10 @@
       border-color: red;
       border-width: 2px;
     }
+    body {
+        color: white;
+        background-color: #2e2c29;
+      }
   </style>
 </head>
 
@@ -22,23 +26,21 @@
 
   <h1>Welcome to WPILib New Project Creator</h1>
 
-  <button id="projectType" onclick="exports.projectTypeButton();" disabled>Select a project base</button>
-
-  <select id="projectTypeSelect" style="display: none" onchange="exports.selectProjectType();">
-    <option value="example">Examples</option>
+  <select id="projectTypeSelect" style="display: initial" onchange="exports.selectProjectType();">
+    <option value="base">Select a project type</option>
     <option value="template">Templates</option>
+    <option value="example">Examples</option>
+    <option value='robotbuilder'>RobotBuilder</option>
   </select>
 
-
-
-  <button id="language" onclick="exports.selectLanguage()" disabled>Select a language</button>
-
-  <select id="languageSelect" style="display: none" onchange="exports.selectLanguage();">
+  <select id="languageSelect" style="display: initial" disabled onchange="exports.selectLanguage();">
+    <option value="base">Select a project language</option>
+    <option value="cpp">C++</option>
+    <option value='java'>Java</option>
   </select>
 
-  <button id="projectBase" onclick="exports.selectProjectBase()" disabled>Select a project base</button>
-
-  <select id="projectBaseSelect" style="display: none" onchange="exports.selectProjectBase();">
+  <select id="projectBaseSelect" style="display: initial" disabled onchange="exports.selectRobotBase();">
+    <option value="base">Select a project base</option>
   </select>
 
   <br/>
@@ -46,7 +48,7 @@
   <br/>
   <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
-  <button onclick="exports.selectProjectFolder();">Select a new project folder</button>
+  <button onclick="exports.projectSelectButtonClick();">Select a new project folder</button>
   <br/>
   <br/> Create new folder? Highly recommended to be checked
   <input id="newFolderCB" type="checkbox" checked/>
@@ -60,6 +62,13 @@
   <input id="teamNumber" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
+  <div id="desktopdiv">
+    This is needed for simulation and unit testing support, however there are some cases where this will do
+    some unexpected things during build. In addition, not all vendor libraries support desktop.
+    This option can be set with the command "WPILib: Set Desktop Support" at any time.
+    <input id="desktopCB" type="checkbox" />
+  </div>
+  <br/>
 
-  <button id="generateProject" onclick="exports.generateProject()">Generate Project</button>
+  <button id="generateProject" onclick="exports.generateProjectButtonClick()">Generate Project</button>
 </body>
