@@ -54,7 +54,61 @@ jobs:
       inputs:
         artifactName: 'Linux'
 
- - job: Windows_64_Bit
+ - job: Windows_Standalone
+   pool:
+    vmImage: 'vs2017-win2016'
+
+   steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '8.x'
+      displayName: 'Install Node.js'
+
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build updateVersions updateAllDependencies'
+        options: '-PjenkinsBuild'
+
+    - script: |
+        npm install
+      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
+      displayName: 'npm install'
+
+    - script: |
+        npm run compile
+      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
+      displayName: 'npm compile'
+
+    - script: |
+        npm run lint
+      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
+      displayName: 'npm lint'
+
+    - script: |
+        npm run packageWindows
+      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
+      displayName: 'npm package'
+
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.SourcesDirectory)/wpilib-utility-standalone/build/wpilibutility-win32-ia32
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/wpilibutility-windows.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        artifactName: 'WindowsStandalone'
+
+ - job: Windows_VSIX
    pool:
     vmImage: 'vs2017-win2016'
 
@@ -117,36 +171,9 @@ jobs:
         contents: '**\*.vsix'
         targetFolder: $(Build.ArtifactStagingDirectory)
 
-    - script: |
-        npm install
-      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
-      displayName: 'npm install'
-
-    - script: |
-        npm run compile
-      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
-      displayName: 'npm compile'
-
-    - script: |
-        npm run lint
-      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
-      displayName: 'npm lint'
-
-    - script: |
-        npm run packageWindows
-      workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
-      displayName: 'npm package'
-
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: $(Build.SourcesDirectory)/wpilib-utility-standalone/build/wpilibutility-win32-ia32
-        includeRootFolder: false
-        archiveFile: '$(Build.ArtifactStagingDirectory)/wpilibutility-windows.zip'
-        replaceExistingArchive: true
-
     - task: PublishBuildArtifacts@1
       inputs:
-        artifactName: 'Windows'
+        artifactName: 'WindowsVSIX'
 
  - job: Mac
    pool:

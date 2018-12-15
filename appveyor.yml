@@ -115,10 +115,3 @@ artifacts:
   name: VSIX
 - path: '**/WPILibStandalone.zip'
   name: Standalone
-deploy:
-- provider: GitHub
-  auth_token:
-    secure: h4+50xyT4O2QudfUFvnjoUGSZUxNePY9WaYshTsaTzJctxhFFb21eERKx40qumep
-  artifact: /.*\.*/
-  on:
-    appveyor_repo_tag: true
