@@ -54,7 +54,7 @@ export async function addRobotBuilderExamples(resourceRoot: string, core: IExamp
               const projectName = path.basename(folderInto.fsPath);
               const replacedProject = yamlText.replace(new RegExp('###PACKAGEREPLACE###', 'g'), 'cpp')
                                               .replace(new RegExp('###PROJECTNAMEREPLACE###', 'g'), projectName);
-              await promisifyWriteFile(path.join(folderInto.fsPath, projectName + 'yaml'), replacedProject);
+              await promisifyWriteFile(path.join(folderInto.fsPath, projectName + '.yaml'), replacedProject);
               return true;
             },
               path.join(gradleBasePath, 'cpp'), folderInto.fsPath, false)) {
