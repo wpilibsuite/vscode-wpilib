@@ -1,8 +1,12 @@
 'use strict';
 
+import * as electron from 'electron';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as temp from 'temp';
 import * as vscode from './vscodeshim';
+
+const dialog = electron.remote.dialog;
 
 export function getIsWindows(): boolean {
   const nodePlatform: NodeJS.Platform = process.platform;
@@ -64,6 +68,17 @@ class ExtensionContext implements vscode.ExtensionContext {
 
 export const extensionContext: vscode.ExtensionContext = new ExtensionContext();
 
-export async function promptForProjectOpen(_toFolder: vscode.Uri): Promise<boolean> {
+export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
+  dialog.showMessageBox({
+    buttons: ['Open Folder', 'OK'],
+    message: 'Creation of project complete: ' + toFolder.fsPath,
+    noLink: true,
+  }, (r) => {
+    if (r === 0) {
+      console.log(toFolder);
+      electron.shell.showItemInFolder(path.join(toFolder.fsPath, 'build.gradle'));
+    }
+    console.log(r);
+  });
   return true;
 }
