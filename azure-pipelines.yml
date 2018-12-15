@@ -42,7 +42,7 @@ jobs:
       workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
       displayName: 'npm package'
 
-    - task: ArchiveFile@2
+    - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: $(Build.SourcesDirectory)/wpilib-utility-standalone/build/wpilibutility-linux-x64
         includeRootFolder: false
@@ -137,7 +137,7 @@ jobs:
       workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
       displayName: 'npm package'
 
-    - task: ArchiveFile@2
+    - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: $(Build.SourcesDirectory)/wpilib-utility-standalone/build/wpilibutility-win32-ia32
         includeRootFolder: false
@@ -191,7 +191,7 @@ jobs:
       workingDirectory: $(Build.SourcesDirectory)/wpilib-utility-standalone
       displayName: 'npm package'
 
-    - task: ArchiveFile@2
+    - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: $(Build.SourcesDirectory)/wpilib-utility-standalone/build/wpilibutility-darwin-x64
         includeRootFolder: false
