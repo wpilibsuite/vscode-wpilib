@@ -53,3 +53,4 @@ task resetVersions(type: Task) {
         oldVersionFile.delete()
     }
 }
+
