@@ -21,6 +21,8 @@
       "node_modules",
       ".vscode-test",
       "out",
-      "release"
+      "release",
+      "build",
+      "dist",
   ]
 }
