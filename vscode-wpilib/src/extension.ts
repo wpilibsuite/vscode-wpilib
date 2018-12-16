@@ -22,7 +22,6 @@ import { PersistentFolderState } from './persistentState';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { promisifyMkdirp } from './shared/generator';
-import { addRobotBuilderExamples } from './shared/robotbuilder';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
@@ -187,13 +186,6 @@ export async function activate(context: vscode.ExtensionContext) {
     await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI(), externalApi.getUtilitiesAPI(), vendorLibs);
   } catch (err) {
     logger.error('error creating vendor lib utilities', err);
-    creationError = true;
-  }
-
-  try {
-    await addRobotBuilderExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI());
-  } catch (err) {
-    logger.error('error creating robotbuilder utilities', err);
     creationError = true;
   }
 

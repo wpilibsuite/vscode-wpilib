@@ -89,7 +89,6 @@ export class ProjectCreator extends WebViewBase {
     const items = [];
     items.push({label: 'Template', value: ProjectType.Template});
     items.push({label: 'Example', value: ProjectType.Example});
-    items.push({label: 'RobotBuilder', value: ProjectType.RobotBuilder});
     const result = await vscode.window.showQuickPick(items, {
       placeHolder: 'Select a project type.',
     });
@@ -102,13 +101,7 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleLanguage(data: IProjectIPCData) {
-    let languages: string[] = [];
-    // tslint:disable-next-line:prefer-conditional-expression
-    if (data.projectType === ProjectType.RobotBuilder) {
-      languages = ['cpp', 'java'];
-    } else {
-      languages = this.exampleTemplateApi.getLanguages(data.projectType === ProjectType.Template);
-    }
+    const languages: string[] = this.exampleTemplateApi.getLanguages(data.projectType === ProjectType.Template);
     const result = await vscode.window.showQuickPick(languages, {
       placeHolder: 'Select a language',
     });

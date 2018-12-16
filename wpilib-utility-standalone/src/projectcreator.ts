@@ -5,7 +5,6 @@ import * as path from 'path';
 import { Examples } from './shared/examples';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { setDesktopEnabled } from './shared/generator';
-import { addRobotBuilderExamples } from './shared/robotbuilder';
 import { Templates } from './shared/templates';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
@@ -64,10 +63,8 @@ export function selectLanguage() {
     // Not a base, enable lang
     const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
     const typeSelect = document.getElementById('projectTypeSelect') as HTMLSelectElement;
-    if (typeSelect.value !== 'robotbuilder') {
-      setupBaseSelects(typeSelect.value === 'template', select.value);
-      baseSelect.disabled = false;
-    }
+    setupBaseSelects(typeSelect.value === 'template', select.value);
+    baseSelect.disabled = false;
   } else {
     const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
     baseSelect.disabled = true;
@@ -89,13 +86,9 @@ export async function generateProjectButtonClick() {
     alert('project type or language not selected');
     return;
   }
-  if (typeSelect.value === 'robotbuilder') {
-    // RobotBuilder
-    await handleProjectGenerate(false, langSelect.value, 'RobotBuilder');
-  } else if (baseSelect.value === 'base') {
+  if (baseSelect.value === 'base') {
     // No base selected, error
     alert('project base not selected');
-    return;
   } else {
     await handleProjectGenerate(typeSelect.value === 'template', langSelect.value, baseSelect.value);
   }
@@ -160,7 +153,6 @@ window.addEventListener('load', async () => {
   const javaExamples = new Examples(javaRoot, true, exampleTemplateApi);
   const javaTemplates = new Templates(javaRoot, true, exampleTemplateApi);
   await addVendorExamples(resourceRoot, exampleTemplateApi, utilitesApi, vendorLibsBase);
-  await addRobotBuilderExamples(resourceRoot, exampleTemplateApi);
 
   disposables.push(cppExamples);
   disposables.push(cppTemplates);
