@@ -137,11 +137,6 @@ jobs:
       displayName: 'npm install'
 
     - script: |
-        npm run compile
-      workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
-      displayName: 'npm compile'
-
-    - script: |
         npm run lint
       workingDirectory: $(Build.SourcesDirectory)/vscode-wpilib
       displayName: 'npm lint'

@@ -44,6 +44,7 @@
         "onCommand:wpilibcore.installGradleTools",
         "onCommand:wpilibcore.showLogFolder",
         "onCommand:wpilibcore.runGradleCommand",
+        "onCommand:wpilibcore.resetAutoUpdate",
         "onCommand:wpilibcore.changeDesktop"
     ],
     "main": "./out/extension",
@@ -370,7 +371,6 @@
         "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
         "gulp": "gulp",
         "test": "npm run webpack && node ./node_modules/vscode/bin/test",
-        "gulp": "gulp",
         "updateActivation": "gulp update-activation",
         "vscePackage": "vsce package"
     },
