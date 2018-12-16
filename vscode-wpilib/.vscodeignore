@@ -1,5 +1,12 @@
 .vscode/**
 .vscode-test/**
+node_modules
+webpack.config.js
+gulpfile.js
+package-lock.json
+i18n/**
+tsconfig.json
+tslint.json
 out/test/**
 out/**/*.map
 resources/webviews/out/**/*.map
