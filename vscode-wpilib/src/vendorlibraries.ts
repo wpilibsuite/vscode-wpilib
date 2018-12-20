@@ -4,6 +4,7 @@ import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
+import { logger } from './logger';
 import { promisifyReadDir } from './shared/generator';
 import { IJsonDependency, isJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { promisifyDeleteFile } from './utilities';
@@ -262,7 +263,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   private async loadFileFromUrl(url: string): Promise<IJsonDependency | undefined> {
     try {
-      const response = await fetch(url, {
+      const response = await fetch.default(url, {
         timeout: 5000,
       });
       if (response === undefined) {
@@ -283,7 +284,8 @@ export class VendorLibraries extends VendorLibrariesBase {
       } else {
         return undefined;
       }
-    } catch {
+    } catch (err) {
+      logger.log('Error fetching file', err);
       return undefined;
     }
   }
