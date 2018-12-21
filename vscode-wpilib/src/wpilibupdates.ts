@@ -117,7 +117,7 @@ export class WPILibUpdates {
   private async checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
     const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
     try {
-      const response = await fetch(metaDataUrl, {
+      const response = await fetch.default(metaDataUrl, {
         timeout: 5000,
       });
       if (response === undefined) {
