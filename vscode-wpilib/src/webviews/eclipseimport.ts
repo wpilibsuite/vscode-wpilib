@@ -177,12 +177,14 @@ export class EclipseImport extends WebViewBase {
 
     await setDesktopEnabled(buildgradle, true);
 
-    let mainFile = await promisifyReadFile(path.join(this.resourceRoot, 'eclipseprojectmain.java'));
-    mainFile = mainFile.replace(new RegExp('insertnewpackagehere', 'g'), javaRobotPackage)
-                       .replace(new RegExp('ROBOTCLASSNAMEHERE', 'g'), javaRobotClass);
+    if (!cpp) {
+      let mainFile = await promisifyReadFile(path.join(this.resourceRoot, 'eclipseprojectmain.java'));
+      mainFile = mainFile.replace(new RegExp('insertnewpackagehere', 'g'), javaRobotPackage)
+                        .replace(new RegExp('ROBOTCLASSNAMEHERE', 'g'), javaRobotClass);
 
-    const filePath = path.join(toFolder, 'src', 'main', 'java', ...javaRobotPackage.split('.'), 'Main.java');
-    await promisifyWriteFile(filePath, mainFile);
+      const filePath = path.join(toFolder, 'src', 'main', 'java', ...javaRobotPackage.split('.'), 'Main.java');
+      await promisifyWriteFile(filePath, mainFile);
+    }
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
