@@ -91,14 +91,9 @@ window.addEventListener('message', (event) => {
       pType.innerText = ProjectType[projectType].toLowerCase();
       lang.disabled = false;
       lang.innerText = 'Select a language';
-      if (projectType === ProjectType.RobotBuilder) {
-        baseButton.style.visibility = 'hidden';
-        base = 'RobotBuilder';
-      } else {
-        baseButton.style.visibility = 'initial';
-        baseButton.disabled = true;
-        baseButton.innerText = 'Select a project base';
-      }
+      baseButton.style.visibility = 'initial';
+      baseButton.disabled = true;
+      baseButton.innerText = 'Select a project base';
       selectLanguage();
       break;
     case 'language':
@@ -106,9 +101,7 @@ window.addEventListener('message', (event) => {
       lang.innerText = language;
       baseButton.disabled = false;
       baseButton.innerText = 'Select a project base';
-      if (projectType !== ProjectType.RobotBuilder) {
-        selectProjectBase();
-      }
+      selectProjectBase();
       break;
     case 'base':
       base = data.data as string;
