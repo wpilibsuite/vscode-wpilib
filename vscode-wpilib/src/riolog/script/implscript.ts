@@ -16,7 +16,7 @@ export function checkResize() {
 }
 
 export function scrollImpl() {
-  document.body.scrollTop = document.body.scrollHeight;
+  document.documentElement.scrollTop = document.documentElement.scrollHeight;
 }
 
 export function sendMessage(message: IIPCReceiveMessage) {
