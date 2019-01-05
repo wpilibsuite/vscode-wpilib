@@ -136,9 +136,6 @@ export async function activate(context: vscode.ExtensionContext) {
   // Active the java parts of the extension
   await activateJava(context, externalApi);
 
-  // Create all of our commands that the extension runs
-  createVsCommands(context, externalApi);
-
   let creationError: boolean = false;
 
   let help: Help | undefined;
@@ -198,6 +195,9 @@ export async function activate(context: vscode.ExtensionContext) {
     logger.error('error creating wpilib updater', err);
     creationError = true;
   }
+
+  // Create all of our commands that the extension runs
+  createVsCommands(context, externalApi);
 
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
   // Also check for local GradleRIO update
