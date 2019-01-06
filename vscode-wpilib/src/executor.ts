@@ -56,7 +56,7 @@ export class ExecuteAPI implements IExecuteAPI {
       }
     }
 
-    logger.log('executing command: ', shell);
+    logger.log('executing command in workspace', shell, workspace.uri.fsPath);
 
     const task = new vscode.Task({ type: 'wpilibgradle' }, workspace, name, 'wpilib', shell);
     const execution = await vscode.tasks.executeTask(task);
