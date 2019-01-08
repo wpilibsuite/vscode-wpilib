@@ -28,5 +28,6 @@
 	"wpilibcore.showLogFolder.title": "显示目录文件夹",
 	"wpilibcore.runGradleCommand.title": "在 Gradle 中运行命令",
 	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates Flag",
-	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Property"
+	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Property",
+	"wpilibcore.setDeployOnline.title": "Change Run Deploy Command in Online Mode Setting"
 }

@@ -215,6 +215,22 @@ export class Preferences implements IPreferences {
     return res;
   }
 
+  public async setDeployOnline(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('deployOnline', value, target);
+  }
+
+  public getDeployOnline(): boolean {
+    const res = this.getConfiguration().get<boolean>('deployOnline');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
   public dispose() {
     for (const d of this.disposables) {
       d.dispose();

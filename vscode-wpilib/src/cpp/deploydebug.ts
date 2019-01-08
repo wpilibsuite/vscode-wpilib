@@ -58,8 +58,11 @@ class DebugCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+    let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
+    if (!prefs.getDeployOnline() && prefs.getOnline()) {
+      command += ' --offline';
+    }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Debug', this.executeApi, prefs);
     if (result !== 0) {
       return false;
@@ -145,8 +148,11 @@ class DeployCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy -PteamNumber=' + teamNumber;
+    let command = 'deploy -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
+    if (!prefs.getDeployOnline() && prefs.getOnline()) {
+      command += ' --offline';
+    }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Deploy', this.executeApi, prefs);
     if (result !== 0) {
       return false;

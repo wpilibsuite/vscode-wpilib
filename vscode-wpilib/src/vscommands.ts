@@ -213,6 +213,25 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await preferences.setOnline(result.yes, result.global);
   }));
 
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setDeployOnline', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set deploy online in an empty workspace');
+      return;
+    }
+
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Run deploy command in Online mode? Currently ${preferences.getDeployOnline()}`);
+    if (result === undefined) {
+      logger.log('Invalid selection for settting deploy online');
+      return;
+    }
+
+    await preferences.setDeployOnline(result.yes, result.global);
+  }));
+
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStopSimulationOnEntry', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();

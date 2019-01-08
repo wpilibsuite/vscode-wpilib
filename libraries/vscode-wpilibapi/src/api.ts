@@ -98,6 +98,8 @@ export interface IPreferences {
   setOnline(value: boolean, global: boolean): Promise<void>;
   setSkipTests(value: boolean, global: boolean): Promise<void>;
   setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
+  setDeployOnline(value: boolean, global: boolean): Promise<void>;
+  getDeployOnline(): boolean;
 }
 
 export interface IExampleTemplateCreator {

@@ -11,6 +11,7 @@
 	"wpilibcore.setAutoSave.title": "Change Auto Save On Deploy Setting",
 	"wpilibcore.setSkipTests.title": "Change Skip Tests On Deploy Setting",
 	"wpilibcore.setOnline.title": "Change Run Commands in Online Mode Setting",
+	"wpilibcore.setDeployOnline.title": "Change Run Deploy Command in Online Mode Setting",
 	"wpilibcore.setStopSimulationOnEntry.title": "Change Stop Simulation on Entry Setting",
 	"wpilibcore.setStartRioLog.title": "Change Auto Start RioLog on Deploy Setting",
 	"wpilibcore.createCommand.title": "Create a new class/command",

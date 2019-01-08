@@ -30,6 +30,7 @@
         "onCommand:wpilibcore.setOnline",
         "onCommand:wpilibcore.setStopSimulationOnEntry",
         "onCommand:wpilibcore.setStartRioLog",
+        "onCommand:wpilibcore.setDeployOnline",
         "onCommand:wpilibcore.createCommand",
         "onCommand:wpilibcore.cancelTasks",
         "onCommand:wpilibcore.help",
@@ -117,6 +118,12 @@
                     "description": "Perform gradle commands without offline flag",
                     "scope": "resource"
                 },
+                "wpilib.deployOnline": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Perform gradle deploy command without offline flag",
+                    "scope": "resource"
+                },
                 "wpilib.skipTests": {
                     "type": "boolean",
                     "default": false,
@@ -202,6 +209,11 @@
             {
                 "command": "wpilibcore.setStartRioLog",
                 "title": "%wpilibcore.setStartRioLog.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.setDeployOnline",
+                "title": "%wpilibcore.setDeployOnline.title%",
                 "category": "WPILib"
             },
             {
@@ -415,7 +427,7 @@
         "vscode-cpptools": "2.1.2",
         "vscode-jsonrpc": "^4.0.0",
         "vscode-nls": "^4.0.0",
-        "vscode-wpilibapi": "^2019.0.8",
+        "vscode-wpilibapi": "^2019.1.0",
         "winston": "^3.1.0",
         "winston-transport": "^4.2.0",
         "wpilib-riolog": "^0.1.0",
