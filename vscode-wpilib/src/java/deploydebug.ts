@@ -63,7 +63,7 @@ class DebugCodeDeployer implements ICodeDeployer {
     const prefs = this.preferences.getPreferences(workspace);
     // If deploy offline, and builds online, set flags
     // Otherwise, build offline will be set later
-    if (!prefs.getDeployOnline() && prefs.getOnline()) {
+    if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Debug', this.executeApi, prefs);
@@ -132,7 +132,9 @@ class DeployCodeDeployer implements ICodeDeployer {
       command += ' -xcheck';
     }
     const prefs = this.preferences.getPreferences(workspace);
-    if (!prefs.getDeployOnline() && prefs.getOnline()) {
+    // If deploy offline, and builds online, set flags
+    // Otherwise, build offline will be set later
+    if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Deploy', this.executeApi, prefs);

@@ -91,15 +91,15 @@ export interface IPreferences {
   setEnableCppIntellisense(set: boolean): Promise<void>;
   getProjectYear(): string;
   setProjectYear(year: string): Promise<void>;
-  getOnline(): boolean;
   getSkipTests(): boolean;
   getStopSimulationOnEntry(): boolean;
   getAdditionalGradleArguments(): string;
-  setOnline(value: boolean, global: boolean): Promise<void>;
   setSkipTests(value: boolean, global: boolean): Promise<void>;
   setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
-  setDeployOnline(value: boolean, global: boolean): Promise<void>;
-  getDeployOnline(): boolean;
+  getOffline(): boolean;
+  setOffline(value: boolean, global: boolean): Promise<void>;
+  getDeployOffline(): boolean;
+  setDeployOffline(value: boolean, global: boolean): Promise<void>;
 }
 
 export interface IExampleTemplateCreator {

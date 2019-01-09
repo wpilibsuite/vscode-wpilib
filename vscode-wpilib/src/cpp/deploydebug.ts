@@ -60,7 +60,9 @@ class DebugCodeDeployer implements ICodeDeployer {
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
-    if (!prefs.getDeployOnline() && prefs.getOnline()) {
+    // If deploy offline, and builds online, set flags
+    // Otherwise, build offline will be set later
+    if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Debug', this.executeApi, prefs);
@@ -150,7 +152,9 @@ class DeployCodeDeployer implements ICodeDeployer {
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
     let command = 'deploy -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
-    if (!prefs.getDeployOnline() && prefs.getOnline()) {
+    // If deploy offline, and builds online, set flags
+    // Otherwise, build offline will be set later
+    if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Deploy', this.executeApi, prefs);

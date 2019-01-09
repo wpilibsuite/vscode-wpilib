@@ -129,7 +129,7 @@ export function setJavaHome(jhome: string): void {
 export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
                                 name: string, executeApi: IExecuteAPI, preferences: IPreferences): Promise<number> {
   let command = './gradlew ' + args + ' ' + preferences.getAdditionalGradleArguments();
-  if (!preferences.getOnline()) {
+  if (preferences.getOffline()) {
     command += ' --offline';
   }
 
