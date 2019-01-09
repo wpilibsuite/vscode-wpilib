@@ -27,6 +27,6 @@
 	"wpilibcore.installGradleTools.title": "从 GradleRIO 安装工具",
 	"wpilibcore.showLogFolder.title": "显示目录文件夹",
 	"wpilibcore.runGradleCommand.title": "在 Gradle 中运行命令",
-	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates Flag",
-	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Property"
+	"wpilibcore.resetAutoUpdate.title": "重制自动检查 WPILib 更新设置",
+	"wpilibcore.changeDesktop.title": "设置桌面支持属性"
 }
