@@ -26,7 +26,7 @@ import { promisifyMkdirp } from './shared/generator';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
-import { promisifyExists, setExtensionContext, setJavaHome } from './utilities';
+import { setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
