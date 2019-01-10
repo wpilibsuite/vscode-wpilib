@@ -10,7 +10,6 @@
 	"wpilibcore.setLanguage.title": "设置语言",
 	"wpilibcore.setAutoSave.title": "设置部署时自动保存",
 	"wpilibcore.setSkipTests.title": "设置是否跳过测试",
-	"wpilibcore.setOnline.title": "设置“模式”是否为“在线模式”",
 	"wpilibcore.setStopSimulationOnEntry.title": "设置是否在进入时停止模拟运行",
 	"wpilibcore.setStartRioLog.title": "设置是否在部署时启动 RioLog",
 	"wpilibcore.createCommand.title": "创建一个新的类/命令",
@@ -28,5 +27,7 @@
 	"wpilibcore.showLogFolder.title": "显示目录文件夹",
 	"wpilibcore.runGradleCommand.title": "在 Gradle 中运行命令",
 	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates Flag",
-	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Property"
+	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Property",
+	"wpilibcore.setDeployOffline.title": "Change Run Deploy/Debug Command in Offline Mode Setting",
+	"wpilibcore.setOffline.title": "Change Run Commands Except Deploy/Debug in Offline Mode Setting"
 }

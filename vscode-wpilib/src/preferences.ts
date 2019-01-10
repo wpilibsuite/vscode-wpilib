@@ -147,12 +147,12 @@ export class Preferences implements IPreferences {
     return this.getConfiguration().update('autoStartRioLog', autoStart, target);
   }
 
-  public async setOnline(value: boolean, global: boolean): Promise<void> {
+  public async setOffline(value: boolean, global: boolean): Promise<void> {
     let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
     if (!global) {
       target = vscode.ConfigurationTarget.WorkspaceFolder;
     }
-    return this.getConfiguration().update('online', value, target);
+    return this.getConfiguration().update('offline', value, target);
   }
 
   public async setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void> {
@@ -195,8 +195,8 @@ export class Preferences implements IPreferences {
     return res;
   }
 
-  public getOnline(): boolean {
-    const res = this.getConfiguration().get<boolean>('online');
+  public getOffline(): boolean {
+    const res = this.getConfiguration().get<boolean>('offline');
     if (res === undefined) {
       return false;
     }
@@ -213,6 +213,22 @@ export class Preferences implements IPreferences {
 
   public getStopSimulationOnEntry(): boolean {
     const res = this.getConfiguration().get<boolean>('stopSimulationOnEntry');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
+  public async setDeployOffline(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('deployOffline', value, target);
+  }
+
+  public getDeployOffline(): boolean {
+    const res = this.getConfiguration().get<boolean>('deployOffline');
     if (res === undefined) {
       return false;
     }
