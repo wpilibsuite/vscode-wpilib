@@ -3,6 +3,9 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
 def ROBOT_MAIN_CLASS = "###ROBOTCLASSREPLACE###"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
