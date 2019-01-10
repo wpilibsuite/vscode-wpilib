@@ -297,21 +297,9 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     if (javaHome === '') {
       return;
     }
-    const selection = await vscode.window.showInformationMessage('Set in project or globally?', {modal: true}, 'Project', 'Global');
-    if (selection !== undefined) {
-      if (selection === 'Project') {
-        const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-        if (wp === undefined) {
-          vscode.window.showInformationMessage('Cannot set java on empty workspace');
-          return;
-        }
-        const javaConfig = vscode.workspace.getConfiguration('java', wp.uri);
-        await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.WorkspaceFolder);
-      } else {
-        const javaConfig = vscode.workspace.getConfiguration('java');
-        await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
-      }
-    }
+    const javaConfig = vscode.workspace.getConfiguration('java');
+    await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
+    await vscode.window.showInformationMessage('Successfully set java.home');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {
