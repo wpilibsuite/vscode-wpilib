@@ -17,7 +17,9 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     console: 'integratedTerminal',
     cwd: commands.workspace.uri.fsPath,
     env: {
+      DYLD_LIBRARY_PATH: commands.librarydir,
       HALSIM_EXTENSIONS: commands.extensions,
+      LD_LIBRARY_PATH: commands.librarydir,
       PATH: commands.librarydir,
     },
     mainClass: commands.mainclass,

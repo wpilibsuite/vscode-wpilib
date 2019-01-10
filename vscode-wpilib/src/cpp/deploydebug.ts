@@ -251,6 +251,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
         clang: targetSimulateInfo.clang!,
         executablePath: targetSimulateInfo.launchfile,
         extensions,
+        ldPath: path.dirname(targetSimulateInfo.launchfile),    // gradle puts all the libs in the same dir as the executable
         soLibPath: soPath,
         srcPaths: new Set<string>(targetSimulateInfo.srcpaths),
         stopAtEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
