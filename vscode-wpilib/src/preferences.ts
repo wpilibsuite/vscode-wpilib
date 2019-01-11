@@ -32,6 +32,9 @@ export async function requestTeamNumber(): Promise<number> {
 
 // Stores the preferences for a specific workspace
 export class Preferences implements IPreferences {
+  public static readonly preferenceFileName: string = 'wpilib_preferences.json';
+  public static readonly wpilibPreferencesFolder: string = '.wpilib';
+
   // Create for a specific workspace
   public static async Create(workspace: vscode.WorkspaceFolder): Promise<Preferences> {
     const prefs = new Preferences(workspace);
@@ -39,21 +42,22 @@ export class Preferences implements IPreferences {
     return prefs;
   }
 
+  public static getPrefrencesFilePath(root: string): string {
+    return path.join(root, Preferences.wpilibPreferencesFolder, Preferences.preferenceFileName);
+  }
+
   // Workspace these preferences are assigned to.
   public workspace: vscode.WorkspaceFolder;
 
   private preferencesFile?: vscode.Uri;
-  private readonly configFolder: string;
-  private readonly preferenceFileName: string = 'wpilib_preferences.json';
   private preferencesJson: IPreferencesJson = defaultPreferences;
   private configFileWatcher: vscode.FileSystemWatcher;
-  private readonly preferencesGlob: string = '**/' + this.preferenceFileName;
+  private readonly preferencesGlob: string = '**/' + Preferences.preferenceFileName;
   private disposables: vscode.Disposable[] = [];
   private isWPILibProject: boolean = false;
 
   private constructor(workspace: vscode.WorkspaceFolder) {
     this.workspace = workspace;
-    this.configFolder = path.join(workspace.uri.fsPath, '.wpilib');
 
     const rp = new vscode.RelativePattern(workspace, this.preferencesGlob);
 
@@ -143,12 +147,12 @@ export class Preferences implements IPreferences {
     return this.getConfiguration().update('autoStartRioLog', autoStart, target);
   }
 
-  public async setOnline(value: boolean, global: boolean): Promise<void> {
+  public async setOffline(value: boolean, global: boolean): Promise<void> {
     let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
     if (!global) {
       target = vscode.ConfigurationTarget.WorkspaceFolder;
     }
-    return this.getConfiguration().update('online', value, target);
+    return this.getConfiguration().update('offline', value, target);
   }
 
   public async setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void> {
@@ -191,8 +195,8 @@ export class Preferences implements IPreferences {
     return res;
   }
 
-  public getOnline(): boolean {
-    const res = this.getConfiguration().get<boolean>('online');
+  public getOffline(): boolean {
+    const res = this.getConfiguration().get<boolean>('offline');
     if (res === undefined) {
       return false;
     }
@@ -215,6 +219,22 @@ export class Preferences implements IPreferences {
     return res;
   }
 
+  public async setDeployOffline(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('deployOffline', value, target);
+  }
+
+  public getDeployOffline(): boolean {
+    const res = this.getConfiguration().get<boolean>('deployOffline');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
   public dispose() {
     for (const d of this.disposables) {
       d.dispose();
@@ -222,7 +242,7 @@ export class Preferences implements IPreferences {
   }
 
   private async asyncInitialize() {
-    const configFilePath = path.join(this.configFolder, this.preferenceFileName);
+    const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
 
     if (await promisifyExists(configFilePath)) {
       vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
@@ -252,7 +272,7 @@ export class Preferences implements IPreferences {
 
   private async writePreferences(): Promise<void> {
     if (this.preferencesFile === undefined) {
-      const configFilePath = path.join(this.configFolder, this.preferenceFileName);
+      const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
       this.preferencesFile = vscode.Uri.file(configFilePath);
       await promisifyMkDir(path.dirname(this.preferencesFile.fsPath));
     }

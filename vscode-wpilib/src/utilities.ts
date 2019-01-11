@@ -121,7 +121,7 @@ export function promisifyDeleteFile(file: string): Promise<boolean> {
   });
 }
 
-export let javaHome: string;
+export let javaHome: string | undefined;
 export function setJavaHome(jhome: string): void {
   javaHome = jhome;
 }
@@ -129,18 +129,21 @@ export function setJavaHome(jhome: string): void {
 export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
                                 name: string, executeApi: IExecuteAPI, preferences: IPreferences): Promise<number> {
   let command = './gradlew ' + args + ' ' + preferences.getAdditionalGradleArguments();
-  if (!preferences.getOnline()) {
+  if (preferences.getOffline()) {
     command += ' --offline';
   }
 
-  if (javaHome !== '') {
+  let varCommands;
+
+  if (javaHome !== undefined && javaHome !== '') {
     command += ` -Dorg.gradle.java.home="${javaHome}"`;
+    varCommands = {
+      ['JAVA_HOME']: javaHome,
+    };
   }
 
   await setExecutePermissions(path.join(workspace.uri.fsPath, 'gradlew'));
-  return executeApi.executeCommand(command, name, rootDir, workspace, {
-    ['JAVA_HOME']: javaHome,
-  });
+  return executeApi.executeCommand(command, name, rootDir, workspace, varCommands);
 }
 
 export let extensionContext: vscode.ExtensionContext;

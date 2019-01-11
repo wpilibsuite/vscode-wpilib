@@ -58,8 +58,13 @@ class DebugCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+    let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
+    // If deploy offline, and builds online, set flags
+    // Otherwise, build offline will be set later
+    if (prefs.getDeployOffline() && !prefs.getOffline()) {
+      command += ' --offline';
+    }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Debug', this.executeApi, prefs);
     if (result !== 0) {
       return false;
@@ -145,8 +150,13 @@ class DeployCodeDeployer implements ICodeDeployer {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
   public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'deploy -PteamNumber=' + teamNumber;
+    let command = 'deploy -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
+    // If deploy offline, and builds online, set flags
+    // Otherwise, build offline will be set later
+    if (prefs.getDeployOffline() && !prefs.getOffline()) {
+      command += ' --offline';
+    }
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Deploy', this.executeApi, prefs);
     if (result !== 0) {
       return false;
@@ -241,6 +251,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
         clang: targetSimulateInfo.clang!,
         executablePath: targetSimulateInfo.launchfile,
         extensions,
+        ldPath: path.dirname(targetSimulateInfo.launchfile),    // gradle puts all the libs in the same dir as the executable
         soLibPath: soPath,
         srcPaths: new Set<string>(targetSimulateInfo.srcpaths),
         stopAtEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),

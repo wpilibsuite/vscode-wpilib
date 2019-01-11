@@ -19,6 +19,7 @@ import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
 import { closeLogger, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
+import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { promisifyMkdirp } from './shared/generator';
@@ -136,9 +137,6 @@ export async function activate(context: vscode.ExtensionContext) {
   // Active the java parts of the extension
   await activateJava(context, externalApi);
 
-  // Create all of our commands that the extension runs
-  createVsCommands(context, externalApi);
-
   let creationError: boolean = false;
 
   let help: Help | undefined;
@@ -199,6 +197,9 @@ export async function activate(context: vscode.ExtensionContext) {
     creationError = true;
   }
 
+  // Create all of our commands that the extension runs
+  createVsCommands(context, externalApi);
+
   // Detect if we are a new WPILib project, and if so display the WPILib help window.
   // Also check for local GradleRIO update
   const wp = vscode.workspace.workspaceFolders;
@@ -236,6 +237,55 @@ export async function activate(context: vscode.ExtensionContext) {
             help.displayHelp();
           }
           break;
+        }
+      } else {
+        const persistentState = new PersistentFolderState('wpilib.invalidFolder', false, w.uri.fsPath);
+        if (persistentState.Value === false) {
+          // Check if wpilib project might be in a subfolder
+          // Only go 1 subfolder deep
+          const pattern = new vscode.RelativePattern(w, '*/' + Preferences.wpilibPreferencesFolder + '/' + Preferences.preferenceFileName);
+
+          const wpilibFiles = await vscode.workspace.findFiles(pattern);
+
+          if (wpilibFiles.length === 1) {
+            // Only 1 subfolder found, likely it
+            const openResult = await vscode.window.showInformationMessage('Incorrect folder opened for WPILib project. ' +
+              'The correct folder was found in a subfolder, ' +
+              'Would you like to open it? Selecting no will cause many tasks to not work.', {
+                modal: true,
+              }, 'Yes', 'No', 'No, Don\'t ask again for this folder');
+            if (openResult === 'Yes') {
+              const wpRoot = vscode.Uri.file(path.dirname(path.dirname(wpilibFiles[0].fsPath)));
+              await vscode.commands.executeCommand('vscode.openFolder', wpRoot, false);
+            } else if (openResult === 'No, Don\'t ask again for this folder') {
+              persistentState.Value = true;
+            }
+          } else if (wpilibFiles.length > 1) {
+            // Multiple subfolders found
+            const openResult = await vscode.window.showInformationMessage('Incorrect folder opened for WPILib project. ' +
+            'Multiple possible subfolders found, ' +
+            'Would you like to open one? Selecting no will cause many tasks to not work.', {
+              modal: true,
+            }, 'Yes', 'No', 'No, Don\'t ask again for this folder');
+            if (openResult === 'Yes') {
+              const list = wpilibFiles.map((value) => {
+                const fullRoot = path.dirname(path.dirname(value.fsPath));
+                const baseFolder = path.basename(fullRoot);
+                return {
+                  fullFolder: vscode.Uri.file(fullRoot),
+                  label: baseFolder,
+                };
+              });
+              const picked = await vscode.window.showQuickPick(list, {
+                canPickMany: false,
+              });
+              if (picked !== undefined) {
+                await vscode.commands.executeCommand('vscode.openFolder', picked.fullFolder, false);
+              }
+            } else if (openResult === 'No, Don\'t ask again for this folder') {
+              persistentState.Value = true;
+            }
+          }
         }
       }
     }

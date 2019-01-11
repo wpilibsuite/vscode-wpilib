@@ -194,23 +194,42 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await preferences.setSkipTests(result.yes, result.global);
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setOnline', async () => {
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setOffline', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set online in an empty workspace');
+      vscode.window.showInformationMessage('Cannot set offline in an empty workspace');
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Run commands in Online mode? Currently ${preferences.getOnline()}`);
+    const result = await globalProjectSettingUpdate(`Run commands other then deploy in offline mode? Currently ${preferences.getOffline()}`);
     if (result === undefined) {
-      logger.log('Invalid selection for settting online');
+      logger.log('Invalid selection for settting offline');
       return;
     }
 
-    await preferences.setOnline(result.yes, result.global);
+    await preferences.setOffline(result.yes, result.global);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setDeployOffline', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot set deploy offline in an empty workspace');
+      return;
+    }
+
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(`Run deploy command in offline mode? Currently ${preferences.getDeployOffline()}`);
+    if (result === undefined) {
+      logger.log('Invalid selection for settting deploy offline');
+      return;
+    }
+
+    await preferences.setDeployOffline(result.yes, result.global);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setStopSimulationOnEntry', async () => {
@@ -278,21 +297,9 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     if (javaHome === '') {
       return;
     }
-    const selection = await vscode.window.showInformationMessage('Set in project or globally?', {modal: true}, 'Project', 'Global');
-    if (selection !== undefined) {
-      if (selection === 'Project') {
-        const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-        if (wp === undefined) {
-          vscode.window.showInformationMessage('Cannot set java on empty workspace');
-          return;
-        }
-        const javaConfig = vscode.workspace.getConfiguration('java', wp.uri);
-        await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.WorkspaceFolder);
-      } else {
-        const javaConfig = vscode.workspace.getConfiguration('java');
-        await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
-      }
-    }
+    const javaConfig = vscode.workspace.getConfiguration('java');
+    await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
+    await vscode.window.showInformationMessage('Successfully set java.home');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {

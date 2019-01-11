@@ -152,7 +152,12 @@ export class VendorLibraries extends VendorLibrariesBase {
 
         if (toUpdate !== undefined) {
           for (const ti of toUpdate) {
-            await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+            const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+            if (success) {
+              vscode.window.showInformationMessage('Successfully installed ' + ti.dep.name);
+            } else {
+              vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
+            }
           }
         }
       } else {
@@ -191,7 +196,12 @@ export class VendorLibraries extends VendorLibrariesBase {
 
         if (toUpdate !== undefined) {
           for (const ti of toUpdate) {
-            await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+            const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+            if (success) {
+              vscode.window.showInformationMessage('Successfully installed ' + ti.dep.name);
+            } else {
+              vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
+            }
           }
         }
       } else {
@@ -228,7 +238,12 @@ export class VendorLibraries extends VendorLibrariesBase {
 
       if (toInstall !== undefined) {
         for (const ti of toInstall) {
-          await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+          const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
+          if (success) {
+            vscode.window.showInformationMessage('Successfully installed ' + ti.dep.name);
+          } else {
+            vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
+          }
         }
       }
     } else {
@@ -256,7 +271,12 @@ export class VendorLibraries extends VendorLibrariesBase {
           }
         }
 
-        await this.installDependency(file, this.getWpVendorFolder(workspace), true);
+        const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
+        if (success) {
+          vscode.window.showInformationMessage('Successfully installed ' + file.name);
+        } else {
+          vscode.window.showErrorMessage('Failed to install ' + file.name);
+        }
       }
     }
   }

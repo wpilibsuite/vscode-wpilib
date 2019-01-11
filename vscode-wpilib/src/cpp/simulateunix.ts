@@ -9,6 +9,7 @@ export interface IUnixSimulateCommands {
   stopAtEntry: boolean;
   clang: boolean;
   soLibPath: string;
+  ldPath: string;
   srcPaths: Set<string>;
 }
 
@@ -17,10 +18,14 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
     MIMode: commands.clang ? 'lldb' : 'gdb',
     additionalSOLibSearchPath: commands.soLibPath,
     cwd: commands.workspace.uri.fsPath,
-    environment: {
-      HALSIM_EXTENSIONS: commands.extensions,
-    },
-    externalConsole: true,
+    environment: [{
+      name: 'HALSIM_EXTENSIONS', value: commands.extensions,
+    }, {
+      name: 'LD_LIBRARY_PATH', value: commands.ldPath,
+    }, {
+      name: 'DYLD_FALLBACK_LIBRARY_PATH', value: commands.ldPath,
+    }],
+    externalConsole: false,
     name: 'WPILib C++ Simulate',
     program: commands.executablePath,
     request: 'launch',

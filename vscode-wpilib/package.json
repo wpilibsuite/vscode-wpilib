@@ -14,8 +14,8 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:.wpilib/wpilib_preferences.json",
-        "workspaceContains:build/vscodeconfig.json",
+        "workspaceContains:.wpilib/**/wpilib_preferences.json",
+        "workspaceContains:build/**/vscodeconfig.json",
         "onCommand:wpilibcore.startRioLog",
         "onCommand:wpilibcore.setTeamNumber",
         "onCommand:wpilibcore.startTool",
@@ -27,9 +27,10 @@
         "onCommand:wpilibcore.setLanguage",
         "onCommand:wpilibcore.setAutoSave",
         "onCommand:wpilibcore.setSkipTests",
-        "onCommand:wpilibcore.setOnline",
+        "onCommand:wpilibcore.setOffline",
         "onCommand:wpilibcore.setStopSimulationOnEntry",
         "onCommand:wpilibcore.setStartRioLog",
+        "onCommand:wpilibcore.setDeployOffline",
         "onCommand:wpilibcore.createCommand",
         "onCommand:wpilibcore.cancelTasks",
         "onCommand:wpilibcore.help",
@@ -111,10 +112,16 @@
                     "description": "Always ask for a team number, even if set",
                     "scope": "resource"
                 },
-                "wpilib.online": {
+                "wpilib.offline": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Perform gradle commands without offline flag",
+                    "description": "Perform gradle commands other then deploy/debug with offline flag",
+                    "scope": "resource"
+                },
+                "wpilib.deployOffline": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Perform gradle deploy command with offline flag",
                     "scope": "resource"
                 },
                 "wpilib.skipTests": {
@@ -190,8 +197,8 @@
                 "category": "WPILib"
             },
             {
-                "command": "wpilibcore.setOnline",
-                "title": "%wpilibcore.setOnline.title%",
+                "command": "wpilibcore.setOffline",
+                "title": "%wpilibcore.setOffline.title%",
                 "category": "WPILib"
             },
             {
@@ -202,6 +209,11 @@
             {
                 "command": "wpilibcore.setStartRioLog",
                 "title": "%wpilibcore.setStartRioLog.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.setDeployOffline",
+                "title": "%wpilibcore.setDeployOffline.title%",
                 "category": "WPILib"
             },
             {
@@ -415,7 +427,7 @@
         "vscode-cpptools": "2.1.2",
         "vscode-jsonrpc": "^4.0.0",
         "vscode-nls": "^4.0.0",
-        "vscode-wpilibapi": "^2019.0.8",
+        "vscode-wpilibapi": "^2019.2.0",
         "winston": "^3.1.0",
         "winston-transport": "^4.2.0",
         "wpilib-riolog": "^0.1.0",

@@ -41,12 +41,16 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   // Check for java property, as thats easily user settable, and we want it to win
   const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
   if (vscodeJavaHome) {
-    const javaVersion = await getJavaVersion(vscodeJavaHome);
-    if (javaVersion >= 11) {
-      logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeJavaHome}`);
-      return vscodeJavaHome;
-    } else {
-      logger.info(`Bad Java version ${javaVersion} at ${vscodeJavaHome}`);
+    try {
+      const javaVersion = await getJavaVersion(vscodeJavaHome);
+      if (javaVersion >= 11) {
+        logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeJavaHome}`);
+        return vscodeJavaHome;
+      } else {
+        logger.info(`Bad Java version ${javaVersion} at ${vscodeJavaHome}`);
+      }
+    } catch (err) {
+      logger.log('Error loading java from java.home, skipping', err);
     }
   }
 
@@ -54,36 +58,48 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   const frcHome = api.getUtilitiesAPI().getWPILibHomeDir();
   {
     const frcHomeJava = path.join(frcHome, 'jdk');
-    const javaVersion = await getJavaVersion(frcHomeJava);
-    if (javaVersion >= 11) {
-      logger.log(`Found Java Home Version: ${javaVersion} at ${frcHomeJava}`);
-      return frcHomeJava;
-    } else {
-      logger.info(`Bad Java version ${javaVersion} at ${frcHomeJava}`);
+    try {
+      const javaVersion = await getJavaVersion(frcHomeJava);
+      if (javaVersion >= 11) {
+        logger.log(`Found Java Home Version: ${javaVersion} at ${frcHomeJava}`);
+        return frcHomeJava;
+      } else {
+        logger.info(`Bad Java version ${javaVersion} at ${frcHomeJava}`);
+      }
+    } catch (err) {
+      logger.log('Error loading java from frc home, skipping', err);
     }
   }
 
   // Check for java home
   const javaHome = process.env.JAVA_HOME;
   if (javaHome !== undefined) {
-    const javaVersion = await getJavaVersion(javaHome);
-    if (javaVersion >= 11) {
-      logger.log(`Found Java Home Version: ${javaVersion} at ${javaHome}`);
-      return javaHome;
-    } else {
-      logger.info(`Bad Java version ${javaVersion} at ${javaHome}`);
+    try {
+      const javaVersion = await getJavaVersion(javaHome);
+      if (javaVersion >= 11) {
+        logger.log(`Found Java Home Version: ${javaVersion} at ${javaHome}`);
+        return javaHome;
+      } else {
+        logger.info(`Bad Java version ${javaVersion} at ${javaHome}`);
+      }
+    } catch (err) {
+      logger.log('Error loading java from JAVA_HOME, skipping', err);
     }
   }
 
   // Check for jdk home
   const jdkHome = process.env.JDK_HOME;
   if (jdkHome !== undefined) {
-    const javaVersion = await getJavaVersion(jdkHome);
-    if (javaVersion >= 11) {
-      logger.log(`Found Java Home Version: ${javaVersion} at ${jdkHome}`);
-      return jdkHome;
-    } else {
-      logger.info(`Bad Java version ${javaVersion} at ${jdkHome}`);
+    try {
+      const javaVersion = await getJavaVersion(jdkHome);
+      if (javaVersion >= 11) {
+        logger.log(`Found Java Home Version: ${javaVersion} at ${jdkHome}`);
+        return jdkHome;
+      } else {
+        logger.info(`Bad Java version ${javaVersion} at ${jdkHome}`);
+      }
+    } catch (err) {
+      logger.log('Error loading java from JDK_HOME, skipping', err);
     }
   }
 
