@@ -28,5 +28,5 @@
 	"wpilibcore.resetAutoUpdate.title": "重制自动检查 WPILib 更新设置",
 	"wpilibcore.changeDesktop.title": "设置桌面支持属性",
 	"wpilibcore.setDeployOffline.title": "在离线模式中 更改 部署/调试命令 设置",
-	"wpilibcore.setOffline.title": "在离线模式中 更改 部署/调试命令 外的设置
+	"wpilibcore.setOffline.title": "在离线模式中 更改 部署/调试命令 外的设置"
 }
