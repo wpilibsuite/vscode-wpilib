@@ -14,6 +14,5 @@ TODO
 
 ## Known Issues
 
-This is an alpha, so if you find any PLEASE report them.
-
 ## Release Notes
+
