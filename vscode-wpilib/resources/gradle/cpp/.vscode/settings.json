@@ -11,6 +11,5 @@
     ".classpath": true,
     ".project": true
   },
-  "C_Cpp.default.configurationProvider": "vscode-wpilib",
-  "wpilib.online": true
+  "C_Cpp.default.configurationProvider": "vscode-wpilib"
 }
