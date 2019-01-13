@@ -118,8 +118,8 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
 
   await promisifyWriteFile(path.join(deployDir, 'example.txt'),
 `Files placed in this directory will be deployed to the RoboRIO into the
-'deploy' directory in the home folder. Use the 'frc::GetFilePath' function from
-the 'frc/FileUtilities.h' header to get a proper path relative to the deploy
+'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
+function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
 directory.`);
 
   return true;
@@ -240,7 +240,7 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
 
   await promisifyWriteFile(path.join(deployDir, 'example.txt'),
 `Files placed in this directory will be deployed to the RoboRIO into the
-'deploy' directory in the home folder. Use the 'FileUtilities.getFilePath' wpilib function
+'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.`);
 
   return true;
