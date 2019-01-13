@@ -53,7 +53,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public async manageVendorLibraries(uri: vscode.Uri | undefined): Promise<void> {
-    let workspace: vscode.WorkspaceFolder | undefined ;
+    let workspace: vscode.WorkspaceFolder | undefined;
     if (uri !== undefined) {
       workspace = vscode.workspace.getWorkspaceFolder(uri);
     }
@@ -152,7 +152,13 @@ export class VendorLibraries extends VendorLibrariesBase {
           for (const ti of toUpdate) {
             const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
             if (success) {
-              vscode.window.showInformationMessage('Successfully installed ' + ti.dep.name);
+              const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
+                'dependencies are installed correctly. Would you like to do this now?', {
+                  modal: true,
+                }, 'Yes', 'No');
+              if (buildRes === 'Yes') {
+                await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+              }
             } else {
               vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
             }
@@ -196,7 +202,13 @@ export class VendorLibraries extends VendorLibrariesBase {
           for (const ti of toUpdate) {
             const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
             if (success) {
-              vscode.window.showInformationMessage('Successfully installed ' + ti.dep.name);
+              const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
+                'dependencies are installed correctly. Would you like to do this now?', {
+                  modal: true,
+                }, 'Yes', 'No');
+              if (buildRes === 'Yes') {
+                await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+              }
             } else {
               vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
             }
@@ -238,7 +250,13 @@ export class VendorLibraries extends VendorLibrariesBase {
         for (const ti of toInstall) {
           const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           if (success) {
-            vscode.window.showInformationMessage('Successfully installed ' + ti.dep.name);
+            const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
+              'dependencies are installed correctly. Would you like to do this now?', {
+                modal: true,
+              }, 'Yes', 'No');
+            if (buildRes === 'Yes') {
+              await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+            }
           } else {
             vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
           }
@@ -271,7 +289,13 @@ export class VendorLibraries extends VendorLibrariesBase {
 
         const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
         if (success) {
-          vscode.window.showInformationMessage('Successfully installed ' + file.name);
+          const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
+            'dependencies are installed correctly. Would you like to do this now?', {
+              modal: true,
+            }, 'Yes', 'No');
+          if (buildRes === 'Yes') {
+            await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+          }
         } else {
           vscode.window.showErrorMessage('Failed to install ' + file.name);
         }

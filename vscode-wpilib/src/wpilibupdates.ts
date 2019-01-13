@@ -77,6 +77,13 @@ export class WPILibUpdates {
                             },  'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
         await this.setGradleRIOVersion(newVersion, wp);
+        const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +
+          'dependencies are installed correctly. Would you like to do this now?', {
+            modal: true,
+          }, 'Yes', 'No');
+        if (buildRes === 'Yes') {
+          await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
+        }
       }
     }
 
