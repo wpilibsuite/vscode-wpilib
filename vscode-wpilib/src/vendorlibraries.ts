@@ -281,35 +281,6 @@ export class VendorLibraries extends VendorLibrariesBase {
     }
   }
 
-  private async loadFileFromUrl(url: string): Promise<IJsonDependency | undefined> {
-    try {
-      const response = await fetch.default(url, {
-        timeout: 5000,
-      });
-      if (response === undefined) {
-        return undefined;
-      }
-      if (response.status >= 200 && response.status <= 300) {
-        try {
-          const text = await response.text();
-          const json = JSON.parse(text);
-          if (isJsonDependency(json)) {
-            return json;
-          } else {
-            return undefined;
-          }
-        } catch {
-          return undefined;
-        }
-      } else {
-        return undefined;
-      }
-    } catch (err) {
-      logger.log('Error fetching file', err);
-      return undefined;
-    }
-  }
-
   private getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
     return this.getVendorFolder(workspace.uri.fsPath);
   }

@@ -1,5 +1,6 @@
 'use strict';
 
+import * as fetch from 'node-fetch';
 import * as path from 'path';
 import { logger } from '../logger';
 import { promisifyMkdirp, promisifyReadDir } from '../shared/generator';
@@ -110,4 +111,32 @@ export class VendorLibrariesBase {
     }
   }
 
+  protected async loadFileFromUrl(url: string): Promise<IJsonDependency | undefined> {
+    try {
+      const response = await fetch.default(url, {
+        timeout: 5000,
+      });
+      if (response === undefined) {
+        return undefined;
+      }
+      if (response.status >= 200 && response.status <= 300) {
+        try {
+          const text = await response.text();
+          const json = JSON.parse(text);
+          if (isJsonDependency(json)) {
+            return json;
+          } else {
+            return undefined;
+          }
+        } catch {
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+    } catch (err) {
+      logger.log('Error fetching file', err);
+      return undefined;
+    }
+  }
 }

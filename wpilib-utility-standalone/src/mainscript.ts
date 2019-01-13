@@ -47,6 +47,20 @@ window.addEventListener('load', () => {
   mainDiv.appendChild(generatorButton);
   mainDiv.appendChild(document.createElement('br'));
 
+  const vendorDepsButton = document.createElement('button');
+  vendorDepsButton.appendChild(document.createTextNode('Start Vendor Deps Manager'));
+  vendorDepsButton.addEventListener('click', () => {
+    const bWindow = remote.getCurrentWindow();
+
+    bWindow.setSize(800, 600);
+    bWindow.setTitle('Vendor Deps Manager');
+
+    bWindow.loadFile('vendordeps.html');
+  });
+  vendorDepsButton.style.marginTop = '5px';
+  mainDiv.appendChild(vendorDepsButton);
+  mainDiv.appendChild(document.createElement('br'));
+
   return;
   /*
 
