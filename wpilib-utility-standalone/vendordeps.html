@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WPILib Vendor Dependencies</title>
+  <script>
+    const exports = require('./out/vendordeps.js');
+    const validators = require('./out/validators.js');
+  </script>
+
+  <style>
+    .error {
+      color: red;
+      border-color: red;
+      border-width: 2px;
+    }
+    body {
+        color: white;
+        background-color: #2e2c29;
+      }
+  </style>
+</head>
+
+<body>
+  <img src="./wpilib.svg" width="100" />
+
+  <h1>Welcome to WPILib Vendor Dependencies Editor</h1>
+
+  Select your project (Do this by selecting the build.gradle file for your project).
+  <br/>
+  <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <button onclick="exports.selectProjectButton();">Select project (build.gradle)</button>
+
+  <div id='validprojectdiv' style="display: none;">
+  <br/>
+  Installed Dependencies
+  <button onclick="exports.refreshDependencies();">Refresh Dependencies</button>
+  <br/>
+  <ul id="installedlist"></ul>
+  <br/>
+  <br/>
+  Available to Install Dependencies
+  <button onclick="exports.refreshAvailableDependencies();">Refresh Available Dependencies</button>
+  <br/>
+  <ul id="availablelist"></ul>
+  <br/>
+  Enter a URL to install an online dependency
+  <input id="onlineurl" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <button onclick="exports.installOnlineLibrary();">Install Online Library</button>
+  </div>
+</body>
+</html>

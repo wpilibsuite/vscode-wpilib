@@ -1,12 +1,10 @@
 'use scrict';
 
-import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { logger } from './logger';
 import { promisifyReadDir } from './shared/generator';
-import { IJsonDependency, isJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { promisifyDeleteFile } from './utilities';
 import { isNewerVersion } from './versions';
 
@@ -278,35 +276,6 @@ export class VendorLibraries extends VendorLibrariesBase {
           vscode.window.showErrorMessage('Failed to install ' + file.name);
         }
       }
-    }
-  }
-
-  private async loadFileFromUrl(url: string): Promise<IJsonDependency | undefined> {
-    try {
-      const response = await fetch.default(url, {
-        timeout: 5000,
-      });
-      if (response === undefined) {
-        return undefined;
-      }
-      if (response.status >= 200 && response.status <= 300) {
-        try {
-          const text = await response.text();
-          const json = JSON.parse(text);
-          if (isJsonDependency(json)) {
-            return json;
-          } else {
-            return undefined;
-          }
-        } catch {
-          return undefined;
-        }
-      } else {
-        return undefined;
-      }
-    } catch (err) {
-      logger.log('Error fetching file', err);
-      return undefined;
     }
   }
 
