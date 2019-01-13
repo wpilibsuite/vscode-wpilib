@@ -1,12 +1,10 @@
 'use scrict';
 
-import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { logger } from './logger';
 import { promisifyReadDir } from './shared/generator';
-import { IJsonDependency, isJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { promisifyDeleteFile } from './utilities';
 import { isNewerVersion } from './versions';
 
