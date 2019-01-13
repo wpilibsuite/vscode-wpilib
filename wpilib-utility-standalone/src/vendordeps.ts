@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisifyReadDir } from './shared/generator';
 import { UtilitiesAPI } from './shared/utilitiesapi';
-import { VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { promisifyDeleteFile } from './utilities';
 
 const dialog = electron.remote.dialog;
@@ -16,7 +16,29 @@ class VendorLibraries extends VendorLibrariesBase {
     super(new UtilitiesAPI());
   }
 
-  public async uninstallDependencies(dir: string, uuid: string): Promise<void> {
+  public async refreshAvailableDependencies(dir: string): Promise<void> {
+    const deps = await this.getHomeDirDeps();
+
+    const list = document.getElementById('availablelist') as HTMLUListElement;
+    list.innerHTML = '';
+
+    for (const dep of deps) {
+      const innerDiv = document.createElement('li');
+      const text = document.createTextNode(`${dep.name} (${dep.version})\t`);
+      innerDiv.appendChild(text);
+      const button = document.createElement('button');
+      button.innerText = 'Install';
+      button.dataset.uuid = dep.uuid;
+      button.onclick = async () => {
+        await this.installOfflineDependency(dir, dep.uuid);
+        await this.refreshDependencies(dir);
+      };
+      innerDiv.appendChild(button);
+      list.appendChild(innerDiv);
+    }
+  }
+
+  public async uninstallDependency(dir: string, uuid: string): Promise<void> {
     const url = this.getVendorFolder(dir);
 
     const files = await promisifyReadDir(url);
@@ -45,10 +67,45 @@ class VendorLibraries extends VendorLibrariesBase {
       button.innerText = 'Uninstall';
       button.dataset.uuid = dep.uuid;
       button.onclick = async () => {
-        await this.uninstallDependencies(dir, dep.uuid);
+        await this.uninstallDependency(dir, dep.uuid);
       };
       innerDiv.appendChild(button);
       list.appendChild(innerDiv);
+    }
+  }
+
+  public async installOfflineDependency(dir: string, uuid: string) {
+    const deps = await this.getHomeDirDeps();
+
+    let fileDep: IJsonDependency | undefined;
+
+    for (const d of deps) {
+      if (d.uuid === uuid) {
+        fileDep = d;
+        break;
+      }
+    }
+
+    if (fileDep === undefined) {
+      alert('Failed to find dep to install');
+      return;
+    }
+
+    // Load existing libraries
+    const existing = await this.getDependencies(this.getVendorFolder(dir));
+
+    for (const dep of existing) {
+      if (dep.uuid === fileDep.uuid) {
+        alert ('Library already installed');
+        return;
+      }
+    }
+
+    const success = await this.installDependency(fileDep, this.getVendorFolder(dir), true);
+    if (success) {
+      alert('Successfully installed ' + fileDep.name);
+    } else {
+      alert('Failed to install ' + fileDep.name);
     }
   }
 
@@ -98,6 +155,7 @@ export function selectProjectButton() {
           const div = document.getElementById('validprojectdiv') as HTMLDivElement;
           div.style.display = null;
           await vendorLibs.refreshDependencies(input.value);
+          await vendorLibs.refreshAvailableDependencies(input.value);
 
         }
       });
@@ -110,6 +168,11 @@ export function selectProjectButton() {
 export async function refreshDependencies() {
   const input = document.getElementById('projectFolder') as HTMLInputElement;
   await vendorLibs.refreshDependencies(input.value);
+}
+
+export async function refreshAvailableDependencies() {
+  const input = document.getElementById('projectFolder') as HTMLInputElement;
+  await vendorLibs.refreshAvailableDependencies(input.value);
 }
 
 export async function installOnlineLibrary() {
