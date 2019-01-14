@@ -27,9 +27,9 @@ export class WPILibUpdates {
     this.externalApi = externalApi;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.checkForUpdates', async () => {
-       if (!await this.checkForUpdates()) {
-         logger.log('no update installed');
-       }
+      if (!await this.checkForUpdates()) {
+        logger.log('no update installed');
+      }
     }, this));
   }
 
@@ -42,16 +42,17 @@ export class WPILibUpdates {
     const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
     if (newVersion !== undefined && persistentState.Value === false) {
       vscode.window.showInformationMessage
-                    (`WPILib update (${newVersion}) found, would you like to install it?`, {
-                      modal: true,
-                    }, 'Yes', 'No', 'No, Don\'t ask again')
-                    .then(async (result) => {
-                      if (result !== undefined && result === 'Yes') {
-                        await this.setGradleRIOVersion(newVersion, wp);
-                      } else if (result !== undefined && result === 'No, Don\'t ask again') {
-                        persistentState.Value = true;
-                      }
-                    });
+        (`WPILib project update (${newVersion}) found, would you like to install it? ` +
+          `${grVersion} currently installed`, {
+            modal: true,
+          }, 'Yes', 'No', 'No, Don\'t ask again')
+        .then(async (result) => {
+          if (result !== undefined && result === 'Yes') {
+            await this.setGradleRIOVersion(newVersion, wp);
+          } else if (result !== undefined && result === 'No, Don\'t ask again') {
+            persistentState.Value = true;
+          }
+        });
     }
   }
 
@@ -72,9 +73,10 @@ export class WPILibUpdates {
       return false;
     } else {
       const result = await vscode.window.showInformationMessage
-                           (`WPILib update (${newVersion}) found, would you like to install it?`, {
-                             modal: true,
-                            },  'Yes', 'No');
+        (`WPILib project update (${newVersion}) found, would you like to install it? ` +
+          `${grVersion} currently installed`, {
+            modal: true,
+          }, 'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
         await this.setGradleRIOVersion(newVersion, wp);
         const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +
@@ -111,7 +113,7 @@ export class WPILibUpdates {
   }
 
   private async checkForGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-    const qResult = await vscode.window.showInformationMessage('Check offline or online?', {modal: true}, 'Online', 'Offline');
+    const qResult = await vscode.window.showInformationMessage('Check offline or online?', { modal: true }, 'Online', 'Offline');
     if (qResult === undefined) {
       return undefined;
     } else if (qResult === 'Online') {
