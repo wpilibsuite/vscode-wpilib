@@ -13,6 +13,7 @@ import { BuildTestAPI } from './buildtestapi';
 import { BuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
+import { ApiProvider } from './cppprovider/apiprovider';
 import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
@@ -26,7 +27,7 @@ import { promisifyMkdirp } from './shared/generator';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
-import { setExtensionContext, setJavaHome } from './utilities';
+import { promisifyExists, setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
@@ -92,6 +93,8 @@ class ExternalAPI implements IExternalAPI {
   }
 }
 
+let updatePromptCount = 0;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
@@ -142,7 +145,7 @@ export async function activate(context: vscode.ExtensionContext) {
   let help: Help | undefined;
 
   try {
-  // Create the help window provider
+    // Create the help window provider
     help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
     context.subscriptions.push(help);
   } catch (err) {
@@ -151,7 +154,7 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   try {
-  // Create the eclipse import provider
+    // Create the eclipse import provider
     const eclipseimport = await EclipseImport.Create(extensionResourceLocation);
     context.subscriptions.push(eclipseimport);
   } catch (err) {
@@ -160,16 +163,16 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   try {
-  // Create the new project creator provider
-  const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
-  context.subscriptions.push(projectcreator);
+    // Create the new project creator provider
+    const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
+    context.subscriptions.push(projectcreator);
   } catch (err) {
     logger.error('error creating project creator', err);
     creationError = true;
   }
 
   try {
-  // Add built in tools
+    // Add built in tools
     context.subscriptions.push(await BuiltinTools.Create(externalApi));
   } catch (err) {
     logger.error('error creating built in tool handler', err);
@@ -224,12 +227,44 @@ export async function activate(context: vscode.ExtensionContext) {
 
         if (prefs.getProjectYear() !== '2019') {
           vscode.window
-                .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
+            .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
           continue;
         }
-        if (wpilibUpdate) {
-          await wpilibUpdate.checkForInitialUpdate(w);
+
+        if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
+          let didUpdate: boolean = false;
+          if (wpilibUpdate) {
+            didUpdate = await wpilibUpdate.checkForInitialUpdate(w);
+          }
+
+          let runBuild: boolean = !await promisifyExists(path.join(w.uri.fsPath, 'build'));
+
+          if (didUpdate) {
+            const result = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +
+              'dependencies are installed correctly. Would you like to do this now?', {
+                modal: true,
+              }, 'Yes', 'No');
+            if (result !== 'Yes') {
+              runBuild = false;
+            }
+          }
+
+          if (runBuild) {
+            updatePromptCount++;
+            externalApi.getBuildTestAPI().buildCode(w, undefined).then(() => {
+              updatePromptCount--;
+              if (updatePromptCount === 0) {
+                ApiProvider.promptForUpdates = true;
+              }
+            }).catch(() => {
+              updatePromptCount--;
+              if (updatePromptCount === 0) {
+                ApiProvider.promptForUpdates = true;
+              }
+            });
+          }
         }
+
         const persistentState = new PersistentFolderState('wpilib.newProjectHelp', false, w.uri.fsPath);
         if (persistentState.Value === false) {
           persistentState.Value = true;
@@ -263,10 +298,10 @@ export async function activate(context: vscode.ExtensionContext) {
           } else if (wpilibFiles.length > 1) {
             // Multiple subfolders found
             const openResult = await vscode.window.showInformationMessage('Incorrect folder opened for WPILib project. ' +
-            'Multiple possible subfolders found, ' +
-            'Would you like to open one? Selecting no will cause many tasks to not work.', {
-              modal: true,
-            }, 'Yes', 'No', 'No, Don\'t ask again for this folder');
+              'Multiple possible subfolders found, ' +
+              'Would you like to open one? Selecting no will cause many tasks to not work.', {
+                modal: true,
+              }, 'Yes', 'No', 'No, Don\'t ask again for this folder');
             if (openResult === 'Yes') {
               const list = wpilibFiles.map((value) => {
                 const fullRoot = path.dirname(path.dirname(value.fsPath));
@@ -297,6 +332,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Log our extension is active
   logger.log('Congratulations, your extension "vscode-wpilib" is now active!');
+
+  if (updatePromptCount === 0) {
+    ApiProvider.promptForUpdates = true;
+  }
 
   return externalApi;
 }

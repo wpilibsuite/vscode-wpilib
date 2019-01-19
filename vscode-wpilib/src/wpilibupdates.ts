@@ -33,27 +33,27 @@ export class WPILibUpdates {
     }, this));
   }
 
-  public async checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<void> {
+  public async checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<boolean> {
     const grVersion = await this.getGradleRIOVersion(wp);
     if (grVersion === undefined) {
-      return;
+      return false;
     }
     const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
     const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
     if (newVersion !== undefined && persistentState.Value === false) {
-      vscode.window.showInformationMessage
+      const result = await vscode.window.showInformationMessage
         (`WPILib project update (${newVersion}) found, would you like to install it? ` +
           `${grVersion} currently installed`, {
             modal: true,
-          }, 'Yes', 'No', 'No, Don\'t ask again')
-        .then(async (result) => {
-          if (result !== undefined && result === 'Yes') {
-            await this.setGradleRIOVersion(newVersion, wp);
-          } else if (result !== undefined && result === 'No, Don\'t ask again') {
-            persistentState.Value = true;
-          }
-        });
+          }, 'Yes', 'No', 'No, Don\'t ask again');
+      if (result !== undefined && result === 'Yes') {
+        await this.setGradleRIOVersion(newVersion, wp);
+        return true;
+      } else if (result !== undefined && result === 'No, Don\'t ask again') {
+        persistentState.Value = true;
+      }
     }
+    return false;
   }
 
   public async checkForUpdates(): Promise<boolean> {
@@ -98,7 +98,7 @@ export class WPILibUpdates {
     }
   }
 
-  private async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
+  public async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
     try {
       const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
       const gradleBuildFile = await promisifyReadFile(buildFile);
