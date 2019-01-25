@@ -21,7 +21,7 @@ class CodeBuilder implements ICodeBuilder {
   }
 
   public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'build';
+    const command = 'build generateVsCodeConfig';
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Build', this.executeApi, prefs);
     logger.log(result.toString());

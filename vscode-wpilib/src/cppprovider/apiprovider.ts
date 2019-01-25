@@ -31,6 +31,8 @@ function normalizeDriveLetter(pth: string): string {
 }
 
 export class ApiProvider implements CustomConfigurationProvider {
+  public static promptForUpdates: boolean = false;
+
   // ConfigurationProvider public variables
   public readonly extensionId: string = 'vscode-wpilib';
   public readonly name: string = 'WPILib';
@@ -86,16 +88,9 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.setupWatchers();
 
-    this.disposables.push(this.headerTreeProvider);
+    this.loadConfigs().catch();
 
-    this.loadConfigs().then(async (found) => {
-      if (!found) {
-        await this.runGradleRefresh();
-        return;
-      }
-    }).catch((err) => {
-      logger.error('Rejected load?', err);
-    });
+    this.disposables.push(this.headerTreeProvider);
   }
 
   public async canProvideBrowseConfiguration(_?: vscode.CancellationToken | undefined): Promise<boolean> {
@@ -328,6 +323,9 @@ export class ApiProvider implements CustomConfigurationProvider {
   }
 
   private async couldBeUpdated(): Promise<void> {
+    if (!ApiProvider.promptForUpdates) {
+      return;
+    }
     const result = await vscode.window.showInformationMessage('Intellisense configurations might have been updated. Refresh them now?', 'Yes', 'No');
     if (result && result === 'Yes') {
       await this.runGradleRefresh();
