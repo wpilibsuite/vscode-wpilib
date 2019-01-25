@@ -15,6 +15,11 @@ function getGradleRioRegex() {
   return /(id\s*?[\"|\']edu\.wpi\.first\.GradleRIO[\"|\'].*?version\s*?[\"|\'])(.+?)([\"|\'])/g;
 }
 
+interface IOnlineTuple {
+  online: boolean;
+  newVersion: string | undefined;
+}
+
 export class WPILibUpdates {
   public static getUpdatePersistentState(workspace: vscode.WorkspaceFolder): PersistentFolderState<boolean> {
     return new PersistentFolderState('wpilib.projectUpdate', false, workspace.uri.fsPath);
@@ -67,7 +72,7 @@ export class WPILibUpdates {
       return false;
     }
     const newVersion = await this.checkForGradleRIOUpdate(grVersion);
-    if (newVersion === undefined) {
+    if (newVersion === undefined || newVersion.newVersion === undefined) {
       logger.log('no update found');
       vscode.window.showInformationMessage('No WPILib Update Found');
       return false;
@@ -78,13 +83,27 @@ export class WPILibUpdates {
             modal: true,
           }, 'Yes', 'No');
       if (result !== undefined && result === 'Yes') {
-        await this.setGradleRIOVersion(newVersion, wp);
-        const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +
-          'dependencies are installed correctly. Would you like to do this now?', {
-            modal: true,
-          }, 'Yes', 'No');
-        if (buildRes === 'Yes') {
-          await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
+        await this.setGradleRIOVersion(newVersion.newVersion, wp);
+        if (newVersion.online) {
+          const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" and update tools after a ' +
+            'WPILib update to ensure dependencies are installed correctly. Would you like to do this now?', {
+              modal: true,
+            }, 'Yes (Both)', 'Yes (Build Only)', 'No');
+          if (buildRes !== undefined && buildRes.indexOf('Yes') >= 0) {
+            if (buildRes.indexOf('(Both)') >= 0) {
+              await this.externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
+            } else {
+              await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
+            }
+          }
+        } else {
+          const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +
+            'dependencies are installed correctly. Would you like to do this now?', {
+              modal: true,
+            }, 'Yes', 'No');
+          if (buildRes === 'Yes') {
+            await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
+          }
         }
       }
     }
@@ -112,14 +131,20 @@ export class WPILibUpdates {
     }
   }
 
-  private async checkForGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
+  private async checkForGradleRIOUpdate(currentVersion: string): Promise<IOnlineTuple | undefined> {
     const qResult = await vscode.window.showInformationMessage('Check offline or online?', { modal: true }, 'Online', 'Offline');
     if (qResult === undefined) {
       return undefined;
     } else if (qResult === 'Online') {
-      return this.checkForRemoteGradleRIOUpdate(currentVersion);
+      return {
+        newVersion: await this.checkForRemoteGradleRIOUpdate(currentVersion),
+        online: true,
+      };
     } else {
-      return this.checkForLocalGradleRIOUpdate(currentVersion);
+      return {
+        newVersion: await this.checkForLocalGradleRIOUpdate(currentVersion),
+        online: false,
+      };
     }
   }
 

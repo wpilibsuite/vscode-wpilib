@@ -57,8 +57,9 @@ class DebugCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
+                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    let command = 'deploy ' + args.join(' ') + ' -PdebugMode -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
     // If deploy offline, and builds online, set flags
     // Otherwise, build offline will be set later
@@ -149,8 +150,9 @@ class DeployCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    let command = 'deploy -PteamNumber=' + teamNumber;
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
+                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    let command = 'deploy ' + args.join(' ') + ' -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
     // If deploy offline, and builds online, set flags
     // Otherwise, build offline will be set later
@@ -185,8 +187,9 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
-  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'simulateExternalCpp';
+  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
+                           __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    const command = 'simulateExternalCpp ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Simulate', this.executeApi, prefs);
     if (result !== 0) {

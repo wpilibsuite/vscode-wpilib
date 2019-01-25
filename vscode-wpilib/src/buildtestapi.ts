@@ -19,12 +19,12 @@ export class BuildTestAPI implements IBuildTestAPI {
     this.preferences = preferences;
   }
 
-  public buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
-    return this.buildTestCommon(workspace, this.builders, source);
+  public buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    return this.buildTestCommon(workspace, this.builders, source, args);
   }
 
-  public testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
-    return this.buildTestCommon(workspace, this.testers, source);
+  public testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    return this.buildTestCommon(workspace, this.testers, source, args);
   }
 
   public registerCodeBuild(builder: ICodeBuilder): void {
@@ -59,7 +59,7 @@ export class BuildTestAPI implements IBuildTestAPI {
   }
 
   private async buildTestCommon(workspace: vscode.WorkspaceFolder, builder: ICodeBuilderQuickPick[],
-                                source: vscode.Uri | undefined): Promise<boolean> {
+                                source: vscode.Uri | undefined, args: string[]): Promise<boolean> {
     if (builder.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
@@ -94,7 +94,7 @@ export class BuildTestAPI implements IBuildTestAPI {
       await vscode.workspace.saveAll();
     }
 
-    const deploySuccess = await langSelection.builder.runBuilder(workspace, source);
+    const deploySuccess = await langSelection.builder.runBuilder(workspace, source, ...args);
     return deploySuccess;
   }
 }

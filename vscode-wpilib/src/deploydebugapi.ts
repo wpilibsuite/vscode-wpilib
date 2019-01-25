@@ -135,16 +135,16 @@ export class DeployDebugAPI implements IDeployDebugAPI {
     this.languageChoices.push(language);
   }
 
-  public debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
-    return this.deployCommon(workspace, this.debuggers, true, false, source);
+  public debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    return this.deployCommon(workspace, this.debuggers, true, false, source, args);
   }
 
-  public deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
-    return this.deployCommon(workspace, this.deployers, false, false, source);
+  public deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    return this.deployCommon(workspace, this.deployers, false, false, source, args);
   }
 
-  public simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean> {
-    return this.deployCommon(workspace, this.simulators, true, true, source);
+  public simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    return this.deployCommon(workspace, this.simulators, true, true, source, args);
   }
 
   public getLanguageChoices(): string[] {
@@ -158,7 +158,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
   }
 
   private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[],
-                             debug: boolean, desktop: boolean, source: vscode.Uri | undefined): Promise<boolean> {
+                             debug: boolean, desktop: boolean, source: vscode.Uri | undefined, args: string[]): Promise<boolean> {
     if (deployer.length <= 0) {
       vscode.window.showInformationMessage('No registered deployers');
       return false;
@@ -194,7 +194,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
     }
     const teamNumber = await preferences.getTeamNumber();
     try {
-      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace, source);
+      const deploySuccess = await langSelection.deployer.runDeployer(teamNumber, workspace, source, ...args);
       if (preferences.getAutoStartRioLog() && deploySuccess && !desktop) {
         await this.startRioLog(teamNumber, !debug);
       }

@@ -37,20 +37,20 @@ export interface ICommandAPI {
 
 export interface IDeployDebugAPI {
   startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
   registerCodeDeploy(deployer: ICodeDeployer): void;
-  debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
   registerCodeDebug(deployer: ICodeDeployer): void;
-  simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
   registerCodeSimulate(deployer: ICodeDeployer): void;
   addLanguageChoice(language: string): void;
   getLanguageChoices(): string[];
 }
 
 export interface IBuildTestAPI {
-  buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
   registerCodeBuild(builder: ICodeBuilder): void;
-  testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
   registerCodeTest(builder: ICodeBuilder): void;
   addLanguageChoice(language: string): void;
 }
@@ -138,7 +138,7 @@ export interface ICodeDeployer {
    *
    * @param teamNumber The team number to deploy to
    */
-  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection
@@ -160,7 +160,7 @@ export interface ICodeBuilder {
   /**
    * Run the command with the specified team number
    */
-  runBuilder(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined): Promise<boolean>;
+  runBuilder(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection
