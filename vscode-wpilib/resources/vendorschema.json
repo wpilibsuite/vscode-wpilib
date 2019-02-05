@@ -83,7 +83,6 @@
             "groupId",
             "artifactId",
             "version",
-            "skipOnUnknownClassifier",
             "isJar",
             "validClassifiers"
           ]
@@ -142,14 +141,9 @@
             "groupId",
             "artifactId",
             "version",
-            "isHeaderOnly",
             "headerClassifier",
-            "hasSources",
-            "sourcesClassifier",
             "sharedLibrary",
-            "libName",
-            "skipOnUnknownClassifier",
-            "validClassifiers"
+            "libName"
           ]
         }
       ]
