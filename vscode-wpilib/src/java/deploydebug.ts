@@ -55,8 +55,9 @@ class DebugCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    let command = 'deploy -PdebugMode -PteamNumber=' + teamNumber;
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
+                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    let command = 'deploy ' + args.join(' ') + ' -PdebugMode -PteamNumber=' + teamNumber;
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
       command += ' -xcheck';
     }
@@ -126,8 +127,9 @@ class DeployCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    let command = 'deploy -PteamNumber=' + teamNumber;
+  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
+                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    let command = 'deploy ' + args.join(' ') + ' -PteamNumber=' + teamNumber;
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
       command += ' -xcheck';
     }
@@ -165,8 +167,9 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'simulateExternalJava';
+  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
+                           __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    const command = 'simulateExternalJava ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Simulate', this.executeApi, prefs);
     if (result !== 0) {

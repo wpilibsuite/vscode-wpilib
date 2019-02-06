@@ -20,8 +20,8 @@ class CodeBuilder implements ICodeBuilder {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
 
-  public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'build generateVsCodeConfig';
+  public async runBuilder(workspace: vscode.WorkspaceFolder, _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    const command = 'build generateVsCodeConfig ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Build', this.executeApi, prefs);
     logger.log(result.toString());
@@ -52,8 +52,8 @@ class CodeTester implements ICodeBuilder {
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
 
-  public async runBuilder(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-    const command = 'check';
+  public async runBuilder(workspace: vscode.WorkspaceFolder, _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+    const command = 'check ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Test', this.executeApi, prefs);
 
