@@ -57,13 +57,13 @@ export class ApiProvider implements CustomConfigurationProvider {
 
   private executeApi: IExecuteAPI;
 
-  constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI, resourceRoot: string) {
+  constructor(workspace: vscode.WorkspaceFolder, cppToolsApi: CppToolsApi, externalApi: IExternalAPI, headerTreeProvider: HeaderExplorer) {
     this.preferences = externalApi.getPreferencesAPI().getPreferences(workspace);
     this.workspace = workspace;
     this.cppToolsApi = cppToolsApi;
     this.executeApi = externalApi.getExecuteAPI();
     this.cppToolsApi.registerCustomConfigurationProvider(this);
-    this.headerTreeProvider = new HeaderExplorer(resourceRoot);
+    this.headerTreeProvider = headerTreeProvider;
 
     const fsPath = workspace.uri.fsPath;
 
@@ -89,8 +89,6 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.setupWatchers();
 
     this.loadConfigs().catch();
-
-    this.disposables.push(this.headerTreeProvider);
   }
 
   public async canProvideBrowseConfiguration(_?: vscode.CancellationToken | undefined): Promise<boolean> {
