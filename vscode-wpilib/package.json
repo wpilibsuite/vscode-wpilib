@@ -410,7 +410,7 @@
         "tslint": "^5.11.0",
         "typescript": "^3.0.1",
         "vsce": "^1.53.0",
-        "vscode": "^1.1.21",
+        "vscode": "^1.1.29",
         "vscode-nls-dev": "^3.2.3",
         "webpack": "^4.25.1",
         "webpack-cli": "^3.1.2"
