@@ -3,6 +3,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { logger } from '../logger';
 import { IToolChain } from './jsonformats';
 
 //#region Utilities
@@ -218,7 +219,12 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
   }
 
   private async _readDirectory(uri: vscode.Uri): Promise<Array<[string, vscode.FileType]>> {
-    const children = await readdir(uri.fsPath);
+    let children: string[] = [];
+    try {
+      children = await readdir(uri.fsPath);
+    } catch (err) {
+      logger.log('Directory Warning', err);
+    }
 
     const result: Array<[string, vscode.FileType]> = [];
     for (const child of children) {
