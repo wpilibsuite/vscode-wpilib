@@ -1,6 +1,6 @@
 {
   "name": "wpilib-riolog",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "RIOLog for FRC",
   "typings": "./out/index.d.ts",
   "main": "./out/index.js",

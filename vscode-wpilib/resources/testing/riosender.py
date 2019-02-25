@@ -27,6 +27,10 @@ class ConsoleHandler(socketserver.StreamRequestHandler):
         inner = self.makeErrorMsgInner(timestamp, sequence, occur, errorCode, flags, details, location, callStack)
         return b''.join([self.tagHeader.pack(len(inner) + 1, 11), inner])
 
+    def makeErrorMsgSplit(self, timestamp, sequence, occur, errorCode, flags, details, location, callStack):
+        inner = self.makeErrorMsgInner(timestamp, sequence, occur, errorCode, flags, details, location, callStack)
+        return [self.tagHeader.pack(len(inner) + 1, 11), inner]
+
     def makePrintMsgInner(self, timestamp, sequence, line):
         return b''.join([
             self.printMsgStart.pack(timestamp, sequence),
@@ -43,15 +47,20 @@ class ConsoleHandler(socketserver.StreamRequestHandler):
         while 1:
             timestamp = time.time() - startTime
             sequence = (sequence + 1) & 0xffff
-            self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 1, "this is an </br>errorwitha\r\nong text", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
+            split = self.makeErrorMsgSplit(timestamp, sequence, 1, 0x111111, 1, "this is an </br>errorwitha\r\nong text", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n")
+            print(split[0])
+            print (split[1])
+            self.wfile.write(split[0])
+            time.sleep(0.1)
+            self.wfile.write(split[1])
             self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
             count = count + 1
             time.sleep(0.25)
-            self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
+            #self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
             count = count + 1
             time.sleep(0.1)
-            self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 0, "this is a warning", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
-            self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
+            #self.wfile.write(self.makeErrorMsg(timestamp, sequence, 1, 0x111111, 0, "this is a warning", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n"))
+            #self.wfile.write(self.makePrintMsg(timestamp, sequence, str(count)))
             count = count + 1
             #time.sleep(1)
 

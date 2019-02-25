@@ -7,6 +7,14 @@ import { ErrorMessage, PrintMessage } from './message';
 import { PromiseCondition } from './promisecond';
 import { connectToRobot } from './rioconnector';
 
+const maxFrameSize = 100000;
+
+class DataStore {
+  public buf: Buffer = new Buffer(65535);
+  public count: number = 0;
+  public frameSize: number = maxFrameSize;
+}
+
 export class RioConsole extends EventEmitter implements IRioConsole {
   public discard: boolean = false;
   public connected: boolean = false;
@@ -15,6 +23,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
   private promise: Promise<void> | undefined;
   private condition: PromiseCondition = new PromiseCondition();
   private closeFunc: (() => void) | undefined;
+  private dataStore: DataStore = new DataStore();
   private teamNumber: number = 0;
 
   public stop(): void {
@@ -80,6 +89,37 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     return socket;
   }
 
+  private handleBuffer(data: Buffer) {
+    while (data.length > 0) {
+      if (this.dataStore.frameSize === maxFrameSize) {
+        if (this.dataStore.count < 2) {
+          const toCopy = Math.min(2 - this.dataStore.count, data.length);
+          data.copy(this.dataStore.buf, this.dataStore.count, 0, toCopy);
+          this.dataStore.count += toCopy;
+          data = data.slice(toCopy);
+          if (this.dataStore.count < 2) {
+            return;
+          }
+        }
+        // tslint:disable-next-line:no-bitwise
+        this.dataStore.frameSize = (this.dataStore.buf[0] << 8) | this.dataStore.buf[1];
+      }
+      {
+        let need = this.dataStore.frameSize - (this.dataStore.count - 2);
+        const toCopy = Math.min(need, data.length);
+        data.copy(this.dataStore.buf, this.dataStore.count, 0, toCopy);
+        this.dataStore.count += toCopy;
+        data = data.slice(toCopy);
+        need -= toCopy;
+        if (need === 0) {
+          this.handleData(this.dataStore.buf);
+          this.dataStore.count = 0;
+          this.dataStore.frameSize = maxFrameSize;
+        }
+      }
+    }
+  }
+
   private handleData(data: Buffer) {
     if (this.discard) {
       return;
@@ -97,8 +137,6 @@ export class RioConsole extends EventEmitter implements IRioConsole {
 
     const outputBuffer = data.slice(3, len + 2);
 
-    const extendedBuf = data.slice(2 + len);
-
     if (tag === 11) {
       // error or warning.
       const m = new ErrorMessage(outputBuffer);
@@ -106,10 +144,6 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     } else if (tag === 12) {
       const m = new PrintMessage(outputBuffer);
       this.emit('message', m);
-    }
-
-    if (extendedBuf.length > 0) {
-      this.handleData(extendedBuf);
     }
   }
 
@@ -123,7 +157,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     this.emit('connectionChanged', true);
     console.log('succesfully connected');
     socket.on('data', (data) => {
-      this.handleData(data);
+      this.handleBuffer(data);
     });
     if (this.cleanup) {
       socket.end();
