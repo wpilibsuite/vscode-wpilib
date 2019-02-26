@@ -214,6 +214,7 @@ suite('Input Buffer Tests', () => {
       const bufc = newBuf.slice(buf.length + 10);
       rioconsoleany.handleBuffer(bufa);
       rioconsoleany.handleBuffer(bufb);
+      assert.strictEqual(1, count);
       rioconsoleany.handleBuffer(bufc);
       assert.strictEqual(2, count);
     });
