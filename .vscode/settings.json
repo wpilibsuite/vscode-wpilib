@@ -1,5 +1,12 @@
 {
   "java.configuration.updateBuildConfiguration": "disabled",
   "java.import.gradle.enabled": false,
-  "java.import.maven.enabled": false
+  "java.import.maven.enabled": false,
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  },
+  "python.linting.pylintEnabled": true
 }
