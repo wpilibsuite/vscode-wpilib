@@ -53,32 +53,9 @@ function getBufferFromError(message: IErrorMessage): Buffer {
   return buffer.slice(0, count);
 }
 
-// function getBufferFromPrint(message: IPrintMessage): Buffer {
-//   const buffer = new Buffer(65535);
-//   let count = 0;
-//   buffer.writeInt8(0, count);
-//   count++;
-//   buffer.writeInt8(0, count);
-//   count++;
-//   buffer.writeUInt8(11, count);
-//   count++;
-//   buffer.writeFloatBE(message.timestamp, count);
-//   count += 4;
-//   buffer.writeInt16BE(message.seqNumber, count);
-//   count += 2;
-
-//   buffer.writeUInt16BE(message.line.length, count);
-//   count += 2;
-//   count += buffer.write(message.line, count, undefined, 'utf8');
-
-//   buffer.writeUInt16BE(count - 2, 0);
-
-//   return buffer.slice(0, count);
-// }
-
-suite('Input Buffer Tests', () => {
+suite('Input Error Buffer Tests', () => {
   [true, false].forEach((x) => {
-    test(`Single Error Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Single Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole: riolog.RioConsole = new riolog.RioConsole();
       // tslint:disable-next-line:no-any
       const rioconsoleany = (rioconsole as any);
@@ -102,7 +79,7 @@ suite('Input Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Split Error Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Split Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole: riolog.RioConsole = new riolog.RioConsole();
       // tslint:disable-next-line:no-any
       const rioconsoleany = (rioconsole as any);
@@ -129,7 +106,7 @@ suite('Input Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Split Length Error Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Split Length Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole: riolog.RioConsole = new riolog.RioConsole();
       // tslint:disable-next-line:no-any
       const rioconsoleany = (rioconsole as any);
@@ -156,7 +133,7 @@ suite('Input Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Split Length 2 Error Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Split Length 2 Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole: riolog.RioConsole = new riolog.RioConsole();
       // tslint:disable-next-line:no-any
       const rioconsoleany = (rioconsole as any);
@@ -185,7 +162,7 @@ suite('Input Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Double Split Error Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Double Split Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole: riolog.RioConsole = new riolog.RioConsole();
       // tslint:disable-next-line:no-any
       const rioconsoleany = (rioconsole as any);
@@ -220,3 +197,4 @@ suite('Input Buffer Tests', () => {
     });
   });
 });
+
