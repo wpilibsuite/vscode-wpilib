@@ -7,12 +7,16 @@
   "devDependencies": {
     "@types/node": "^8.0.46",
     "typescript": "^3.0.1",
-    "tslint": "^5.11.0"
+    "tslint": "^5.11.0",
+    "@types/mocha": "^5.2.6",
+    "ts-node": "^7.0.1",
+    "mocha": "^5.2.0"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",
     "compile": "tsc -p ./",
-    "lint": "tslint -c tslint.json -p tsconfig.json"
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts"
   },
   "keywords": [
     "wpilib",
