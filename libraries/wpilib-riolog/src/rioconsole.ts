@@ -10,7 +10,8 @@ import { connectToRobot } from './rioconnector';
 const maxFrameSize = 100000;
 
 class DataStore {
-  public buf: Buffer = new Buffer(65535);
+  // 65536 is max length, plus 2 for the length itself, rounded to the nearest 256
+  public buf: Buffer = new Buffer(65792);
   public count: number = 0;
   public frameSize: number = maxFrameSize;
 }
