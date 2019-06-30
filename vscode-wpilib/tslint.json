@@ -48,7 +48,6 @@
 		"member-access": true,
 		"forin": true,
 		"no-for-in-array": true,
-		"no-use-before-declare": true,
 		"no-invalid-this": true,
 		"no-shadowed-variable": true,
 		"no-this-assignment": true,

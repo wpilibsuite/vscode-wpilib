@@ -5,12 +5,12 @@
   "typings": "./out/index.d.ts",
   "main": "./out/index.js",
   "devDependencies": {
-    "@types/node": "^8.0.46",
-    "typescript": "^3.0.1",
-    "tslint": "^5.11.0",
-    "@types/mocha": "^5.2.6",
-    "ts-node": "^7.0.1",
-    "mocha": "^5.2.0"
+    "@types/node": "^10.2.0",
+    "typescript": "^3.5.2",
+    "tslint": "^5.18.0",
+    "@types/mocha": "^5.2.7",
+    "ts-node": "^8.3.0",
+    "mocha": "^6.1.4"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",

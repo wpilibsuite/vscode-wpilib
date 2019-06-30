@@ -8,10 +8,10 @@
     "vscode": "^1.26.0"
   },
   "devDependencies": {
-    "@types/node": "^8.0.46",
-    "typescript": "^3.0.1",
-    "tslint": "^5.11.0",
-    "vscode": "^1.1.21"
+    "@types/node": "^10.2.0",
+    "typescript": "^3.5.2",
+    "tslint": "^5.18.0",
+    "vscode": "^1.1.35"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",
