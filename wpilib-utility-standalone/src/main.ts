@@ -4,16 +4,19 @@ import { app, BrowserWindow } from 'electron';
 
 let mainWindow: Electron.BrowserWindow | undefined;
 
-function createWindow() {
+async function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     backgroundColor: '#2e2c29',
     height: 250,
     title: 'WPILib Utility',
+    webPreferences: {
+      nodeIntegration: true,
+    },
     width: 350,
   });
 
-  mainWindow.loadFile('index.html');
+  await mainWindow.loadFile('index.html');
 
   mainWindow.setMenu(null);
 
@@ -47,11 +50,11 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('activate', () => {
+app.on('activate', async () => {
   // On OS X it"s common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createWindow();
+    await createWindow();
   }
 });
 

@@ -19,13 +19,13 @@ window.addEventListener('load', () => {
   mainDiv.appendChild(document.createElement('br'));
   const rioLogButton = document.createElement('button');
   rioLogButton.appendChild(document.createTextNode('Start RioLog'));
-  rioLogButton.addEventListener('click', () => {
+  rioLogButton.addEventListener('click', async () => {
     const bWindow = remote.getCurrentWindow();
 
     bWindow.setSize(800, 600);
     bWindow.setTitle('RioLog');
 
-    bWindow.loadFile('riolog.html');
+    await bWindow.loadFile('riolog.html');
 
     return;
   });
@@ -35,13 +35,13 @@ window.addEventListener('load', () => {
 
   const generatorButton = document.createElement('button');
   generatorButton.appendChild(document.createTextNode('Start New Project Generator'));
-  generatorButton.addEventListener('click', () => {
+  generatorButton.addEventListener('click', async () => {
     const bWindow = remote.getCurrentWindow();
 
     bWindow.setSize(800, 600);
     bWindow.setTitle('New Project Generator');
 
-    bWindow.loadFile('projectcreator.html');
+    await bWindow.loadFile('projectcreator.html');
   });
   generatorButton.style.marginTop = '5px';
   mainDiv.appendChild(generatorButton);
@@ -49,13 +49,13 @@ window.addEventListener('load', () => {
 
   const vendorDepsButton = document.createElement('button');
   vendorDepsButton.appendChild(document.createTextNode('Start Vendor Deps Manager'));
-  vendorDepsButton.addEventListener('click', () => {
+  vendorDepsButton.addEventListener('click', async () => {
     const bWindow = remote.getCurrentWindow();
 
     bWindow.setSize(800, 600);
     bWindow.setTitle('Vendor Deps Manager');
 
-    bWindow.loadFile('vendordeps.html');
+    await bWindow.loadFile('vendordeps.html');
   });
   vendorDepsButton.style.marginTop = '5px';
   mainDiv.appendChild(vendorDepsButton);
