@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
          IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';
-import { promisifyReadFile } from '../utilities';
+import { readFileAsync } from '../utilities';
 
 interface IHTMLProvider {
   getHTML(): string;
@@ -73,7 +73,7 @@ export class RioLogHTMLProvider implements IHTMLProvider {
     // And get the special URI to use with the webview
     const scriptResourcePath = onDiskPath.with({ scheme: 'vscode-resource' });
 
-    provider.html = await promisifyReadFile(htmlFile);
+    provider.html = await readFileAsync(htmlFile, 'utf8');
     provider.html += '\r\n<script src="';
     provider.html += scriptResourcePath.toString();
     provider.html += '">\r\n';

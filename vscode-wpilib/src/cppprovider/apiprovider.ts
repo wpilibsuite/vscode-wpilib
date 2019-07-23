@@ -7,7 +7,7 @@ import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem, 
 import { IExecuteAPI, IExternalAPI, IPreferences } from 'vscode-wpilibapi';
 import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
-import { gradleRun, promisifyReadFile } from '../utilities';
+import { gradleRun, readFileAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { HeaderExplorer } from './headertreeprovider';
 import { IToolChain } from './jsonformats';
@@ -152,7 +152,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     let file = '';
     try {
-      file = await promisifyReadFile(path.join(this.workspace.uri.fsPath, 'build', this.configFile));
+      file = await readFileAsync(path.join(this.workspace.uri.fsPath, 'build', this.configFile), 'utf8');
     } catch (err) {
       this.statusBar.show();
       return false;

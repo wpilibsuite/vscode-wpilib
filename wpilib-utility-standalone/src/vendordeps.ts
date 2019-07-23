@@ -3,10 +3,9 @@
 import * as electron from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
-import { promisifyReadDir } from './shared/generator';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
-import { promisifyDeleteFile } from './utilities';
+import { deleteFileAsync, readdirAsync } from './utilities';
 
 const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
@@ -41,12 +40,12 @@ class VendorLibraries extends VendorLibrariesBase {
   public async uninstallDependency(dir: string, uuid: string): Promise<void> {
     const url = this.getVendorFolder(dir);
 
-    const files = await promisifyReadDir(url);
+    const files = await readdirAsync(url);
     for (const file of files) {
       const fullPath = path.join(url, file);
       const result = await this.readFile(fullPath);
       if (result !== undefined && uuid === result.uuid) {
-        await promisifyDeleteFile(fullPath);
+        await deleteFileAsync(fullPath);
         break;
       }
     }

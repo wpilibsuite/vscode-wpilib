@@ -23,11 +23,10 @@ import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
-import { promisifyMkdirp } from './shared/generator';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
-import { promisifyExists, setExtensionContext, setJavaHome } from './utilities';
+import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
@@ -119,7 +118,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const logPath = path.join(frcHomeDir, 'logs');
   try {
-    await promisifyMkdirp(logPath);
+    await mkdirpAsync(logPath);
     setLoggerDirectory(logPath);
   } catch (err) {
     logger.error('Error creating logger', err);
@@ -237,7 +236,7 @@ export async function activate(context: vscode.ExtensionContext) {
             didUpdate = await wpilibUpdate.checkForInitialUpdate(w);
           }
 
-          let runBuild: boolean = !await promisifyExists(path.join(w.uri.fsPath, 'build'));
+          let runBuild: boolean = !await existsAsync(path.join(w.uri.fsPath, 'build'));
 
           if (didUpdate) {
             const result = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +

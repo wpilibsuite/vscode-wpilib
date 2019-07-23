@@ -3,10 +3,10 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import { logger } from '../logger';
-import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { existsAsync, extensionContext, mkdirpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
 import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../wpilibapishim';
-import { generateCopyCpp, generateCopyJava, promisifyMkdirp, promisifyReadDir } from './generator';
+import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
 
 export interface IFile {
@@ -42,10 +42,10 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
   }
   const exampleDir = path.join(utilities.getWPILibHomeDir(), 'vendorexamples');
   const gradleBasePath = path.join(resourceRoot, 'gradle');
-  if (await promisifyExists(exampleDir)) {
-    const files = await promisifyReadDir(exampleDir);
+  if (await existsAsync(exampleDir)) {
+    const files = await readdirAsync(exampleDir);
     for (const file of files) {
-      const fileContents = await promisifyReadFile(path.join(exampleDir, file));
+      const fileContents = await readFileAsync(path.join(exampleDir, file), 'utf8');
       const parsed = jsonc.parse(fileContents);
       if (Array.isArray(parsed)) {
         for (const ex of parsed) {
@@ -71,8 +71,8 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       for (const copyFile of ex.files) {
                         const copyFilePath = path.join(copyPath, copyFile.deployloc);
                         const copyParent = path.dirname(copyFilePath);
-                        await promisifyMkdirp(copyParent);
-                        await promisifyWriteFile(copyFilePath, copyFile.contents);
+                        await mkdirpAsync(copyParent);
+                        await writeFileAsync(copyFilePath, copyFile.contents);
                       }
                       const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
                       for (const vendorFile of vendorFiles) {
@@ -90,8 +90,8 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       for (const copyFile of ex.files) {
                         const copyFilePath = path.join(copyPath, copyFile.deployloc);
                         const copyParent = path.dirname(copyFilePath);
-                        await promisifyMkdirp(copyParent);
-                        await promisifyWriteFile(copyFilePath, copyFile.contents);
+                        await mkdirpAsync(copyParent);
+                        await writeFileAsync(copyFilePath, copyFile.contents);
                       }
                       const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
                       for (const vendorFile of vendorFiles) {

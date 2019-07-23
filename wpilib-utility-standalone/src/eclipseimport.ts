@@ -4,8 +4,8 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { generateCopyCpp, generateCopyJava, promisifyMkdirp } from './shared/generator';
-import { promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
+import { generateCopyCpp, generateCopyJava } from './shared/generator';
+import { existsAsync, mkdirpAsync, readFileAsync, writeFileAsync } from './utilities';
 
 const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
@@ -87,7 +87,7 @@ export async function importProjectButtonClick() {
 
   const oldProjectPath = path.dirname(data.fromProps);
 
-  const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
+  const cpp = await existsAsync(path.join(oldProjectPath, '.cproject'));
 
   // tslint:disable-next-line:no-unsafe-any
   const values = javaProperties.of(data.fromProps);
@@ -102,7 +102,7 @@ export async function importProjectButtonClick() {
   }
 
   try {
-    await promisifyMkdirp(toFolder);
+    await mkdirpAsync(toFolder);
   } catch {
     //
   }
@@ -149,10 +149,10 @@ export async function importProjectButtonClick() {
 
   const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-  const parsed = JSON.parse(await promisifyReadFile(jsonFilePath));
+  const parsed = JSON.parse(await readFileAsync(jsonFilePath, 'utf8'));
   // tslint:disable-next-line:no-unsafe-any
   parsed.teamNumber = parseInt(data.teamNumber, 10);
-  await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
+  await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
 
   dialog.showMessageBox({
     buttons: ['Open Folder', 'OK'],

@@ -1,10 +1,9 @@
 'use scrict';
 
 import * as path from 'path';
-import { promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { mkdirpAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
 import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
-import { promisifyMkdirp } from './generator';
 import { IPreferencesJson } from './preferencesjson';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
@@ -91,7 +90,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
     }
 
     try {
-      await promisifyMkdirp(toFolder);
+      await mkdirpAsync(toFolder);
     } catch {
       //
     }
@@ -105,9 +104,9 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath)) as IPreferencesJson;
+    const parsed = JSON.parse(await readFileAsync(jsonFilePath, 'utf8')) as IPreferencesJson;
     parsed.teamNumber = teamNumber;
-    await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
+    await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     return true;
   }

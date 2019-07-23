@@ -3,7 +3,7 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import { IExternalAPI, IToolRunner, IUtilitiesAPI } from 'vscode-wpilibapi';
-import { getIsWindows, promisifyExists, promisifyReadFile } from './utilities';
+import { existsAsync, getIsWindows, readFileAsync } from './utilities';
 
 interface ITool {
   name: string;
@@ -64,13 +64,13 @@ export class BuiltinTools {
     for (const ht of homeTools.tools) {
       if (isWindows) {
         const toolPath = path.join(homeTools.dir, ht.name + '.vbs');
-        if (await promisifyExists(toolPath)) {
+        if (await existsAsync(toolPath)) {
           // Tool exists, add it
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name));
         }
       } else {
         const toolPath = path.join(homeTools.dir, ht.name + '.jar');
-        if (await promisifyExists(toolPath)) {
+        if (await existsAsync(toolPath)) {
           // Tool exists, add it
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name));
         }
@@ -96,7 +96,7 @@ export class BuiltinTools {
     const toolsJson = path.join(toolsDir, 'tools.json');
 
     try {
-      const jsonFileContents = await promisifyReadFile(toolsJson);
+      const jsonFileContents = await readFileAsync(toolsJson, 'utf8');
       const jsonResult = JSON.parse(jsonFileContents) as ITool[];
       return {
         dir: toolsDir,

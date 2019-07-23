@@ -7,8 +7,7 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import * as xml2js from 'xml2js';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
-import { promisifyReadDir } from './shared/generator';
-import { promisifyExists, promisifyReadFile, promisifyWriteFile } from './utilities';
+import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './utilities';
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
@@ -120,11 +119,11 @@ export class WPILibUpdates {
   public async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
     try {
       const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
-      const gradleBuildFile = await promisifyReadFile(buildFile);
+      const gradleBuildFile = await readFileAsync(buildFile, 'utf8');
 
       const newgFile = gradleBuildFile.replace(getGradleRioRegex(), `$1${version}$3`);
 
-      await promisifyWriteFile(buildFile, newgFile);
+      await writeFileAsync(buildFile, newgFile);
     } catch (err) {
       logger.error('error setting wpilib (gradlerio) version', err);
       return;
@@ -201,11 +200,11 @@ export class WPILibUpdates {
     const frcHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
     const gradleRioPath = path.join(frcHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
     try {
-      const files = await promisifyReadDir(gradleRioPath);
+      const files = await readdirAsync(gradleRioPath);
       const versions = [];
       for (const file of files) {
         const pth = path.join(gradleRioPath, file, `GradleRIO-${file}.pom`);
-        const isGR = await promisifyExists(pth);
+        const isGR = await existsAsync(pth);
         if (isGR) {
           versions.push(file);
         }
@@ -232,7 +231,7 @@ export class WPILibUpdates {
   private async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
 
     try {
-      const gradleBuildFile = await promisifyReadFile(path.join(wp.uri.fsPath, 'build.gradle'));
+      const gradleBuildFile = await readFileAsync(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
 
       const matchRes = getGradleRioRegex().exec(gradleBuildFile);
 

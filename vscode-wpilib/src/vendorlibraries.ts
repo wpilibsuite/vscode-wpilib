@@ -3,9 +3,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { promisifyReadDir } from './shared/generator';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
-import { promisifyDeleteFile } from './utilities';
+import { deleteFileAsync, readdirAsync } from './utilities';
 import { isNewerVersion } from './versions';
 
 class OptionQuickPick implements vscode.QuickPickItem {
@@ -107,14 +106,14 @@ export class VendorLibraries extends VendorLibrariesBase {
 
       if (toRemove !== undefined) {
         const url = this.getWpVendorFolder(workspace);
-        const files = await promisifyReadDir(url);
+        const files = await readdirAsync(url);
         for (const file of files) {
           const fullPath = path.join(url, file);
           const result = await this.readFile(fullPath);
           if (result !== undefined) {
             for (const ti of toRemove) {
               if (ti.dep.uuid === result.uuid) {
-                await promisifyDeleteFile(fullPath);
+                await deleteFileAsync(fullPath);
               }
             }
           }
