@@ -59,7 +59,7 @@ export class ToolAPI implements IToolAPI {
       return false;
     }
 
-    const ret =  result.runner.runTool();
+    const ret =  await result.runner.runTool();
     if (!ret) {
       vscode.window.showInformationMessage(`Failed to start tool: ${result.runner.getDisplayName()}`);
     }
