@@ -9,13 +9,13 @@
   },
   "devDependencies": {
     "@types/node": "^10.2.0",
+    "@types/vscode": "1.26.0",
     "typescript": "^3.5.2",
-    "tslint": "^5.18.0",
-    "vscode": "^1.1.35"
+    "tslint": "^5.18.0"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",
-    "compile": "node ./node_modules/vscode/bin/install && tsc -p ./",
+    "compile": "tsc -p ./",
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },
   "keywords": [
