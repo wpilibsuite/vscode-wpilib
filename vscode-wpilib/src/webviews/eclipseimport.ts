@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { generateCopyCpp, generateCopyJava, promisifyMkdirp, setDesktopEnabled } from '../shared/generator';
+import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
 import { IPreferencesJson } from '../shared/preferencesjson';
-import { extensionContext, promisifyExists, promisifyReadFile, promisifyWriteFile, promptForProjectOpen } from '../utilities';
+import { existsAsync, extensionContext, mkdirpAsync, promptForProjectOpen, readFileAsync, writeFileAsync } from '../utilities';
 import { IEclipseIPCData, IEclipseIPCReceive, IEclipseIPCSend } from './pages/eclipseimportpagetypes';
 import { WebViewBase } from './webviewbase';
 
@@ -116,7 +116,7 @@ export class EclipseImport extends WebViewBase {
     }
     const oldProjectPath = path.dirname(data.fromProps);
 
-    const cpp = await promisifyExists(path.join(oldProjectPath, '.cproject'));
+    const cpp = await existsAsync(path.join(oldProjectPath, '.cproject'));
 
     // tslint:disable-next-line:no-unsafe-any
     const values = javaProperties.of(data.fromProps);
@@ -136,7 +136,7 @@ export class EclipseImport extends WebViewBase {
     }
 
     try {
-      await promisifyMkdirp(toFolder);
+      await mkdirpAsync(toFolder);
     } catch {
       //
     }
@@ -178,19 +178,19 @@ export class EclipseImport extends WebViewBase {
     await setDesktopEnabled(buildgradle, true);
 
     if (!cpp) {
-      let mainFile = await promisifyReadFile(path.join(this.resourceRoot, 'eclipseprojectmain.java'));
+      let mainFile = await readFileAsync(path.join(this.resourceRoot, 'eclipseprojectmain.java'), 'utf8');
       mainFile = mainFile.replace(new RegExp('insertnewpackagehere', 'g'), javaRobotPackage)
                         .replace(new RegExp('ROBOTCLASSNAMEHERE', 'g'), javaRobotClass);
 
       const filePath = path.join(toFolder, 'src', 'main', 'java', ...javaRobotPackage.split('.'), 'Main.java');
-      await promisifyWriteFile(filePath, mainFile);
+      await writeFileAsync(filePath, mainFile);
     }
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-    const parsed = JSON.parse(await promisifyReadFile(jsonFilePath)) as IPreferencesJson;
+    const parsed = JSON.parse(await readFileAsync(jsonFilePath, 'utf8')) as IPreferencesJson;
     parsed.teamNumber = parseInt(data.teamNumber, 10);
-    await promisifyWriteFile(jsonFilePath, JSON.stringify(parsed, null, 4));
+    await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     await promptForProjectOpen(vscode.Uri.file(toFolder));
   }

@@ -5,8 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
 import { logger } from '../logger';
-import { promisifyNcp } from '../shared/generator';
-import { getClassName, getPackageName } from '../utilities';
+import { getClassName, getPackageName, ncpAsync } from '../utilities';
 
 export interface IJavaJsonLayout {
   name: string;
@@ -20,7 +19,7 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
                            javaPackage: string): Promise<boolean> {
   const commandFolder = path.join(commandRoot, command.foldername);
   const copiedFiles: string[] = [];
-  await promisifyNcp(commandFolder, folder.fsPath, {
+  await ncpAsync(commandFolder, folder.fsPath, {
     filter: (cf: string): boolean => {
       if (fs.lstatSync(cf).isFile()) {
         copiedFiles.push(path.relative(commandFolder, cf));

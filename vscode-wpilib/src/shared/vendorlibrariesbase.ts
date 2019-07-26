@@ -3,8 +3,7 @@
 import * as fetch from 'node-fetch';
 import * as path from 'path';
 import { logger } from '../logger';
-import { promisifyMkdirp, promisifyReadDir } from '../shared/generator';
-import { promisifyDeleteFile, promisifyExists, promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { deleteFileAsync, existsAsync, mkdirpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import { IUtilitiesAPI } from '../wpilibapishim';
 
 export interface IJsonDependency {
@@ -43,16 +42,16 @@ export class VendorLibrariesBase {
   }
 
   public async installDependency(dep: IJsonDependency, url: string, override: boolean): Promise<boolean> {
-    const dirExists = await promisifyExists(url);
+    const dirExists = await existsAsync(url);
 
     if (!dirExists) {
-      await promisifyMkdirp(url);
+      await mkdirpAsync(url);
       // Directly write file
-      await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+      await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
       return true;
     }
 
-    const files = await promisifyReadDir(url);
+    const files = await readdirAsync(url);
 
     for (const file of files) {
       const fullPath = path.join(url, file);
@@ -60,7 +59,7 @@ export class VendorLibrariesBase {
       if (result !== undefined) {
         if (result.uuid === dep.uuid) {
           if (override) {
-            await promisifyDeleteFile(fullPath);
+            await deleteFileAsync(fullPath);
             break;
           } else {
             return false;
@@ -69,7 +68,7 @@ export class VendorLibrariesBase {
       }
     }
 
-    await promisifyWriteFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+    await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
     return true;
   }
 
@@ -79,7 +78,7 @@ export class VendorLibrariesBase {
 
   protected async readFile(file: string): Promise<IJsonDependency | undefined> {
     try {
-      const jsonContents = await promisifyReadFile(file);
+      const jsonContents = await readFileAsync(file, 'utf8');
       const dep = JSON.parse(jsonContents);
 
       if (isJsonDependency(dep)) {
@@ -95,7 +94,7 @@ export class VendorLibrariesBase {
 
   protected async getDependencies(dir: string): Promise<IJsonDependency[]> {
     try {
-      const files = await promisifyReadDir(dir);
+      const files = await readdirAsync(dir);
 
       const promises: Array<Promise<IJsonDependency | undefined>> = [];
 

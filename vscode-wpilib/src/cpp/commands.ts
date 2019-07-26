@@ -5,8 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
 import { logger } from '../logger';
-import { promisifyNcp } from '../shared/generator';
-import { getClassName } from '../utilities';
+import { getClassName, ncpAsync } from '../utilities';
 
 export interface ICppJsonLayout {
   name: string;
@@ -23,7 +22,7 @@ async function performCopy(commandRoot: string, command: ICppJsonLayout, folderS
   const commandFolder = path.join(commandRoot, command.foldername);
   const copiedSrcFiles: string[] = [];
   const copiedHeaderFiles: string[] = [];
-  await promisifyNcp(commandFolder, folderSrc.fsPath, {
+  await ncpAsync(commandFolder, folderSrc.fsPath, {
     filter: (cf: string): boolean => {
       if (!fs.lstatSync(cf).isFile()) {
         return true;
@@ -38,7 +37,7 @@ async function performCopy(commandRoot: string, command: ICppJsonLayout, folderS
     },
   });
 
-  await promisifyNcp(commandFolder, folderHeader.fsPath, {
+  await ncpAsync(commandFolder, folderHeader.fsPath, {
     filter: (cf: string): boolean => {
       if (!fs.lstatSync(cf).isFile()) {
         return true;

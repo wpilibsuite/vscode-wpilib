@@ -1,7 +1,9 @@
 'use strict';
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+import * as ncp from 'ncp';
 import * as path from 'path';
-import * as timers from 'timers';
+import * as util from 'util';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from 'vscode-wpilibapi';
 import { setExecutePermissions } from './shared/permissions';
@@ -45,81 +47,33 @@ export async function getPackageName(): Promise<string | undefined> {
   return packageName;
 }
 
-export function readFileAsync(file: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
+export const readFileAsync = util.promisify(fs.readFile);
+
+export const writeFileAsync = util.promisify(fs.writeFile);
+
+export const mkdirAsync = util.promisify(fs.mkdir);
+
+export const existsAsync = util.promisify(fs.exists);
+
+export const deleteFileAsync = util.promisify(fs.unlink);
+
+export const mkdirpAsync = util.promisify(mkdirp);
+
+export function ncpAsync(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
+  return mkdirpAsync(dest).then(() => {
+    return new Promise<void>((resolve, reject) => {
+      ncp.ncp(source, dest, options, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
   });
 }
 
-export function promisifyReadFile(filename: string): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    fs.readFile(filename, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
-
-export function promisifyExists(filename: string): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
-    fs.exists(filename, (e) => {
-      resolve(e);
-    });
-  });
-}
-
-export function promisifyWriteFile(filename: string, contents: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    fs.writeFile(filename, contents, 'utf8', (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-export function promisifyMkDir(dirName: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    fs.mkdir(dirName, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-export function promisifyTimer(time: number): Promise<void> {
-  return new Promise<void>((resolve, _) => {
-    timers.setTimeout(() => {
-      resolve();
-    }, time);
-  });
-}
-
-export function promisifyDeleteFile(file: string): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
-    fs.unlink(file, (err) => {
-      if (err) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
+export const readdirAsync = util.promisify(fs.readdir);
 
 export let javaHome: string | undefined;
 export function setJavaHome(jhome: string): void {

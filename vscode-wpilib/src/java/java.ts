@@ -7,7 +7,7 @@ import { IExternalAPI } from 'vscode-wpilibapi';
 import { logger } from '../logger';
 import { Examples } from '../shared/examples';
 import { Templates } from '../shared/templates';
-import { promisifyExists } from '../utilities';
+import { existsAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
@@ -61,7 +61,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
         if (prefs.getIsWPILibProject()) {
           const localW = w;
           const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
-          if (await promisifyExists(buildGradle)) {
+          if (await existsAsync(buildGradle)) {
             const buildGradleUri = vscode.Uri.file(buildGradle);
             onVendorDepsChanged(async (workspace) => {
               if (workspace.index === localW.index) {

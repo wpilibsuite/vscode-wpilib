@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { extensionContext, promisifyReadFile } from '../utilities';
+import { extensionContext, readFileAsync } from '../utilities';
 
 export abstract class WebViewBase {
   protected html: string = '';
@@ -19,7 +19,7 @@ export abstract class WebViewBase {
   }
 
   public async loadWebpage(htmlPath: string, scriptPath?: string): Promise<void> {
-    this.html = await promisifyReadFile(htmlPath);
+    this.html = await readFileAsync(htmlPath, 'utf8');
     if (scriptPath) {
       const scriptOnDisk = vscode.Uri.file(scriptPath);
 

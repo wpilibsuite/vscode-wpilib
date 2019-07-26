@@ -7,7 +7,7 @@ import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
-import { getDesktopEnabled, gradleRun, javaHome, promisifyExists } from './utilities';
+import { existsAsync, getDesktopEnabled, gradleRun, javaHome } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
 
 interface IUpdatePair {
@@ -314,7 +314,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.showLogFolder', async () => {
     let mainLog = getMainLogFile();
-    if (!await promisifyExists(mainLog)) {
+    if (!await existsAsync(mainLog)) {
       mainLog = path.dirname(mainLog);
     }
     await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
@@ -361,7 +361,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
 
-    if (!await promisifyExists(buildgradle)) {
+    if (!await existsAsync(buildgradle)) {
       logger.log('build.gradle not found at: ', buildgradle);
       return;
     }

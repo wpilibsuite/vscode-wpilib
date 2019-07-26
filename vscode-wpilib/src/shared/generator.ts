@@ -1,54 +1,15 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
-import * as mkdirp from 'mkdirp';
-import * as ncp from 'ncp';
 import * as path from 'path';
 import { logger } from '../logger';
-import { promisifyReadFile, promisifyWriteFile } from '../utilities';
+import { mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import { setExecutePermissions } from './permissions';
-
-export function promisifyMkdirp(dest: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    mkdirp(dest, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-export function promisifyNcp(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
-  return promisifyMkdirp(dest).then(() => {
-    return new Promise<void>((resolve, reject) => {
-      ncp.ncp(source, dest, options, (err) => {
-        if (err) {
-          reject(err);
-        }
-        resolve();
-      });
-    });
-  });
-}
-
-export function promisifyReadDir(pth: string): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
-    fs.readdir(pth, (err, files) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(files);
-      }
-    });
-  });
-}
 
 type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
 export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
                                       addCpp: boolean): Promise<boolean> {
-  const existingFiles = await promisifyReadDir(toFolder);
+  const existingFiles = await readdirAsync(toFolder);
   if (existingFiles.length > 0) {
     logger.warn('folder not empty');
     return false;
@@ -65,14 +26,14 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
 
   const grVersionFile = path.join(grRoot, 'version.txt');
 
-  const grVersionTo = (await promisifyReadFile(grVersionFile)).trim();
+  const grVersionTo = (await readFileAsync(grVersionFile, 'utf8')).trim();
 
   if (typeof fromTemplateFolder === 'string') {
-    await promisifyNcp(fromTemplateFolder, codePath);
+    await ncpAsync(fromTemplateFolder, codePath);
   } else {
     await fromTemplateFolder(codePath, toFolder);
   }
-  await promisifyNcp(fromGradleFolder, toFolder, {
+  await ncpAsync(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -81,7 +42,7 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
       return true;
     },
   });
-  await promisifyNcp(path.join(grRoot, 'shared'), toFolder, {
+  await ncpAsync(path.join(grRoot, 'shared'), toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -114,9 +75,9 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
 
   const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
 
-  await promisifyMkdirp(deployDir);
+  await mkdirpAsync(deployDir);
 
-  await promisifyWriteFile(path.join(deployDir, 'example.txt'),
+  await writeFileAsync(path.join(deployDir, 'example.txt'),
 `Files placed in this directory will be deployed to the RoboRIO into the
 'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
 function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
@@ -127,7 +88,7 @@ directory.`);
 
 export async function generateCopyJava(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
                                        robotClassTo: string, copyRoot: string, packageReplaceString?: string | undefined): Promise<boolean> {
-  const existingFiles = await promisifyReadDir(toFolder);
+  const existingFiles = await readdirAsync(toFolder);
   if (existingFiles.length > 0) {
     return false;
   }
@@ -136,7 +97,7 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
   const codePath = path.join(rootCodePath, copyRoot);
 
   if (typeof fromTemplateFolder === 'string') {
-    await promisifyNcp(fromTemplateFolder, codePath);
+    await ncpAsync(fromTemplateFolder, codePath);
   } else {
     await fromTemplateFolder(codePath, toFolder);
   }
@@ -166,7 +127,7 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
 
   const grVersionFile = path.join(grRoot, 'version.txt');
 
-  const grVersionTo = (await promisifyReadFile(grVersionFile)).trim();
+  const grVersionTo = (await readFileAsync(grVersionFile, 'utf8')).trim();
 
   const promiseArray: Array<Promise<void>> = [];
 
@@ -193,7 +154,7 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
     }));
   }
 
-  await promisifyNcp(fromGradleFolder, toFolder, {
+  await ncpAsync(fromGradleFolder, toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -202,7 +163,7 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
       return true;
     },
   });
-  await promisifyNcp(path.join(grRoot, 'shared'), toFolder, {
+  await ncpAsync(path.join(grRoot, 'shared'), toFolder, {
     filter: (cf): boolean => {
       const rooted = path.relative(fromGradleFolder, cf);
       if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
@@ -236,9 +197,9 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
 
   const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
 
-  await promisifyMkdirp(deployDir);
+  await mkdirpAsync(deployDir);
 
-  await promisifyWriteFile(path.join(deployDir, 'example.txt'),
+  await writeFileAsync(path.join(deployDir, 'example.txt'),
 `Files placed in this directory will be deployed to the RoboRIO into the
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.`);

@@ -2,8 +2,11 @@
 
 import * as electron from 'electron';
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+import * as ncp from 'ncp';
 import * as path from 'path';
 import * as temp from 'temp';
+import * as util from 'util';
 import * as vscode from './vscodeshim';
 
 const dialog = electron.remote.dialog;
@@ -13,46 +16,28 @@ export function getIsWindows(): boolean {
   return nodePlatform === 'win32';
 }
 
-export function promisifyExists(filename: string): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
-    fs.exists(filename, (e) => {
-      resolve(e);
-    });
-  });
-}
+export const existsAsync = util.promisify(fs.exists);
 
-export function promisifyWriteFile(filename: string, contents: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    fs.writeFile(filename, contents, 'utf8', (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
+export const deleteFileAsync = util.promisify(fs.unlink);
 
-export function promisifyReadFile(filename: string): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    fs.readFile(filename, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
+export const readFileAsync = util.promisify(fs.readFile);
 
-export function promisifyDeleteFile(file: string): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
-    fs.unlink(file, (err) => {
-      if (err) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
+export const writeFileAsync = util.promisify(fs.writeFile);
+
+export const readdirAsync = util.promisify(fs.readdir);
+
+export const mkdirpAsync = util.promisify(mkdirp);
+
+export function ncpAsync(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
+  return mkdirpAsync(dest).then(() => {
+    return new Promise<void>((resolve, reject) => {
+      ncp.ncp(source, dest, options, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
   });
 }
