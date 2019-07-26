@@ -3,7 +3,8 @@
 	"rules": {
 		"no-implicit-dependencies": [
 			true,
-			"dev"
+			"dev",
+			["vscode"]
 		],
 		"variable-name": [
 			true,
