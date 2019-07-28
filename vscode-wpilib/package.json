@@ -317,6 +317,16 @@
             }
         ],
         "menus": {
+            "commandPalette": [
+                {
+                  "command": "wpilibcore.createCommand",
+                  "when": "false"
+                },
+                {
+                    "command": "wpilibcore.openCommandPalette",
+                    "when": "false"
+                }
+            ],
             "editor/title": [
                 {
                     "command": "wpilibcore.openCommandPalette",
