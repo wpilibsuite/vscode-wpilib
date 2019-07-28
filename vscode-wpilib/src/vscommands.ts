@@ -3,6 +3,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
+import { downloadDocs } from './docsapi';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
@@ -383,5 +384,48 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const selection = result === 'Yes';
 
     await setDesktopEnabled(buildgradle, selection);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.openApiDocumentation', async () => {
+    const pick = await vscode.window.showQuickPick(['Java', 'C++'], {
+      placeHolder: 'Select a language',
+    });
+    const homeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+    if (pick === 'Java') {
+      const indexFile = path.join(homeDir, 'documentation', 'java', 'index.html');
+      if (await existsAsync(indexFile)) {
+        await vscode.env.openExternal(vscode.Uri.file(indexFile));
+        return;
+      } else {
+        try {
+          const downloadDir = await downloadDocs('https://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilibj/documentation/',
+                                                 '.zip', path.join(homeDir, 'documentation'), 'java');
+          if (downloadDir === undefined) {
+            return;
+          }
+          await vscode.env.openExternal(vscode.Uri.file(indexFile));
+        } catch (err) {
+          logger.error('Error downloading item', err);
+        }
+      }
+    } else if (pick === 'C++') {
+      const indexFile = path.join(homeDir, 'documentation', 'cpp', 'index.html');
+      if (await existsAsync(indexFile)) {
+        await vscode.env.openExternal(vscode.Uri.file(indexFile));
+        return;
+      } else {
+        try {
+          const downloadDir = await downloadDocs('https://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilibc/documentation/',
+                                                 '.zip', path.join(homeDir, 'documentation'), 'cpp');
+          if (downloadDir === undefined) {
+            return;
+          }
+          await vscode.env.openExternal(vscode.Uri.file(indexFile));
+        } catch (err) {
+          logger.error('Error downloading item', err);
+        }
+      }
+    }
+    //
   }));
 }
