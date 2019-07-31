@@ -6,6 +6,10 @@ export interface ISourceBinaryPair {
   cpp: boolean;
   args: string[];
   macros: string[];
+  sharedLibrary?: boolean;
+  executable?: boolean;
+  langVersion?: 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17';
+  langVersionSet?: boolean;
 }
 
 export interface ISource {
@@ -26,6 +30,8 @@ export interface IBinary {
   componentName: string;
   sourceSets: ISourceSet[];
   libHeaders: string[];
+  sharedLibrary?: boolean;
+  executable?: boolean;
 }
 
 export interface IBinaryMap {
@@ -42,6 +48,7 @@ export interface IToolChain {
   cppPath: string;
   cPath: string;
   msvc: boolean;
+  gcc?: boolean;
   systemCppMacros: string[];
   systemCppArgs: string[];
   systemCMacros: string[];
@@ -50,4 +57,6 @@ export interface IToolChain {
   binaries: IBinary[];
   sourceBinaries: ISourceBinaryPair[];
   nameBinaryMap: { [name: string]: number };
+  cppLangVersion?: 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17';
+  cLangVersion?: 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17';
 }

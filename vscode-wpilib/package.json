@@ -251,6 +251,11 @@
                 "category": "WPILib C++"
             },
             {
+                "command": "wpilibcore.selectCppBinaryTypes",
+                "title": "%wpilibcore.selectCppBinaryTypes.title%",
+                "category": "WPILib C++"
+            },
+            {
                 "command": "wpilibcore.importEclipseProject",
                 "title": "%wpilibcore.importEclipseProject.title%",
                 "category": "WPILib"
