@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { logger } from '../logger';
-import { IToolChain } from './jsonformats';
 import { IEnabledBuildTypes } from './apiprovider';
+import { IToolChain } from './jsonformats';
 
 //#region Utilities
 
