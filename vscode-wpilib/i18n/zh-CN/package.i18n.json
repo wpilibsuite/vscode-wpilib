@@ -30,5 +30,6 @@
 	"wpilibcore.changeDesktop.title": "设置桌面支持属性",
 	"wpilibcore.setDeployOffline.title": "在离线模式中 更改 部署/调试命令 设置",
 	"wpilibcore.setOffline.title": "在离线模式中 更改 部署/调试命令 外的设置",
-	"wpilibcore.selectCppBinaryTypes.title": "Select Enabled C++ Intellisense Binary Types"
+	"wpilibcore.selectCppBinaryTypes.title": "Select Enabled C++ Intellisense Binary Types",
+	"wpilibcore.openApiDocumentation.title": "Open API Documentation"
 }
