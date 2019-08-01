@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { logger } from '../logger';
+import { IEnabledBuildTypes } from './apiprovider';
 import { IToolChain } from './jsonformats';
 
 //#region Utilities
@@ -109,6 +110,7 @@ interface Entry {
 export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
 
   private toolchains: IToolChain | undefined;
+  private enabledBuildTypes: IEnabledBuildTypes | undefined;
 
   private _onDidChangeFile: vscode.EventEmitter<Entry | undefined | null>;
 
@@ -123,8 +125,9 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
     return this._onDidChangeFile.event;
   }
 
-  public updateToolChains(toolchains: IToolChain) {
+  public updateToolChains(toolchains: IToolChain, enables: IEnabledBuildTypes) {
     this.toolchains = toolchains;
+    this.enabledBuildTypes = enables;
     this._onDidChangeFile.fire(undefined);
   }
 
@@ -199,8 +202,33 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
       return entries;
     }
 
+    const currentBinaryTypes = this.enabledBuildTypes;
+
     for (const bin of this.toolchains.binaries) {
-      entries.push({binaryFiles: bin.libHeaders, binaryName: bin.componentName, type: vscode.FileType.Unknown,
+      if (currentBinaryTypes !== undefined) {
+        if (bin.executable === true && currentBinaryTypes.executables === false) {
+          continue;
+        }
+
+        if (bin.sharedLibrary === true && currentBinaryTypes.sharedLibraries === false) {
+          continue;
+        }
+
+        if (bin.executable === false && bin.sharedLibrary === false && currentBinaryTypes.staticLibraries === false) {
+          continue;
+        }
+      }
+
+      let exeType = '';
+      if (bin.executable === true) {
+        exeType = ' (Exe)';
+      } else if (bin.sharedLibrary === true) {
+        exeType = ' (Shared)';
+      } else if (bin.sharedLibrary !== undefined && bin.executable !== undefined) {
+        exeType = ' (Static)';
+      }
+
+      entries.push({binaryFiles: bin.libHeaders, binaryName: bin.componentName + ` ${exeType}`, type: vscode.FileType.Unknown,
                     uri: vscode.Uri.file(bin.componentName)});
     }
 
@@ -245,8 +273,8 @@ export class HeaderExplorer {
     vscode.commands.registerCommand('fileExplorer.openFile', (resource: vscode.Uri) => this.openResource(resource));
   }
 
-  public updateToolChains(toolchains: IToolChain) {
-    this.treeDataProvider.updateToolChains(toolchains);
+  public updateToolChains(toolchains: IToolChain, enables: IEnabledBuildTypes) {
+    this.treeDataProvider.updateToolChains(toolchains, enables);
   }
 
   public dispose() {

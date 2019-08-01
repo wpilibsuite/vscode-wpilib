@@ -30,6 +30,48 @@ function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
+function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined {
+  const lowerArg = arg.toLowerCase();
+  if (lowerArg.startsWith('-std') || lowerArg.startsWith('/std')) {
+    if (lowerArg.indexOf('++') > 0) {
+      // C++ mode
+      if (lowerArg.indexOf('17') >= 0 || lowerArg.indexOf('1z') >= 0) {
+        return 'c++17';
+      } else if (lowerArg.indexOf('14') >= 0 || lowerArg.indexOf('1y') >= 0) {
+        return 'c++14';
+      } else if (lowerArg.indexOf('11') >= 0 || lowerArg.indexOf('1x') >= 0) {
+        return 'c++11';
+      } else if (lowerArg.indexOf('20') >= 0 || lowerArg.indexOf('2a') > 0) {
+        return 'c++17'; // For now, 20 not supported
+      } else if (lowerArg.indexOf('03') >= 0) {
+        return 'c++03';
+      } else if (lowerArg.indexOf('98') >= 0) {
+        return 'c++98';
+      } else {
+        return 'c++14';
+      }
+    } else {
+      // C mode
+      if (lowerArg.indexOf('11') >= 0) {
+        return 'c11';
+      } else if (lowerArg.indexOf('99') >= 0) {
+        return 'c99';
+      } else if (lowerArg.indexOf('89') >= 0) {
+        return 'c89';
+      } else {
+        return 'c11';
+      }
+    }
+  }
+  return undefined;
+}
+
+export interface IEnabledBuildTypes {
+  executables: boolean;
+  sharedLibraries: boolean;
+  staticLibraries: boolean;
+}
+
 export class ApiProvider implements CustomConfigurationProvider {
   public static promptForUpdates: boolean = false;
 
@@ -49,6 +91,10 @@ export class ApiProvider implements CustomConfigurationProvider {
   private foundFiles: SourceFileConfigurationItem[] = [];
   private selectedName: PersistentFolderState<string>;
   private statusBar: vscode.StatusBarItem;
+  private binaryTypeStatusBar: vscode.StatusBarItem;
+
+  private enabledBinaryTypes: PersistentFolderState<IEnabledBuildTypes>;
+
   private readonly configFile: string = 'vscodeconfig.json';
   private configRelativePattern: vscode.RelativePattern;
   private configWatcher: vscode.FileSystemWatcher;
@@ -72,12 +118,25 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.disposables.push(this.configWatcher);
     this.selectedName = new PersistentFolderState<string>('gradleProperties.selectedName', 'none', fsPath);
 
+    this.enabledBinaryTypes = new PersistentFolderState<IEnabledBuildTypes>('gradleProperties.enabledBinaryTypes', {
+      executables: true,
+      sharedLibraries: true,
+      staticLibraries: true,
+    }, fsPath);
+
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
     this.statusBar.text = this.selectedName.Value;
     this.statusBar.tooltip = 'Click to change toolchain';
     this.statusBar.command = 'wpilibcore.selectCppToolchain';
 
     this.disposables.push(this.statusBar);
+
+    this.binaryTypeStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 3);
+    this.binaryTypeStatusBar.text = 'Binary Types';
+    this.binaryTypeStatusBar.tooltip = 'Click to change enabled binary types';
+    this.binaryTypeStatusBar.command = 'wpilibcore.selectCppBinaryTypes';
+
+    this.disposables.push(this.binaryTypeStatusBar);
 
     // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange, this));
@@ -107,14 +166,12 @@ export class ApiProvider implements CustomConfigurationProvider {
     if (compilerPath === undefined) {
       const config: WorkspaceBrowseConfiguration = {
         browsePath,
-        standard: 'c++14',
       };
       return config;
     } else {
       const config: WorkspaceBrowseConfiguration = {
         browsePath,
         compilerPath,
-        standard: 'c++14',
       };
       return config;
     }
@@ -155,25 +212,11 @@ export class ApiProvider implements CustomConfigurationProvider {
       file = await readFileAsync(path.join(this.workspace.uri.fsPath, 'build', this.configFile), 'utf8');
     } catch (err) {
       this.statusBar.show();
+      this.binaryTypeStatusBar.show();
       return false;
     }
 
-    const newToolchains: IToolChain[] = jsonc.parse(file) as IToolChain[];
-    for (const newToolChain of newToolchains) {
-      let foundTc = false;
-      for (const existingChain of this.toolchains) {
-        if (newToolChain.architecture === existingChain.architecture &&
-          newToolChain.operatingSystem === existingChain.operatingSystem &&
-          newToolChain.flavor === existingChain.flavor &&
-          newToolChain.buildType === existingChain.buildType) {
-          foundTc = true;
-          existingChain.binaries.push(...newToolChain.binaries);
-        }
-      }
-      if (!foundTc) {
-        this.toolchains.push(newToolChain);
-      }
-    }
+    this.toolchains = jsonc.parse(file) as IToolChain[];
 
     if (this.selectedName.Value === 'none') {
       // Look for roborio release first
@@ -212,6 +255,31 @@ export class ApiProvider implements CustomConfigurationProvider {
       this.statusBar.text = this.selectedName.Value;
     }
 
+    for (const tc of this.toolchains) {
+      for (const arg of tc.systemCppArgs) {
+        const version = getVersionFromArg(arg);
+        if (version !== undefined) {
+          tc.cppLangVersion = version;
+          break;
+        }
+      }
+      if (tc.cppLangVersion === undefined) {
+        tc.cppLangVersion = 'c++17';
+      }
+
+      for (const arg of tc.systemCArgs) {
+        const version = getVersionFromArg(arg);
+        if (version !== undefined) {
+          tc.cLangVersion = version;
+          break;
+        }
+      }
+
+      if (tc.cLangVersion === undefined) {
+        tc.cLangVersion = 'c11';
+      }
+    }
+
     this.foundFiles = [];
 
     if (!this.registered) {
@@ -219,18 +287,19 @@ export class ApiProvider implements CustomConfigurationProvider {
       this.cppToolsApi.notifyReady(this);
       const currentToolChain = this.getCurrentToolChain();
       if (currentToolChain) {
-        this.headerTreeProvider.updateToolChains(currentToolChain);
+        this.headerTreeProvider.updateToolChains(currentToolChain, this.enabledBinaryTypes.Value);
       }
       await vscode.commands.executeCommand('setContext', 'isWPILibProvidedCpp', true);
     } else {
       const currentToolChain = this.getCurrentToolChain();
       if (currentToolChain) {
-        this.headerTreeProvider.updateToolChains(currentToolChain);
+        this.headerTreeProvider.updateToolChains(currentToolChain, this.enabledBinaryTypes.Value);
       }
       this.cppToolsApi.didChangeCustomConfiguration(this);
     }
 
     this.statusBar.show();
+    this.binaryTypeStatusBar.show();
     return true;
   }
 
@@ -242,6 +311,56 @@ export class ApiProvider implements CustomConfigurationProvider {
       }
     }
     return undefined;
+  }
+
+  public async selectEnabledBinaryTypes(): Promise<void> {
+    const currentTypes = this.enabledBinaryTypes.Value;
+    const items = [
+      {
+        label: 'Executables',
+        picked: currentTypes.executables,
+        type: 'exe',
+      },
+      {
+        label: 'Shared Libraries',
+        picked: currentTypes.sharedLibraries,
+        type: 'shared',
+
+      },
+      {
+        label: 'Static Libraries',
+        picked: currentTypes.staticLibraries,
+        type: 'static',
+      },
+    ];
+    const selectedItems = await vscode.window.showQuickPick(items, {
+      canPickMany: true,
+      placeHolder: 'Enable intellisense for the following types of binaries',
+    });
+
+    if (selectedItems === undefined) {
+      return;
+    }
+
+    currentTypes.executables = false;
+    currentTypes.sharedLibraries = false;
+    currentTypes.staticLibraries = false;
+
+    for (const selected of selectedItems) {
+      if (selected.type === 'exe') {
+        currentTypes.executables = true;
+      } else if (selected.type === 'shared') {
+        currentTypes.sharedLibraries = true;
+      } else if (selected.type === 'static') {
+        currentTypes.staticLibraries = true;
+      }
+    }
+
+    this.enabledBinaryTypes.Value = currentTypes;
+    const currentToolChain = this.getCurrentToolChain();
+    if (currentToolChain) {
+      this.headerTreeProvider.updateToolChains(currentToolChain, this.enabledBinaryTypes.Value);
+    }
   }
 
   public async selectToolChain(): Promise<void> {
@@ -269,7 +388,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       this.statusBar.text = result;
       const currentToolChain = this.getCurrentToolChain();
       if (currentToolChain) {
-        this.headerTreeProvider.updateToolChains(currentToolChain);
+        this.headerTreeProvider.updateToolChains(currentToolChain, this.enabledBinaryTypes.Value);
       }
       this.cppToolsApi.didChangeCustomConfiguration(this);
     }
@@ -343,9 +462,23 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     const normalizedPath = normalizeDriveLetter(uri.fsPath);
 
+    const currentBinaryTypes = this.enabledBinaryTypes.Value;
+
     for (const tc of this.toolchains) {
       if (getToolchainName(tc) === this.selectedName.Value) {
         for (const sb of tc.sourceBinaries) {
+          if (sb.executable === true && currentBinaryTypes.executables === false) {
+            continue;
+          }
+
+          if (sb.sharedLibrary === true && currentBinaryTypes.sharedLibraries === false) {
+            continue;
+          }
+
+          if (sb.executable === false && sb.sharedLibrary === false && currentBinaryTypes.staticLibraries === false) {
+            continue;
+          }
+
           for (const source of sb.source.srcDirs) {
             if (normalizedPath.startsWith(source)) {
               // Found, find binary
@@ -362,6 +495,21 @@ export class ApiProvider implements CustomConfigurationProvider {
                   macros.push(...sb.macros);
                   const includePaths: string[] = [];
                   includePaths.push(...bin.libHeaders);
+
+                  // Compute the cpp language version
+                  if (sb.langVersionSet === undefined) {
+                    sb.langVersionSet = true;
+                    for (const arg of sb.args) {
+                      sb.langVersion = getVersionFromArg(arg);
+                      if (sb.langVersion !== undefined) {
+                        break;
+                      }
+                    }
+                    if (sb.langVersion === undefined) {
+                      sb.langVersion = tc.cppLangVersion;
+                    }
+                  }
+
                   for (const s of bin.sourceSets) {
                     includePaths.push(...s.exportedHeaders.srcDirs);
                   }
@@ -370,8 +518,9 @@ export class ApiProvider implements CustomConfigurationProvider {
                       compilerPath: tc.cppPath,
                       defines: macros,
                       includePath: includePaths,
-                      intelliSenseMode: tc.msvc ? 'msvc-x64' : 'clang-x64',
-                      standard: 'c++14',
+                      intelliSenseMode: tc.msvc ? 'msvc-x64' : tc.gcc ? 'gcc-x64' : 'clang-x64',
+                      // tslint:disable-next-line:no-non-null-assertion
+                      standard: sb.langVersion!,
                     },
                     uri: uriPath,
                   });
@@ -385,6 +534,21 @@ export class ApiProvider implements CustomConfigurationProvider {
                   macros.push(...sb.macros);
                   const includePaths: string[] = [];
                   includePaths.push(...bin.libHeaders);
+
+                  // Compute the cpp language version
+                  if (sb.langVersionSet === undefined) {
+                    sb.langVersionSet = true;
+                    for (const arg of sb.args) {
+                      sb.langVersion = getVersionFromArg(arg);
+                      if (sb.langVersion !== undefined) {
+                        break;
+                      }
+                    }
+                    if (sb.langVersion === undefined) {
+                      sb.langVersion = tc.cLangVersion;
+                    }
+                  }
+
                   for (const s of bin.sourceSets) {
                     includePaths.push(...s.exportedHeaders.srcDirs);
                   }
@@ -393,8 +557,9 @@ export class ApiProvider implements CustomConfigurationProvider {
                       compilerPath: tc.cPath,
                       defines: macros,
                       includePath: includePaths,
-                      intelliSenseMode: tc.msvc ? 'msvc-x64' : 'clang-x64',
-                      standard: 'c11',
+                      intelliSenseMode: tc.msvc ? 'msvc-x64' : tc.gcc ? 'gcc-x64' : 'clang-x64',
+                      // tslint:disable-next-line:no-non-null-assertion
+                      standard: sb.langVersion!,
                     },
                     uri: uriPath,
                   });
