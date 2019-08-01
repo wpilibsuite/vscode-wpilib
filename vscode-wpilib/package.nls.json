@@ -29,5 +29,6 @@
 	"wpilibcore.showLogFolder.title": "Show Log Folder",
 	"wpilibcore.runGradleCommand.title": "Run a command in Gradle",
 	"wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates Flag",
-	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Setting"
+	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Setting",
+	"wpilibcore.openApiDocumentation.title": "Open API Documentation"
 }

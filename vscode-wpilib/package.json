@@ -46,7 +46,8 @@
         "onCommand:wpilibcore.showLogFolder",
         "onCommand:wpilibcore.runGradleCommand",
         "onCommand:wpilibcore.resetAutoUpdate",
-        "onCommand:wpilibcore.changeDesktop"
+        "onCommand:wpilibcore.changeDesktop",
+        "onCommand:wpilibcore.openApiDocumentation"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -299,6 +300,11 @@
                 "command": "wpilibcore.changeDesktop",
                 "title": "%wpilibcore.changeDesktop.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.openApiDocumentation",
+                "title": "%wpilibcore.openApiDocumentation.title%",
+                "category": "WPILib"
             }
         ],
         "views": {
@@ -386,6 +392,7 @@
         "vscePackage": "vsce package"
     },
     "devDependencies": {
+        "@types/extract-zip": "^1.6.2",
         "@types/glob": "^7.1.1",
         "@types/mkdirp": "^0.5.2",
         "@types/mocha": "^5.2.7",
@@ -416,6 +423,7 @@
         "webpack-cli": "^3.3.6"
     },
     "dependencies": {
+        "extract-zip": "^1.6.7",
         "glob": "^7.1.4",
         "java-properties": "^1.0.2",
         "jsonc-parser": "^2.1.0",
