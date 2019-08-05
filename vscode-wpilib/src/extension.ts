@@ -22,6 +22,7 @@ import { closeLogger, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
+import { ProjectInfoGatherer } from './projectinfo';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
@@ -196,6 +197,18 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(wpilibUpdate);
   } catch (err) {
     logger.error('error creating wpilib updater', err);
+    creationError = true;
+  }
+
+  let projectInfo: ProjectInfoGatherer | undefined;
+
+  try {
+    if (wpilibUpdate !== undefined && vendorLibs !== undefined) {
+      projectInfo = new ProjectInfoGatherer(vendorLibs, wpilibUpdate, externalApi);
+      context.subscriptions.push(projectInfo);
+    }
+  } catch (err) {
+    logger.error('error creating project info gatherer', err);
     creationError = true;
   }
 
