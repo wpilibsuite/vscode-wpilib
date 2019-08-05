@@ -167,13 +167,14 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
-                           __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+
+  public async getSimulationInformation(_: number, workspace: vscode.WorkspaceFolder,
+                                        __: vscode.Uri | undefined, ...args: string[]): Promise<ISimulateCommands | undefined> {
     const command = 'simulateExternalJava ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Simulate', this.executeApi, prefs);
     if (result !== 0) {
-      return false;
+      return undefined;
     }
 
     const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'desktopinfo.json'), 'utf8');
@@ -189,7 +190,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       });
       if (picked === undefined) {
         vscode.window.showInformationMessage('Artifact cancelled');
-        return false;
+        return undefined;
       }
       targetSimulateInfo = picked.debugInfo;
     }
@@ -224,6 +225,19 @@ class SimulateCodeDeployer implements ICodeDeployer {
       workspace,
     };
 
+    return config;
+
+  }
+
+  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
+                           __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+
+    const config = await this.getSimulationInformation(_, workspace, __, ...args);
+
+    if (config === undefined) {
+      return false;
+    }
+
     await startSimulation(config);
 
     return true;
@@ -255,6 +269,10 @@ export class DeployDebug {
       deployDebugApi.registerCodeDebug(this.deployDebuger);
       deployDebugApi.registerCodeSimulate(this.simulator);
     }
+  }
+
+  public getSimulator(): SimulateCodeDeployer {
+    return this.simulator;
   }
 
   public dispose() {

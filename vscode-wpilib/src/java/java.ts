@@ -12,10 +12,11 @@ import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
+import { getCodeLensRunCommand, getCodeLensTestCommand } from './simulate';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activateJava(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
+export async function activateJava(context: vscode.ExtensionContext, coreExports: IExternalAPI): Promise<void> {
 
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'java');
 
@@ -33,9 +34,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   }
 
   // Setup build and test
-
   const buildTest = new BuildTest(coreExports);
-
   context.subscriptions.push(buildTest);
 
   // Setup debug and deploy
@@ -51,6 +50,59 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   context.subscriptions.push(examples);
   const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
   context.subscriptions.push(templates);
+
+  // Setup java run debug configuration
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibjava.setupRunDebugButtons', async () => {
+    const preferencesApi = coreExports.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage('Cannot enable simulation with an empty workspace');
+      return;
+    }
+    const teamNumber = await preferencesApi.getPreferences(workspace).getTeamNumber();
+    const simInfo = await deployDebug.getSimulator().getSimulationInformation(teamNumber, workspace, undefined);
+
+    if (simInfo === undefined) {
+      return;
+    }
+
+    const config = vscode.workspace.getConfiguration('launch', workspace.uri);
+    const testConfig = vscode.workspace.getConfiguration('java.test', workspace.uri);
+
+    // tslint:disable-next-line:no-any
+    const testValues: any[] | undefined = testConfig.get<any[] | undefined>('config', undefined);
+    const has = testConfig.has('config');
+
+    // This is broken, getting proxy objects. Need to figure out what is going on.
+    if (testValues === undefined || !has) {
+      testConfig.update('config', [await getCodeLensTestCommand(simInfo)]);
+    } else {
+      let found = false;
+      for (let i = 0; i < testValues.length; i++) {
+        // tslint:disable-next-line: no-unsafe-any
+        if (testValues[i].name === 'WPILib Configuration') {
+          testValues[i] = await getCodeLensTestCommand(simInfo);
+          testConfig.update('config', testValues);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        testValues.push(await getCodeLensTestCommand(simInfo));
+        testConfig.update('config', testValues);
+      }
+    }
+
+    // tslint:disable-next-line:no-any
+    const values: any[] | undefined = config.get('configurations');
+
+    if (values === undefined) {
+      config.update('configurations', [await getCodeLensRunCommand(simInfo)]);
+    } else {
+      values.push(await getCodeLensRunCommand(simInfo));
+      config.update('configurations', values);
+    }
+}));
 
   if (vscode.extensions.getExtension('redhat.java') !== undefined) {
     // Add handlers for each workspace if java is installed
