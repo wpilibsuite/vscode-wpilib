@@ -11,7 +11,8 @@
 			"allow-leading-underscore"
 		],
 		"max-classes-per-file": [
-			false
+			false,
+			1
 		],
 		"max-line-length": [
 			true,
@@ -57,5 +58,10 @@
 		"no-var-keyword": true,
 		"eofline": true
 	},
+  "linterOptions": {
+    "exclude": [
+      "node_modules/**"
+    ]
+  },
 	"defaultSeverity": "error"
 }

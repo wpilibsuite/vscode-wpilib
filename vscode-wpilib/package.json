@@ -310,6 +310,11 @@
                 "command": "wpilibcore.openApiDocumentation",
                 "title": "%wpilibcore.openApiDocumentation.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibjava.setupRunDebugButtons",
+                "title": "%wpilibjava.setupRunDebugButtons.title%",
+                "category": "WPILib"
             }
         ],
         "views": {
