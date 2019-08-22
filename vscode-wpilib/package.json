@@ -310,6 +310,12 @@
                 "command": "wpilibcore.openApiDocumentation",
                 "title": "%wpilibcore.openApiDocumentation.title%",
                 "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.getProjectInformation",
+                "title": "%wpilibcore.getProjectInformation.title%",
+                "category": "WPILib",
+                "enablement": "isWPILibProject"
             }
         ],
         "views": {
@@ -330,8 +336,8 @@
         "menus": {
             "commandPalette": [
                 {
-                  "command": "wpilibcore.createCommand",
-                  "when": "false"
+                    "command": "wpilibcore.createCommand",
+                    "when": "false"
                 },
                 {
                     "command": "wpilibcore.openCommandPalette",

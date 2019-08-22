@@ -92,6 +92,10 @@ export class VendorLibraries extends VendorLibrariesBase {
     }
   }
 
+  public async getCurrentlyInstalledLibraries(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
+    return this.getInstalledDependencies(workspace);
+  }
+
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
 

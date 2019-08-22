@@ -116,6 +116,32 @@ export class WPILibUpdates {
     }
   }
 
+  public async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
+
+    try {
+      const gradleBuildFile = await readFileAsync(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
+
+      const matchRes = getGradleRioRegex().exec(gradleBuildFile);
+
+      if (matchRes === null) {
+        logger.warn('matching error');
+        return undefined;
+      }
+
+      if (matchRes.length !== 4) {
+        logger.warn('matching length not correct');
+        return undefined;
+      }
+
+      logger.log('Local GradleRIO Version ' + matchRes[2]);
+
+      return matchRes[2];
+    } catch (err) {
+      logger.warn('local gradlerio version exception', err);
+      return undefined;
+    }
+  }
+
   public async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
     try {
       const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
@@ -227,31 +253,4 @@ export class WPILibUpdates {
       return undefined;
     }
   }
-
-  private async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
-
-    try {
-      const gradleBuildFile = await readFileAsync(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
-
-      const matchRes = getGradleRioRegex().exec(gradleBuildFile);
-
-      if (matchRes === null) {
-        logger.warn('matching error');
-        return undefined;
-      }
-
-      if (matchRes.length !== 4) {
-        logger.warn('matching length not correct');
-        return undefined;
-      }
-
-      logger.log('Local GradleRIO Version ' + matchRes[2]);
-
-      return matchRes[2];
-    } catch (err) {
-      logger.warn('local gradlerio version exception', err);
-      return undefined;
-    }
-  }
-
 }

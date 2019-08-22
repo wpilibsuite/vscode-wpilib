@@ -426,6 +426,5 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         }
       }
     }
-    //
   }));
 }
