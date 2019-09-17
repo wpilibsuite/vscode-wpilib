@@ -1,5 +1,6 @@
 out
-!i18n/*/out
+i18n
+!locale/*/out
 node_modules
 .vscode-test/
 *.vsix

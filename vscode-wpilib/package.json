@@ -37,6 +37,7 @@
         "onCommand:wpilibcore.openCommandPalette",
         "onCommand:wpilibcore.refreshCppProperties",
         "onCommand:wpilibcore.selectCppToolchain",
+        "onCommand:wpilibcore.selectCppBinaryTypes",
         "onCommand:wpilibcore.importEclipseProject",
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
@@ -47,7 +48,8 @@
         "onCommand:wpilibcore.runGradleCommand",
         "onCommand:wpilibcore.resetAutoUpdate",
         "onCommand:wpilibcore.changeDesktop",
-        "onCommand:wpilibcore.openApiDocumentation"
+        "onCommand:wpilibcore.openApiDocumentation",
+        "onCommand:wpilibcore.getProjectInformation"
     ],
     "main": "./out/extension",
     "contributes": {

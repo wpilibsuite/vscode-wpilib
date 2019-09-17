@@ -1,0 +1,34 @@
+wpilibcore.setTeamNumber.title: 设置队号
+wpilibcore.startRioLog.title: 启动 RioLog
+wpilibcore.startTool.title: 启动工具
+wpilibcore.buildCode.title: 编译机器人代码
+wpilibcore.testCode.title: 测试机器人代码
+wpilibcore.deployCode.title: 部署机器人代码
+wpilibcore.debugCode.title: 调试机器人代码
+wpilibcore.simulateCode.title: 在电脑上模拟运行机器人代码
+wpilibcore.setLanguage.title: 设置语言
+wpilibcore.setAutoSave.title: 设置部署时自动保存
+wpilibcore.setSkipTests.title: 设置是否跳过测试API
+wpilibcore.setStopSimulationOnEntry.title: 设置是否在进入时停止模拟运行
+wpilibcore.setStartRioLog.title: 设置是否在部署时启动 RioLog
+wpilibcore.createCommand.title: 创建一个新的类/命令
+wpilibcore.cancelTasks.title: 取消正在运行的任务
+wpilibcore.help.title: 打开 WPILib 帮助
+wpilibcore.openCommandPalette.title: 打开 WPILib 的命令面板
+wpilibcore.refreshCppProperties.title: 更新 Gradle C++ 属性
+wpilibcore.selectCppToolchain.title: 选择当前的 C++ 工具链
+wpilibcore.importEclipseProject.title: 将 Eclipse 项目迁移到 VSCode
+wpilibcore.createNewProject.title: 创建一个新项目
+wpilibcore.manageVendorLibs.title: 管理外部供应商库
+wpilibcore.setJavaHome.title: 设置 Java 环境
+wpilibcore.checkForUpdates.title: 检查 WPILib 更新
+wpilibcore.installGradleTools.title: 从 GradleRIO 安装工具
+wpilibcore.showLogFolder.title: 显示目录文件夹
+wpilibcore.resetAutoUpdate.title: 重制自动检查 WPILib 更新设置
+wpilibcore.runGradleCommand.title: Run a command in Gradle
+wpilibcore.changeDesktop.title: 设置桌面支持属性
+wpilibcore.setDeployOffline.title: 在离线模式中 更改 部署/调试命令 设置
+wpilibcore.setOffline.title: 在离线模式中 更改 部署/调试命令 外的设置
+wpilibcore.selectCppBinaryTypes.title: Select Enabled C++ Intellisense Binary Types
+wpilibcore.openApiDocumentation.title: Open API Documentation
+wpilibcore.getProjectInformation.title: Open Project Information
