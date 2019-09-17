@@ -47,7 +47,7 @@ gulp.task('update-activation', () => {
 
 gulp.task('i18n-compile', function (){
 	return gulp.src('./locale/**/*.yaml')
-		.pipe(yaml({ ext: '.i18n.json' }))
+		.pipe(yaml())
 		.pipe(gulp.dest('./i18n/'))
 });
 

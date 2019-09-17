@@ -4,7 +4,8 @@ node_modules
 webpack.config.js
 gulpfile.js
 package-lock.json
-i18n/**
+i18n/**/package.i18n.json
+locale/**
 tsconfig.json
 tslint.json
 out/test/**
