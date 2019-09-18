@@ -67,8 +67,6 @@ Enter a vendor file URL (get from vendor): 输入一个文件地址 (从供应�
 # Extracting API Docs
 # Error Downloading Docs
 Select tasks to cancel: 选择要取消的任务
-Enter your team number: 输入你的队伍编号
-Invalid team number: 队伍编号不合法
 No team number, would you like to save one?: 没找到队号，你要保存一个吗？
 Would you like to open the folder?: 你要打开这个文件夹吗？
 Restart required for new tools. Restart now?: 新工具安装完成需要重载，现在重载吗？
@@ -76,3 +74,4 @@ Tool install failed: 工具安装失败
 Tool run canceled: 工具运行取消
 Failed to start tool: 工具运行失败
 No tools found. Would you like to use Gradle to grab some?: 没找到工具，要使用 Gradle 来装一些吗？
+# Can only extract to absolute path

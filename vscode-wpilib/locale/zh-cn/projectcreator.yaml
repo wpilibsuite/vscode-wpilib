@@ -1,1 +1,14 @@
 Generate Project: 生成项目
+Template: 模板
+Example: 样例
+Select a project type: 选择项目类型
+Select a project type (Example or Template): 选择项目类型 (样例或模板)
+Select a language: 选择编程语言
+# Select a project base: 选择项目 base # FIXME
+WPILib Project Creator: WPILib 项目创建工具
+Welcome to WPILib New Project Creator: 欢迎使用 WPILib 新项目创建工具
+Select a folder to place the new project into.: 选择一个存放新项目的文件夹
+Select a new project folder: 为项目选择一个新文件夹
+Highly recommended to be checked: 强烈建议选中这个
+Create new folder?: 创建新文件夹吗？
+hintDesktopSupport: "这个选项是给模拟和单元测试提供支持所使用的。然而在某些情况下，这个选项的开启会让项目构建时产生意想不到的错误，而且不是所有的供应商库都支持桌面模式。你可以随时通过“WPILib: 设置桌面支持”来开启或关闭。"

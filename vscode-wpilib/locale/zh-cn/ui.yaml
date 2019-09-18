@@ -12,9 +12,14 @@ No, Don't ask again: 不，不要再问了 # FIXME
 Cancel: 取消
 Select a tool: 选择一个工具
 Select an option: 选择一个选项
+Select Folder: 选择文件夹
 # Pick a command
 Pick a language: 选择语言
 Pick a language (Currently {0}): 选择语言 (当前为 {0})
 Online: 在线
 Offline: 离线
 "Old Version: {0}": "旧版本: {0}"
+Enter a team number: 输入队伍编号
+Invalid team number: 队伍编号不合法
+Enter a project name: 输入项目名称
+Invalid project name: 项目名称不合法

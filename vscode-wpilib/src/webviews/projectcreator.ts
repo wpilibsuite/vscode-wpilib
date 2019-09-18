@@ -3,6 +3,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from 'vscode-wpilibapi';
+import { localize as i18n } from '../locale';
 import { setDesktopEnabled } from '../shared/generator';
 import { extensionContext, promptForProjectOpen } from '../utilities';
 import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend, ProjectType } from './pages/projectcreatorpagetypes';
@@ -18,7 +19,7 @@ export class ProjectCreator extends WebViewBase {
   private exampleTemplateApi: IExampleTemplateAPI;
 
   private constructor(exampleTemplateApi: IExampleTemplateAPI, resourceRoot: string) {
-    super('wpilibprojectcreator', 'WPILib Project Creator', resourceRoot);
+    super('wpilibprojectcreator', i18n('projectcreator', 'WPILib Project Creator'), resourceRoot);
     this.exampleTemplateApi = exampleTemplateApi;
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.createNewProject', async () => {
@@ -68,7 +69,7 @@ export class ProjectCreator extends WebViewBase {
 
   private async createProject(data: IProjectIPCData) {
     if (!path.isAbsolute(data.toFolder)) {
-      vscode.window.showErrorMessage('Can only extract to absolute path');
+      vscode.window.showErrorMessage(i18n('message', 'Can only extract to absolute path'));
       return;
     }
     await this.exampleTemplateApi.createProject(data.projectType === ProjectType.Template, data.language, data.base, data.toFolder, data.newFolder,
@@ -87,10 +88,10 @@ export class ProjectCreator extends WebViewBase {
 
   private async handleProjectType() {
     const items = [];
-    items.push({label: 'Template', value: ProjectType.Template});
-    items.push({label: 'Example', value: ProjectType.Example});
+    items.push({label: i18n('projectcreator', 'Template'), value: ProjectType.Template});
+    items.push({label: i18n('projectcreator', 'Example'), value: ProjectType.Example});
     const result = await vscode.window.showQuickPick(items, {
-      placeHolder: 'Select a project type.',
+      placeHolder: i18n('projectcreator', 'Select a project type'),
     });
     if (result) {
       await this.postMessage({
@@ -103,7 +104,7 @@ export class ProjectCreator extends WebViewBase {
   private async handleLanguage(data: IProjectIPCData) {
     const languages: string[] = this.exampleTemplateApi.getLanguages(data.projectType === ProjectType.Template);
     const result = await vscode.window.showQuickPick(languages, {
-      placeHolder: 'Select a language',
+      placeHolder: i18n('projectcreator', 'Select a language'),
     });
     if (result) {
       await this.postMessage({
@@ -115,7 +116,7 @@ export class ProjectCreator extends WebViewBase {
 
   private async handleBase(data: IProjectIPCData) {
     const result = await vscode.window.showQuickPick(this.exampleTemplateApi.getBases(data.projectType === ProjectType.Template, data.language), {
-      placeHolder: 'Select a project base',
+      placeHolder: i18n('projectcreator', 'Select a project base'),
     });
     if (result) {
       await this.postMessage({
@@ -130,7 +131,7 @@ export class ProjectCreator extends WebViewBase {
       canSelectFiles: false,
       canSelectFolders: true,
       canSelectMany: false,
-      openLabel: 'Select Folder',
+      openLabel: i18n('ui', 'Select Folder'),
     };
     const result = await vscode.window.showOpenDialog(open);
 

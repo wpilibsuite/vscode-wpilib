@@ -16,11 +16,11 @@ const defaultPreferences: IPreferencesJson = {
 
 export async function requestTeamNumber(): Promise<number> {
   const teamNumber = await vscode.window.showInputBox({
-    prompt: i18n('message', 'Enter your team number'),
+    prompt: i18n('ui', 'Enter a team number'),
     validateInput: (v) => {
       const match = v.match(/^\d{1,5}$/gm);
       if (match === null || match.length === 0) {
-        return i18n('message', 'Invalid team number');
+        return i18n('ui', 'Invalid team number');
       }
       return undefined;
     },

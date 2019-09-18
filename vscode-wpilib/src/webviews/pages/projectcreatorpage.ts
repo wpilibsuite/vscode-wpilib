@@ -90,17 +90,17 @@ window.addEventListener('message', (event) => {
       projectType = data.data as ProjectType;
       pType.innerText = ProjectType[projectType].toLowerCase();
       lang.disabled = false;
-      lang.innerText = 'Select a language';
+      lang.innerText = window.i18nTrans('projectcreator', 'Select a language');
       baseButton.style.visibility = 'initial';
       baseButton.disabled = true;
-      baseButton.innerText = 'Select a project base';
+      baseButton.innerText = window.i18nTrans('projectcreator', 'Select a project base');
       selectLanguage();
       break;
     case 'language':
       language = data.data as string;
       lang.innerText = language;
       baseButton.disabled = false;
-      baseButton.innerText = 'Select a project base';
+      baseButton.innerText = window.i18nTrans('projectcreator', 'Select a project base');
       selectProjectBase();
       break;
     case 'base':
