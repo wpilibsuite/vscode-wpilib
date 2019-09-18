@@ -6,6 +6,7 @@ import * as path from 'path';
 import * as util from 'util';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from 'vscode-wpilibapi';
+import { localize as i18n } from './locale';
 import { setExecutePermissions } from './shared/permissions';
 
 // General utilites usable by multiple classes
@@ -123,14 +124,14 @@ export function getDesktopEnabled(buildgradle: string): Promise<boolean | undefi
 }
 
 export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
-  const openSelection = await vscode.window.showInformationMessage('Would you like to open the folder?', {
+  const openSelection = await vscode.window.showInformationMessage(i18n('message', 'Would you like to open the folder?'), {
     modal: true,
-  }, 'Yes (Current Window)', 'Yes (New Window)', 'No');
+  }, i18n('ui', 'Yes (Current Window)'), i18n('ui', 'Yes (New Window)'), i18n('ui', 'No'));
   if (openSelection === undefined) {
     return true;
-  } else if (openSelection === 'Yes (Current Window)') {
+  } else if (openSelection === i18n('ui', 'Yes (Current Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
-  } else if (openSelection === 'Yes (New Window)') {
+  } else if (openSelection === i18n('ui', 'Yes (New Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
   } else {
     return true;

@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { downloadDocs } from './docsapi';
+import { localize as i18n } from './locale';
 import { getMainLogFile, logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
@@ -31,16 +32,16 @@ class UpdatePair implements IUpdatePair, vscode.MessageItem {
 
 async function globalProjectSettingUpdate(message: string): Promise<IUpdatePair | undefined> {
   const opts: UpdatePair[] = [
-    new UpdatePair('Yes (Project)', true, false),
-    new UpdatePair('Yes (Global)', true, true),
-    new UpdatePair('No (Project)', false, false),
-    new UpdatePair('No (Global)', false, true),
-    new UpdatePair('Cancel', false, false),
+    new UpdatePair(i18n('ui', 'Yes (Project)'), true, false),
+    new UpdatePair(i18n('ui', 'Yes (Global)'), true, true),
+    new UpdatePair(i18n('ui', 'No (Project)'), false, false),
+    new UpdatePair(i18n('ui', 'No (Global)'), false, true),
+    new UpdatePair(i18n('ui', 'Cancel'), false, false),
   ];
 
   const result = await vscode.window.showInformationMessage<UpdatePair>(message, {modal: true}, ...opts);
 
-  if (result !== undefined && result.title === 'Cancel') {
+  if (result !== undefined && result.title === i18n('ui', 'Cancel')) {
     return undefined;
   }
 
@@ -71,7 +72,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set team number in an empty workspace'));
       return;
     }
     const preferences = preferencesApi.getPreferences(workspace);
@@ -90,7 +91,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot deploy code in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot deploy code in an empty workspace'));
       return;
     }
     await externalApi.getDeployDebugAPI().deployCode(workspace, source);
@@ -100,7 +101,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot debug code in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot debug code in an empty workspace'));
       return;
     }
     await externalApi.getDeployDebugAPI().debugCode(workspace, source);
@@ -110,7 +111,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot simulate number in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot simulate number in an empty workspace'));
       return;
     }
     await externalApi.getDeployDebugAPI().simulateCode(workspace, source);
@@ -120,7 +121,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot start tests in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot start tests in an empty workspace'));
       return;
     }
     await externalApi.getBuildTestAPI().testCode(workspace, source);
@@ -130,7 +131,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set team number in an empty workspace'));
       return;
     }
     await externalApi.getBuildTestAPI().buildCode(workspace, source);
@@ -138,13 +139,13 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.createCommand', async (arg: vscode.Uri | undefined) => {
     if (arg === undefined) {
-      vscode.window.showInformationMessage('Must select a folder to create a command');
+      vscode.window.showInformationMessage(i18n('message', 'Must select a folder to create a command'));
       return;
     }
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot create command in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot create command in an empty workspace'));
       return;
     }
     await externalApi.getCommandAPI().createCommand(workspace, arg);
@@ -154,21 +155,21 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set language in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set language in an empty workspace'));
       return;
     }
 
     const deployDebugApi = externalApi.getDeployDebugAPI();
 
     if (deployDebugApi.getLanguageChoices().length <= 0) {
-      vscode.window.showInformationMessage('No languages available to set');
+      vscode.window.showInformationMessage(i18n('message', 'No languages available to set'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
     const result = await vscode.window.showQuickPick(deployDebugApi.getLanguageChoices(),
-      { placeHolder: `Pick a language (Currently ${preferences.getCurrentLanguage()})` });
+      { placeHolder: i18n('ui', 'Pick a language (Currently {0})', preferences.getCurrentLanguage()) });
     if (result === undefined) {
       return;
     }
@@ -180,13 +181,13 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set skip tests in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set skip tests in an empty workspace'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Skip tests on deploy? Currently ${preferences.getSkipTests()}`);
+    const result = await globalProjectSettingUpdate(i18n('message', 'Skip tests on deploy? Currently {0}', preferences.getSkipTests()));
     if (result === undefined) {
       logger.log('Invalid selection for settting skip tests');
       return;
@@ -199,13 +200,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set offline in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set offline in an empty workspace'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Run commands other then deploy in offline mode? Currently ${preferences.getOffline()}`);
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Run commands other then deploy in offline mode? Currently {0}', preferences.getOffline()));
     if (result === undefined) {
       logger.log('Invalid selection for settting offline');
       return;
@@ -218,13 +220,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set deploy offline in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set deploy offline in an empty workspace'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Run deploy command in offline mode? Currently ${preferences.getDeployOffline()}`);
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Run deploy command in offline mode? Currently {0}', preferences.getDeployOffline()));
     if (result === undefined) {
       logger.log('Invalid selection for settting deploy offline');
       return;
@@ -237,13 +240,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set stop simulation in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set stop simulation in an empty workspace'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Stop simulation debugging on entry? Currently ${preferences.getStopSimulationOnEntry()}`);
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Stop simulation debugging on entry? Currently {0}', preferences.getStopSimulationOnEntry()));
     if (result === undefined) {
       logger.log('Invalid selection for settting stop simulation on entry');
       return;
@@ -256,13 +260,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set auto save in an empty workspace'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Automatically save on deploy? Currently ${preferences.getAutoSaveOnDeploy()}`);
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Automatically save on deploy? Currently {0}', preferences.getAutoSaveOnDeploy()));
     if (result === undefined) {
       logger.log('failed to set automatically save on deploy');
       return;
@@ -275,13 +280,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot set team number in an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set start RioLog in an empty workspace'));
       return;
     }
 
     const preferences = preferencesApi.getPreferences(workspace);
 
-    const result = await globalProjectSettingUpdate(`Automatically start RioLog on deploy? Currently ${preferences.getAutoStartRioLog()}`);
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Automatically start RioLog on deploy? Currently {0}', preferences.getAutoStartRioLog()));
     if (result === undefined) {
       logger.log('Invalid selection for riolog on deploy');
       return;
@@ -300,14 +306,14 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     }
     const javaConfig = vscode.workspace.getConfiguration('java');
     await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
-    await vscode.window.showInformationMessage('Successfully set java.home');
+    await vscode.window.showInformationMessage(i18n('message', 'Successfully set java.home'));
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot install gradle tools with an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot install gradle tools with an empty workspace'));
       return;
     }
     await ToolAPI.InstallToolsFromGradle(workspace, externalApi);
@@ -324,20 +330,20 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.runGradleCommand', async () => {
     const command = await vscode.window.showInputBox({
       placeHolder: 'command',
-      prompt: 'Enter Gradle command to run',
+      prompt: i18n('message', 'Enter Gradle command to run'),
     });
     if (command === undefined) {
       return;
     }
     const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
     if (wp === undefined) {
-      vscode.window.showInformationMessage('Cannot run command on empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot run command on empty workspace'));
       return;
     }
     const prefs = externalApi.getPreferencesAPI().getPreferences(wp);
     const result = await gradleRun(command, wp.uri.fsPath, wp, 'Gradle Command', externalApi.getExecuteAPI(), prefs);
     if (result !== 0) {
-      vscode.window.showInformationMessage(`Command (${command}) returned code: ${result}`);
+      vscode.window.showInformationMessage(i18n('message', 'Command ({0}) returned code: {1}', command, result));
     }
   }));
 
@@ -345,7 +351,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot reset auto update with an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot reset auto update with an empty workspace'));
       return;
     }
     const persistState = WPILibUpdates.getUpdatePersistentState(workspace);
@@ -356,7 +362,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage('Cannot change desktop with an empty workspace');
+      vscode.window.showInformationMessage(i18n('message', 'Cannot change desktop with an empty workspace'));
       return;
     }
 
@@ -370,25 +376,25 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const isEnabled = await getDesktopEnabled(buildgradle);
 
     if (isEnabled === undefined) {
-      vscode.window.showInformationMessage('Invalid project format to add or remove desktop support.');
+      vscode.window.showInformationMessage(i18n('message', 'Invalid project format to add or remove desktop support.'));
       return;
     }
 
-    const result = await vscode.window.showInformationMessage(`Enable Desktop Support for Project? Currently ${isEnabled}`,
-      {modal: true}, 'Yes', 'No');
+    const result = await vscode.window.showInformationMessage(i18n('message', 'Enable Desktop Support for Project? Currently {0}', isEnabled),
+      {modal: true}, i18n('ui', 'Yes'), i18n('ui', 'No'));
     if (result === undefined) {
       logger.log('Invalid selection for desktop project support');
       return;
     }
 
-    const selection = result === 'Yes';
+    const selection = result === i18n('ui', 'Yes');
 
     await setDesktopEnabled(buildgradle, selection);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.openApiDocumentation', async () => {
     const pick = await vscode.window.showQuickPick(['Java', 'C++'], {
-      placeHolder: 'Select a language',
+      placeHolder: i18n('ui', 'Pick a language'),
     });
     const homeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
     if (pick === 'Java') {

@@ -3,6 +3,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
+import { localize as i18n } from './locale';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { deleteFileAsync, readdirAsync } from './utilities';
 import { isNewerVersion } from './versions';
@@ -26,7 +27,7 @@ class LibraryQuickPick implements vscode.QuickPickItem {
     this.label = dep.name;
     this.description = dep.version;
     if (oldVersion !== undefined) {
-      this.description += ` (Old Version: ${oldVersion})`;
+      this.description += ` (${i18n('ui', 'Old Version: {0}', oldVersion)})`;
     }
     this.dep = dep;
   }
@@ -67,24 +68,24 @@ export class VendorLibraries extends VendorLibrariesBase {
 
     const qpArr: OptionQuickPick[] = [];
 
-    qpArr.push(new OptionQuickPick('Manage current libraries', async (wp) => {
+    qpArr.push(new OptionQuickPick(i18n('message', 'Manage current libraries'), async (wp) => {
       await this.manageCurrentLibraries(wp);
     }));
-    qpArr.push(new OptionQuickPick('Check for updates (offline)', async (wp) => {
+    qpArr.push(new OptionQuickPick(i18n('message', 'Check for updates (offline)'), async (wp) => {
       await this.offlineUpdates(wp);
     }));
-    qpArr.push(new OptionQuickPick('Check for updates (online)', async (wp) => {
+    qpArr.push(new OptionQuickPick(i18n('message', 'Check for updates (online)'), async (wp) => {
       await this.onlineUpdates(wp);
     }));
-    qpArr.push(new OptionQuickPick('Install new libraries (offline)', async (wp) => {
+    qpArr.push(new OptionQuickPick(i18n('message', 'Install new libraries (offline)'), async (wp) => {
       await this.offlineNew(wp);
     }));
-    qpArr.push(new OptionQuickPick('Install new library (online)', async (wp) => {
+    qpArr.push(new OptionQuickPick(i18n('message', 'Install new libraries (online)'), async (wp) => {
       await this.onlineNew(wp);
     }));
 
     const result = await vscode.window.showQuickPick(qpArr, {
-      placeHolder: 'Select an option',
+      placeHolder: i18n('ui', 'Select an option'),
     });
 
     if (result) {
@@ -105,7 +106,7 @@ export class VendorLibraries extends VendorLibrariesBase {
       });
       const toRemove = await vscode.window.showQuickPick(arr, {
         canPickMany: true,
-        placeHolder: 'Check to uninstall',
+        placeHolder: i18n('message', 'Check to uninstall libraries'),
       });
 
       if (toRemove !== undefined) {
@@ -124,7 +125,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         }
       }
     } else {
-      vscode.window.showInformationMessage('No dependencies installed');
+      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
     }
   }
 
@@ -148,30 +149,31 @@ export class VendorLibraries extends VendorLibrariesBase {
       if (updatableDeps.length !== 0) {
         const toUpdate = await vscode.window.showQuickPick(updatableDeps, {
           canPickMany: true,
-          placeHolder: 'Check to update',
+          placeHolder: i18n('message', 'Check to update libraries'),
         });
 
         if (toUpdate !== undefined) {
           for (const ti of toUpdate) {
             const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
             if (success) {
-              const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
-                'dependencies are installed correctly. Would you like to do this now?', {
+              const buildRes = await vscode.window.showInformationMessage(i18n('message',
+                'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+                'Would you like to do this now?'), {
                   modal: true,
-                }, 'Yes', 'No');
-              if (buildRes === 'Yes') {
+                }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+              if (buildRes === i18n('ui', 'Yes')) {
                 await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
               }
             } else {
-              vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
+              vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
             }
           }
         }
       } else {
-        vscode.window.showInformationMessage('No updates available');
+        vscode.window.showInformationMessage(i18n('message', 'No updates available'));
       }
     } else {
-      vscode.window.showInformationMessage('No dependencies installed');
+      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
     }
   }
 
@@ -198,31 +200,32 @@ export class VendorLibraries extends VendorLibrariesBase {
       if (updatable.length !== 0) {
         const toUpdate = await vscode.window.showQuickPick(updatable, {
           canPickMany: true,
-          placeHolder: 'Check to update',
+          placeHolder: i18n('message', 'Check to update libraries'),
         });
 
         if (toUpdate !== undefined) {
           for (const ti of toUpdate) {
             const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
             if (success) {
-              const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
-                'dependencies are installed correctly. Would you like to do this now?', {
+              const buildRes = await vscode.window.showInformationMessage(i18n('message',
+                'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+                'Would you like to do this now?'), {
                   modal: true,
-                }, 'Yes', 'No');
-              if (buildRes === 'Yes') {
+                }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+              if (buildRes === i18n('ui', 'Yes')) {
                 await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
               }
             } else {
-              vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
+              vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
             }
           }
         }
       } else {
-        vscode.window.showInformationMessage('No updates available');
+        vscode.window.showInformationMessage(i18n('message', 'No updates available'));
       }
 
     } else {
-      vscode.window.showInformationMessage('No dependencies installed');
+      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
     }
   }
 
@@ -246,35 +249,36 @@ export class VendorLibraries extends VendorLibrariesBase {
     if (updatableDeps.length !== 0) {
       const toInstall = await vscode.window.showQuickPick(updatableDeps, {
         canPickMany: true,
-        placeHolder: 'Check to install',
+        placeHolder: i18n('message', 'Check to install libraries'),
       });
 
       if (toInstall !== undefined) {
         for (const ti of toInstall) {
           const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           if (success) {
-            const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
-              'dependencies are installed correctly. Would you like to do this now?', {
+            const buildRes = await vscode.window.showInformationMessage(i18n('message',
+              'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+              'Would you like to do this now?'), {
                 modal: true,
-              }, 'Yes', 'No');
-            if (buildRes === 'Yes') {
+              }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+            if (buildRes === i18n('ui', 'Yes')) {
               await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
             }
           } else {
-            vscode.window.showErrorMessage('Failed to install ' + ti.dep.name);
+            vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
           }
         }
       }
     } else {
-      vscode.window.showInformationMessage('No new dependencies available');
+      vscode.window.showInformationMessage(i18n('message', 'No new dependencies available'));
     }
   }
 
   private async onlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
     const result = await vscode.window.showInputBox({
       ignoreFocusOut: true,
-      placeHolder: 'Enter a vendor file URL (get from vendor)',
-      prompt: 'Enter a vendor file URL (get from vendor)',
+      placeHolder: i18n('message', 'Enter a vendor file URL (get from vendor)'),
+      prompt: i18n('message', 'Enter a vendor file URL (get from vendor)'),
     });
 
     if (result) {
@@ -285,22 +289,23 @@ export class VendorLibraries extends VendorLibrariesBase {
 
         for (const dep of existing) {
           if (dep.uuid === file.uuid) {
-            vscode.window.showWarningMessage('Library already installed');
+            vscode.window.showWarningMessage(i18n('message', 'Library already installed'));
             return;
           }
         }
 
         const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
         if (success) {
-          const buildRes = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a vendor update to ensure ' +
-            'dependencies are installed correctly. Would you like to do this now?', {
+          const buildRes = await vscode.window.showInformationMessage(i18n('message',
+            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+            'Would you like to do this now?'), {
               modal: true,
-            }, 'Yes', 'No');
-          if (buildRes === 'Yes') {
+            }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+          if (buildRes === i18n('ui', 'Yes')) {
             await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
           }
         } else {
-          vscode.window.showErrorMessage('Failed to install ' + file.name);
+          vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
         }
       }
     }

@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { IExecuteAPI } from 'vscode-wpilibapi';
+import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PromiseCondition } from './shared/promisecondition';
 import { getIsWindows } from './utilities';
@@ -85,7 +86,7 @@ export class ExecuteAPI implements IExecuteAPI {
     }
     const result = await vscode.window.showQuickPick(arr, {
       canPickMany: true,
-      placeHolder: 'Select tasks to cancel',
+      placeHolder: i18n('message', 'Select tasks to cancel'),
     });
     if (result === undefined) {
       return 0;

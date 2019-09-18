@@ -3,6 +3,7 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IPreferences } from 'vscode-wpilibapi';
+import { localize as i18n } from './locale';
 import { IPreferencesJson } from './shared/preferencesjson';
 import { existsAsync, mkdirAsync, readFileAsync, writeFileAsync } from './utilities';
 
@@ -15,11 +16,11 @@ const defaultPreferences: IPreferencesJson = {
 
 export async function requestTeamNumber(): Promise<number> {
   const teamNumber = await vscode.window.showInputBox({
-    prompt: 'Enter your team number',
+    prompt: i18n('message', 'Enter your team number'),
     validateInput: (v) => {
       const match = v.match(/^\d{1,5}$/gm);
       if (match === null || match.length === 0) {
-        return 'Invalid team number';
+        return i18n('message', 'Invalid team number');
       }
       return undefined;
     },
@@ -281,14 +282,14 @@ export class Preferences implements IPreferences {
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    const teamRequest = await vscode.window.showInformationMessage('No team number, would you like to save one?', {
+    const teamRequest = await vscode.window.showInformationMessage(i18n('message', 'No team number, would you like to save one?'), {
       modal: true,
-    }, 'Yes', 'No');
+    }, i18n('ui', 'Yes'), i18n('ui', 'No'));
     if (teamRequest === undefined) {
       return -1;
     }
     const teamNumber = await requestTeamNumber();
-    if (teamRequest === 'No') {
+    if (teamRequest === i18n('ui', 'No')) {
       return teamNumber;
     } else if (teamNumber >= 0) {
       await this.setTeamNumber(teamNumber);

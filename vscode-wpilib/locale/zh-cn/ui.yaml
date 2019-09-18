@@ -1,1 +1,20 @@
+"Yes": 是
+"No": 否
+Yes (Build Only): 仅执行构建
+Yes (Project): 是 (项目)
+Yes (Global): 是 (全局)
+No (Project): 是 (项目)
+No (Global): 是 (全局)
+Yes (Current Window): 是 (当前窗口)
+Yes (New Window): 是 (新窗口)
+No, Don\'t ask again for this folder: 不，不要再提示这个文件夹了 # FIXME
+No, Don\'t ask again: 不，不要再问了 # FIXME
 Cancel: 取消
+Select a tool: 选择一个工具
+Select an option: 选择一个选项
+# Pick a command
+Pick a language: 选择语言
+Pick a language (Currently {0}): 选择语言 (当前为 {0})
+Online: 在线
+Offline: 离线
+"Old Version: {0}": "旧版本: {0}"
