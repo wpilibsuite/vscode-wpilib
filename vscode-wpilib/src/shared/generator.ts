@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
-import { localize as i18n } from '../locale';
+import { localize as i18n } from '../localeshim';
 import { logger } from '../logger';
 import { mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import { setExecutePermissions } from './permissions';

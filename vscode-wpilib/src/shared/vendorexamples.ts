@@ -2,7 +2,7 @@
 
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
-import { localize as i18n } from '../locale';
+import { localize as i18n } from '../localeshim';
 import { logger } from '../logger';
 import { existsAsync, extensionContext, mkdirpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
