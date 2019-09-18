@@ -148,6 +148,7 @@ export class ProjectCreator extends WebViewBase {
 
   private async asyncInitialize() {
     await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'projectcreator.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'dist', 'projectcreatorpage.js'));
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'projectcreatorpage.js'),
+      'projectcreator');
   }
 }
