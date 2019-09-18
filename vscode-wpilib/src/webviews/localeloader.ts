@@ -10,6 +10,7 @@ interface ITranslationMap {
 const localeDomains: {
   [domain: string]: ITranslationMap;
 } = {};
+let defaultDomain: string;
 
 function localize(domain: string, message: string, ...args: any[]) {
   if (localeDomains[domain] && localeDomains[domain][message]) {
@@ -19,20 +20,29 @@ function localize(domain: string, message: string, ...args: any[]) {
 }
 
 window.addEventListener('load', () => {
+  // Loads locale translations
   document.querySelectorAll('[data-locale]').forEach((e: Element) => {
     const domainAttr = e.attributes.getNamedItem('data-domain');
     if (!domainAttr) {
       console.log('failed to process ', e);
       return;
     }
-    localeDomains[domainAttr.value] = JSON.parse(e.innerHTML) as ITranslationMap;
+    const domain = domainAttr.value;
+    if (!!e.attributes.getNamedItem('data-default-domain')) {
+      defaultDomain = domain;
+    }
+
+    localeDomains[domain] = JSON.parse(e.innerHTML) as ITranslationMap;
   });
+
+  // auto translate `textContent`
   document.querySelectorAll('[data-i18n-trans]').forEach((e: Element) => {
     const domainAttr = e.attributes.getNamedItem('data-i18n-trans');
     if (!domainAttr || !e.textContent) {
       return;
     }
-    e.textContent = localize(domainAttr.value, e.textContent);
+    const domain = domainAttr.value === '' ? defaultDomain : domainAttr.value;
+    e.textContent = localize(domain, e.textContent);
   });
 });
 

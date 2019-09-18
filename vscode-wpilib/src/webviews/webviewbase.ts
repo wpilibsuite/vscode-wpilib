@@ -19,19 +19,25 @@ export abstract class WebViewBase {
     this.resourceRoot = resourceRoot;
   }
 
-  public async loadWebpage(htmlPath: string, scriptPath?: string, localeDomain?: string): Promise<void> {
+  public async loadWebpage(htmlPath: string, scriptPath?: string, localeDomains?: string[]): Promise<void> {
     this.html = await readFileAsync(htmlPath, 'utf8');
 
     if (scriptPath) {
       this.html += this.getScriptTag(scriptPath);
     }
 
-    const localeDomains = ['ui'];
-    if (localeDomain) {
-      localeDomains.push(localeDomain);
+    if (localeDomains) {
+      localeDomains.push('ui');
+    } else {
+      localeDomains = ['ui'];
     }
+    const defaultDomain = localeDomains[0];
+
     localeDomains.forEach((domain) => {
-      this.html += `\r\n<script data-locale data-domain="${domain}" type="application/json">${JSON.stringify(loadLocaleFile(domain))}</script>\r\n`;
+      this.html +=
+        `\r\n<script data-locale data-domain="${domain}"${defaultDomain === domain ? ' data-default-domain' : ''} type="application/json">` +
+        JSON.stringify(loadLocaleFile(domain)) +
+        '</script>\r\n';
     });
     this.html += this.getScriptTag(path.join(extensionContext.extensionPath, 'resources', 'dist', 'localeloader.js'));
 
