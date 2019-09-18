@@ -25,10 +25,10 @@ wpilibcore.checkForUpdates.title: 检查 WPILib 更新
 wpilibcore.installGradleTools.title: 从 GradleRIO 安装工具
 wpilibcore.showLogFolder.title: 显示目录文件夹
 wpilibcore.resetAutoUpdate.title: 重制自动检查 WPILib 更新设置
-wpilibcore.runGradleCommand.title: Run a command in Gradle
+wpilibcore.runGradleCommand.title: 在 Gradle 中执行命令
 wpilibcore.changeDesktop.title: 设置桌面支持属性
 wpilibcore.setDeployOffline.title: 在离线模式中 更改 部署/调试命令 设置
 wpilibcore.setOffline.title: 在离线模式中 更改 部署/调试命令 外的设置
-wpilibcore.selectCppBinaryTypes.title: Select Enabled C++ Intellisense Binary Types
-wpilibcore.openApiDocumentation.title: Open API Documentation
-wpilibcore.getProjectInformation.title: Open Project Information
+wpilibcore.selectCppBinaryTypes.title: 选择 C++ Intellisense Binary Types
+wpilibcore.openApiDocumentation.title: 打开 API 文档
+wpilibcore.getProjectInformation.title: 显示项目信息

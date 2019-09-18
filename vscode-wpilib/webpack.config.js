@@ -4,6 +4,8 @@ const path = require('path');
 module.exports = [{
   mode: 'none',
   entry: {
+	localeloader: './src/webviews/localeloader.ts',
+	
     eclipseimportpage: './src/webviews/pages/eclipseimportpage.ts',
     projectcreatorpage: './src/webviews/pages/projectcreatorpage.ts',
     riologpage: './src/riolog/shared/sharedscript.ts'

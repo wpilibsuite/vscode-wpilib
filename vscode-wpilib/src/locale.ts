@@ -5,6 +5,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import format from './formatter';
 import { logger } from './logger';
 import { extensionContext } from './utilities';
 
@@ -20,8 +21,7 @@ interface IVSCodeNlsConfig {
   _corruptedFile: string;
 }
 
-// tslint:disable-next-line:prefer-const
-let localeCache: {
+const localeCache: {
   [domain: string]: { [text: string]: string };
 } = {};
 
@@ -81,45 +81,37 @@ function initializeSettings() {
 }
 initializeSettings();
 
-function format(message: string, args: any[]): string {
-  let result: string;
-
-  if (args.length === 0) {
-    result = message;
-  } else {
-    result = message.replace(/\{(\d+)\}/g, (match: string, rest: number[]) => {
-      const index = rest[0];
-      const arg = args[index];
-      let replacement = match;
-      if (typeof arg === 'string') {
-        replacement = arg;
-      } else if (typeof arg === 'number' || typeof arg === 'boolean' || arg === void 0 || arg === null) {
-        replacement = String(arg);
-      }
-      return replacement;
-    });
-  }
-  return result;
-}
-
-function loadLocaleFile(domain: string) {
+export function getLocaleFilePath(domain: string) {
+  let rootPath: string;
   // get extension path for getting locale files
-  let rootPath = path.resolve(__dirname, '../');
   if (extensionContext !== undefined) {
     rootPath = extensionContext.extensionPath;
   } else {
     logger.error(`[Locale] Failed to get extension context.`);
+    return undefined;
   }
   const lang = options.language || 'en';
-  logger.log(`[Locale] Loading ${domain}@${lang}`);
-  const domainLocalePath = path.resolve(rootPath, `./i18n/${lang.toLowerCase()}/${domain}.json`);
+  return path.resolve(rootPath, `./i18n/${lang.toLowerCase()}/${domain}.json`);
+}
+
+export function loadLocaleFile(domain: string) {
+  if (isDefined(localeCache[domain])) {
+    logger.log(`[Locale] ${domain}@${options.language} is already loaded, using cached one.`);
+    return localeCache[domain];
+  }
+  logger.log(`[Locale] Loading ${domain}@${options.language}`);
+  let filePath = getLocaleFilePath(domain);
+  if (!filePath) {
+    filePath = path.resolve(__dirname, '../');
+  }
   try {
-    localeCache[domain] = readJsonFileSync(domainLocalePath);
-    logger.log(`[Locale] Loaded ${domain}@${lang}`);
+    localeCache[domain] = readJsonFileSync(filePath);
+    logger.log(`[Locale] Loaded ${domain}@${options.language}`);
   } catch (e) {
     localeCache[domain] = {}; // suppress errors when finding messages in non-existence domain
-    logger.error(`[Locale] Failed to load ${domain}@${lang}.`, e);
+    logger.error(`[Locale] Failed to load ${domain}@${options.language}.`, e);
   }
+  return localeCache[domain];
 }
 
 export function localize(domain: string, message: string, ...args: any[]) {
