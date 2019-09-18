@@ -114,12 +114,24 @@ export function loadLocaleFile(domain: string) {
   return localeCache[domain];
 }
 
-export function localize(domain: string, message: string, ...args: any[]) {
+/**
+ * When `message` takes an array, it will be treated as [translationKey, fallbackMessage]
+ */
+export function localize(domain: string, message: string | string[], ...args: any[]) {
   if (!isDefined(localeCache[domain])) {
     loadLocaleFile(domain);
   }
-  if (isDefined(localeCache[domain][message])) {
-    message = localeCache[domain][message];
+  let key: string;
+  if (isString(message)) {
+    key = message;
+  } else if (message.length === 2) {
+    key = message[0];
+    message = message[1];
+  } else {
+    throw new Error('Invalid message');
+  }
+  if (isDefined(localeCache[domain][key])) {
+    message = localeCache[domain][key];
   }
   return format(message, args);
 }

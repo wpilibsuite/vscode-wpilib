@@ -1,0 +1,23 @@
+generateCppDeployHint: >
+  这个目录中的文件将会被部署到 RoboRIO 中 home 文件夹下的 deploy 文件夹中。
+  
+  使用 'frc/Filesystem.h' 中的 frc::filesystem::GetDeployDirectory 函数
+  可以获得一个到部署目录的相对路径。
+
+  Files placed in this directory will be deployed to the RoboRIO into the
+  'deploy' directory in the home folder.
+  
+  Use the 'frc::filesystem::GetDeployDirectory' function from the 'frc/Filesystem.h'
+  header to get a proper path relative to the deploydirectory.
+
+generateJavaDeployHint: >
+  这个目录中的文件将会被部署到 RoboRIO 中 home 文件夹下的 deploy 文件夹中。
+  
+  使用 WPILib 中的 Filesystem.getDeployDirectory 函数
+  可以获得一个到部署目录的相对路径。
+
+  Files placed in this directory will be deployed to the RoboRIO into the
+  'deploy' directory in the home folder.
+  
+  Use the 'Filesystem.getDeployDirectory' wpilib function to get
+  a proper path relative to the deploy directory.
