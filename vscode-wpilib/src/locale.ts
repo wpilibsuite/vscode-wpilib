@@ -110,15 +110,15 @@ function loadLocaleFile(domain: string) {
   } else {
     logger.error(`[Locale] Failed to get extension context.`);
   }
-
-  logger.log(`[Locale] Loading ${domain}@${options.language}`);
-  const domainLocalePath = path.resolve(rootPath, `./i18n/${options.language}/${domain}.json`);
+  const lang = options.language || 'en';
+  logger.log(`[Locale] Loading ${domain}@${lang}`);
+  const domainLocalePath = path.resolve(rootPath, `./i18n/${lang.toLowerCase()}/${domain}.json`);
   try {
     localeCache[domain] = readJsonFileSync(domainLocalePath);
-    logger.log(`[Locale] Loaded ${domain}@${options.language}`);
+    logger.log(`[Locale] Loaded ${domain}@${lang}`);
   } catch (e) {
     localeCache[domain] = {}; // suppress errors when finding messages in non-existence domain
-    logger.error(`[Locale] Failed to load ${domain}@${options.language}.`, e);
+    logger.error(`[Locale] Failed to load ${domain}@${lang}.`, e);
   }
 }
 
