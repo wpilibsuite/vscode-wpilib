@@ -38,11 +38,16 @@ window.addEventListener('load', () => {
   // auto translate `textContent`
   document.querySelectorAll('[data-i18n-trans]').forEach((e: Element) => {
     const domainAttr = e.attributes.getNamedItem('data-i18n-trans');
+    const keyAttr = e.attributes.getNamedItem('data-i18n-key');
     if (!domainAttr || !e.textContent) {
       return;
     }
+    let message = e.textContent;
+    if (!!keyAttr && keyAttr.value !== '') {
+      message = keyAttr.value;
+    }
     const domain = domainAttr.value === '' ? defaultDomain : domainAttr.value;
-    e.textContent = localize(domain, e.textContent);
+    e.textContent = localize(domain, message);
   });
 });
 
