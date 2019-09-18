@@ -1,5 +1,11 @@
 /* `vscode-nls` is really hard to use, so we implement i18n here. */
+
+// many `any` used in locale functions, disabled for whole file
+// tslint:disable:no-any
+
 import * as fs from 'fs';
+import * as path from 'path';
+import * as vscode from 'vscode';
 import { logger } from './logger';
 
 interface IVSCodeNlsConfig {
@@ -14,31 +20,34 @@ interface IVSCodeNlsConfig {
     _corruptedFile: string;
 }
 
+// tslint:disable-next-line:prefer-const
+let localeCache: {
+    [domain: string]: { [text: string]: string };
+} = {};
+
 let options: {
     locale: string | undefined;
     language: string | undefined;
     languagePackSupport: boolean;
     languagePackId?: string;
 };
-let isPseudo: boolean;
 
-// tslint:disable-next-line:no-any
 function isString(value: any): value is string {
     return toString.call(value) === '[object String]';
 }
-// tslint:disable-next-line:no-any
 function isBoolean(value: any): value is boolean {
     return value === true || value === false;
 }
+function isDefined(value: any): boolean {
+    return typeof value !== 'undefined';
+}
 
-// tslint:disable-next-line:no-any
 function readJsonFileSync<T = any>(filename: string): T {
     return JSON.parse(fs.readFileSync(filename, 'utf8')) as T;
 }
 
 function initializeSettings() {
     options = { locale: undefined, language: undefined, languagePackSupport: false };
-    logger.log(process.env.VSCODE_NLS_CONFIG as string);
     if (isString(process.env.VSCODE_NLS_CONFIG)) {
         try {
             const vscodeOptions = JSON.parse(process.env.VSCODE_NLS_CONFIG) as IVSCodeNlsConfig;
@@ -68,12 +77,58 @@ function initializeSettings() {
             // Do nothing.
         }
     }
-    logger.log('Locale initialized.');
-    isPseudo = options.locale === 'pseudo';
+    logger.info('[Locale] initialized.');
 }
 initializeSettings();
 
-// tslint:disable-next-line:no-any
-export function localize(_message: string, ..._args: any[]) {
-    return;
+function format(message: string, args: any[]): string {
+    let result: string;
+
+    if (args.length === 0) {
+        result = message;
+    } else {
+        result = message.replace(/\{(\d+)\}/g, (match: string, rest: number[]) => {
+            const index = rest[0];
+            const arg = args[index];
+            let replacement = match;
+            if (typeof arg === 'string') {
+                replacement = arg;
+            } else if (typeof arg === 'number' || typeof arg === 'boolean' || arg === void 0 || arg === null) {
+                replacement = String(arg);
+            }
+            return replacement;
+        });
+    }
+    return result;
+}
+
+function loadLocaleFile(domain: string) {
+    // get extension path for getting locale files
+    const extension = vscode.extensions.getExtension('wpilibsuite.vscode-wpilib');
+    let rootPath = path.resolve(__dirname, '../');
+    if (extension !== undefined) {
+        rootPath = extension.extensionPath;
+    } else {
+        logger.error(`[Locale] Failed to get current extension.`);
+    }
+
+    logger.log(`[Locale] Loading ${domain}@${options.language}`);
+    const domainLocalePath = path.resolve(rootPath, `./i18n/${options.language}/${domain}.json`);
+    try {
+        localeCache[domain] = readJsonFileSync(domainLocalePath);
+        logger.log(`[Locale] Loaded ${domain}@${options.language}`);
+    } catch (e) {
+        localeCache[domain] = {}; // suppress errors when finding messages in non-existence domain
+        logger.error(`[Locale] Failed to load ${domain}@${options.language}.`, e);
+    }
+}
+
+export function localize(domain: string, message: string, ...args: any[]) {
+    if (!isDefined(localeCache[domain])) {
+        loadLocaleFile(domain);
+    }
+    if (isDefined(localeCache[domain][message])) {
+        message = localeCache[domain][message];
+    }
+    return format(message, args);
 }

@@ -23,10 +23,9 @@ module.exports = [{
   },
   resolve: {
     extensions: ['.ts', '.js']
-
   },
   node: {
-    net: 'empty',
+	net: 'empty'
   },
   output: {
     path: path.resolve(__dirname, 'resources', 'dist'),
@@ -49,6 +48,7 @@ module.exports = [{
   resolve: { // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
       extensions: ['.ts', '.js']
   },
+  node: false, // no polyfill for node context
   module: {
       rules: [{
           test: /\.ts$/,
@@ -58,5 +58,4 @@ module.exports = [{
           }]
       }]
   },
-}
-];
+}];

@@ -37,7 +37,7 @@ import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
 
-i18n('233', 666);
+i18n('ui', '233', 666);
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
