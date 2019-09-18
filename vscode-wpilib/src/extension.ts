@@ -18,6 +18,7 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
+import { localize as i18n } from './locale';
 import { closeLogger, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
@@ -35,6 +36,8 @@ import { EclipseImport } from './webviews/eclipseimport';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
+
+i18n('233', 666);
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
