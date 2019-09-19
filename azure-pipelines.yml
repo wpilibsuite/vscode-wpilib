@@ -15,12 +15,12 @@ jobs:
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
         javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
+        jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build updateVersions updateAllDependencies'
-        options: '-PjenkinsBuild'
+        options: '-PbuildServer'
 
     - script: |
         npm install
@@ -70,12 +70,12 @@ jobs:
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
         javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
+        jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build updateVersions updateAllDependencies'
-        options: '-PjenkinsBuild'
+        options: '-PbuildServer'
 
     - script: |
         npm install
@@ -124,12 +124,12 @@ jobs:
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
         javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
+        jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build updateVersions updateAllDependencies'
-        options: '-PjenkinsBuild'
+        options: '-PbuildServer'
 
     - script: |
         npm install
@@ -186,12 +186,12 @@ jobs:
         gradleWrapperFile: 'gradlew'
         gradleOptions: '-Xmx3072m'
         javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
+        jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
         publishJUnitResults: false
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'build updateVersions updateAllDependencies'
-        options: '-PjenkinsBuild'
+        options: '-PbuildServer'
 
     - script: |
         npm install
