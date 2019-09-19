@@ -17,7 +17,7 @@ export async function activateCppProvider(context: vscode.ExtensionContext, core
 
     const workspaces = vscode.workspace.workspaceFolders;
 
-    const cppToolsApi = await getCppToolsApi(Version.v2);
+    const cppToolsApi = await getCppToolsApi(Version.v3);
 
     if (cppToolsApi) {
         context.subscriptions.push(cppToolsApi);

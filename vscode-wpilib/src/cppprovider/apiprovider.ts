@@ -30,7 +30,7 @@ function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
-function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined {
+function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | undefined {
   const lowerArg = arg.toLowerCase();
   if (lowerArg.startsWith('-std') || lowerArg.startsWith('/std')) {
     if (lowerArg.indexOf('++') > 0) {
@@ -42,7 +42,7 @@ function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++0
       } else if (lowerArg.indexOf('11') >= 0 || lowerArg.indexOf('1x') >= 0) {
         return 'c++11';
       } else if (lowerArg.indexOf('20') >= 0 || lowerArg.indexOf('2a') > 0) {
-        return 'c++17'; // For now, 20 not supported
+        return 'c++20'; // For now, 20 not supported
       } else if (lowerArg.indexOf('03') >= 0) {
         return 'c++03';
       } else if (lowerArg.indexOf('98') >= 0) {
@@ -148,6 +148,14 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.setupWatchers();
 
     this.loadConfigs().catch();
+  }
+
+  public async canProvideBrowseConfigurationsPerFolder(_?: import('vscode-jsonrpc').CancellationToken | undefined): Promise<boolean> {
+    return false;
+  }
+  public async provideFolderBrowseConfiguration(_: vscode.Uri, __?: import('vscode-jsonrpc').CancellationToken | undefined)
+      : Promise<WorkspaceBrowseConfiguration> {
+    throw new Error('Method not supported.');
   }
 
   public async canProvideBrowseConfiguration(_?: vscode.CancellationToken | undefined): Promise<boolean> {
