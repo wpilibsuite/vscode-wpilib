@@ -9,7 +9,7 @@ export class UtilitiesAPI implements IUtilitiesAPI {
   private wpilibHome: string | undefined;
 
   public getFrcYear(): string {
-    return '2019';
+    return '2020';
   }
   public getWPILibHomeDir(): string {
     if (this.wpilibHome) {
@@ -21,10 +21,10 @@ export class UtilitiesAPI implements IUtilitiesAPI {
       if (!publicFolder) {
         publicFolder = 'C:\\Users\\Public';
       }
-      this.wpilibHome = path.join(publicFolder, `frc${year}`);
+      this.wpilibHome = path.join(publicFolder, 'wpilib', year);
     } else {
       const dir = os.homedir();
-      this.wpilibHome = path.join(dir, `frc${year}`);
+      this.wpilibHome = path.join(dir, 'wpilib', year);
     }
     return this.wpilibHome;
   }

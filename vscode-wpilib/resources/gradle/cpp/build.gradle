@@ -65,7 +65,7 @@ model {
             }
 
             // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-            useLibrary(it, "wpilib")
+            wpi.deps.wpilib(it)
             wpi.deps.vendor.cpp(it)
         }
     }
@@ -80,7 +80,8 @@ model {
                 }
             }
 
-            useLibrary(it, "wpilib", "googletest")
+            wpi.deps.wpilib(it)
+            wpi.deps.googleTest(it)
             wpi.deps.vendor.cpp(it)
         }
     }
