@@ -1,9 +1,9 @@
 'use strict';
 import * as electron from 'electron';
 import { EventEmitter } from 'events';
-import * as fs from 'fs';
 import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
          IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';
+import { writeFileAsync } from '../utilities';
 
 const dialog = electron.remote.dialog;
 
@@ -25,24 +25,19 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
   }
 
   public async handleSave(saveData: Array<IPrintMessage | IErrorMessage>): Promise<boolean> {
-    const file = await new Promise<string>((resolve, _) => {
-      dialog.showSaveDialog({
-        title: 'Select a file to save to',
-      }, (f) => {
-        resolve(f);
-      });
+    const f = await dialog.showSaveDialog({
+      title: 'Select a file to save to',
     });
+
+    const file = f.filePath;
+
     console.log(file);
 
     if (file === undefined) {
       return false;
     }
 
-    await new Promise((resolve, _) => {
-      fs.writeFile(file, JSON.stringify(saveData, null, 4), 'utf8', () => {
-        resolve();
-      });
-    });
+    await writeFileAsync(file, JSON.stringify(saveData, null, 4), 'utf8');
 
     return true;
   }

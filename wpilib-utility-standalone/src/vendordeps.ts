@@ -1,11 +1,10 @@
 'use strict';
 
 import * as electron from 'electron';
-import * as fs from 'fs';
 import * as path from 'path';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
-import { deleteFileAsync, readdirAsync } from './utilities';
+import { deleteFileAsync, existsAsync, readdirAsync } from './utilities';
 
 const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
@@ -133,8 +132,8 @@ class VendorLibraries extends VendorLibrariesBase {
 
 const vendorLibs = new VendorLibraries();
 
-export function selectProjectButton() {
-  dialog.showOpenDialog(bWindow, {
+export async function selectProjectButton(): Promise<void> {
+  const paths = await dialog.showOpenDialog(bWindow, {
     buttonLabel: 'Select Project (build.gradle)',
     defaultPath: electron.remote.app.getPath('documents'),
     filters: [
@@ -145,23 +144,19 @@ export function selectProjectButton() {
       'openFile',
     ],
     title: 'Select your project',
-  }, (paths) => {
-    if (paths && paths.length === 1) {
-      fs.exists(paths[0], async (exists) => {
-        if (exists) {
-          const input = document.getElementById('projectFolder') as HTMLInputElement;
-          input.value = path.dirname(paths[0]);
-          const div = document.getElementById('validprojectdiv') as HTMLDivElement;
-          div.style.display = null;
-          await vendorLibs.refreshDependencies(input.value);
-          await vendorLibs.refreshAvailableDependencies(input.value);
-
-        }
-      });
-    } else {
-      // TODO
-    }
   });
+  if (paths.filePaths && paths.filePaths.length === 1) {
+    if (await existsAsync(paths.filePaths[0])) {
+      const input = document.getElementById('projectFolder') as HTMLInputElement;
+      input.value = path.dirname(paths.filePaths[0]);
+      const div = document.getElementById('validprojectdiv') as HTMLDivElement;
+      div.style.display = null;
+      await vendorLibs.refreshDependencies(input.value);
+      await vendorLibs.refreshAvailableDependencies(input.value);
+    }
+  } else {
+    // TODO
+  }
 }
 
 export async function refreshDependencies() {
