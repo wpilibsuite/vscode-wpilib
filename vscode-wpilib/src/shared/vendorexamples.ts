@@ -2,6 +2,7 @@
 
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
+import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { existsAsync, extensionContext, mkdirpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
@@ -82,7 +83,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                     },
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
                       path.join('frc', 'robot'), ex.packagetoreplace)) {
-                      vscode.window.showErrorMessage('Cannot create into non empty folder');
+                      vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   } else {
@@ -100,7 +101,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       return true;
                     },
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false)) {
-                      vscode.window.showErrorMessage('Cannot create into non empty folder');
+                      vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   }

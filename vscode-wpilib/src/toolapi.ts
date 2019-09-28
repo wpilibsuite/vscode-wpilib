@@ -1,6 +1,7 @@
 'use scrict';
 import * as vscode from 'vscode';
 import { IExternalAPI, IToolAPI, IToolRunner } from 'vscode-wpilibapi';
+import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { gradleRun } from './utilities';
 
@@ -15,15 +16,15 @@ export class ToolAPI implements IToolAPI {
                                      externalApi.getPreferencesAPI().getPreferences(workspace));
 
     if (grResult === 0) {
-      const result = await vscode.window.showInformationMessage('Restart required for new tools. Restart now?', {
+      const result = await vscode.window.showInformationMessage(i18n('message', 'Restart required for new tools. Restart now?'), {
         modal: true,
-      }, 'Yes', 'No');
-      if (result !== undefined && result === 'Yes') {
+      }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+      if (result !== undefined && result === i18n('ui', 'Yes')) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
     } else {
       logger.log(grResult.toString());
-      vscode.window.showInformationMessage('Tool install failed');
+      vscode.window.showInformationMessage(i18n('message', 'Tool install failed'));
       return;
     }
   }
@@ -38,13 +39,13 @@ export class ToolAPI implements IToolAPI {
 
   public async startTool(): Promise<boolean> {
     if (this.tools.length <= 0) {
-      const grResult = await vscode.window.showInformationMessage('No tools found. Would you like to use Gradle to grab some?',
-        {modal: true}, 'Yes', 'No');
-      if (grResult !== undefined && grResult === 'Yes') {
+      const grResult = await vscode.window.showInformationMessage(i18n('message', 'No tools found. Would you like to use Gradle to grab some?'),
+        {modal: true}, i18n('ui', 'Yes'), i18n('ui', 'No'));
+      if (grResult !== undefined && grResult === i18n('ui', 'Yes')) {
         const preferencesApi = this.externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
-          vscode.window.showInformationMessage('Cannot install gradle tools with an empty workspace');
+          vscode.window.showInformationMessage(i18n('message', 'Cannot install gradle tools with an empty workspace'));
           return false;
         }
         await ToolAPI.InstallToolsFromGradle(workspace, this.externalApi);
@@ -52,16 +53,16 @@ export class ToolAPI implements IToolAPI {
       return false;
     }
 
-    const result = await vscode.window.showQuickPick(this.tools, { placeHolder: 'Pick a tool' });
+    const result = await vscode.window.showQuickPick(this.tools, { placeHolder: i18n('ui', 'Pick a tool') });
 
     if (result === undefined) {
-      vscode.window.showInformationMessage('Tool run canceled');
+      vscode.window.showInformationMessage(i18n('message', 'Tool run canceled'));
       return false;
     }
 
     const ret =  await result.runner.runTool();
     if (!ret) {
-      vscode.window.showInformationMessage(`Failed to start tool: ${result.runner.getDisplayName()}`);
+      vscode.window.showInformationMessage(`${i18n('message', 'Failed to start tool')}: ${result.runner.getDisplayName()}`);
     }
     return ret;
   }

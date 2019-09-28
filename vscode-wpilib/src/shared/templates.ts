@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
+import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import * as vscode from '../vscodeshim';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
@@ -44,13 +45,13 @@ export class Templates {
               if (java) {
                 if (!await generateCopyJava(path.join(templatesFolder, e.foldername),
                   path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'))) {
-                  vscode.window.showErrorMessage('Cannot create into non empty folder');
+                  vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               } else {
                 if (!await generateCopyCpp(path.join(templatesFolder, e.foldername),
                   path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false)) {
-                  vscode.window.showErrorMessage('Cannot create into non empty folder');
+                  vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               }

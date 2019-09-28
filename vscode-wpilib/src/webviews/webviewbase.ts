@@ -2,6 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { loadLocaleFile } from '../locale';
 import { extensionContext, readFileAsync } from '../utilities';
 
 export abstract class WebViewBase {
@@ -18,18 +19,28 @@ export abstract class WebViewBase {
     this.resourceRoot = resourceRoot;
   }
 
-  public async loadWebpage(htmlPath: string, scriptPath?: string): Promise<void> {
+  public async loadWebpage(htmlPath: string, scriptPath?: string, localeDomains?: string[]): Promise<void> {
     this.html = await readFileAsync(htmlPath, 'utf8');
-    if (scriptPath) {
-      const scriptOnDisk = vscode.Uri.file(scriptPath);
 
-      // And get the special URI to use with the webview
-      const scriptResourcePath = scriptOnDisk.with({ scheme: 'vscode-resource' });
-      this.html += '\r\n<script src="';
-      this.html += scriptResourcePath.toString();
-      this.html += '">\r\n';
-      this.html += '\r\n</script>\r\n';
+    if (scriptPath) {
+      this.html += this.getScriptTag(scriptPath);
     }
+
+    if (localeDomains) {
+      localeDomains.push('ui');
+    } else {
+      localeDomains = ['ui'];
+    }
+    const defaultDomain = localeDomains[0];
+
+    localeDomains.forEach((domain) => {
+      this.html +=
+        `\r\n<script data-locale data-domain="${domain}"${defaultDomain === domain ? ' data-default-domain' : ''} type="application/json">` +
+        JSON.stringify(loadLocaleFile(domain)) +
+        '</script>\r\n';
+    });
+    this.html += this.getScriptTag(path.join(extensionContext.extensionPath, 'resources', 'dist', 'localeloader.js'));
+
     const onDiskPath = vscode.Uri.file(extensionContext.extensionPath);
     const replacePath = onDiskPath.with({ scheme: 'vscode-resource' });
     this.html = this.html.replace(/replaceresource/g, replacePath.toString());
@@ -57,5 +68,17 @@ export abstract class WebViewBase {
     for (const d of this.disposables) {
       d.dispose();
     }
+  }
+
+  private getScriptTag(scriptPath: string) {
+    let html = '';
+    const scriptOnDisk = vscode.Uri.file(scriptPath);
+    // get the special URI to use with the webview
+    const scriptResourcePath = scriptOnDisk.with({ scheme: 'vscode-resource' });
+    html += '\r\n<script src="';
+    html += scriptResourcePath.toString();
+    html += '">\r\n';
+    html += '\r\n</script>\r\n';
+    return html;
   }
 }

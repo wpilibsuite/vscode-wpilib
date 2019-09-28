@@ -18,6 +18,7 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
+import { localize as i18n } from './locale';
 import { closeLogger, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
@@ -130,9 +131,7 @@ export async function activate(context: vscode.ExtensionContext) {
   if (jdkLoc !== undefined) {
     setJavaHome(jdkLoc);
   } else {
-    // vscode.window.showErrorMessage(localize('extension.noJava',
-    //                                         'Java 11 required, but not found. Might have compilation errors'));
-    vscode.window.showErrorMessage('Java 11 required, but not found. Might have compilation errors');
+    vscode.window.showErrorMessage(i18n('message', 'Java 11 required, but not found. Might have compilation errors.'));
   }
 
   // Activate the C++ parts of the extension
@@ -238,8 +237,8 @@ export async function activate(context: vscode.ExtensionContext) {
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
         if (prefs.getProjectYear() !== 'Beta2020') {
-          vscode.window
-            .showInformationMessage('This project is not compatible with this version of the extension. Please create a new project.');
+          vscode.window.showInformationMessage(i18n('message',
+            'This project is not compatible with this version of the extension. Please create a new project.'));
           continue;
         }
 
@@ -252,11 +251,12 @@ export async function activate(context: vscode.ExtensionContext) {
           let runBuild: boolean = !await existsAsync(path.join(w.uri.fsPath, 'build'));
 
           if (didUpdate) {
-            const result = await vscode.window.showInformationMessage('It is recommended to run a "Build" after a WPILib update to ensure ' +
-              'dependencies are installed correctly. Would you like to do this now?', {
+            const result = await vscode.window.showInformationMessage(i18n('message',
+              'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
+              'Would you like to do this now?', {
                 modal: true,
-              }, 'Yes', 'No');
-            if (result !== 'Yes') {
+              }, i18n('ui', 'Yes'), i18n('ui', 'No')));
+            if (result !== i18n('ui', 'Yes')) {
               runBuild = false;
             }
           }
@@ -296,15 +296,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
           if (wpilibFiles.length === 1) {
             // Only 1 subfolder found, likely it
-            const openResult = await vscode.window.showInformationMessage('Incorrect folder opened for WPILib project. ' +
+            const openResult = await vscode.window.showInformationMessage(i18n('message', 'Incorrect folder opened for WPILib project. ' +
               'The correct folder was found in a subfolder, ' +
-              'Would you like to open it? Selecting no will cause many tasks to not work.', {
+              'Would you like to open it? Selecting no will cause many tasks to not work.'), {
                 modal: true,
-              }, 'Yes', 'No', 'No, Don\'t ask again for this folder');
-            if (openResult === 'Yes') {
+              }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
+            if (openResult === i18n('ui', 'Yes')) {
               const wpRoot = vscode.Uri.file(path.dirname(path.dirname(wpilibFiles[0].fsPath)));
               await vscode.commands.executeCommand('vscode.openFolder', wpRoot, false);
-            } else if (openResult === 'No, Don\'t ask again for this folder') {
+            } else if (openResult === i18n('ui', 'No, Don\'t ask again for this folder')) {
               persistentState.Value = true;
             }
           } else if (wpilibFiles.length > 1) {
@@ -313,8 +313,8 @@ export async function activate(context: vscode.ExtensionContext) {
               'Multiple possible subfolders found, ' +
               'Would you like to open one? Selecting no will cause many tasks to not work.', {
                 modal: true,
-              }, 'Yes', 'No', 'No, Don\'t ask again for this folder');
-            if (openResult === 'Yes') {
+              }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
+            if (openResult === i18n('ui', 'Yes')) {
               const list = wpilibFiles.map((value) => {
                 const fullRoot = path.dirname(path.dirname(value.fsPath));
                 const baseFolder = path.basename(fullRoot);
@@ -329,7 +329,7 @@ export async function activate(context: vscode.ExtensionContext) {
               if (picked !== undefined) {
                 await vscode.commands.executeCommand('vscode.openFolder', picked.fullFolder, false);
               }
-            } else if (openResult === 'No, Don\'t ask again for this folder') {
+            } else if (openResult === i18n('ui', 'No, Don\'t ask again for this folder')) {
               persistentState.Value = true;
             }
           }

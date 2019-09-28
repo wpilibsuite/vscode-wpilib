@@ -4,6 +4,8 @@ const path = require('path');
 module.exports = [{
   mode: 'none',
   entry: {
+	localeloader: './src/webviews/localeloader.ts',
+	
     eclipseimportpage: './src/webviews/pages/eclipseimportpage.ts',
     projectcreatorpage: './src/webviews/pages/projectcreatorpage.ts',
     riologpage: './src/riolog/shared/sharedscript.ts'
@@ -23,10 +25,9 @@ module.exports = [{
   },
   resolve: {
     extensions: ['.ts', '.js']
-
   },
   node: {
-    net: 'empty',
+	net: 'empty'
   },
   output: {
     path: path.resolve(__dirname, 'resources', 'dist'),
@@ -49,6 +50,7 @@ module.exports = [{
   resolve: { // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
       extensions: ['.ts', '.js']
   },
+  node: false, // no polyfill for node context
   module: {
       rules: [{
           test: /\.ts$/,
@@ -58,5 +60,4 @@ module.exports = [{
           }]
       }]
   },
-}
-];
+}];

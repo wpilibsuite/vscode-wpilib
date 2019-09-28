@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
 import { RioLogWindow } from 'wpilib-riolog';
+import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';
 import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
@@ -160,7 +161,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
   private async deployCommon(workspace: vscode.WorkspaceFolder, deployer: ICodeDeployerQuickPick[],
                              debug: boolean, desktop: boolean, source: vscode.Uri | undefined, args: string[]): Promise<boolean> {
     if (deployer.length <= 0) {
-      vscode.window.showInformationMessage('No registered deployers');
+      vscode.window.showInformationMessage(i18n('message', 'No registered deployers'));
       return false;
     }
 
@@ -176,14 +177,14 @@ export class DeployDebugAPI implements IDeployDebugAPI {
     let langSelection: ICodeDeployerQuickPick;
 
     if (validDeployers.length <= 0) {
-      vscode.window.showInformationMessage('No available deployers');
+      vscode.window.showInformationMessage(i18n('message', 'No available deployers'));
       return false;
     } else if (validDeployers.length === 1) {
       langSelection = validDeployers[0];
     } else {
-      const selection = await vscode.window.showQuickPick(validDeployers, { placeHolder: 'Pick a language' });
+      const selection = await vscode.window.showQuickPick(validDeployers, { placeHolder: i18n('ui', 'Pick a language') });
       if (selection === undefined) {
-        vscode.window.showInformationMessage('Selection exited. Cancelling');
+        vscode.window.showInformationMessage(i18n('message', 'Selection exited. Cancelling'));
         return false;
       }
       langSelection = selection;
@@ -200,7 +201,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
       }
       return true;
     } catch (err) {
-      vscode.window.showErrorMessage('Unknown error occurred. See output window or console log for more information.');
+      vscode.window.showErrorMessage(i18n('message', 'Unknown error occurred. See output window or console log for more information.'));
       logger.error('Debug error', err);
       return false;
     }

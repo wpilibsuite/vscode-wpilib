@@ -1,0 +1,78 @@
+Java 11 required, but not found. Might have compilation errors.: 没有找到需要的 Java 11，可能会产生编译错误。
+# This project is not compatible with this version of the extension. Please create a new project.
+# It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. Would you like to do this now?
+# It is recommended to run a "Build" and update tools after a WPILib update to ensure dependencies are installed correctly. Would you like to do this now?
+# It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. Would you like to do this now?
+# Incorrect folder opened for WPILib project. The correct folder was found in a subfolder, Would you like to open it? Selecting no will cause many tasks to not work.
+# No registered deployers
+# No available deployers
+# No available builders
+# No updates available
+# No dependencies installed
+# No new dependencies available
+# No command providers found
+# Selection exited. Cancelling
+# WPILib project update ({0}) found, would you like to install it? {1} currently installed
+# No WPILib Update Found
+No dependencies installed: 没有安装任何依赖
+# Check offline or online?
+# Cannot deploy code in an empty workspace
+# Cannot debug code in an empty workspace
+# Cannot simulate number in an empty workspace
+# Cannot start tests in an empty workspace
+# Cannot create command in an empty workspace
+# Cannot set team number in an empty workspace
+# Cannot set language in an empty workspace
+# Cannot set skip tests in an empty workspace
+# Cannot set offline in an empty workspace
+# Cannot set deploy offline in an empty workspace
+# Cannot set stop simulation in an empty workspace
+# Cannot set auto save in an empty workspace
+# Cannot set team number in an empty workspace
+# Cannot run command on empty workspace
+# Cannot reset auto update with an empty workspace
+# Cannot install gradle tools with an empty workspace
+# Cannot change desktop with an empty workspace
+# Cannot create into non empty folder
+# Must select a folder to create a command
+# No languages available to set
+# Skip tests on deploy? Currently {0}
+# Run commands other then deploy in offline mode? Currently {0}
+# Run deploy command in offline mode? Currently {0}
+# Stop simulation debugging on entry? Currently {0}
+Automatically save on deploy? Currently {0}: 部署时自动保存吗？当前为 {0}
+# Cannot set start RioLog in an empty workspace
+# Automatically start RioLog on deploy? Currently {0}
+# Successfully set java.home
+# Enable Desktop Support for Project? Currently ${isEnabled}
+# Invalid project format to add or remove desktop support.
+# Command ({0}) returned code: {1}
+# Enter Gradle command to run
+# Failed to install {0}
+# Library already installed
+Manage current libraries: 管理当前的库
+Check for updates (offline): 离线检查更新
+Check for updates (online): 在线检查更新
+Install new libraries (offline): 离线安装新的库
+Install new libraries (online): 在线安装新的库
+Check to uninstall libraries: 勾选要卸载的库
+Check to install libraries: 勾选要安装的库
+Check to update libraries: 勾选要更新的库
+Enter a vendor file URL (get from vendor): 输入一个文件地址 (从供应商处得到)
+# Invalid selection
+# No available command creators
+# Unknown error occurred. See output window or console log for more information.
+# Documentation not installed locally. Would you like to download it?
+# Downloading Maven MetaData
+# Downloading API Docs
+# Extracting API Docs
+# Error Downloading Docs
+Select tasks to cancel: 选择要取消的任务
+No team number, would you like to save one?: 没找到队号，你要保存一个吗？
+Would you like to open the folder?: 你要打开这个文件夹吗？
+Restart required for new tools. Restart now?: 新工具安装完成需要重载，现在重载吗？
+Tool install failed: 工具安装失败
+Tool run canceled: 工具运行取消
+Failed to start tool: 工具运行失败
+No tools found. Would you like to use Gradle to grab some?: 没找到工具，要使用 Gradle 来装一些吗？
+# Can only extract to absolute path

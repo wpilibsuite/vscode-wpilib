@@ -8,6 +8,7 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const typescript = require('typescript');
 const sourcemaps = require('gulp-sourcemaps');
+const yaml = require('gulp-yaml');
 const jsontransform = require('gulp-json-transform');
 const del = require('del');
 const nls = require('vscode-nls-dev');
@@ -44,7 +45,13 @@ gulp.task('update-activation', () => {
 	return updateActivationCommands();
 });
 
-gulp.task('add-i18n', function() {
+gulp.task('i18n-compile', function (){
+	return gulp.src('./locale/**/*.yaml')
+		.pipe(yaml())
+		.pipe(gulp.dest('./i18n/'))
+});
+
+gulp.task('i18n-additional', function() {
 	return gulp.src(['package.nls.json'])
 		.pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
 		.pipe(gulp.dest('.'));
@@ -54,6 +61,6 @@ gulp.task('clean', function() {
 	return del(['package.nls.*.json', 'vscode-wpilib*.vsix']);
 })
 
-gulp.task('build', gulp.series('clean', 'add-i18n', 'update-activation'));
+gulp.task('build', gulp.series('clean', 'i18n-compile', 'i18n-additional', 'update-activation'));
 
 gulp.task('default', gulp.series('build'));

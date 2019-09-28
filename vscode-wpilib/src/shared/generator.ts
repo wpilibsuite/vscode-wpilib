@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
+import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import { setExecutePermissions } from './permissions';
@@ -77,11 +78,11 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
 
   await mkdirpAsync(deployDir);
 
-  await writeFileAsync(path.join(deployDir, 'example.txt'),
+  await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', [ 'generateCppDeployHint',
 `Files placed in this directory will be deployed to the RoboRIO into the
 'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
 function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
-directory.`);
+directory.` ]));
 
   return true;
 }
@@ -199,10 +200,10 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
 
   await mkdirpAsync(deployDir);
 
-  await writeFileAsync(path.join(deployDir, 'example.txt'),
+  await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', [ 'generateJavaDeployHint',
 `Files placed in this directory will be deployed to the RoboRIO into the
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
-to get a proper path relative to the deploy directory.`);
+to get a proper path relative to the deploy directory.` ]));
 
   return true;
 }
