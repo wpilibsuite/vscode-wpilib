@@ -21,9 +21,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-export function eclipseSelectButtonClick() {
+export async function eclipseSelectButtonClick(): Promise<void> {
   (document.activeElement as HTMLElement).blur();
-  dialog.showOpenDialog(bWindow, {
+  const paths = await dialog.showOpenDialog(bWindow, {
     buttonLabel: 'Select Project',
     defaultPath: path.join(os.homedir(), 'eclipse-workspace'),
     filters: [
@@ -34,22 +34,21 @@ export function eclipseSelectButtonClick() {
     ],
     message: 'Select a Project',
     title: 'Select a Project',
-  }, (paths) => {
-    if (paths && paths.length === 1) {
-      const input = document.getElementById('eclipseInput') as HTMLInputElement;
-      input.value = paths[0];
-      const project = document.getElementById('projectName') as HTMLInputElement;
-      project.disabled = false;
-      project.value = path.basename(path.dirname(paths[0]));
-    } else {
-      // TODO
-    }
   });
+  if (paths.filePaths && paths.filePaths.length === 1) {
+    const input = document.getElementById('eclipseInput') as HTMLInputElement;
+    input.value = paths.filePaths[0];
+    const project = document.getElementById('projectName') as HTMLInputElement;
+    project.disabled = false;
+    project.value = path.basename(path.dirname(paths.filePaths[0]));
+  } else {
+    // TODO
+  }
 }
 
-export function projectSelectButtonClick() {
+export async function projectSelectButtonClick(): Promise<void> {
   (document.activeElement as HTMLElement).blur();
-  dialog.showOpenDialog(bWindow, {
+  const paths = await dialog.showOpenDialog(bWindow, {
     buttonLabel: 'Select Folder',
     defaultPath: electron.remote.app.getPath('documents'),
     message: 'Select a folder to put the project in',
@@ -57,14 +56,13 @@ export function projectSelectButtonClick() {
       'openDirectory',
     ],
     title: 'Select a folder to put the project in',
-  }, (paths) => {
-    if (paths && paths.length === 1) {
-      const input = document.getElementById('projectFolder') as HTMLInputElement;
-      input.value = paths[0];
-    } else {
-      // TODO
-    }
   });
+  if (paths.filePaths && paths.filePaths.length === 1) {
+    const input = document.getElementById('projectFolder') as HTMLInputElement;
+    input.value = paths.filePaths[0];
+  } else {
+    // TODO
+  }
 }
 
 interface IImportProject {
@@ -154,15 +152,14 @@ export async function importProjectButtonClick() {
   parsed.teamNumber = parseInt(data.teamNumber, 10);
   await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
 
-  dialog.showMessageBox({
+  const r = await dialog.showMessageBox({
     buttons: ['Open Folder', 'OK'],
     message: 'Creation of project complete',
     noLink: true,
-  }, (r) => {
-    if (r === 0) {
-      console.log(toFolder);
-      electron.shell.showItemInFolder(path.join(toFolder, 'build.gradle'));
-    }
-    console.log(r);
   });
+  if (r.response === 0) {
+    console.log(toFolder);
+    electron.shell.showItemInFolder(path.join(toFolder, 'build.gradle'));
+  }
+  console.log(r);
 }

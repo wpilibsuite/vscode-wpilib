@@ -17,9 +17,9 @@ const bWindow = electron.remote.getCurrentWindow();
 
 let exampleTemplateApi: ExampleTemplateAPI;
 
-export function projectSelectButtonClick() {
+export async function projectSelectButtonClick(): Promise<void> {
   (document.activeElement as HTMLElement).blur();
-  dialog.showOpenDialog(bWindow, {
+  const paths = await dialog.showOpenDialog(bWindow, {
     buttonLabel: 'Select Folder',
     defaultPath: electron.remote.app.getPath('documents'),
     message: 'Select a folder to put the project in',
@@ -27,14 +27,13 @@ export function projectSelectButtonClick() {
       'openDirectory',
     ],
     title: 'Select a folder to put the project in',
-  }, (paths) => {
-    if (paths && paths.length === 1) {
-      const input = document.getElementById('projectFolder') as HTMLInputElement;
-      input.value = paths[0];
-    } else {
-      // TODO
-    }
   });
+  if (paths.filePaths && paths.filePaths.length === 1) {
+    const input = document.getElementById('projectFolder') as HTMLInputElement;
+    input.value = paths.filePaths[0];
+  } else {
+    // TODO
+  }
 }
 
 export function selectProjectType() {

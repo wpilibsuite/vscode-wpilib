@@ -192,15 +192,15 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-function askForFolder(): Promise<string[]> {
-  return new Promise<string[]>((resolve) => {
-    dialog.showOpenDialog({
-      defaultPath: projectRootPath,
-      properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
-    }, (paths) => {
-      resolve(paths);
-    });
+async function askForFolder(): Promise<string[]> {
+  const paths = await dialog.showOpenDialog({
+    defaultPath: projectRootPath,
+    properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
   });
+  if (paths.filePaths === undefined) {
+    return [];
+  }
+  return paths.filePaths;
 }
 
 async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<void> {
@@ -213,7 +213,7 @@ async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<v
   const templateFolder = path.join(_srcRoot, _item.foldername);
   const result = await generateCopyCpp(templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder, false);
   if (!result) {
-    dialog.showMessageBox({
+    await dialog.showMessageBox({
       message: 'Cannot extract into non empty directory',
       noLink: true,
     });
@@ -232,22 +232,21 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
                                         'frc.robot.Robot', path.join('frc', 'robot'));
 
   if (!result) {
-    dialog.showMessageBox({
+    await dialog.showMessageBox({
       message: 'Cannot extract into non empty directory',
       noLink: true,
     });
     return;
   }
 
-  dialog.showMessageBox({
+  const r = await dialog.showMessageBox({
     buttons: ['Open Folder', 'OK'],
     message: 'Creation of project complete',
     noLink: true,
-  }, (r) => {
-    if (r === 0) {
-      console.log(toFolder);
-      shell.showItemInFolder(path.join(toFolder, 'build.gradle'));
-    }
-    console.log(r);
   });
+  if (r.response === 0) {
+    console.log(toFolder);
+    shell.showItemInFolder(path.join(toFolder, 'build.gradle'));
+  }
+  console.log(r);
 }

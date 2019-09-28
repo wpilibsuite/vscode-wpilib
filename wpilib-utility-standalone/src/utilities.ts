@@ -54,16 +54,15 @@ class ExtensionContext implements vscode.ExtensionContext {
 export const extensionContext: vscode.ExtensionContext = new ExtensionContext();
 
 export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
-  dialog.showMessageBox({
+  const r = await dialog.showMessageBox({
     buttons: ['Open Folder', 'OK'],
     message: 'Creation of project complete: ' + toFolder.fsPath,
     noLink: true,
-  }, (r) => {
-    if (r === 0) {
-      console.log(toFolder);
-      electron.shell.showItemInFolder(path.join(toFolder.fsPath, 'build.gradle'));
-    }
-    console.log(r);
   });
+  if (r.response === 0) {
+    console.log(toFolder);
+    electron.shell.showItemInFolder(path.join(toFolder.fsPath, 'build.gradle'));
+  }
+  console.log(r);
   return true;
 }
