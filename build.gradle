@@ -1,18 +1,30 @@
 plugins {
-    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "2.2" apply false
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.1'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.2'
     id "base"
 }
+
+if (project.hasProperty('buildServer')) {
+    wpilibVersioning.buildServerMode = true
+}
+
+ext.addedRelease = false
+wpilibVersioning.useAllTags = true
 
 def azureRelease = System.getenv('BUILD_SOURCEBRANCH')
 if (azureRelease != null) {
     println azureRelease
     if (azureRelease.startsWith('refs/tags/')) {
-        project.ext.releaseType = 'OFFICIAL'
+        wpilibVersioning.releaseMode = true
+        wpilibRepositories.addAllReleaseRepositories(project)
+        ext.addedRelease = true
         println 'tagged build'
     }
 }
 
-apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+if (!ext.addedRelease) {
+    wpilibRepositories.addAllDevelopmentRepositories(project)
+}
 
 configurations {
     cppSource
@@ -83,20 +95,14 @@ task updateAllDependencies() {
     dependsOn copyFromVsCodeToStandaloneSrc
 }
 
-// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
-// already specified on the command line
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
+if (project.hasProperty("publishVersion")) {
+    wpilibVersioning.version.set(project.publishVersion)
 }
 
-ext.pubVersion = ''
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
+wpilibVersioning.version.finalizeValue()
+
+ext.pubVersion = wpilibVersioning.version.get()
+
 
 if (pubVersion == '') {
     pubVersion = '0.0.1-unknown'
@@ -105,5 +111,5 @@ if (pubVersion == '') {
 apply from: 'versions.gradle'
 
 wrapper {
-    gradleVersion = '5.0'
+    gradleVersion = '5.4.1'
 }

@@ -236,7 +236,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        if (prefs.getProjectYear() !== '2019') {
+        if (prefs.getProjectYear() !== 'Beta2020') {
           vscode.window.showInformationMessage(i18n('message',
             'This project is not compatible with this version of the extension. Please create a new project.'));
           continue;
