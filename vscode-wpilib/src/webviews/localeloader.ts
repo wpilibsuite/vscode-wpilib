@@ -12,9 +12,22 @@ const localeDomains: {
 } = {};
 let defaultDomain: string;
 
-function localize(domain: string, message: string, ...args: any[]) {
-  if (localeDomains[domain] && localeDomains[domain][message]) {
-    message = localeDomains[domain][message];
+function isString(value: any): value is string {
+  return toString.call(value) === '[object String]';
+}
+
+function localize(domain: string, message: string | string[], ...args: any[]) {
+  let key: string;
+  if (isString(message)) {
+    key = message;
+  } else if (message.length === 2) {
+    key = message[0];
+    message = message[1];
+  } else {
+    throw new Error('Invalid message');
+  }
+  if (localeDomains[domain] && localeDomains[domain][key]) {
+    message = localeDomains[domain][key];
   }
   return format(message, args);
 }
@@ -42,9 +55,9 @@ window.addEventListener('load', () => {
     if (!domainAttr || !e.textContent) {
       return;
     }
-    let message = e.textContent;
+    let message: string | string[] = e.textContent;
     if (!!keyAttr && keyAttr.value !== '') {
-      message = keyAttr.value;
+      message = [keyAttr.value, message];
     }
     const domain = domainAttr.value === '' ? defaultDomain : domainAttr.value;
     e.textContent = localize(domain, message);
