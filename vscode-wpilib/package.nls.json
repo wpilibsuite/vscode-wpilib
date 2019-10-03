@@ -21,6 +21,7 @@
 	"wpilibcore.refreshCppProperties.title": "Refresh C++ Intellisense",
 	"wpilibcore.selectCppToolchain.title": "Select Current C++ Toolchain",
 	"wpilibcore.importEclipseProject.title": "Import a WPILib Eclipse project",
+	"wpilibcore.importGradle2019Project.title": "Import a WPILib 2019 Gradle project",
 	"wpilibcore.createNewProject.title": "Create a new project",
 	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",
 	"wpilibcore.setJavaHome.title": "Set VS Code Java Home to FRC Home",
