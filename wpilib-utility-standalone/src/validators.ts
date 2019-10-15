@@ -9,9 +9,8 @@ export function hasSpecialCharacter(str: string): boolean {
       continue;
     }
     // check lower character
-    if( c <= 'a' && c <= 'z') {
-      continue;
-    }
+    if( c >= 'a' && c <= 'z') continue;
+   
     return true;
   }
   return false;
