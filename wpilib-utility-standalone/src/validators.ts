@@ -1,7 +1,20 @@
+export function hasSpecialCharacter(str: string): boolean {
+  for(let c of str) {
+    // check number character
+    if( c >= '0' && c <= '9') continue;
+    // check upper character
+    if( c >= 'A' && c <= 'Z') continue;
+    // check lower character
+    if( c <= 'a' && c <= 'Z') continue;
+   
+    return true;
+  }
+  return false;
+}
+
 export function validateProject(input: HTMLInputElement, div: HTMLDivElement) {
   const s = input.value;
-  const match = s.match(/\w[\w-]*$/gm);
-  if (match === null || match.length === 0) {
+  if (hasSpecialCharacter(s)) {
     div.innerText = 'Invalid Project Name';
     div.classList.add('error');
     input.classList.add('error');
