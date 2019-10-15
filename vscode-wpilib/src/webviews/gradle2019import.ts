@@ -1,9 +1,9 @@
 'use strict';
 
-import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { existsAsync, extensionContext, mkdirpAsync, promptForProjectOpen, readFileAsync, writeFileAsync } from '../utilities';
@@ -113,11 +113,56 @@ export class Gradle2019Import extends WebViewBase {
     }
     const oldProjectPath = path.dirname(data.fromProps);
 
-    // TODO: This is where the update occurs
+    // Detect C++ or Java project
+    const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
-    const cpp = await existsAsync(path.join(oldProjectPath, '.cproject'));
+    let cpp = true;
 
-    const javaRobotPackage: string = '';
+    if (await existsAsync(wpilibJsonFile)) {
+      const wpilibJsonFileContents = await readFileAsync(wpilibJsonFile, 'utf8');
+      const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
+      if (wpilibJsonFileParsed.currentLanguage === 'cpp') {
+        cpp = true;
+      } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
+        cpp = false;
+      } else {
+        await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select a wpilib project?'));
+        return;
+      }
+    } else {
+      // Error
+      await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select a wpilib project?'));
+      return;
+    }
+
+    const gradleFile = path.join(oldProjectPath, 'build.gradle');
+
+    let javaRobotPackage: string = '';
+
+    if (await existsAsync(gradleFile) && !cpp) {
+      const gradleContents = await readFileAsync(gradleFile, 'utf8');
+      const mainClassRegex = 'def ROBOT_MAIN_CLASS = \"(.+)\"';
+      const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
+      if (regexRes !== null && regexRes.length === 1) {
+        javaRobotPackage = regexRes[1];
+      } else {
+        const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
+          modal: true,
+        }, 'Yes', 'No');
+        if (res !== 'Yes') {
+          await vscode.window.showErrorMessage('Project Import Failed');
+          return;
+        }
+      }
+    } else if (!cpp) {
+      const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
+        modal: true,
+      }, 'Yes', 'No');
+      if (res !== 'Yes') {
+        await vscode.window.showErrorMessage('Project Import Failed');
+        return;
+      }
+    }
 
     let toFolder = data.toFolder;
 
@@ -136,34 +181,20 @@ export class Gradle2019Import extends WebViewBase {
     let success = false;
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, 'cpp');
-      success = await generateCopyCpp(path.join(oldProjectPath, 'src'), gradlePath, toFolder, true);
+      success = await generateCopyCpp(path.join(oldProjectPath, 'src'), gradlePath, toFolder, true, true);
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
       success = await generateCopyJava(path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage + '.Main', '');
     }
 
     if (!success) {
+      vscode.window.showErrorMessage(i18n('message', 'Failed to update. Did you attempt to extract to the existing project folder?'), {
+        modal: true,
+      });
       return;
     }
 
     const buildgradle = path.join(toFolder, 'build.gradle');
-
-    await new Promise<void>((resolve, reject) => {
-      fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
-        if (err) {
-          resolve();
-        } else {
-          const dataOut = dataIn.replace(new RegExp('def includeSrcInIncludeRoot = false', 'g'), 'def includeSrcInIncludeRoot = true');
-          fs.writeFile(buildgradle, dataOut, 'utf8', (err1) => {
-            if (err1) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        }
-      });
-    });
 
     await setDesktopEnabled(buildgradle, true);
 

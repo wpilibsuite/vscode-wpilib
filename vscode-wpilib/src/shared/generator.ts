@@ -9,7 +9,7 @@ import { setExecutePermissions } from './permissions';
 type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
 export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                      addCpp: boolean): Promise<boolean> {
+                                      addCpp: boolean, directGradleImport: boolean): Promise<boolean> {
   const existingFiles = await readdirAsync(toFolder);
   if (existingFiles.length > 0) {
     logger.warn('folder not empty');
@@ -19,6 +19,8 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
   let codePath = path.join(toFolder, 'src', 'main');
   if (addCpp) {
     codePath = path.join(codePath, 'cpp');
+  } else if (directGradleImport) {
+    codePath = path.join(toFolder, 'src');
   }
 
   const gradleRioFrom = '###GRADLERIOREPLACE###';
@@ -74,15 +76,17 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
     });
   });
 
-  const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
+  if (!directGradleImport) {
+    const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
 
-  await mkdirpAsync(deployDir);
+    await mkdirpAsync(deployDir);
 
-  await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', [ 'generateCppDeployHint',
-`Files placed in this directory will be deployed to the RoboRIO into the
-'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
-function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
-directory.` ]));
+    await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', [ 'generateCppDeployHint',
+  `Files placed in this directory will be deployed to the RoboRIO into the
+  'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
+  function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
+  directory.` ]));
+  }
 
   return true;
 }
