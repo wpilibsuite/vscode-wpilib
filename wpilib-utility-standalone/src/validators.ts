@@ -1,16 +1,17 @@
 export function hasSpecialCharacter(str: string): boolean {
-  for(const c of str) {
+  for (const c of str) {
     // check number character
-    if( c >= '0' && c <= '9') {
+    if (c >= '0' && c <= '9') {
       continue;
     }
     // check upper character
-    if( c >= 'A' && c <= 'Z') {
+    if (c >= 'A' && c <= 'Z') {
       continue;
     }
     // check lower character
-    if( c >= 'a' && c <= 'z') continue;
-   
+    if (c >= 'a' && c <= 'z') {
+      continue;
+    }
     return true;
   }
   return false;
