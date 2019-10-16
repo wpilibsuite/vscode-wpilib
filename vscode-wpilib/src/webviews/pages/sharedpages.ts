@@ -6,7 +6,7 @@ declare global {
 }
 
 export function hasSpecialCharacter(str: string): boolean {
-  const characterBlacklist = ['@', '!', '.', '/', '\\', '$', '&', '|', '`', '~', ':'];
+  const characterBlacklist = ['@', '!', '.', '/', '\\', '$', '&', '|', '`', '~', ':', ' '];
   // check black list characters
   for (const c of str) {
     if (characterBlacklist.indexOf(c) !== -1) {

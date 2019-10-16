@@ -1,5 +1,5 @@
 export function hasSpecialCharacter(str: string): boolean {
-  const characterBlacklist = ['@', '!', '.', '$', '&', '|', '`', ':'];
+  const characterBlacklist = ['@', '!', '.', '/', '\\', '$', '&', '|', '`', '~', ':', ' '];
   // check black list characters
   for (const c of str) {
     if (characterBlacklist.indexOf(c) !== -1) {
@@ -25,10 +25,10 @@ export function hasSpecialCharacter(str: string): boolean {
 export function validatePath(str: string): boolean {
   const characterBlacklist = ['@', '!', '.', '$', '&', '|', '`'];
   for (const c of str) {
-    if(characterBlacklist.indexOf(c) !== -1) {
+    if (characterBlacklist.indexOf(c) !== -1) {
       return false;
     }
-  } 
+  }
   return true;
 }
 
