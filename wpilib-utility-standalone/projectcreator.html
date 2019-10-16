@@ -43,9 +43,8 @@
   </select>
 
   <br/>
-  <br/> Select a folder to place the new project into.
-  <br/>
-  <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <div id="projectFolderdiv"> Select a folder to place the new project into. </div>
+  <input id="projectFolder" oninput="validators.validateProjectFolder(document.getElementById('projectFolder'), document.getElementById('projectFolderdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
   <button onclick="exports.projectSelectButtonClick();">Select a new project folder</button>
   <br/>
