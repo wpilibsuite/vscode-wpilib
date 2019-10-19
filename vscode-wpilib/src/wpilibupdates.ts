@@ -207,9 +207,10 @@ export class WPILibUpdates {
         if (versions.length === 0) {
           return undefined;
         }
-        let newestVersion = versions[0];
+        let newestVersion = '0';
+        const frcYear = this.externalApi.getUtilitiesAPI().getFrcYear();
         for (const v of versions) {
-          if (isNewerVersion(v, newestVersion)) {
+          if (v.startsWith(frcYear) && isNewerVersion(v, newestVersion)) {
             newestVersion = v;
           }
         }
