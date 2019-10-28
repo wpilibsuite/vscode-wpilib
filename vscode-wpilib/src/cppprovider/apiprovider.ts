@@ -1,6 +1,7 @@
 'use strict';
 
 import * as jsonc from 'jsonc-parser';
+import * as mm from 'micromatch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { CppToolsApi, CustomConfigurationProvider, SourceFileConfigurationItem, WorkspaceBrowseConfiguration } from 'vscode-cpptools';
@@ -10,7 +11,7 @@ import { PersistentFolderState } from '../persistentState';
 import { gradleRun, readFileAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { HeaderExplorer } from './headertreeprovider';
-import { IToolChain } from './jsonformats';
+import { ISource, IToolChain } from './jsonformats';
 
 const isWindows = (process.platform === 'win32');
 
@@ -64,6 +65,16 @@ function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++0
     }
   }
   return undefined;
+}
+
+function matchesIncludesExcludes(source: ISource, file: string): boolean {
+  if (source.includes.length === 0) {
+    return true;
+  }
+  const result = mm([file], source.includes, {
+    ignore: source.excludes,
+  });
+  return result.length === 1;
 }
 
 export interface IEnabledBuildTypes {
@@ -481,6 +492,9 @@ export class ApiProvider implements CustomConfigurationProvider {
 
           for (const source of sb.source.srcDirs) {
             if (normalizedPath.startsWith(source)) {
+              if (!matchesIncludesExcludes(sb.source, normalizedPath)) {
+                continue;
+              }
               // Found, find binary
               const index: number = tc.nameBinaryMap[sb.componentName];
               if (index >= 0) {
