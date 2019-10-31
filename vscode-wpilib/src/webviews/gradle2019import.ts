@@ -73,15 +73,32 @@ export class Gradle2019Import extends WebViewBase {
     }
 
     const oldProjectPath = path.dirname(oldProject[0].fsPath);
+
+    const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
+
+    let teamNumber: string | undefined;
+
+    if (await existsAsync(wpilibJsonFile)) {
+      const wpilibJsonFileContents = await readFileAsync(wpilibJsonFile, 'utf8');
+      const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
+      teamNumber = wpilibJsonFileParsed.teamNumber.toString(10);
+    }
+
     if (this.webview) {
       await this.postMessage({
         data: oldProject[0].fsPath,
         type: 'gradle2019',
       });
       await this.postMessage({
-        data: path.basename(oldProjectPath),
+        data: path.basename(oldProjectPath) + '-Imported',
         type: 'projectname',
       });
+      if (teamNumber !== undefined) {
+        await this.postMessage({
+          data: teamNumber,
+          type: 'teamnumber',
+        });
+      }
     }
   }
 
@@ -90,6 +107,7 @@ export class Gradle2019Import extends WebViewBase {
       canSelectFiles: false,
       canSelectFolders: true,
       canSelectMany: false,
+      defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
       openLabel: 'Select Folder',
     };
     const result = await vscode.window.showOpenDialog(open);
@@ -143,7 +161,7 @@ export class Gradle2019Import extends WebViewBase {
       const gradleContents = await readFileAsync(gradleFile, 'utf8');
       const mainClassRegex = 'def ROBOT_MAIN_CLASS = \"(.+)\"';
       const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
-      if (regexRes !== null && regexRes.length === 1) {
+      if (regexRes !== null && regexRes.length === 2) {
         javaRobotPackage = regexRes[1];
       } else {
         const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
@@ -181,10 +199,10 @@ export class Gradle2019Import extends WebViewBase {
     let success = false;
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, 'cpp');
-      success = await generateCopyCpp(path.join(oldProjectPath, 'src'), gradlePath, toFolder, true, true);
+      success = await generateCopyCpp(path.join(oldProjectPath, 'src'), gradlePath, toFolder, false, true);
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
-      success = await generateCopyJava(path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage + '.Main', '');
+      success = await generateCopyJava(path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage, '', true);
     }
 
     if (!success) {

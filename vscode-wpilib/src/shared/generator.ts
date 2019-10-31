@@ -92,14 +92,18 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
 }
 
 export async function generateCopyJava(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                       robotClassTo: string, copyRoot: string, packageReplaceString?: string | undefined): Promise<boolean> {
+                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean,
+                                       packageReplaceString?: string | undefined): Promise<boolean> {
   const existingFiles = await readdirAsync(toFolder);
   if (existingFiles.length > 0) {
     return false;
   }
 
   const rootCodePath = path.join(toFolder, 'src', 'main', 'java');
-  const codePath = path.join(rootCodePath, copyRoot);
+  let codePath = path.join(rootCodePath, copyRoot);
+  if (directGradleImport) {
+    codePath = path.join(toFolder, 'src');
+  }
 
   if (typeof fromTemplateFolder === 'string') {
     await ncpAsync(fromTemplateFolder, codePath);
@@ -200,14 +204,16 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
     });
   });
 
-  const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
+  if (!directGradleImport) {
+    const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
 
-  await mkdirpAsync(deployDir);
+    await mkdirpAsync(deployDir);
 
-  await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', [ 'generateJavaDeployHint',
+    await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', [ 'generateJavaDeployHint',
 `Files placed in this directory will be deployed to the RoboRIO into the
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.` ]));
+  }
 
   return true;
 }

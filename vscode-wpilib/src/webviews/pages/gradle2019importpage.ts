@@ -51,6 +51,10 @@ window.addEventListener('message', (event) => {
       const elem = document.getElementById('projectFolder') as HTMLInputElement;
       elem.value = data.data;
       break;
+    case 'teamnumber':
+      const tn = document.getElementById('teamNumber') as HTMLInputElement;
+      tn.value = data.data;
+      break;
     default:
       break;
   }

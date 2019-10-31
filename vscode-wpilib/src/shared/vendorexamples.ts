@@ -82,7 +82,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       return true;
                     },
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
-                      path.join('frc', 'robot'), ex.packagetoreplace)) {
+                      path.join('frc', 'robot'), false, ex.packagetoreplace)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
@@ -100,7 +100,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       }
                       return true;
                     },
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false)) {
+                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
