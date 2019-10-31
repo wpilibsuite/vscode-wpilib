@@ -415,6 +415,7 @@
         "vscePackage": "vsce package"
     },
     "devDependencies": {
+        "@types/micromatch": "^3.1.0",
         "@types/extract-zip": "^1.6.2",
         "@types/glob": "^7.1.1",
         "@types/mkdirp": "^0.5.2",
@@ -452,6 +453,7 @@
         "java-properties": "^1.0.2",
         "jsonc-parser": "^2.1.1",
         "logform": "^2.1.2",
+        "micromatch": "^4.0.2",
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
         "node-fetch": "^2.6.0",
