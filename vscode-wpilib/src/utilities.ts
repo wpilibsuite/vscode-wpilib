@@ -52,6 +52,8 @@ export const readFileAsync = util.promisify(fs.readFile);
 
 export const writeFileAsync = util.promisify(fs.writeFile);
 
+export const copyFileAsync = util.promisify(fs.copyFile);
+
 export const mkdirAsync = util.promisify(fs.mkdir);
 
 export const existsAsync = util.promisify(fs.exists);

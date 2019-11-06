@@ -43,14 +43,14 @@ export class Templates {
           async generate(folderInto: vscode.Uri): Promise<boolean> {
             try {
               if (java) {
-                if (!await generateCopyJava(path.join(templatesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'), false)) {
+                if (!await generateCopyJava(resourceRoot, path.join(templatesFolder, e.foldername),
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'), false, false)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               } else {
-                if (!await generateCopyCpp(path.join(templatesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false)) {
+                if (!await generateCopyCpp(resourceRoot, path.join(templatesFolder, e.foldername),
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false, false)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }

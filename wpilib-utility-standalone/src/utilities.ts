@@ -18,6 +18,8 @@ export function getIsWindows(): boolean {
 
 export const existsAsync = util.promisify(fs.exists);
 
+export const copyFileAsync = util.promisify(fs.copyFile);
+
 export const deleteFileAsync = util.promisify(fs.unlink);
 
 export const readFileAsync = util.promisify(fs.readFile);

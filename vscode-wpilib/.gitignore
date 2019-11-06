@@ -6,6 +6,7 @@ node_modules
 resources/cpp
 resources/java
 resources/dist
+resources/vendordeps
 
 // These files will be generated from the i18n folder
 *nls.*.json

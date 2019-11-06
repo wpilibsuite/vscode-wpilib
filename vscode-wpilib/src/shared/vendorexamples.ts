@@ -68,7 +68,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               async generate(folderInto: vscode.Uri): Promise<boolean> {
                 try {
                   if (ex.language === 'java') {
-                    if (!await generateCopyJava(async (copyPath, rootDir) => {
+                    if (!await generateCopyJava(resourceRoot, async (copyPath, rootDir) => {
                       for (const copyFile of ex.files) {
                         const copyFilePath = path.join(copyPath, copyFile.deployloc);
                         const copyParent = path.dirname(copyFilePath);
@@ -82,12 +82,12 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       return true;
                     },
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
-                      path.join('frc', 'robot'), false, ex.packagetoreplace)) {
+                      path.join('frc', 'robot'), false, false, ex.packagetoreplace)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   } else {
-                    if (!await generateCopyCpp(async (copyPath, rootDir) => {
+                    if (!await generateCopyCpp(resourceRoot, async (copyPath, rootDir) => {
                       for (const copyFile of ex.files) {
                         const copyFilePath = path.join(copyPath, copyFile.deployloc);
                         const copyParent = path.dirname(copyFilePath);
@@ -100,7 +100,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                       }
                       return true;
                     },
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false)) {
+                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false, false)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }

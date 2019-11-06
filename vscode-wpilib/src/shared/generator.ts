@@ -3,13 +3,13 @@ import * as glob from 'glob';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
+import { copyFileAsync, mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
 import { setExecutePermissions } from './permissions';
 
 type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
-export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                      addCpp: boolean, directGradleImport: boolean): Promise<boolean> {
+export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
+                                      addCpp: boolean, directGradleImport: boolean, oldCommands: boolean): Promise<boolean> {
   const existingFiles = await readdirAsync(toFolder);
   if (existingFiles.length > 0) {
     logger.warn('folder not empty');
@@ -88,11 +88,17 @@ export async function generateCopyCpp(fromTemplateFolder: string | CopyCallback,
   directory.` ]));
   }
 
+  const vendorDir = path.join(toFolder, 'vendordeps');
+  await mkdirpAsync(vendorDir);
+  const commandName = oldCommands ? 'WPILibOldCommands.json' : 'WPILibNewCommands.json';
+  const vendorFile = path.join(resourcesFolder, 'vendordeps', commandName);
+  await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
+
   return true;
 }
 
-export async function generateCopyJava(fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean,
+export async function generateCopyJava(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
+                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean, oldCommands: boolean,
                                        packageReplaceString?: string | undefined): Promise<boolean> {
   const existingFiles = await readdirAsync(toFolder);
   if (existingFiles.length > 0) {
@@ -214,6 +220,12 @@ export async function generateCopyJava(fromTemplateFolder: string | CopyCallback
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.` ]));
   }
+
+  const vendorDir = path.join(toFolder, 'vendordeps');
+  await mkdirpAsync(vendorDir);
+  const commandName = oldCommands ? 'WPILibOldCommands.json' : 'WPILibNewCommands.json';
+  const vendorFile = path.join(resourcesFolder, 'vendordeps', commandName);
+  await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
 
   return true;
 }
