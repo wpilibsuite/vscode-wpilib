@@ -33,6 +33,7 @@ import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
 import { EclipseImport } from './webviews/eclipseimport';
+import { Gradle2019Import } from './webviews/gradle2019import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
@@ -158,6 +159,15 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(eclipseimport);
   } catch (err) {
     logger.error('error creating eclipse importer', err);
+    creationError = true;
+  }
+
+  try {
+    // Create the gradle 2019 import provider
+    const gradle2019import = await Gradle2019Import.Create(extensionResourceLocation);
+    context.subscriptions.push(gradle2019import);
+  } catch (err) {
+    logger.error('error creating gradle 2019 importer', err);
     creationError = true;
   }
 

@@ -39,6 +39,7 @@
         "onCommand:wpilibcore.selectCppToolchain",
         "onCommand:wpilibcore.selectCppBinaryTypes",
         "onCommand:wpilibcore.importEclipseProject",
+        "onCommand:wpilibcore.importGradle2019Project",
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
@@ -261,6 +262,11 @@
             {
                 "command": "wpilibcore.importEclipseProject",
                 "title": "%wpilibcore.importEclipseProject.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.importGradle2019Project",
+                "title": "%wpilibcore.importGradle2019Project.title%",
                 "category": "WPILib"
             },
             {

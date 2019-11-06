@@ -5,8 +5,9 @@ module.exports = [{
   mode: 'none',
   entry: {
 	localeloader: './src/webviews/localeloader.ts',
-	
+
     eclipseimportpage: './src/webviews/pages/eclipseimportpage.ts',
+    gradle2019importpage: './src/webviews/pages/gradle2019importpage.ts',
     projectcreatorpage: './src/webviews/pages/projectcreatorpage.ts',
     riologpage: './src/riolog/shared/sharedscript.ts'
   },
