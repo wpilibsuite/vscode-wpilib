@@ -116,10 +116,10 @@ export async function importProjectButtonClick() {
   let success = false;
   if (cpp) {
     const gradlePath = path.join(gradleBasePath, 'cpp');
-    success = await generateCopyCpp(path.join(oldProjectPath, 'src'), gradlePath, toFolder, true, false);
+    success = await generateCopyCpp(resourceRoot, path.join(oldProjectPath, 'src'), gradlePath, toFolder, true, false, true);
   } else {
     const gradlePath = path.join(gradleBasePath, 'java');
-    success = await generateCopyJava(path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotClass, '', false);
+    success = await generateCopyJava(resourceRoot, path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotClass, '', false, true);
   }
 
   if (!success) {
