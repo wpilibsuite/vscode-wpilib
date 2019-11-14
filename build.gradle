@@ -1,7 +1,7 @@
 plugins {
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.1'
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.2'
-    id "de.undercouch.download" version "4.0.0"
+    id "de.undercouch.download" version "4.0.1"
     id "base"
 }
 
@@ -131,5 +131,5 @@ if (pubVersion == '') {
 apply from: 'versions.gradle'
 
 wrapper {
-    gradleVersion = '5.4.1'
+    gradleVersion = '6.0'
 }

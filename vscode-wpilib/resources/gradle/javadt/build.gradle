@@ -5,19 +5,14 @@ plugins {
 
 def ROBOT_MAIN_CLASS = "###ROBOTCLASSREPLACE###"
 
-// Maven central needed for JUnit
-repositories {
-    mavenCentral()
-}
-
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {
-    compile wpi.deps.wpilib()
+    implementation wpi.deps.wpilib()
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
