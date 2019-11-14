@@ -17,34 +17,46 @@ export class Gradle2019Import extends WebViewBase {
     return cimport;
   }
 
+  private hasEnabledHandler: boolean = false;
+
   private constructor(resourceRoot: string) {
     super('wpilibgradle2019import', 'WPILib Gradle2019 Import', resourceRoot);
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2019Project', async () => {
-      this.displayWebView(vscode.ViewColumn.Active, true, {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-      });
-      if (this.webview) {
-        this.webview.webview.onDidReceiveMessage(async (data: IGradle2019IPCReceive) => {
-          switch (data.type) {
-            case 'gradle2019':
-              await this.handleGradle2019Button();
-              break;
-            case 'newproject':
-              await this.handleNewProjectLoc();
-              break;
-            case 'importproject':
-              if (data.data) {
-                await this.handleImport(data.data);
-              }
-              break;
-            default:
-              break;
-          }
-        }, undefined, this.disposables);
-      }
+    this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2019Project', () => {
+      return this.startWebpage();
     }));
+  }
+
+  public async startWithProject(project: vscode.Uri) {
+    await this.startWebpage();
+    return this.handleProject(project);
+  }
+
+  private async startWebpage() {
+    this.displayWebView(vscode.ViewColumn.Active, true, {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+    });
+    if (this.webview && !this.hasEnabledHandler) {
+      this.hasEnabledHandler = true;
+      this.webview.webview.onDidReceiveMessage(async (data: IGradle2019IPCReceive) => {
+        switch (data.type) {
+          case 'gradle2019':
+            await this.handleGradle2019Button();
+            break;
+          case 'newproject':
+            await this.handleNewProjectLoc();
+            break;
+          case 'importproject':
+            if (data.data) {
+              await this.handleImport(data.data);
+            }
+            break;
+          default:
+            break;
+        }
+      }, undefined, this.disposables);
+    }
   }
 
   private async postMessage(data: IGradle2019IPCSend): Promise<boolean> {
@@ -52,6 +64,37 @@ export class Gradle2019Import extends WebViewBase {
       return this.webview.webview.postMessage(data);
     } else {
       return false;
+    }
+  }
+
+  private async handleProject(oldProject: vscode.Uri) {
+    const oldProjectPath = path.dirname(oldProject.fsPath);
+
+    const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
+
+    let teamNumber: string | undefined;
+
+    if (await existsAsync(wpilibJsonFile)) {
+      const wpilibJsonFileContents = await readFileAsync(wpilibJsonFile, 'utf8');
+      const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
+      teamNumber = wpilibJsonFileParsed.teamNumber.toString(10);
+    }
+
+    if (this.webview) {
+      await this.postMessage({
+        data: oldProject.fsPath,
+        type: 'gradle2019',
+      });
+      await this.postMessage({
+        data: path.basename(oldProjectPath) + '-Imported',
+        type: 'projectname',
+      });
+      if (teamNumber !== undefined) {
+        await this.postMessage({
+          data: teamNumber,
+          type: 'teamnumber',
+        });
+      }
     }
   }
 
@@ -72,34 +115,7 @@ export class Gradle2019Import extends WebViewBase {
       return;
     }
 
-    const oldProjectPath = path.dirname(oldProject[0].fsPath);
-
-    const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
-
-    let teamNumber: string | undefined;
-
-    if (await existsAsync(wpilibJsonFile)) {
-      const wpilibJsonFileContents = await readFileAsync(wpilibJsonFile, 'utf8');
-      const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
-      teamNumber = wpilibJsonFileParsed.teamNumber.toString(10);
-    }
-
-    if (this.webview) {
-      await this.postMessage({
-        data: oldProject[0].fsPath,
-        type: 'gradle2019',
-      });
-      await this.postMessage({
-        data: path.basename(oldProjectPath) + '-Imported',
-        type: 'projectname',
-      });
-      if (teamNumber !== undefined) {
-        await this.postMessage({
-          data: teamNumber,
-          type: 'teamnumber',
-        });
-      }
-    }
+    return this.handleProject(oldProject[0]);
   }
 
   private async handleNewProjectLoc() {
