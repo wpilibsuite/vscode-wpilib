@@ -162,9 +162,11 @@ export async function activate(context: vscode.ExtensionContext) {
     creationError = true;
   }
 
+  let gradle2019import: Gradle2019Import | undefined;
+
   try {
     // Create the gradle 2019 import provider
-    const gradle2019import = await Gradle2019Import.Create(extensionResourceLocation);
+    gradle2019import = await Gradle2019Import.Create(extensionResourceLocation);
     context.subscriptions.push(gradle2019import);
   } catch (err) {
     logger.error('error creating gradle 2019 importer', err);
@@ -247,8 +249,20 @@ export async function activate(context: vscode.ExtensionContext) {
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
         if (prefs.getProjectYear() !== 'Beta2020-2') {
-          vscode.window.showInformationMessage(i18n('message',
-            'This project is not compatible with this version of the extension. Please create a new project.'));
+          const importPersistantState = new PersistentFolderState('wpilib.beta2020persist', false, w.uri.fsPath);
+          if (importPersistantState.Value === false) {
+            const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2020?.'), {
+              modal: true,
+            }, 'Yes', 'No', 'No, Don\'t ask again');
+            if (upgradeResult === 'Yes') {
+              if (gradle2019import) {
+                await gradle2019import.startWithProject(w.uri);
+              }
+            } else if (upgradeResult === 'No, Don\'t ask again') {
+              importPersistantState.Value = true;
+            }
+          }
           continue;
         }
 
@@ -264,8 +278,8 @@ export async function activate(context: vscode.ExtensionContext) {
             const result = await vscode.window.showInformationMessage(i18n('message',
               'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
               'Would you like to do this now?', {
-                modal: true,
-              }, i18n('ui', 'Yes'), i18n('ui', 'No')));
+              modal: true,
+            }, i18n('ui', 'Yes'), i18n('ui', 'No')));
             if (result !== i18n('ui', 'Yes')) {
               runBuild = false;
             }
@@ -309,8 +323,8 @@ export async function activate(context: vscode.ExtensionContext) {
             const openResult = await vscode.window.showInformationMessage(i18n('message', 'Incorrect folder opened for WPILib project. ' +
               'The correct folder was found in a subfolder, ' +
               'Would you like to open it? Selecting no will cause many tasks to not work.'), {
-                modal: true,
-              }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
+              modal: true,
+            }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
             if (openResult === i18n('ui', 'Yes')) {
               const wpRoot = vscode.Uri.file(path.dirname(path.dirname(wpilibFiles[0].fsPath)));
               await vscode.commands.executeCommand('vscode.openFolder', wpRoot, false);
@@ -322,8 +336,8 @@ export async function activate(context: vscode.ExtensionContext) {
             const openResult = await vscode.window.showInformationMessage('Incorrect folder opened for WPILib project. ' +
               'Multiple possible subfolders found, ' +
               'Would you like to open one? Selecting no will cause many tasks to not work.', {
-                modal: true,
-              }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
+              modal: true,
+            }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
             if (openResult === i18n('ui', 'Yes')) {
               const list = wpilibFiles.map((value) => {
                 const fullRoot = path.dirname(path.dirname(value.fsPath));
