@@ -91,7 +91,7 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
   const vendorDir = path.join(toFolder, 'vendordeps');
   await mkdirpAsync(vendorDir);
   const commandName = oldCommands ? 'WPILibOldCommands.json' : 'WPILibNewCommands.json';
-  const vendorFile = path.join(resourcesFolder, 'vendordeps', commandName);
+  const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
   await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
 
   return true;
@@ -224,7 +224,7 @@ to get a proper path relative to the deploy directory.` ]));
   const vendorDir = path.join(toFolder, 'vendordeps');
   await mkdirpAsync(vendorDir);
   const commandName = oldCommands ? 'WPILibOldCommands.json' : 'WPILibNewCommands.json';
-  const vendorFile = path.join(resourcesFolder, 'vendordeps', commandName);
+  const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
   await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
 
   return true;
