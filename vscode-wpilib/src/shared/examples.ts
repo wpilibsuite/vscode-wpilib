@@ -14,6 +14,7 @@ export interface IExampleJsonLayout {
   tags: string[];
   foldername: string;
   gradlebase: string;
+  commandversion: string;
 }
 
 export class Examples {
@@ -44,13 +45,13 @@ export class Examples {
             try {
               if (java) {
                 if (!await generateCopyJava(resourceRoot, path.join(examplesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'), false, false)) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'), false, e.commandversion !== '2')) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               } else {
                 if (!await generateCopyCpp(resourceRoot, path.join(examplesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false, false)) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false, e.commandversion !== '2')) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
