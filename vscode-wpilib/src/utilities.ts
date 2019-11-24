@@ -126,7 +126,8 @@ export function getDesktopEnabled(buildgradle: string): Promise<boolean | undefi
 }
 
 export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
-  const openSelection = await vscode.window.showInformationMessage(i18n('message', 'Would you like to open the folder?'), {
+  const openSelection = await vscode.window.showInformationMessage(i18n('message',
+      'Project successfully created. Would you like to open the folder?'), {
     modal: true,
   }, i18n('ui', 'Yes (Current Window)'), i18n('ui', 'Yes (New Window)'), i18n('ui', 'No'));
   if (openSelection === undefined) {

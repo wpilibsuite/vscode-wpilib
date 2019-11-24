@@ -147,10 +147,10 @@ export class EclipseImport extends WebViewBase {
     let success = false;
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, 'cpp');
-      success = await generateCopyCpp(resourceRoot, path.join(oldProjectPath, 'src'), gradlePath, toFolder, true, false, true);
+      success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder, true, false, true);
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
-      success = await generateCopyJava(resourceRoot, path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage + '.Main', '', false,
+      success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage + '.Main', '', false,
                                        true);
     }
 
