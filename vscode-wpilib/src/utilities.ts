@@ -16,6 +16,11 @@ export function getIsWindows(): boolean {
   return nodePlatform === 'win32';
 }
 
+export function getIsMac(): boolean {
+  const nodePlatform: NodeJS.Platform = process.platform;
+  return nodePlatform === 'darwin';
+}
+
 export async function getClassName(): Promise<string | undefined> {
   const promptString = 'Please enter a class name';
   const className = await vscode.window.showInputBox({
