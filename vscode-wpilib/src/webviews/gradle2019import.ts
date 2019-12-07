@@ -216,10 +216,11 @@ export class Gradle2019Import extends WebViewBase {
     let success = false;
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, 'cpp');
-      success = await generateCopyCpp(resourceRoot, path.join(oldProjectPath, 'src'), gradlePath, toFolder, false, true, true);
+      success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder, false, true, true);
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
-      success = await generateCopyJava(resourceRoot, path.join(oldProjectPath, 'src'), gradlePath, toFolder, javaRobotPackage, '', true, true);
+      success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
+                                       javaRobotPackage, '', true, true);
     }
 
     if (!success) {
