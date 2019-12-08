@@ -43,6 +43,12 @@ def includeSrcInIncludeRoot = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
 
+// Enable simulation gui support. Must check the box in vscode to enable support
+// upon debugging
+dependencies {
+    simulation wpi.deps.sim.gui(wpi.platforms.desktop, true)
+}
+
 model {
     components {
         frcUserProgram(NativeExecutableSpec) {
