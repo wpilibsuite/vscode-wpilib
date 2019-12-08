@@ -17,7 +17,19 @@ export interface IVendorLibraryPair {
 export interface IProjectInfo {
   wpilibProjectVersion: string;
   wpilibExtensionVersion: string;
+  javaDebugExtensionVersion: string;
+  javaExtensionVersion: string;
+  javaDependenciesExtensionVersion: string;
+  cppExtensionVersion: string;
   vendorLibraries: IVendorLibraryPair[];
+}
+
+async function extensionVersion(extension: vscode.Extension<unknown> | undefined): Promise<string> {
+  if (extension === undefined) {
+    return 'Not Installed';
+  }
+  // tslint:disable-next-line: no-unsafe-any
+  return extension.packageJSON.version;
 }
 
 export class ProjectInfoGatherer {
@@ -52,6 +64,10 @@ export class ProjectInfoGatherer {
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 WPILib Extension Version: ${projectInfo.wpilibExtensionVersion}
+C++ Extension Version: ${projectInfo.cppExtensionVersion}
+Java Extension Version: ${projectInfo.javaExtensionVersion}
+Java Debug Extension Version: ${projectInfo.javaDebugExtensionVersion}
+Java Dependencies Extension Version ${projectInfo.javaDependenciesExtensionVersion}
 Vendor Libraries:
 `;
 
@@ -74,12 +90,21 @@ Vendor Libraries:
       currentGradleVersion = 'unknown';
     }
 
+    const debugExt =  await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-debug'));
+    const depViewer = await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-dependency'));
+    const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
+    const cpp = await extensionVersion(vscode.extensions.getExtension('cpp'));
+
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFileAsync(extensionPackageJson, 'utf8');
     // tslint:disable-next-line: no-unsafe-any
     const currentVsCodeVersion: string = json.parse(packageJson).version;
 
     const projectInfo: IProjectInfo = {
+      cppExtensionVersion: cpp,
+      javaDebugExtensionVersion: debugExt,
+      javaDependenciesExtensionVersion: depViewer,
+      javaExtensionVersion: javaExt,
       vendorLibraries: [],
       wpilibExtensionVersion: currentVsCodeVersion,
       wpilibProjectVersion: currentGradleVersion,
