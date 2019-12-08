@@ -153,19 +153,23 @@ export class VendorLibraries extends VendorLibrariesBase {
         });
 
         if (toUpdate !== undefined) {
+          let anySucceeded = false;
           for (const ti of toUpdate) {
             const success = await this.installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
-            if (success) {
-              const buildRes = await vscode.window.showInformationMessage(i18n('message',
-                'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-                'Would you like to do this now?'), {
-                  modal: true,
-                }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-              if (buildRes === i18n('ui', 'Yes')) {
-                await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
-              }
-            } else {
+            if (!success) {
               vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
+            } else {
+              anySucceeded = true;
+            }
+          }
+          if (anySucceeded) {
+            const buildRes = await vscode.window.showInformationMessage(i18n('message',
+            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+            'Would you like to do this now?'), {
+              modal: true,
+            }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+            if (buildRes === i18n('ui', 'Yes')) {
+              await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
             }
           }
         }
