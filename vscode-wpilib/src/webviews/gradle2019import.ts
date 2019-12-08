@@ -166,13 +166,17 @@ export class Gradle2019Import extends WebViewBase {
         cpp = false;
       } else {
         // tslint:disable-next-line: max-line-length
-        await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'));
+        await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
+          modal: true,
+        });
         return;
       }
     } else {
       // Error
       // tslint:disable-next-line: max-line-length
-      await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'));
+      await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
+        modal: true,
+      });
       return;
     }
 
