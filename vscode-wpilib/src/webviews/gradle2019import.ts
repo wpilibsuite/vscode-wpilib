@@ -27,8 +27,9 @@ export class Gradle2019Import extends WebViewBase {
     }));
   }
 
-  public async startWithProject(project: vscode.Uri) {
+  public async startWithProject(projectRoot: vscode.Uri) {
     await this.startWebpage();
+    const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
     return this.handleProject(project);
   }
 
@@ -84,6 +85,10 @@ export class Gradle2019Import extends WebViewBase {
       await this.postMessage({
         data: oldProject.fsPath,
         type: 'gradle2019',
+      });
+      await this.postMessage({
+        data: path.dirname(path.dirname(oldProject.fsPath)),
+        type: 'newproject',
       });
       await this.postMessage({
         data: path.basename(oldProjectPath) + '-Imported',
@@ -160,12 +165,18 @@ export class Gradle2019Import extends WebViewBase {
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
         cpp = false;
       } else {
-        await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select a wpilib project?'));
+        // tslint:disable-next-line: max-line-length
+        await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
+          modal: true,
+        });
         return;
       }
     } else {
       // Error
-      await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select a wpilib project?'));
+      // tslint:disable-next-line: max-line-length
+      await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
+        modal: true,
+      });
       return;
     }
 
