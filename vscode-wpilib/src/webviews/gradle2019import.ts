@@ -241,9 +241,11 @@ export class Gradle2019Import extends WebViewBase {
       return;
     }
 
-    const buildgradle = path.join(toFolder, 'build.gradle');
+    if (data.desktop) {
+      const buildgradle = path.join(toFolder, 'build.gradle');
 
-    await setDesktopEnabled(buildgradle, true);
+      await setDesktopEnabled(buildgradle, true);
+    }
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 

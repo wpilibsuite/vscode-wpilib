@@ -177,7 +177,9 @@ export class EclipseImport extends WebViewBase {
       });
     });
 
-    await setDesktopEnabled(buildgradle, true);
+    if (data.desktop) {
+      await setDesktopEnabled(buildgradle, true);
+    }
 
     if (!cpp) {
       let mainFile = await readFileAsync(path.join(this.resourceRoot, 'eclipseprojectmain.java'), 'utf8');
