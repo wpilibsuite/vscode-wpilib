@@ -248,8 +248,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        if (prefs.getProjectYear() !== 'Beta2020-2') {
-          const importPersistantState = new PersistentFolderState('wpilib.beta2020persist', false, w.uri.fsPath);
+        // Auto update any Beta2020-2 project to 2020
+        if (prefs.getProjectYear() === 'Beta2020-2') {
+          await prefs.setProjectYear('2020');
+        }
+
+        if (prefs.getProjectYear() !== '2020') {
+          const importPersistantState = new PersistentFolderState('wpilib.2020persist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
               'This project is not compatible with this version of the extension. Would you like to import this project into 2020?.'), {
