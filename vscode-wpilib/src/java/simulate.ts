@@ -47,5 +47,7 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
 
   logger.log('Java Simulation: ', config);
 
+  console.log(config);
+
   await vscode.debug.startDebugging(commands.workspace, config);
 }

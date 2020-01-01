@@ -2,6 +2,7 @@
 
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
+import { setTimeout } from 'timers';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from 'vscode-wpilibapi';
 import { gradleRun, readFileAsync } from '../utilities';
@@ -223,6 +224,12 @@ class SimulateCodeDeployer implements ICodeDeployer {
       stopOnEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
       workspace,
     };
+
+    await new Promise((resolve) => {
+      setTimeout(() => resolve(), 10000);
+    });
+
+    console.log(config);
 
     await startSimulation(config);
 
