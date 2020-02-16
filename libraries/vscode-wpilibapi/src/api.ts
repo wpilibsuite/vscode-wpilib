@@ -92,9 +92,11 @@ export interface IPreferences {
   getProjectYear(): string;
   setProjectYear(year: string): Promise<void>;
   getSkipTests(): boolean;
+  getSelectDefaultSimulateExtension(): boolean;
   getStopSimulationOnEntry(): boolean;
   getAdditionalGradleArguments(): string;
   setSkipTests(value: boolean, global: boolean): Promise<void>;
+  setSelectDefaultSimulateExtension(value: boolean, global: boolean): Promise<void>;
   setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
   getOffline(): boolean;
   setOffline(value: boolean, global: boolean): Promise<void>;
