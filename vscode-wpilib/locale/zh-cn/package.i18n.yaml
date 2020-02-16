@@ -9,6 +9,7 @@ wpilibcore.simulateCode.title: 在电脑上模拟运行机器人代码
 wpilibcore.setLanguage.title: 设置语言
 wpilibcore.setAutoSave.title: 设置部署时自动保存
 wpilibcore.setSkipTests.title: 设置是否跳过测试API
+wpilibcore.selectDefaultSimulateExtension.title: Set to select the simulation extension automatically, if there is only one
 wpilibcore.setStopSimulationOnEntry.title: 设置是否在进入时停止模拟运行
 wpilibcore.setStartRioLog.title: 设置是否在部署时启动 RioLog
 wpilibcore.createCommand.title: 创建一个新的类/命令

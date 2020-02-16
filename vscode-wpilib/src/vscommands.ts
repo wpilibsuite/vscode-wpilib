@@ -196,6 +196,27 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await preferences.setSkipTests(result.yes, result.global);
   }));
 
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setSelectDefaultSimulateExtension', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage(i18n('message',
+        'Cannot set select default simulate extension in an empty workspace'));
+      return;
+    }
+
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Enable selecting of default simulate extension? Currently {0}', preferences.getSelectDefaultSimulateExtension()));
+    if (result === undefined) {
+      logger.log('Invalid selection for selecting default simulate extension');
+      return;
+    }
+
+    await preferences.setSelectDefaultSimulateExtension(result.yes, result.global);
+  }));
+
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setOffline', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();

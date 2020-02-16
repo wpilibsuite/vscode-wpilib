@@ -172,6 +172,14 @@ export class Preferences implements IPreferences {
     return this.getConfiguration().update('skipTests', value, target);
   }
 
+  public async setSelectDefaultSimulateExtension(value: boolean, global: boolean): Promise<void> {
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return this.getConfiguration().update('selectDefaultSimulateExtension', value, target);
+  }
+
   public getAutoSaveOnDeploy(): boolean {
     const res = this.getConfiguration().get<boolean>('autoSaveOnDeploy');
     if (res === undefined) {
@@ -206,6 +214,14 @@ export class Preferences implements IPreferences {
 
   public getSkipTests(): boolean {
     const res = this.getConfiguration().get<boolean>('skipTests');
+    if (res === undefined) {
+      return false;
+    }
+    return res;
+  }
+
+  public getSelectDefaultSimulateExtension(): boolean {
+    const res = this.getConfiguration().get<boolean>('selectDefaultSimulateExtension');
     if (res === undefined) {
       return false;
     }
