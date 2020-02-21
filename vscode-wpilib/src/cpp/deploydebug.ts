@@ -16,7 +16,7 @@ interface ICppDebugInfo {
 
 interface ICppDebugCommand {
   name?: string;
-  extensions?: string;
+  extensions: string;
   clang?: boolean;
   launchfile: string;
   target: string;
@@ -216,24 +216,27 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     let extensions = '';
-    // tslint:disable-next-line:no-non-null-assertion
-    const targetExtensions = targetSimulateInfo.extensions!;
-    if (targetExtensions.length > 0) {
+    if (targetSimulateInfo.extensions.length > 0) {
       const extList = [];
-      for (const e of targetExtensions) {
+      for (const e of targetSimulateInfo.extensions) {
         extList.push({
           label: path.basename(e),
           path: e,
         });
       }
-      const quickPick = await vscode.window.showQuickPick(extList, {
-        canPickMany: true,
-        placeHolder: 'Pick extensions to run',
-      });
-      if (quickPick !== undefined) {
-        for (const qp of quickPick) {
-          extensions += qp.path;
-          extensions += path.delimiter;
+      if (this.preferences.getPreferences(workspace).getSelectDefaultSimulateExtension() && extList.length === 1) {
+        extensions += extList[0].path;
+        extensions += path.delimiter;
+      } else {
+        const quickPick = await vscode.window.showQuickPick(extList, {
+          canPickMany: true,
+          placeHolder: 'Pick extensions to run',
+        });
+        if (quickPick !== undefined) {
+          for (const qp of quickPick) {
+            extensions += qp.path;
+            extensions += path.delimiter;
+          }
         }
       }
     }
