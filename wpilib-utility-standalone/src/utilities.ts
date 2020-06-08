@@ -28,7 +28,7 @@ export const writeFileAsync = util.promisify(fs.writeFile);
 
 export const readdirAsync = util.promisify(fs.readdir);
 
-export const mkdirpAsync = util.promisify(mkdirp);
+export const mkdirpAsync = mkdirp;
 
 export function ncpAsync(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
   return mkdirpAsync(dest).then(() => {

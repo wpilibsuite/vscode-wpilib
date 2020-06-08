@@ -150,7 +150,8 @@ export async function selectProjectButton(): Promise<void> {
       const input = document.getElementById('projectFolder') as HTMLInputElement;
       input.value = path.dirname(paths.filePaths[0]);
       const div = document.getElementById('validprojectdiv') as HTMLDivElement;
-      div.style.display = null;
+      // tslint:disable-next-line: no-non-null-assertion
+      div.style.display = null!;
       await vendorLibs.refreshDependencies(input.value);
       await vendorLibs.refreshAvailableDependencies(input.value);
     }

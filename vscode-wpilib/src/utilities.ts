@@ -65,7 +65,7 @@ export const existsAsync = util.promisify(fs.exists);
 
 export const deleteFileAsync = util.promisify(fs.unlink);
 
-export const mkdirpAsync = util.promisify(mkdirp);
+export const mkdirpAsync = mkdirp;
 
 export function ncpAsync(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
   return mkdirpAsync(dest).then(() => {

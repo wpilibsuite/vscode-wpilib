@@ -96,7 +96,7 @@ export class VendorLibrariesBase {
     try {
       const files = await readdirAsync(dir);
 
-      const promises: Array<Promise<IJsonDependency | undefined>> = [];
+      const promises: Promise<IJsonDependency | undefined>[] = [];
 
       for (const file of files) {
         promises.push(this.readFile(path.join(dir, file)));

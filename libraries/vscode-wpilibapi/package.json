@@ -10,8 +10,8 @@
   "devDependencies": {
     "@types/node": "^10.2.0",
     "@types/vscode": "1.26.0",
-    "typescript": "^3.5.2",
-    "tslint": "^5.18.0"
+    "typescript": "^3.9.5",
+    "tslint": "^6.1.2"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",

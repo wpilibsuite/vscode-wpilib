@@ -75,7 +75,7 @@ class DebugCodeDeployer implements ICodeDeployer {
     const parsedDebugInfo: ICppDebugInfo[] = jsonc.parse(debugInfo) as ICppDebugInfo[];
     let targetDebugInfo = parsedDebugInfo[0];
     if (parsedDebugInfo.length > 1) {
-      const arr: Array<CppQuickPick<ICppDebugInfo>> = [];
+      const arr: CppQuickPick<ICppDebugInfo>[] = [];
       for (const i of parsedDebugInfo) {
         arr.push(new CppQuickPick<ICppDebugInfo>(i, i.artifact));
       }
@@ -200,7 +200,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const parsedSimulateInfo: ICppDebugCommand[] = jsonc.parse(simulateInfo) as ICppDebugCommand[];
     let targetSimulateInfo = parsedSimulateInfo[0];
     if (parsedSimulateInfo.length > 1) {
-      const arr: Array<CppQuickPick<ICppDebugCommand>> = [];
+      const arr: CppQuickPick<ICppDebugCommand>[] = [];
       for (const i of parsedSimulateInfo) {
         // tslint:disable-next-line:no-non-null-assertion
         arr.push(new CppQuickPick<ICppDebugCommand>(i, i.name!));
