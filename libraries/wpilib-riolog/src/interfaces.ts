@@ -12,7 +12,7 @@ export enum SendTypes {
 
 export interface IIPCSendMessage {
   type: SendTypes;
-  message: IPrintMessage | IErrorMessage | Array<IPrintMessage | IErrorMessage> | boolean | number;
+  message: IPrintMessage | IErrorMessage | (IPrintMessage | IErrorMessage)[] | boolean | number;
 }
 
 export enum ReceiveTypes {
@@ -39,7 +39,7 @@ export interface IDisposable {
 
 export interface IWindowView extends EventEmitter, IDisposable {
   postMessage(message: IIPCSendMessage): Promise<boolean>;
-  handleSave(saveData: Array<IPrintMessage | IErrorMessage>): Promise<boolean>;
+  handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean>;
 
   // tslint:disable-next-line:ban-types
   addListener(event: string, listener: Function): this;

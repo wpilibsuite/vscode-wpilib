@@ -1,12 +1,12 @@
 jobs:
  - job: Linux
    pool:
-    vmImage: 'Ubuntu 16.04'
+    vmImage: 'ubuntu-18.04'
 
    steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '8.x'
+        versionSpec: '10.x'
       displayName: 'Install Node.js'
 
     - task: Gradle@2
@@ -56,12 +56,12 @@ jobs:
 
  - job: Windows_Standalone
    pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
 
    steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '8.x'
+        versionSpec: '10.x'
       displayName: 'Install Node.js'
 
     - task: Gradle@2
@@ -110,12 +110,12 @@ jobs:
 
  - job: Windows_VSIX
    pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
 
    steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '8.x'
+        versionSpec: '10.x'
       displayName: 'Install Node.js'
 
     - task: Gradle@2
@@ -172,12 +172,12 @@ jobs:
 
  - job: Mac
    pool:
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-10.14'
 
    steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '8.x'
+        versionSpec: '10.x'
       displayName: 'Install Node.js'
 
     - task: Gradle@2

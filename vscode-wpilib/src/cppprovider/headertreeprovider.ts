@@ -242,11 +242,11 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
     return new FileStat(await stat(pth));
   }
 
-  private readDirectory(uri: vscode.Uri): Array<[string, vscode.FileType]> | Thenable<Array<[string, vscode.FileType]>> {
+  private readDirectory(uri: vscode.Uri): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
     return this._readDirectory(uri);
   }
 
-  private async _readDirectory(uri: vscode.Uri): Promise<Array<[string, vscode.FileType]>> {
+  private async _readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
     let children: string[] = [];
     try {
       children = await readdir(uri.fsPath);
@@ -254,7 +254,7 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
       logger.log('Directory Warning', err);
     }
 
-    const result: Array<[string, vscode.FileType]> = [];
+    const result: [string, vscode.FileType][] = [];
     for (const child of children) {
       const st = await this._stat(path.join(uri.fsPath, child));
       result.push([child, st.type]);

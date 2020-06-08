@@ -150,7 +150,7 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
 
     const grVersionTo = (await readFileAsync(grVersionFile, 'utf8')).trim();
 
-    const promiseArray: Array<Promise<void>> = [];
+    const promiseArray: Promise<void>[] = [];
 
     for (const f of files) {
       const file = path.join(codePath, f);

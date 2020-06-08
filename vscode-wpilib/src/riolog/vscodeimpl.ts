@@ -53,7 +53,7 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     }
   }
 
-  public async handleSave(saveData: Array<IPrintMessage | IErrorMessage>): Promise<boolean> {
+  public async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
     const d = await vscode.workspace.openTextDocument({
       content: JSON.stringify(saveData, null, 4),
       language: 'json',

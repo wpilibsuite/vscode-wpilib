@@ -31,7 +31,7 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
   const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:commands)\\..+?(?=;|\\.)';
   const replacePackageTo = javaPackage;
 
-  const promiseArray: Array<Promise<void>> = [];
+  const promiseArray: Promise<void>[] = [];
 
   for (const f of copiedFiles) {
     const file = path.join(folder.fsPath, f);
@@ -56,7 +56,7 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
 
   await Promise.all(promiseArray);
 
-  const movePromiseArray: Array<Promise<string>> = [];
+  const movePromiseArray: Promise<string>[] = [];
   for (const f of copiedFiles) {
     const file = path.join(folder.fsPath, f);
     const bname = path.basename(file);

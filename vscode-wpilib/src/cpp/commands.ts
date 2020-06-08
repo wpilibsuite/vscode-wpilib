@@ -52,7 +52,7 @@ async function performCopy(commandRoot: string, command: ICppJsonLayout, folderS
     },
   });
 
-  let promiseArray: Array<Promise<void>> = [];
+  let promiseArray: Promise<void>[] = [];
 
   for (const f of copiedHeaderFiles) {
     const file = path.join(folderHeader.fsPath, f);
@@ -104,7 +104,7 @@ async function performCopy(commandRoot: string, command: ICppJsonLayout, folderS
 
   await Promise.all(promiseArray);
 
-  let movePromiseArray: Array<Promise<void>> = [];
+  let movePromiseArray: Promise<void>[] = [];
   for (const f of copiedSrcFiles) {
     const file = path.join(folderSrc.fsPath, f);
     const bname = path.basename(file);

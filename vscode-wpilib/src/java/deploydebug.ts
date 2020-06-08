@@ -76,7 +76,7 @@ class DebugCodeDeployer implements ICodeDeployer {
     const parsedDebugInfo: IJavaDebugInfo[] = jsonc.parse(debugInfo) as IJavaDebugInfo[];
     let targetDebugInfo = parsedDebugInfo[0];
     if (parsedDebugInfo.length > 1) {
-      const arr: Array<JavaQuickPick<IJavaDebugInfo>> = [];
+      const arr: JavaQuickPick<IJavaDebugInfo>[] = [];
       for (const i of parsedDebugInfo) {
         arr.push(new JavaQuickPick<IJavaDebugInfo>(i, i.artifact));
       }
@@ -180,7 +180,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(simulateInfo) as IJavaSimulateInfo[];
     let targetSimulateInfo = parsedSimulateInfo[0];
     if (parsedSimulateInfo.length > 1) {
-      const arr: Array<JavaQuickPick<IJavaSimulateInfo>> = [];
+      const arr: JavaQuickPick<IJavaSimulateInfo>[] = [];
       for (const i of parsedSimulateInfo) {
         arr.push(new JavaQuickPick<IJavaSimulateInfo>(i, i.name));
       }

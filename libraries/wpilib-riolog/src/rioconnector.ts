@@ -3,7 +3,7 @@
 import * as net from 'net';
 import * as timers from 'timers';
 
-async function properRace<T>(promises: Array<Promise<T>>): Promise<T> {
+async function properRace<T>(promises: Promise<T>[]): Promise<T> {
   if (promises.length < 1) {
     return Promise.reject('Can\'t start a race without promises!');
   }
@@ -224,7 +224,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
   }
   pairs.push(getSocketFromIP(port, `10.${Math.trunc(teamNumber / 100)}.${teamNumber % 100}.2`));
   pairs.push(getSocketFromDS(port));
-  const connectors: Array<Promise<net.Socket | undefined>> = [];
+  const connectors: Promise<net.Socket | undefined>[] = [];
   for (const p of pairs) {
     connectors.push(p.promise);
   }

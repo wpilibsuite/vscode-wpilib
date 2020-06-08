@@ -50,7 +50,7 @@ window.addEventListener('load', async () => {
 
   const radioForm = document.createElement('div');
 
-  const languages: Array<[string, (e?: Event) => void, (e?: Event) => void]> = [
+  const languages: [string, (e?: Event) => void, (e?: Event) => void][] = [
     ['Java', handleJavaTemplates, handleJavaExamples],
     ['C++', handleCppTemplates, handleCppExamples],
   ];

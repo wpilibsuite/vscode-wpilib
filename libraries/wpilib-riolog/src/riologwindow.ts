@@ -9,9 +9,9 @@ export class RioLogWindow {
   private rioConsole: IRioConsole | undefined = undefined;
   private running: boolean = false;
   private disposables: IDisposable[] = [];
-  private pausedArray: Array<IPrintMessage | IErrorMessage> = [];
+  private pausedArray: (IPrintMessage | IErrorMessage)[] = [];
   private paused: boolean = false;
-  private hiddenArray: Array<IPrintMessage | IErrorMessage> = [];
+  private hiddenArray: (IPrintMessage | IErrorMessage)[] = [];
   private windowProvider: IWindowProvider;
   private rioConsoleProvider: IRioConsoleProvider;
 
@@ -169,7 +169,7 @@ export class RioLogWindow {
       if (this.webview === undefined) {
         return;
       }
-      const deserializedLogs: Array<IPrintMessage | IErrorMessage> = [];
+      const deserializedLogs: (IPrintMessage | IErrorMessage)[] = [];
       for (const d of data.message as string[]) {
         const parsed = JSON.parse(d);
         deserializedLogs.push(parsed as IPrintMessage | IErrorMessage);

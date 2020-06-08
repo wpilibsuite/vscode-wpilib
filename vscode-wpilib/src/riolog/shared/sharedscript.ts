@@ -416,7 +416,7 @@ function handleFileSelect(evt: any) {
   const reader = new FileReader();
   reader.onload = (loaded: Event) => {
     const target: FileReader = loaded.target as FileReader;
-    const parsed = JSON.parse(target.result as string) as Array<IPrintMessage | IErrorMessage>;
+    const parsed = JSON.parse(target.result as string) as (IPrintMessage | IErrorMessage)[];
     for (const p of parsed) {
       addMessage(p);
     }
@@ -450,7 +450,7 @@ export function handleMessage(data: IIPCSendMessage): void {
       scrollImpl();
       break;
     case SendTypes.Batch:
-      for (const message of data.message as Array<IPrintMessage | IErrorMessage>) {
+      for (const message of data.message as (IPrintMessage | IErrorMessage)[]) {
         addMessage(message);
       }
       scrollImpl();

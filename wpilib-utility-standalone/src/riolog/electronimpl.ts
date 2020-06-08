@@ -24,7 +24,7 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     return true;
   }
 
-  public async handleSave(saveData: Array<IPrintMessage | IErrorMessage>): Promise<boolean> {
+  public async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
     const f = await dialog.showSaveDialog({
       title: 'Select a file to save to',
     });
