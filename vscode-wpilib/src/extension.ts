@@ -127,9 +127,12 @@ export async function activate(context: vscode.ExtensionContext) {
     logger.error('Error creating logger', err);
   }
 
-  const jdkLoc = await findJdkPath(externalApi);
+  let jdkLoc = await findJdkPath(externalApi);
 
   if (jdkLoc !== undefined) {
+    if (jdkLoc.endsWith('\\') || jdkLoc.endsWith('/')) {
+      jdkLoc = jdkLoc.substring(0, jdkLoc.length - 1);
+    }
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(i18n('message', 'Java 11 required, but not found. Might have compilation errors.'));
