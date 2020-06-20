@@ -93,7 +93,7 @@ Vendor Libraries:
     const debugExt =  await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-debug'));
     const depViewer = await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-dependency'));
     const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
-    const cpp = await extensionVersion(vscode.extensions.getExtension('cpp'));
+    const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFileAsync(extensionPackageJson, 'utf8');
