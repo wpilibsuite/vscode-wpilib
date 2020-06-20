@@ -8,7 +8,7 @@ import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRio
 import { readFileAsync } from '../utilities';
 
 interface IHTMLProvider {
-  getHTML(): string;
+  getHTML(webview: vscode.Webview): string;
 }
 
 export class RioLogWindowView extends EventEmitter implements IWindowView {
@@ -41,7 +41,12 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     }, null, this.disposables);
   }
 
+  public getWebview(): vscode.Webview {
+    return this.webview.webview;
+  }
+
   public setHTML(html: string): void {
+
     this.webview.webview.html = html;
   }
   public async postMessage(message: IIPCSendMessage): Promise<boolean> {
@@ -65,32 +70,32 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 
 export class RioLogHTMLProvider implements IHTMLProvider {
   public static async Create(resourceRoot: string): Promise<RioLogHTMLProvider> {
-    const provider = new RioLogHTMLProvider();
+    const provider = new RioLogHTMLProvider(resourceRoot);
     const htmlFile = path.join(resourceRoot, 'live.html');
-
-    const onDiskPath = vscode.Uri.file(path.join(resourceRoot, 'dist', 'riologpage.js'));
-
-    // And get the special URI to use with the webview
-    const scriptResourcePath = onDiskPath.with({ scheme: 'vscode-resource' });
-
     provider.html = await readFileAsync(htmlFile, 'utf8');
-    provider.html += '\r\n<script src="';
-    provider.html += scriptResourcePath.toString();
-    provider.html += '">\r\n';
-    provider.html += '\r\n</script>\r\n';
     return provider;
   }
 
-  private html: string | undefined;
+  private readonly resourceRoot: string;
+  private html?: string;
 
-  private constructor() {
+  private constructor(resourceRoot: string) {
+    this.resourceRoot = resourceRoot;
   }
 
-  public getHTML(): string {
-    if (this.html === undefined) {
-      return '';
-    }
-    return this.html;
+  public getHTML(webview: vscode.Webview): string {
+    const onDiskPath = vscode.Uri.file(path.join(this.resourceRoot, 'dist', 'riologpage.js'));
+
+    // And get the special URI to use with the webview
+    const scriptResourcePath = webview.asWebviewUri(onDiskPath);
+
+    let html = this.html!;
+    html += '\r\n<script src="';
+    html += scriptResourcePath.toString();
+    html += '">\r\n';
+    html += '\r\n</script>\r\n';
+
+    return html;
   }
 }
 
@@ -109,7 +114,7 @@ export class RioLogWebviewProvider implements IWindowProvider {
   public createWindowView(): IWindowView {
     const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
     // tslint:disable-next-line:no-non-null-assertion
-    wv.setHTML(this.htmlProvider!.getHTML());
+    wv.setHTML(this.htmlProvider!.getHTML(wv.getWebview()));
     return wv;
   }
 }
