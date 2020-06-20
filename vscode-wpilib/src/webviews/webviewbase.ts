@@ -48,7 +48,7 @@ export abstract class WebViewBase {
     }
     this.html += this.getScriptTag(path.join(extensionContext.extensionPath, 'resources', 'dist', 'localeloader.js'), webview);
     const onDiskPath = vscode.Uri.file(extensionContext.extensionPath);
-    const replacePath = webview.asWebviewUri(onDiskPath)
+    const replacePath = webview.asWebviewUri(onDiskPath);
     this.html = this.html.replace(/replaceresource/g, replacePath.toString());
   }
 

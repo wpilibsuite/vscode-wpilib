@@ -89,6 +89,7 @@ export class RioLogHTMLProvider implements IHTMLProvider {
     // And get the special URI to use with the webview
     const scriptResourcePath = webview.asWebviewUri(onDiskPath);
 
+    // tslint:disable-next-line:no-non-null-assertion
     let html = this.html!;
     html += '\r\n<script src="';
     html += scriptResourcePath.toString();
