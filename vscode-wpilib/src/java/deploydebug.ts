@@ -74,6 +74,12 @@ class DebugCodeDeployer implements ICodeDeployer {
 
     const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'), 'utf8');
     const parsedDebugInfo: IJavaDebugInfo[] = jsonc.parse(debugInfo) as IJavaDebugInfo[];
+    if (parsedDebugInfo.length === 0) {
+      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
+        modal: true,
+      });
+      return false;
+    }
     let targetDebugInfo = parsedDebugInfo[0];
     if (parsedDebugInfo.length > 1) {
       const arr: JavaQuickPick<IJavaDebugInfo>[] = [];
@@ -178,6 +184,12 @@ class SimulateCodeDeployer implements ICodeDeployer {
 
     const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'desktopinfo.json'), 'utf8');
     const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(simulateInfo) as IJavaSimulateInfo[];
+    if (parsedSimulateInfo.length === 0) {
+      await vscode.window.showInformationMessage('No debug configurations found. Do you have desktop builds enabled?', {
+        modal: true,
+      });
+      return false;
+    }
     let targetSimulateInfo = parsedSimulateInfo[0];
     if (parsedSimulateInfo.length > 1) {
       const arr: JavaQuickPick<IJavaSimulateInfo>[] = [];
