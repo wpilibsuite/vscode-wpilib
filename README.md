@@ -1,4 +1,4 @@
-# VS Code WPILib
+# VS Code WPILib - an amazing project
 
 [![Build status](https://ci.appveyor.com/api/projects/status/p6swigkvyfv693g2/branch/master?svg=true)](https://ci.appveyor.com/project/wpilibsuite/vscode-wpilib/branch/master)
 
