@@ -425,7 +425,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         return;
       } else {
         try {
-          const downloadDir = await downloadDocs('https://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilibj/documentation/',
+          const downloadDir = await downloadDocs('https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/documentation/',
                                                  '.zip', path.join(homeDir, 'documentation'), 'java');
           if (downloadDir === undefined) {
             return;
@@ -442,7 +442,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         return;
       } else {
         try {
-          const downloadDir = await downloadDocs('https://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilibc/documentation/',
+          const downloadDir = await downloadDocs('https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibc/documentation/',
                                                  '.zip', path.join(homeDir, 'documentation'), 'cpp');
           if (downloadDir === undefined) {
             return;
