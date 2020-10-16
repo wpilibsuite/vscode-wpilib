@@ -9,19 +9,22 @@ jobs:
       matrix:
         include:
           - os: windows-latest
+            display-name: Windows
             artifact-name: windows
             package-cmd: packageWindows
             build-folder-name: wpilibutility-win32-ia32 
           - os: ubuntu-latest
+            display-name: Linux
             artifact-name: linux
             package-cmd: packageLinux
             build-folder-name: wpilibutility-linux-x64
           - os: macos-latest
+            display-name: macOS
             artifact-name: mac
             package-cmd: packageMac
             build-folder-name: wpilibutility-darwin-x64
     
-    name: "Build - ${{ matrix.artifact-name }}"
+    name: "Build - ${{ matrix.display-name }}"
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -34,14 +37,13 @@ jobs:
           java-version: '11'
       - name: Build with Gradle
         run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
-      - run: npm install
+      - name: Build with NPM
         working-directory: wpilib-utility-standalone
-      - run: npm run compile
-        working-directory: wpilib-utility-standalone
-      - run: npm run lint
-        working-directory: wpilib-utility-standalone
-      - run: npm run ${{ matrix.package-cmd }}
-        working-directory: wpilib-utility-standalone
+        run: |
+          npm install
+          npm run compile
+          npm run lint
+          npm run ${{ matrix.package-cmd }}
       - uses: actions/upload-artifact@v2
         with:
           name: wpilibutility-${{ matrix.artifact-name }}
