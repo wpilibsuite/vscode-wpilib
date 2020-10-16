@@ -1,0 +1,48 @@
+name: CI
+
+on: [pull_request, push]
+
+jobs:
+  build-host:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact-name: windows
+            package-cmd: packageWindows
+            build-folder-name: wpilibutility-win32-ia32 
+          - os: ubuntu-latest
+            artifact-name: linux
+            package-cmd: packageLinux
+            build-folder-name: wpilibutility-linux-x64
+          - os: macos-latest
+            artifact-name: mac
+            package-cmd: packageMac
+            build-folder-name: wpilibutility-darwin-x64
+    
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '10.x'
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Build with Gradle
+        run: ./gradlew build updateVersions updateAllDependencies -PbuildServer -Xmx3072m
+      - run: npm install
+        working-directory: wpilib-utility-standalone
+      - run: npm run compile
+        working-directory: wpilib-utility-standalone
+      - run: npm run lint
+        working-directory: wpilib-utility-standalone
+      - run: npm run ${{ matrix.package-cmd }}
+        working-directory: wpilib-utility-standalone
+      - uses: actions/upload-artifact@v2
+        with:
+          name: wpilibutility-${{ matrix.artifact-name }}
+          path: wpilib-utility-standalone/build/${{ matrix.build-folder-name }}/
