@@ -3,48 +3,38 @@ name: CI
 on: [pull_request, push]
 
 jobs:
-  build-host:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            display-name: Windows
-            artifact-name: windows
-            package-cmd: packageWindows
-            build-folder-name: wpilibutility-win32-ia32 
-          - os: ubuntu-latest
-            display-name: Linux
-            artifact-name: linux
-            package-cmd: packageLinux
-            build-folder-name: wpilibutility-linux-x64
-          - os: macos-latest
-            display-name: macOS
-            artifact-name: mac
-            package-cmd: packageMac
-            build-folder-name: wpilibutility-darwin-x64
-    
-    name: "Build - ${{ matrix.display-name }}"
-    runs-on: ${{ matrix.os }}
-
+  build-mac:
+    env:
+      developer-id: ${{ secrets.DEVELOPER_ID }}
+    name: Build - macOS
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      
+      - uses: actions/setup-node@v2
         with:
           node-version: '10.x'
+      
       - uses: actions/setup-java@v1
         with:
-          java-version: '11'
-      - name: Build with Gradle
-        run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
-      - name: Build with NPM
-        working-directory: wpilib-utility-standalone
-        run: |
+          java-version: 11
+      
+      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
+        name: Build with Gradle
+      
+      - run: |
           npm install
           npm run compile
           npm run lint
-          npm run ${{ matrix.package-cmd }}
+          npm run packageMac
+        name: Build Standalone Utility
+        working-directory: wpilib-utility-standalone
+            
+      - run: tar -pcvzf wpulibutility-mac.tar.gz build/wpilibutility-darwin-x64
+        working-directory: wpilib-utility-standalone
+        name: Create Archive
+      
       - uses: actions/upload-artifact@v2
         with:
-          name: wpilibutility-${{ matrix.artifact-name }}
-          path: wpilib-utility-standalone/build/${{ matrix.build-folder-name }}/
+          name: wpilibutility-mac
+          path: wpilib-utlilty-standalone/wpilibutility-mac.tar.gz
+         
