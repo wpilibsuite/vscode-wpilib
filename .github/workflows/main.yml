@@ -7,6 +7,7 @@ jobs:
     env:
       developer-id: ${{ secrets.DEVELOPER_ID }}
     name: Build - macOS
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       
