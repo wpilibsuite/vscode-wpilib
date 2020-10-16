@@ -30,7 +30,7 @@ jobs:
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
             
-      - run: tar -pcvzf wpulibutility-mac.tar.gz build/wpilibutility-darwin-x64
+      - run: tar -pcvzf wpilibutility-mac.tar.gz build/wpilibutility-darwin-x64
         working-directory: wpilib-utility-standalone
         name: Create Archive
       
