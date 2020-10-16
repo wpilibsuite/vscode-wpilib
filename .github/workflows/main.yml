@@ -33,7 +33,7 @@ jobs:
         with:
           java-version: '11'
       - name: Build with Gradle
-        run: ./gradlew build updateVersions updateAllDependencies -PbuildServer -Xmx3072m
+        run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
       - run: npm install
         working-directory: wpilib-utility-standalone
       - run: npm run compile
