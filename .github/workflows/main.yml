@@ -39,7 +39,7 @@ jobs:
       - name: Notarize Standalone Utility
         uses: devbotsxyz/xcode-notarize@v1
         with:
-          product-path: "wpilib-standalone-utility/build/wpilibutility-darwin-x64/wpilibutility.app"
+          product-path: "wpilib-utility-standalone/build/wpilibutility-darwin-x64/wpilibutility.app"
           primary-bundle-id: com.prateekma.wpilibutilitytest
           appstore-connect-username: ${{ secrets.NOTARIZATION_USERNAME }}
           appstore-connect-password: ${{ secrets.NOTARIZATION_PASSWORD }}
