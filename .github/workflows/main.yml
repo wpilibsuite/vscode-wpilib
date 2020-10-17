@@ -49,10 +49,9 @@ jobs:
       - run: ls
         working-directory: wpilib-utility-standalone
       - uses: actions/upload-artifact@v2
-        working-directory: wpilib-utility-standalone
         with:
           name: Mac
-          path: wpilibutility-mac.tar.gz
+          path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-mac.tar.gz
 
   build-linux:
     name: Build - Linux
@@ -78,10 +77,9 @@ jobs:
         working-directory: wpilib-utility-standalone
         name: Archive Utility
       - uses: actions/upload-artifact@v2
-        working-directory: wpilib-utility-standalone
         with:
           name: Linux
-          path: wpilibutility-linux.tar.gz
+          path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-linux.tar.gz
   
   build-windows:
     name: Build - Windows Standalone
