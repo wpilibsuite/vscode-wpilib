@@ -49,9 +49,10 @@ jobs:
       - run: ls
         working-directory: wpilib-utility-standalone
       - uses: actions/upload-artifact@v2
+        working-directory: wpilib-utility-standalone
         with:
           name: Mac
-          path: wpilib-utlilty-standalone/wpilibutility-mac.tar.gz
+          path: wpilibutility-mac.tar.gz
 
   build-linux:
     name: Build - Linux
@@ -74,14 +75,16 @@ jobs:
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
       - run: tar -pcvzf wpilibutility-linux.tar.gz build/wpilibutility-linux-x64
+        working-directory: wpilib-utility-standalone
         name: Archive Utility
       - uses: actions/upload-artifact@v2
+        working-directory: wpilib-utility-standalone
         with:
           name: Linux
-          path: wpilib-utility-standalone/wpilibutility-linux.tar.gz
+          path: wpilibutility-linux.tar.gz
   
   build-windows:
-    name: Build - Windows
+    name: Build - Windows Standalone
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -125,6 +128,7 @@ jobs:
           npm gulp
           npm webpack
           npm package
+        working-directory: wpilib-utility-standalone
         name: Build VSIX
       - uses: actions/upload-artifact@v2
         with:
