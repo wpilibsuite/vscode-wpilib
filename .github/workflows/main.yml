@@ -126,9 +126,9 @@ jobs:
           npm gulp
           npm webpack
           npm package
-        working-directory: wpilib-utility-standalone
+        working-directory: vscode-wpilib
         name: Build VSIX
       - uses: actions/upload-artifact@v2
         with:
           name: WindowsVSIX
-          path: '**\*.vsix'
+          path: ${{ github.workspace }}/**/*.vsix
