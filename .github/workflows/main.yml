@@ -34,11 +34,12 @@ jobs:
         if: ${{ env.developer-id != 0 }}
       - name: Sign Standalone Utility
         run: npm run signMac
+        working-directory: wpilib-utility-standalone
         if: ${{ env.developer-id != 0 }}
       - name: Notarize Standalone Utility
         uses: devbotsxyz/xcode-notarize@v1
         with:
-          product-path: "build/wpilibutility-darwin-x64/wpilibutility.app"
+          product-path: "wpilib-standalone-utility/build/wpilibutility-darwin-x64/wpilibutility.app"
           primary-bundle-id: com.prateekma.wpilibutilitytest
           appstore-connect-username: ${{ secrets.NOTARIZATION_USERNAME }}
           appstore-connect-password: ${{ secrets.NOTARIZATION_PASSWORD }}
