@@ -43,12 +43,13 @@ jobs:
           primary-bundle-id: com.prateekma.wpilibutilitytest
           appstore-connect-username: ${{ secrets.NOTARIZATION_USERNAME }}
           appstore-connect-password: ${{ secrets.NOTARIZATION_PASSWORD }}
-        if: ${{ env.developer-id != 0 }}        
-      - run: tar -pcvzf wpilibutility-mac.tar.gz build/wpilibutility-darwin-x64
+        if: ${{ env.developer-id != 0 }}   
+      - name: Staple Notarization Ticket
+        run: xcrun stapler staple -v wpilibutility.app
+        working-directory: wpilib-utility-standalone/build/wpilibutility-darwin-x64     
+      - run: tar -C build/wpilibutility-darwin-x64 -pcvzf wpilibutility-mac.tar.gz .
         working-directory: wpilib-utility-standalone
         name: Create Archive
-      - run: ls
-        working-directory: wpilib-utility-standalone
       - uses: actions/upload-artifact@v2
         with:
           name: Mac
@@ -74,7 +75,7 @@ jobs:
           npm run packageLinux
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
-      - run: tar -pcvzf wpilibutility-linux.tar.gz build/wpilibutility-linux-x64
+      - run: tar -C build/wpilibutility-linux-x64 -pcvzf wpilibutility-linux.tar.gz .
         working-directory: wpilib-utility-standalone
         name: Archive Utility
       - uses: actions/upload-artifact@v2
