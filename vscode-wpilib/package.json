@@ -3,7 +3,7 @@
     "displayName": "WPILib",
     "author": "WPILib Suite",
     "description": "VSCode extension for WPILib Team Use",
-    "version": "2020.3.2-16-g946770e-dirty",
+    "version": "0.1.0",
     "publisher": "wpilibsuite",
     "license": "BSD-3-Clause",
     "icon": "wpilib-128.png",
