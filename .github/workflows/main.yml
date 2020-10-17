@@ -10,18 +10,14 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '10.x'
-      
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-      
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
-      
       - run: |
           npm install
           npm run compile
@@ -29,13 +25,108 @@ jobs:
           npm run packageMac
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
-            
+      - name: Import Developer ID Certificate
+        uses: devbotsxyz/xcode-import-certificate@v1
+        with:
+          certificate-data: ${{ secrets.CERTIFICATE_DATA }}
+          certificate-passphrase: ${{ secrets.CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.developer-id != 0 }}
+      - name: Sign Standalone Utility
+        run: npm run signMac
+        if: ${{ env.developer-id != 0 }}
+      - name: Notarize Standalone Utility
+        uses: devbotsxyz/xcode-notarize@v1
+        with:
+          product-path: "build/wpilibutility-darwin-x64/wpilibutility.app"
+          primary-bundle-id: com.prateekma.wpilibutilitytest
+          appstore-connect-username: ${{ secrets.NOTARIZATION_USERNAME }}
+          appstore-connect-password: ${{ secrets.NOTARIZATION_PASSWORD }}
+        if: ${{ env.developer-id != 0 }}        
       - run: tar -pcvzf wpilibutility-mac.tar.gz build/wpilibutility-darwin-x64
         working-directory: wpilib-utility-standalone
         name: Create Archive
-      
+      - run: ls
+        working-directory: wpilib-utility-standalone
       - uses: actions/upload-artifact@v2
         with:
-          name: wpilibutility-mac
+          name: Mac
           path: wpilib-utlilty-standalone/wpilibutility-mac.tar.gz
-         
+
+  build-linux:
+    name: Build - Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '10.x'
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
+        name: Build with Gradle
+      - run: |
+          npm install
+          npm run compile
+          npm run lint
+          npm run packageLinux
+        name: Build Standalone Utility
+        working-directory: wpilib-utility-standalone
+      - run: tar -pcvzf wpilibutility-linux.tar.gz build/wpilibutility-linux-x64
+        name: Archive Utility
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Linux
+          path: wpilib-utility-standalone/wpilibutility-linux.tar.gz
+  
+  build-windows:
+    name: Build - Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '10.x'
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
+        name: Build with Gradle
+      - run: |
+          npm install
+          npm run compile
+          npm run lint
+          npm run packageWindows
+        name: Build Standalone Utility
+        working-directory: wpilib-utility-standalone
+      - uses: actions/upload-artifact@v2
+        with:
+          name: WindowsStandalone
+          path: wpilib-utility-standalone/build/wpilibutility-win32-ia32
+  
+  build-windows-vsix:
+    name: Build - Windows VSIX
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '10.x'
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
+        name: Build with Gradle
+      - run: |
+          npm install
+          npm lint
+          npm unittest
+          npm gulp
+          npm webpack
+          npm package
+        name: Build VSIX
+      - uses: actions/upload-artifact@v2
+        with:
+          name: WindowsVSIX
+          path: '**\*.vsix'
