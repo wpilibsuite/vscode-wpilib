@@ -121,11 +121,11 @@ jobs:
         name: Build with Gradle
       - run: |
           npm install
-          npm lint
-          npm unittest
-          npm gulp
-          npm webpack
-          npm package
+          npm run lint
+          npm run unittest
+          npm run gulp
+          npm run webpack
+          npm run vscePackage
         working-directory: vscode-wpilib
         name: Build VSIX
       - uses: actions/upload-artifact@v2
