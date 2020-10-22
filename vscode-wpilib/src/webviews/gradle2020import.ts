@@ -7,12 +7,12 @@ import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { existsAsync, extensionContext, mkdirpAsync, promptForProjectOpen, readFileAsync, writeFileAsync } from '../utilities';
-import { IGradle2019IPCData, IGradle2019IPCReceive, IGradle2019IPCSend } from './pages/gradle2019importpagetypes';
+import { IGradle2020IPCData, IGradle2020IPCReceive, IGradle2020IPCSend } from './pages/gradle2020importpagetypes';
 import { WebViewBase } from './webviewbase';
 
-export class Gradle2019Import extends WebViewBase {
-  public static async Create(resourceRoot: string): Promise<Gradle2019Import> {
-    const cimport = new Gradle2019Import(resourceRoot);
+export class Gradle2020Import extends WebViewBase {
+  public static async Create(resourceRoot: string): Promise<Gradle2020Import> {
+    const cimport = new Gradle2020Import(resourceRoot);
     await cimport.asyncInitialize();
     return cimport;
   }
@@ -20,9 +20,9 @@ export class Gradle2019Import extends WebViewBase {
   private hasEnabledHandler: boolean = false;
 
   private constructor(resourceRoot: string) {
-    super('wpilibgradle2019import', 'WPILib Gradle2019 Import', resourceRoot);
+    super('wpilibgradle2020import', 'WPILib Gradle2020 Import', resourceRoot);
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2019Project', () => {
+    this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2020Project', () => {
       return this.startWebpage();
     }));
   }
@@ -40,10 +40,10 @@ export class Gradle2019Import extends WebViewBase {
     });
     if (this.webview && !this.hasEnabledHandler) {
       this.hasEnabledHandler = true;
-      this.webview.webview.onDidReceiveMessage(async (data: IGradle2019IPCReceive) => {
+      this.webview.webview.onDidReceiveMessage(async (data: IGradle2020IPCReceive) => {
         switch (data.type) {
-          case 'gradle2019':
-            await this.handleGradle2019Button();
+          case 'gradle2020':
+            await this.handleGradle2020Button();
             break;
           case 'newproject':
             await this.handleNewProjectLoc();
@@ -60,7 +60,7 @@ export class Gradle2019Import extends WebViewBase {
     }
   }
 
-  private async postMessage(data: IGradle2019IPCSend): Promise<boolean> {
+  private async postMessage(data: IGradle2020IPCSend): Promise<boolean> {
     if (this.webview) {
       return this.webview.webview.postMessage(data);
     } else {
@@ -84,7 +84,7 @@ export class Gradle2019Import extends WebViewBase {
     if (this.webview) {
       await this.postMessage({
         data: oldProject.fsPath,
-        type: 'gradle2019',
+        type: 'gradle2020',
       });
       await this.postMessage({
         data: path.dirname(path.dirname(oldProject.fsPath)),
@@ -103,7 +103,7 @@ export class Gradle2019Import extends WebViewBase {
     }
   }
 
-  private async handleGradle2019Button() {
+  private async handleGradle2020Button() {
     // Find old project
     const oldProject = await vscode.window.showOpenDialog({
       canSelectFiles: true,
@@ -111,7 +111,7 @@ export class Gradle2019Import extends WebViewBase {
       canSelectMany: false,
       defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
       filters: {
-        'Gradle 2019 Project': ['gradle'],
+        'Gradle 2020 Project': ['gradle'],
       },
       openLabel: 'Select a Project',
     });
@@ -145,7 +145,7 @@ export class Gradle2019Import extends WebViewBase {
     }
   }
 
-  private async handleImport(data: IGradle2019IPCData) {
+  private async handleImport(data: IGradle2020IPCData) {
     if (!path.isAbsolute(data.toFolder)) {
       vscode.window.showErrorMessage('Can only extract to absolute path');
       return;
@@ -257,7 +257,7 @@ export class Gradle2019Import extends WebViewBase {
   }
 
   private async asyncInitialize() {
-    await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'gradle2019import.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'dist', 'gradle2019importpage.js'));
+    await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'gradle2020import.html'),
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'gradle2020importpage.js'));
   }
 }

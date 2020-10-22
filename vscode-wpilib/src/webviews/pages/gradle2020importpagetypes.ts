@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IGradle2019IPCData {
+export interface IGradle2020IPCData {
   desktop: boolean;
   fromProps: string;
   toFolder: string;
@@ -9,12 +9,12 @@ export interface IGradle2019IPCData {
   teamNumber: string;
 }
 
-export interface IGradle2019IPCReceive {
+export interface IGradle2020IPCReceive {
   type: string;
-  data?: IGradle2019IPCData;
+  data?: IGradle2020IPCData;
 }
 
-export interface IGradle2019IPCSend {
+export interface IGradle2020IPCSend {
   type: string;
   data: string;
 }

@@ -33,7 +33,7 @@ import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
 import { EclipseImport } from './webviews/eclipseimport';
-import { Gradle2019Import } from './webviews/gradle2019import';
+import { Gradle2020Import } from './webviews/gradle2020import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
@@ -165,14 +165,14 @@ export async function activate(context: vscode.ExtensionContext) {
     creationError = true;
   }
 
-  let gradle2019import: Gradle2019Import | undefined;
+  let gradle2020import: Gradle2020Import | undefined;
 
   try {
-    // Create the gradle 2019 import provider
-    gradle2019import = await Gradle2019Import.Create(extensionResourceLocation);
-    context.subscriptions.push(gradle2019import);
+    // Create the gradle 2020 import provider
+    gradle2020import = await Gradle2020Import.Create(extensionResourceLocation);
+    context.subscriptions.push(gradle2020import);
   } catch (err) {
-    logger.error('error creating gradle 2019 importer', err);
+    logger.error('error creating gradle 2020 importer', err);
     creationError = true;
   }
 
@@ -251,21 +251,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        // Auto update any Beta2020-2 project to 2020
-        if (prefs.getProjectYear() === 'Beta2020-2') {
-          await prefs.setProjectYear('2020');
-        }
-
-        if (prefs.getProjectYear() !== '2020') {
-          const importPersistantState = new PersistentFolderState('wpilib.2020persist', false, w.uri.fsPath);
+        if (prefs.getProjectYear() !== '2021alpha') {
+          const importPersistantState = new PersistentFolderState('wpilib.2021alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2020?.'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2021 Alpha?.'), {
               modal: true,
             }, 'Yes', 'No', 'No, Don\'t ask again');
             if (upgradeResult === 'Yes') {
-              if (gradle2019import) {
-                await gradle2019import.startWithProject(w.uri);
+              if (gradle2020import) {
+                await gradle2020import.startWithProject(w.uri);
               }
             } else if (upgradeResult === 'No, Don\'t ask again') {
               importPersistantState.Value = true;
