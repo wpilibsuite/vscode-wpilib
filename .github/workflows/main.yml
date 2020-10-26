@@ -116,10 +116,12 @@ jobs:
           npm run packageWindows
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
+      - run: Compress-Archive build/wpilibutility-win32-ia32 wpilibutility-windows.zip
+        shell: powershell
       - uses: actions/upload-artifact@v2
         with:
           name: WindowsStandalone
-          path: wpilib-utility-standalone/build/wpilibutility-win32-ia32
+          path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-windows.zip
 
   build-windows-vsix:
     name: Build - Windows VSIX
