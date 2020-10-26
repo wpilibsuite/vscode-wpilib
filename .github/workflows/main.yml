@@ -8,8 +8,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: git fetch --prune --unshallow --tags
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -69,8 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: git fetch --prune --unshallow --tags
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -99,8 +99,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: git fetch --prune --unshallow --tags
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -129,8 +129,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Fetch all history and metadata
+        run: git fetch --prune --unshallow --tags
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
