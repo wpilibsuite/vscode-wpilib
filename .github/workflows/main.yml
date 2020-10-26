@@ -33,13 +33,13 @@ jobs:
           keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
         if: |
           (github.repository_owner == 'wpilibsuite') &&
-          (github.refs == 'refs/heads/master' || startsWith(github.refs, 'refs/tags/v'))
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
       - name: Sign Standalone Utility
         run: npm run signMac
         working-directory: wpilib-utility-standalone
         if: |
           (github.repository_owner == 'wpilibsuite') &&
-          (github.refs == 'refs/heads/master' || startsWith(github.refs, 'refs/tags/v'))
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
       - name: Notarize Standalone Utility
         uses: wpilibsuite/xcode-notarize@v1
         with:
@@ -49,13 +49,13 @@ jobs:
           appstore-connect-password: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
         if: |
           (github.repository_owner == 'wpilibsuite') &&
-          (github.refs == 'refs/heads/master' || startsWith(github.refs, 'refs/tags/v'))
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
       - name: Staple Notarization Ticket
         run: xcrun stapler staple -v wpilibutility.app
         working-directory: wpilib-utility-standalone/build/wpilibutility-darwin-x64
         if: |
           (github.repository_owner == 'wpilibsuite') &&
-          (github.refs == 'refs/heads/master' || startsWith(github.refs, 'refs/tags/v'))
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
       - run: tar -C build/wpilibutility-darwin-x64 -pcvzf wpilibutility-mac.tar.gz .
         working-directory: wpilib-utility-standalone
         name: Create Archive
@@ -116,7 +116,7 @@ jobs:
           npm run packageWindows
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
-      - run: tar.exe -C build/wpilibutility-windows-x64 -pcvzf wpilibutility-windows.zip .
+      - run: tar.exe -C build/wpilibutility-win32-ia32 -pcvzf wpilibutility-windows.zip .
         working-directory: wpilib-utility-standalone
         shell: powershell
       - uses: actions/upload-artifact@v2
