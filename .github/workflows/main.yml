@@ -117,6 +117,7 @@ jobs:
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
       - run: Compress-Archive build/wpilibutility-win32-ia32 wpilibutility-windows.zip
+        working-directory: wpilib-utility-standalone
         shell: powershell
       - uses: actions/upload-artifact@v2
         with:
