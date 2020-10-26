@@ -18,8 +18,6 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
-        env:
-          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run compile
@@ -81,8 +79,6 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
-        env:
-          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run compile
@@ -113,8 +109,6 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
-        env:
-          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run compile
@@ -145,8 +139,6 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
-        env:
-          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run lint
