@@ -52,7 +52,7 @@ jobs:
         run: xcrun stapler staple -v wpilibutility.app
         working-directory: wpilib-utility-standalone/build/wpilibutility-darwin-x64
         if: |
-          (github.repository_owner == 'wpilibsuite') && 
+          (github.repository_owner == 'wpilibsuite') &&
           (github.refs == 'refs/heads/master' || startsWith(github.refs, 'refs/tags/v'))
       - run: tar -C build/wpilibutility-darwin-x64 -pcvzf wpilibutility-mac.tar.gz .
         working-directory: wpilib-utility-standalone
@@ -141,3 +141,17 @@ jobs:
         with:
           name: WindowsVSIX
           path: ${{ github.workspace }}/**/*.vsix
+
+  release:
+    name: "Release"
+    needs: [build-mac, build-linux, build-windows, build-windows-vsix]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v2
+        name: Download Artifacts
+      - uses: softprops/action-gh-release@v1
+        name: Release
+        with:
+          files: "**/*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
