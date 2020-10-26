@@ -7,9 +7,7 @@ jobs:
     name: Build - macOS
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Fetch all history and metadata
-        run: git fetch --prune --unshallow --tags -f
+      - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -68,9 +66,7 @@ jobs:
     name: Build - Linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Fetch all history and metadata
-        run: git fetch --prune --unshallow --tags -f
+      - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -98,9 +94,7 @@ jobs:
     name: Build - Windows Standalone
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Fetch all history and metadata
-        run: git fetch --prune --unshallow --tags -f
+      - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -128,9 +122,7 @@ jobs:
     name: Build - Windows VSIX
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Fetch all history and metadata
-        run: git fetch --prune --unshallow --tags -f
+      - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
