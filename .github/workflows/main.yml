@@ -7,7 +7,9 @@ jobs:
     name: Build - macOS
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -16,6 +18,8 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
+        env:
+          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run compile
@@ -66,7 +70,9 @@ jobs:
     name: Build - Linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -75,6 +81,8 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
+        env:
+          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run compile
@@ -94,7 +102,9 @@ jobs:
     name: Build - Windows Standalone
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -103,6 +113,8 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
+        env:
+          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run compile
@@ -122,7 +134,9 @@ jobs:
     name: Build - Windows VSIX
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -131,6 +145,8 @@ jobs:
           java-version: 11
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
+        env:
+          BUILD_SOURCEBRANCH: ${{ github.refs }}
       - run: |
           npm install
           npm run lint
