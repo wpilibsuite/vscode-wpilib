@@ -1,8 +1,7 @@
 'use strict';
 
-import * as extractzip from 'extract-zip';
+import * as extract from 'extract-zip';
 import * as path from 'path';
-import * as util from 'util';
 import * as vscode from 'vscode';
 import { downloadFileToStream } from './fetchhelpers';
 import { localize as i18n } from './locale';
@@ -52,12 +51,10 @@ export async function downloadDocs(repoRoot: string, ext: string,  rootFolder: s
 
       await mkdirpAsync(outputDir);
 
-      const extractAsync = util.promisify(extractzip);
-
       disposable.dispose();
       disposable = vscode.window.setStatusBarMessage(i18n('message', 'Extracting API Docs'));
 
-      await extractAsync(outputFile, {
+      await extract(outputFile, {
         dir: outputDir,
       });
       return outputDir;
