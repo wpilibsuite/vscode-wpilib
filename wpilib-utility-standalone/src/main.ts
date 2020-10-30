@@ -11,6 +11,7 @@ async function createWindow() {
     height: 250,
     title: 'WPILib Utility',
     webPreferences: {
+      enableRemoteModule: true,
       nodeIntegration: true,
     },
     width: 350,

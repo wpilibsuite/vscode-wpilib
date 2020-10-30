@@ -1,19 +1,19 @@
 'use strict';
 
-import { IGradle2019IPCReceive, IGradle2019IPCSend } from './gradle2019importpagetypes';
+import { IGradle2020IPCReceive, IGradle2020IPCSend } from './gradle2020importpagetypes';
 import { validateTeamNumber } from './sharedpages';
 
 interface IVsCodeApi {
-  postMessage(message: IGradle2019IPCReceive): void;
+  postMessage(message: IGradle2020IPCReceive): void;
 }
 
 declare function acquireVsCodeApi(): IVsCodeApi;
 
 const vscode = acquireVsCodeApi();
 
-function gradle2019SelectButtonClick() {
+function gradle2020SelectButtonClick() {
   (document.activeElement as HTMLElement).blur();
-  vscode.postMessage({ type: 'gradle2019' });
+  vscode.postMessage({ type: 'gradle2020' });
 }
 
 function projectSelectButtonClick() {
@@ -26,7 +26,7 @@ function importProjectButtonClick() {
   vscode.postMessage({
     data: {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
-      fromProps: (document.getElementById('gradle2019Input') as HTMLInputElement).value,
+      fromProps: (document.getElementById('gradle2020Input') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
       teamNumber: (document.getElementById('teamNumber') as HTMLInputElement).value,
@@ -37,10 +37,10 @@ function importProjectButtonClick() {
 }
 
 window.addEventListener('message', (event) => {
-  const data = event.data as IGradle2019IPCSend;
+  const data = event.data as IGradle2020IPCSend;
   switch (data.type) {
-    case 'gradle2019':
-      (document.getElementById('gradle2019Input') as HTMLInputElement).value = data.data;
+    case 'gradle2020':
+      (document.getElementById('gradle2020Input') as HTMLInputElement).value = data.data;
       break;
     case 'projectname':
       const doc = document.getElementById('projectName') as HTMLInputElement;
@@ -62,7 +62,7 @@ window.addEventListener('message', (event) => {
 
 window.addEventListener('load', (_: Event) => {
   // tslint:disable-next-line:no-non-null-assertion
-  document.getElementById('gradle2019SelectButton')!.onclick = gradle2019SelectButtonClick;
+  document.getElementById('gradle2020SelectButton')!.onclick = gradle2020SelectButtonClick;
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectSelectButton')!.onclick = projectSelectButtonClick;
   // tslint:disable-next-line:no-non-null-assertion
