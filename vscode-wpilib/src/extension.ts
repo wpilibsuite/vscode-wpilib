@@ -251,11 +251,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        if (prefs.getProjectYear() !== '2021alpha') {
-          const importPersistantState = new PersistentFolderState('wpilib.2021alphapersist', false, w.uri.fsPath);
+        if (prefs.getProjectYear() !== '2021') {
+          const importPersistantState = new PersistentFolderState('wpilib.2021persist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2021 Alpha?.'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2021?.'), {
               modal: true,
             }, 'Yes', 'No', 'No, Don\'t ask again');
             if (upgradeResult === 'Yes') {
