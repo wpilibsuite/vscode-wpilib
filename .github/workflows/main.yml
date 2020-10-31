@@ -116,13 +116,13 @@ jobs:
           npm run packageWindows
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
-      - run: tar.exe -C build/wpilibutility-win32-ia32 -pcvzf wpilibutility-windows.zip .
-        working-directory: wpilib-utility-standalone
+      - run: Compress-Archive -Path wpilibutility-win32-ia32\* -DestinationPath wpilibutility-windows.zip
+        working-directory: wpilib-utility-standalone/build
         shell: powershell
       - uses: actions/upload-artifact@v2
         with:
           name: WindowsStandalone
-          path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-windows.zip
+          path: ${{ github.workspace }}/wpilib-utility-standalone/build/wpilibutility-windows.zip
 
   build-windows-vsix:
     name: Build - Windows VSIX
@@ -164,6 +164,7 @@ jobs:
       - uses: softprops/action-gh-release@v1
         name: Release
         with:
+          prerelease: true
           files: "**/*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
