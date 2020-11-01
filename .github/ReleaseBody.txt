@@ -1,0 +1,3 @@
+# For Beta Teams Only
+
+This release is for beta teams only. Please download the latest stable release (v2020.3.2) if you are not a beta team. You can find v2020.3.2 at https://github.com/wpilibsuite/vscode-wpilib/releases/tag/v2020.3.2
