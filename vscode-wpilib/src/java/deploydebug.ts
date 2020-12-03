@@ -215,9 +215,11 @@ class SimulateCodeDeployer implements ICodeDeployer {
           path: e,
         });
       }
-      if (this.preferences.getPreferences(workspace).getSelectDefaultSimulateExtension() && extList.length === 1) {
-        extensions += extList[0].path;
-        extensions += path.delimiter;
+      if (this.preferences.getPreferences(workspace).getSelectDefaultSimulateExtension() && extList.length >= 1) {
+        for (const e of extList) {
+          extensions += e.path;
+          extensions += path.delimiter;
+        }
       } else {
         const quickPick = await vscode.window.showQuickPick(extList, {
           canPickMany: true,
