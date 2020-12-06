@@ -6,12 +6,17 @@ import { logger } from '../logger';
 
 export interface IWindowsSimulateCommands {
   extensions: string;
-  environment?: Map<string, string>;
+  environment?: IEnvMap;
   launchfile: string;
   stopAtEntry: boolean;
   workspace: vscode.WorkspaceFolder;
   debugPaths: string[];
   srcPaths: string[];
+}
+
+interface IEnvMap {
+  // tslint:disable-next-line: no-any
+  [key: string]: any;
 }
 
 export async function startWindowsSimulation(commands: IWindowsSimulateCommands): Promise<void> {
@@ -42,11 +47,12 @@ export async function startWindowsSimulation(commands: IWindowsSimulateCommands)
   };
 
   if (commands.environment !== undefined) {
-    for (const envVar of commands.environment) {
+    for (const envVar of Object.keys(commands.environment)) {
+      const value = commands.environment[envVar];
       /* tslint:disable-next-line:no-unsafe-any */
-      config.enviroment.push({
-        name: envVar[0],
-        value: envVar[1]
+      config.environment.push({
+        name: envVar,
+        value,
       });
     }
   }
