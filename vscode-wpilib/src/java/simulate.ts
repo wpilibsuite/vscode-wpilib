@@ -5,6 +5,7 @@ import { getIsMac, getIsWindows } from '../utilities';
 
 export interface ISimulateCommands {
   extensions: string;
+  environment?: Map<string, string>;
   librarydir: string;
   mainclass: string;
   robotclass: string;

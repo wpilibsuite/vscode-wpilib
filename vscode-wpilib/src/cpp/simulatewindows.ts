@@ -6,6 +6,7 @@ import { logger } from '../logger';
 
 export interface IWindowsSimulateCommands {
   extensions: string;
+  environment?: Map<string, string>;
   launchfile: string;
   stopAtEntry: boolean;
   workspace: vscode.WorkspaceFolder;
@@ -39,6 +40,16 @@ export async function startWindowsSimulation(commands: IWindowsSimulateCommands)
     symbolSearchPath,
     type: 'cppvsdbg',
   };
+
+  if (commands.environment !== undefined) {
+    for (const envVar of commands.environment) {
+      /* tslint:disable-next-line:no-unsafe-any */
+      config.enviroment.push({
+        name: envVar[0],
+        value: envVar[1]
+      });
+    }
+  }
 
   logger.log('C++ Windows Simulation: ', config);
 
