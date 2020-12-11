@@ -36,8 +36,8 @@ class VbsToolRunner implements IToolRunner {
           }
         });
       } else {
-        // Unix, run as java
-        cp.exec(`java -jar ${this.toolScript}`, (err) => {
+        // Unix, run as python
+        cp.exec(`python ${this.toolScript}`, (err) => {
           if (err) {
             resolve(false);
           } else {
@@ -69,7 +69,7 @@ export class BuiltinTools {
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name));
         }
       } else {
-        const toolPath = path.join(homeTools.dir, ht.name + '.jar');
+        const toolPath = path.join(homeTools.dir, ht.name + '.py');
         if (await existsAsync(toolPath)) {
           // Tool exists, add it
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name));
