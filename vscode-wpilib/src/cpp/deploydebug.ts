@@ -21,6 +21,7 @@ interface ICppDebugCommand {
   launchfile: string;
   target: string;
   gdb: string;
+  env?: Map<string, string>;
   sysroot: string | null;
   srcpaths: string[];
   headerpaths: string[];
@@ -264,6 +265,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       const config: IUnixSimulateCommands = {
         // tslint:disable-next-line:no-non-null-assertion
         clang: targetSimulateInfo.clang!,
+        environment: targetSimulateInfo.env,
         executablePath: targetSimulateInfo.launchfile,
         extensions,
         ldPath: path.dirname(targetSimulateInfo.launchfile),    // gradle puts all the libs in the same dir as the executable
@@ -277,6 +279,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     } else {
       const config: IWindowsSimulateCommands = {
         debugPaths: targetSimulateInfo.debugpaths,
+        environment: targetSimulateInfo.env,
         extensions,
         launchfile: targetSimulateInfo.launchfile,
         srcPaths: targetSimulateInfo.srcpaths,

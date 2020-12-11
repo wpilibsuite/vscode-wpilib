@@ -5,6 +5,7 @@ import { getIsMac, getIsWindows } from '../utilities';
 
 export interface ISimulateCommands {
   extensions: string;
+  environment?: IEnvMap;
   librarydir: string;
   mainclass: string;
   robotclass: string;
@@ -26,6 +27,13 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
   } else {
     env.DYLD_LIBRARY_PATH = commands.librarydir;
     env.LD_LIBRARY_PATH = commands.librarydir;
+  }
+
+  if (commands.environment !== undefined) {
+    for (const envVar of Object.keys(commands.environment)) {
+      const value = commands.environment[envVar];
+      env[envVar] = value;
+    }
   }
 
   const config = {
