@@ -25,7 +25,7 @@ dependencies {
 }
 
 // Set the websocket remote host (the Romi IP address).
-tasks.withType(edu.wpi.first.gradlerio.test.NativeSimulationTask.class) {
+sim {
   envVar "HALSIMWS_HOST", "10.0.0.2"
 }
 
