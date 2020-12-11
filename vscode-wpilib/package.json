@@ -131,10 +131,16 @@
                     "description": "Set to skip running tests on build",
                     "scope": "resource"
                 },
+                "wpilib.skipSelectSimulateExtension": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to skip selection of simulation extensions",
+                    "scope": "resource"
+                },
                 "wpilib.selectDefaultSimulateExtension": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to select the simulation extension automatically, if there is only one",
+                    "description": "Set to select all simulation extensions by default",
                     "scope": "resource"
                 },
                 "wpilib.stopSimulationOnEntry": {
@@ -474,7 +480,7 @@
         "vscode-cpptools": "2.1.2",
         "vscode-jsonrpc": "^5.0.1",
         "vscode-nls": "^5.0.0",
-        "vscode-wpilibapi": "^2020.1.1",
+        "vscode-wpilibapi": "^2021.1.1",
         "winston": "^3.3.3",
         "winston-transport": "^4.4.0",
         "wpilib-riolog": "^0.2.0",

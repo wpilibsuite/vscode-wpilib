@@ -196,6 +196,27 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     await preferences.setSkipTests(result.yes, result.global);
   }));
 
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setSkipSelectSimulateExtension', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage(i18n('message',
+        'Cannot set skip select simulate extension in an empty workspace'));
+      return;
+    }
+
+    const preferences = preferencesApi.getPreferences(workspace);
+
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Enable skipping of selection of simulation extensions? Currently {0}', preferences.getSelectDefaultSimulateExtension()));
+    if (result === undefined) {
+      logger.log('Invalid selection for skipping of selection of simulation extensions');
+      return;
+    }
+
+    await preferences.setSkipSelectSimulateExtension(result.yes, result.global);
+  }));
+
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setSelectDefaultSimulateExtension', async () => {
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
@@ -208,9 +229,9 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferences = preferencesApi.getPreferences(workspace);
 
     const result = await globalProjectSettingUpdate(i18n('message',
-      'Enable selecting of default simulate extension? Currently {0}', preferences.getSelectDefaultSimulateExtension()));
+      'Enable selecting of all simulation extensions by default? Currently {0}', preferences.getSelectDefaultSimulateExtension()));
     if (result === undefined) {
-      logger.log('Invalid selection for selecting default simulate extension');
+      logger.log('Invalid selection for selection of all simulation extensions by default');
       return;
     }
 

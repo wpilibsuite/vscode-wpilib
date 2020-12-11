@@ -102,6 +102,8 @@ export interface IPreferences {
   setOffline(value: boolean, global: boolean): Promise<void>;
   getDeployOffline(): boolean;
   setDeployOffline(value: boolean, global: boolean): Promise<void>;
+  getSkipSelectSimulateExtension(): boolean;
+  setSkipSelectSimulateExtension(value: boolean, global: boolean): Promise<void>;
 }
 
 export interface IExampleTemplateCreator {
