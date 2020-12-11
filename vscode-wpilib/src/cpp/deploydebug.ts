@@ -230,7 +230,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
 
     let extensions = '';
     if (targetSimulateInfo.extensions.length > 0) {
-      if (this.preferences.getPreferences(workspace).getSkipSelectSimulationExtension()) {
+      if (this.preferences.getPreferences(workspace).getSkipSelectSimulateExtension()) {
         for (const e of targetSimulateInfo.extensions) {
           extensions += e;
           extensions += path.delimiter;

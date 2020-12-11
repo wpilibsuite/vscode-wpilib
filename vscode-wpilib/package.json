@@ -480,7 +480,7 @@
         "vscode-cpptools": "2.1.2",
         "vscode-jsonrpc": "^5.0.1",
         "vscode-nls": "^5.0.0",
-        "vscode-wpilibapi": "^2020.1.1",
+        "vscode-wpilibapi": "^2021.1.1",
         "winston": "^3.3.3",
         "winston-transport": "^4.4.0",
         "wpilib-riolog": "^0.2.0",
