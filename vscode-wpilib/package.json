@@ -131,10 +131,16 @@
                     "description": "Set to skip running tests on build",
                     "scope": "resource"
                 },
+                "wpilib.skipSelectSimulateExtension": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to skip selection of simulation extensions",
+                    "scope": "resource"
+                },
                 "wpilib.selectDefaultSimulateExtension": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to select the simulation extension automatically, if there is only one",
+                    "description": "Set to select all simulation extensions by default",
                     "scope": "resource"
                 },
                 "wpilib.stopSimulationOnEntry": {
