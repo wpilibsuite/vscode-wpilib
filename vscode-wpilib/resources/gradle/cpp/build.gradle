@@ -55,10 +55,10 @@ dependencies {
 }
 
 // Simulation configuration (e.g. environment variables).
-// HALSIMWS_HOST sets the websocket client remote host.
-//sim {
-//  envVar "HALSIMWS_HOST", "10.0.0.2"
-//}
+sim {
+    // Sets the websocket client remote host.
+    // envVar "HALSIMWS_HOST", "10.0.0.2"
+}
 
 model {
     components {
