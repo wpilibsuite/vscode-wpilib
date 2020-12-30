@@ -64,6 +64,12 @@ dependencies {
     // simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, false)
 }
 
+// Simulation configuration (e.g. environment variables).
+// HALSIMWS_HOST sets the websocket client remote host.
+//sim {
+//  envVar "HALSIMWS_HOST", "10.0.0.2"
+//}
+
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
