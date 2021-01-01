@@ -1,5 +1,6 @@
 'use strict';
 
+import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -223,15 +224,16 @@ export class Gradle2020Import extends WebViewBase {
 
     const gradleBasePath = path.join(extensionContext.extensionPath, 'resources', 'gradle');
     const resourceRoot = path.join(extensionContext.extensionPath, 'resources');
+    const commandsJsonPath = path.join(oldProjectPath, 'vendordeps', 'WPILibOldCommands.json');
 
     let success = false;
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, 'cpp');
-      success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder, false, true, true);
+      success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder, false, true, fs.existsSync(commandsJsonPath));
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
       success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
-                                       javaRobotPackage, '', true, true);
+                                       javaRobotPackage, '', true, fs.existsSync(commandsJsonPath));
     }
 
     if (!success) {
