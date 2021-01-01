@@ -124,7 +124,7 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
     }
 
     const files = await new Promise<string[]>((resolve, reject) => {
-      glob('**/*', {
+      glob('**/*{.[jJ]ava,.[gG]radle}', {
         cwd: codePath,
         nodir: true,
         nomount: true,
