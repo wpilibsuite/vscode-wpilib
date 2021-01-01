@@ -15,7 +15,7 @@ export function validateProject() {
     pdiv.classList.add('error');
     elem.classList.add('error');
   } else {
-    pdiv.innerText = window.i18nTrans('ui', 'Enter a project name');
+    pdiv.innerText = window.i18nTrans('ui', 'Project Name');
     pdiv.classList.remove('error');
     elem.classList.remove('error');
   }
@@ -31,7 +31,7 @@ export function validateTeamNumber() {
     pdiv.classList.add('error');
     elem.classList.add('error');
   } else {
-    pdiv.innerText = window.i18nTrans('ui', 'Enter a team number');
+    pdiv.innerText = window.i18nTrans('ui', 'Team Number');
     pdiv.classList.remove('error');
     elem.classList.remove('error');
   }

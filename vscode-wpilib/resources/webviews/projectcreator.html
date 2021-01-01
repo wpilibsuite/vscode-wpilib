@@ -25,31 +25,36 @@
 
   <button id="projectBase" data-i18n-trans disabled>Select a project base</button>
   <br/>
-  <br/> <span data-i18n-trans>Select a folder to place the new project into.</span>
+  <br/> <span data-i18n-trans STYLE="font-weight:bold">Base Folder.</span> <span data-i18n-trans>Select a base folder to place the new project into.</span>
   <br/>
   <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
   <button id="projectSelectButton" data-i18n-trans>Select a new project folder</button>
   <br/>
-  <br/> <span data-i18n-trans>Create new folder?</span> <span data-i18n-trans>Highly recommended to be checked</span>
-  <input id="newFolderCB" type="checkbox" checked/>
   <br/>
-  <br/>
-  <div id="projectnamediv" data-i18n-trans="ui">Enter a project name</div>
+  <div id="projectnamediv" data-i18n-trans="ui" STYLE="font-weight:bold">Project Name</div>
   <input id="projectName" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
-  <div id="teamnumberdiv" data-i18n-trans="ui">Enter a team number</div>
+  <br/> <span data-i18n-trans STYLE="font-weight:bold">Create a new folder?</span>
+  <input id="newFolderCB" type="checkbox" checked/>
+  <br/>
+  <span data-i18n-trans>This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be checked. Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project Name</span>
+  <br/>
+  <br/>
+  <div id="teamnumberdiv" data-i18n-trans="ui" STYLE="font-weight:bold">Team Number</div>
   <input id="teamNumber" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
   <div id="desktopdiv">
-	<span data-i18n-trans data-i18n-key="hintDesktopSupport">
+    <span data-i18n-trans STYLE="font-weight:bold">Enable Desktop Support</span>
+    <input id="desktopCB" type="checkbox" />
+    <br/>
+    <span data-i18n-trans data-i18n-key="hintDesktopSupport">
       This is needed for simulation and unit testing support, however there are some cases where this will do
       some unexpected things during build. In addition, not all vendor libraries support desktop.
-	  This option can be set with the command "WPILib: Set Desktop Support" at any time.
-	</span>
-    <input id="desktopCB" type="checkbox" />
+      This option can be set with the command "WPILib: Set Desktop Support" at any time.
+    </span>
   </div>
   <br/>
 
