@@ -16,6 +16,8 @@ export function getIsWindows(): boolean {
   return nodePlatform === 'win32';
 }
 
+export const statAsync = util.promisify(fs.stat);
+
 export const existsAsync = util.promisify(fs.exists);
 
 export const copyFileAsync = util.promisify(fs.copyFile);

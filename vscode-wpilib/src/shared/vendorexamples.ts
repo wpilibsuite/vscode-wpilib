@@ -4,7 +4,7 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { existsAsync, extensionContext, readdirAsync, readFileAsync } from '../utilities';
+import { existsAsync, extensionContext, statAsync, readdirAsync, readFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
 import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../wpilibapishim';
 import { generateCopyCpp, generateCopyJava } from './generator';
@@ -34,6 +34,7 @@ function isJsonExample(arg: any): arg is IJsonExample {
 
 export async function addVendorExamples(resourceRoot: string, core: IExampleTemplateAPI, utilities: IUtilitiesAPI,
                                         vendorlibs: VendorLibrariesBase): Promise<void> {
+  const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
   const storagePath = extensionContext.storagePath;
   if (storagePath === undefined) {
     return;
@@ -43,7 +44,11 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
   if (await existsAsync(exampleDir)) {
     const files = await readdirAsync(exampleDir);
     for (const file of files) {
-      const fileContents = await readFileAsync(path.join(exampleDir, file), 'utf8');
+      const filePath = path.join(exampleDir, file);
+      if ((await statAsync(filePath)).isDirectory()) {
+        continue;
+      }
+      const fileContents = await readFileAsync(filePath, 'utf8');
       const parsed = jsonc.parse(fileContents);
       if (Array.isArray(parsed)) {
         for (const ex of parsed) {
@@ -65,14 +70,14 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               async generate(folderInto: vscode.Uri): Promise<boolean> {
                 try {
                   if (ex.language === 'java') {
-                    if (!await generateCopyJava(resourceRoot, path.join(exampleDir, ex.foldername),
+                    if (!await generateCopyJava(shimmedResourceRoot, path.join(exampleDir, ex.foldername),
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
                       path.join('frc', 'robot'), false, ex.commandversion !== 2, ex.packagetoreplace)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   } else {
-                    if (!await generateCopyCpp(resourceRoot, path.join(exampleDir, ex.foldername),
+                    if (!await generateCopyCpp(shimmedResourceRoot, path.join(exampleDir, ex.foldername),
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false, ex.commandversion !== 2)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
