@@ -10,20 +10,17 @@ import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
 
-export interface IFile {
-  deployloc: string;
-  contents: string;
-}
-
 interface IJsonExample {
   name: string;
   description: string;
+  tags: string[]
   gradlebase: string;
-  language: string;
+  language: string; // either "java" or "cpp"
+  commandversion: number;
   mainclass?: string | undefined;
   packagetoreplace?: string | undefined;
   dependencies: string[];
-  files: IFile[];
+  foldername: string;
 }
 
 // tslint:disable-next-line:no-any
@@ -32,7 +29,7 @@ function isJsonExample(arg: any): arg is IJsonExample {
 
   return jsonDep.name !== undefined && jsonDep.description !== undefined
     && jsonDep.gradlebase !== undefined && jsonDep.dependencies !== undefined
-    && jsonDep.files !== undefined && jsonDep.language !== undefined;
+    && jsonDep.foldername !== undefined && jsonDep.language !== undefined;
 }
 
 export async function addVendorExamples(resourceRoot: string, core: IExampleTemplateAPI, utilities: IUtilitiesAPI,
@@ -68,42 +65,22 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               async generate(folderInto: vscode.Uri): Promise<boolean> {
                 try {
                   if (ex.language === 'java') {
-                    if (!await generateCopyJava(resourceRoot, async (copyPath, rootDir) => {
-                      for (const copyFile of ex.files) {
-                        const copyFilePath = path.join(copyPath, copyFile.deployloc);
-                        const copyParent = path.dirname(copyFilePath);
-                        await mkdirpAsync(copyParent);
-                        await writeFileAsync(copyFilePath, copyFile.contents);
-                      }
-                      const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
-                      for (const vendorFile of vendorFiles) {
-                        await vendorlibs.installDependency(vendorFile, vendorlibs.getVendorFolder(rootDir), true);
-                      }
-                      return true;
-                    },
+                    if (!await generateCopyJava(resourceRoot, path.join(exampleDir, ex.foldername),
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
-                      path.join('frc', 'robot'), false, false, ex.packagetoreplace)) {
+                      path.join('frc', 'robot'), false, ex.commandversion !== 2, ex.packagetoreplace)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   } else {
-                    if (!await generateCopyCpp(resourceRoot, async (copyPath, rootDir) => {
-                      for (const copyFile of ex.files) {
-                        const copyFilePath = path.join(copyPath, copyFile.deployloc);
-                        const copyParent = path.dirname(copyFilePath);
-                        await mkdirpAsync(copyParent);
-                        await writeFileAsync(copyFilePath, copyFile.contents);
-                      }
-                      const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
-                      for (const vendorFile of vendorFiles) {
-                        await vendorlibs.installDependency(vendorFile, vendorlibs.getVendorFolder(rootDir), true);
-                      }
-                      return true;
-                    },
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false, false)) {
+                    if (!await generateCopyCpp(resourceRoot, path.join(exampleDir, ex.foldername),
+                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false, ex.commandversion !== 2)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
+                  }
+                  const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
+                  for (const vendorFile of vendorFiles) {
+                    await vendorlibs.installDependency(vendorFile, vendorlibs.getVendorFolder(folderInto.fsPath), true);
                   }
                 } catch (err) {
                   logger.error('Example generation error: ', err);
