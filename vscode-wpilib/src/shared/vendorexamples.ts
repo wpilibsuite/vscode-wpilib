@@ -4,7 +4,7 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { existsAsync, extensionContext, mkdirpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
+import { existsAsync, extensionContext, readdirAsync, readFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
 import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../wpilibapishim';
 import { generateCopyCpp, generateCopyJava } from './generator';
@@ -13,7 +13,7 @@ import { VendorLibrariesBase } from './vendorlibrariesbase';
 interface IJsonExample {
   name: string;
   description: string;
-  tags: string[]
+  tags: string[];
   gradlebase: string;
   language: string; // either "java" or "cpp"
   commandversion: number;
