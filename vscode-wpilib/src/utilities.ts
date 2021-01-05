@@ -53,6 +53,8 @@ export async function getPackageName(): Promise<string | undefined> {
   return packageName;
 }
 
+export const statAsync = util.promisify(fs.stat);
+
 export const readFileAsync = util.promisify(fs.readFile);
 
 export const writeFileAsync = util.promisify(fs.writeFile);
