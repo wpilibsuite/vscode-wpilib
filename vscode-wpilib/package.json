@@ -352,7 +352,8 @@
         "keybindings": [
             {
                 "command": "wpilibcore.deployCode",
-                "key": "shift+F5"
+                "key": "shift+F5",
+                "when": "isWPILibProject"
             }
         ],
         "menus": {
