@@ -64,13 +64,13 @@ task extractJavaDependencies(type: Copy) {
 }
 
 def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/master/wpilibNewCommands/WPILibNewCommands.json'
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibNewCommands/WPILibNewCommands.json'
   dest 'vscode-wpilib/resources/vendordeps/WPILibNewCommands.json'
   overwrite true
 }
 
 def downloadOldCommands = tasks.register('downloadOldCommands', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/master/wpilibOldCommands/WPILibOldCommands.json'
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibOldCommands/WPILibOldCommands.json'
   dest 'vscode-wpilib/resources/vendordeps/WPILibOldCommands.json'
   overwrite true
 }
