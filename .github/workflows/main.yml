@@ -137,7 +137,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
+      - run: ./gradlew build updateVersions updateAllDependencies generateTemplateZip generateExamplesZip -PbuildServer
         name: Build with Gradle
       - run: |
           npm install
@@ -152,6 +152,10 @@ jobs:
         with:
           name: WindowsVSIX
           path: ${{ github.workspace }}/**/*.vsix
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Distributions
+          path: ${{ github.workspace }}/build/distributions/*
 
   release:
     name: "Release"

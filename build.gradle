@@ -108,6 +108,7 @@ task copyFromVsCodeToStandaloneSrc(type: Copy) {
     into 'wpilib-utility-standalone/src'
 }
 
+apply from: 'templatebuilder.gradle'
 
 
 task updateAllDependencies() {
