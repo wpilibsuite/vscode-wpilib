@@ -60,6 +60,12 @@ function selectProjectFolder() {
 }
 
 function generateProject() {
+  const isValidTeam = validateTeamNumber();
+  const isValidProject = validateProject();
+  if (!isValidTeam || !isValidProject) {
+    return;
+  }
+
   (document.activeElement as HTMLElement).blur();
   vscode.postMessage({
     data: {

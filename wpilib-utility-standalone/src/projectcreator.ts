@@ -10,6 +10,7 @@ import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { promptForProjectOpen } from './utilities';
+import { validateProject, validateTeamNumber } from './validators';
 import * as vscode from './vscodeshim';
 
 const dialog = electron.remote.dialog;
@@ -94,6 +95,13 @@ export async function generateProjectButtonClick() {
 }
 
 async function handleProjectGenerate(template: boolean, language: string, base: string) {
+  const isValidProject = validateProject((document.getElementById('projectName') as HTMLInputElement), (document.getElementById('projectnamediv') as HTMLInputElement));
+  const isValidTeam = validateTeamNumber((document.getElementById('teamNumber') as HTMLInputElement), (document.getElementById('teamnumberdiv') as HTMLInputElement));
+  if (!isValidTeam || !isValidProject) {
+    alert('Project name and team number must be correct');
+    return;
+  }
+
   const projectFolder = (document.getElementById('projectFolder') as HTMLInputElement).value;
   const projectName = (document.getElementById('projectName') as HTMLInputElement).value;
   const newFolder = (document.getElementById('newFolderCB') as HTMLInputElement).checked;

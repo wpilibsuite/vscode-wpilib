@@ -53,12 +53,12 @@
   <input id="newFolderCB" type="checkbox" checked/>
   <br/>
   <br/>
-  <div id="projectnamediv">Enter a project name</div>
-  <input id="projectName" oninput="validators.validateProject(document.getElementById('projectName'), document.getElementById('projectnamediv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  <div id="projectnamediv" class="error">Enter a project name</div>
+  <input id="projectName" class="error" oninput="validators.validateProject(document.getElementById('projectName'), document.getElementById('projectnamediv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
-  <div id="teamnumberdiv">Enter a team number</div>
-  <input id="teamNumber" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  <div id="teamnumberdiv" class="error">Enter a team number</div>
+  <input id="teamNumber" class="error" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
   <div id="desktopdiv">
