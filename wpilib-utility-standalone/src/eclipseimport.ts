@@ -75,8 +75,10 @@ interface IImportProject {
 }
 
 export async function importProjectButtonClick() {
-  const isValidProject = validateProject((document.getElementById('projectName') as HTMLInputElement), (document.getElementById('projectnamediv') as HTMLInputElement));
-  const isValidTeam = validateTeamNumber((document.getElementById('teamNumber') as HTMLInputElement), (document.getElementById('teamnumberdiv') as HTMLInputElement));
+  const isValidProject = validateProject((document.getElementById('projectName') as HTMLInputElement),
+    (document.getElementById('projectnamediv') as HTMLInputElement));
+  const isValidTeam = validateTeamNumber((document.getElementById('teamNumber') as HTMLInputElement),
+    (document.getElementById('teamnumberdiv') as HTMLInputElement));
   if (!isValidTeam || !isValidProject) {
     alert('Project name and team number must be correct');
     return;
