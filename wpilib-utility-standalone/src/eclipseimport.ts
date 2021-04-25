@@ -6,6 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { generateCopyCpp, generateCopyJava } from './shared/generator';
 import { existsAsync, mkdirpAsync, readFileAsync, writeFileAsync } from './utilities';
+import { validateProject, validateTeamNumber } from './validators';
 
 const dialog = electron.remote.dialog;
 const bWindow = electron.remote.getCurrentWindow();
@@ -74,6 +75,15 @@ interface IImportProject {
 }
 
 export async function importProjectButtonClick() {
+  const isValidProject = validateProject((document.getElementById('projectName') as HTMLInputElement),
+    (document.getElementById('projectnamediv') as HTMLInputElement));
+  const isValidTeam = validateTeamNumber((document.getElementById('teamNumber') as HTMLInputElement),
+    (document.getElementById('teamnumberdiv') as HTMLInputElement));
+  if (!isValidTeam || !isValidProject) {
+    alert('Project name and team number must be correct');
+    return;
+  }
+
   (document.activeElement as HTMLElement).blur();
   const data: IImportProject = {
     fromProps: (document.getElementById('eclipseInput') as HTMLInputElement).value,

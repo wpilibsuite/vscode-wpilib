@@ -1,7 +1,7 @@
 'use strict';
 
 import { IEclipseIPCReceive, IEclipseIPCSend } from './eclipseimportpagetypes';
-import { validateTeamNumber } from './sharedpages';
+import { validateProject, validateTeamNumber } from './sharedpages';
 
 interface IVsCodeApi {
   postMessage(message: IEclipseIPCReceive): void;
@@ -22,6 +22,12 @@ function projectSelectButtonClick() {
 }
 
 function importProjectButtonClick() {
+  const isValidTeam = validateTeamNumber();
+  const isValidProject = validateProject();
+  if (!isValidTeam || !isValidProject) {
+    return;
+  }
+
   (document.activeElement as HTMLElement).blur();
   vscode.postMessage({
     data: {
@@ -63,6 +69,8 @@ window.addEventListener('load', (_: Event) => {
   document.getElementById('projectSelectButton')!.onclick = projectSelectButtonClick;
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
+  // tslint:disable-next-line:no-non-null-assertion
+  document.getElementById('projectName')!.oninput = validateProject;
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
 });
