@@ -98,8 +98,9 @@ class ExternalAPI implements IExternalAPI {
 let updatePromptCount = 0;
 
 async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.ExtensionContext,
-  creationError: boolean, extensionResourceLocation: string, gradle2020import: Gradle2020Import | undefined,
-  help: Help | undefined) {
+                                  creationError: boolean, extensionResourceLocation: string,
+                                  gradle2020import: Gradle2020Import | undefined,
+                                  help: Help | undefined) {
   // Only trusted workspace code can occur below here
 
   let jdkLoc = await findJdkPath(externalApi);
