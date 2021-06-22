@@ -8,7 +8,7 @@
     "license": "BSD-3-Clause",
     "icon": "wpilib-128.png",
     "engines": {
-        "vscode": "^1.38.0"
+        "vscode": "^1.57.0"
     },
     "categories": [
         "Other"
