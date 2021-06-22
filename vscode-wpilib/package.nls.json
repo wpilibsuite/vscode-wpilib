@@ -35,5 +35,6 @@
 	"wpilibcore.changeDesktop.title": "Change Desktop Support Enabled Setting",
 	"wpilibcore.selectCppBinaryTypes.title": "Select Enabled C++ Intellisense Binary Types",
 	"wpilibcore.openApiDocumentation.title": "Open API Documentation",
-	"wpilibcore.getProjectInformation.title": "Open Project Information"
+	"wpilibcore.getProjectInformation.title": "Open Project Information",
+	"wpilibcore.untrustedWorkspace.title": "This workspace is untrusted. Only new project creation is supported"
 }
