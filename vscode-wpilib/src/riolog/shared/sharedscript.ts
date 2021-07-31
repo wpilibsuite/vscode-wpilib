@@ -496,6 +496,7 @@ function createButton(id: string, text: string, callback: () => void): HTMLLIEle
   const button = document.createElement('button');
   button.id = id;
   button.style.width = '100%';
+  button.style.marginBottom = '2px';
   button.appendChild(document.createTextNode(text));
   button.addEventListener('click', callback);
   li.appendChild(button);
@@ -548,15 +549,16 @@ function setLivePage() {
   rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
   rightList.appendChild(createButton('savelot', 'Save Log', onSaveLog));
   const teamNumberUl = document.createElement('li');
+  teamNumberUl.style.display = 'flex';
+  teamNumberUl.style.flexDirection = 'flex-row';
+  teamNumberUl.style.marginBottom = '2px';
   const teamNumberI = document.createElement('input');
   teamNumberI.id = 'teamNumber';
   teamNumberI.type = 'number';
-  teamNumberI.style.width = '50%';
+  teamNumberI.style.flexGrow = '1';
   const teamNumberB = document.createElement('button');
   teamNumberB.id = 'changeTeamNumber';
-  teamNumberB.style.width = '24.9%';
-  teamNumberB.style.right = '0';
-  teamNumberB.style.position = 'fixed';
+  teamNumberB.style.flexGrow = '1';
   teamNumberB.addEventListener('click', onChangeTeamNumber);
   teamNumberB.appendChild(document.createTextNode('Set Team Number'));
   teamNumberUl.appendChild(teamNumberI);
@@ -566,6 +568,58 @@ function setLivePage() {
   if (autoReconnect !== true) {
     onAutoReconnect();
   }
+
+  const styling = document.createElement('style');
+  styling.innerHTML = `
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+body {
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+  font-family: var(--vscode-font-family);
+}
+
+button {
+  border: none;
+  padding: 6px 4px;
+  text-align: center;
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+}
+
+button:hover {
+  cursor: pointer;
+  background: var(--vscode-button-hoverBackground);
+}
+
+button:focus {
+  outline-color: var(--vscode-focusBorder);
+}
+
+input:not([type="checkbox"]),
+textarea {
+  border: none;
+  font-family: var(--vscode-font-family);
+  padding: var(--input-padding-vertical) var(--input-padding-horizontal);
+  color: var(--vscode-input-foreground);
+  outline-color: var(--vscode-input-border);
+  background-color: var(--vscode-input-background);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--vscode-input-placeholderForeground);
+}
+  `;
+  document.body.appendChild(styling);
 }
 
 export function setViewerPage() {
