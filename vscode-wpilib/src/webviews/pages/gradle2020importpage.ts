@@ -1,5 +1,6 @@
 'use strict';
 
+import applyVsCodeStyling from '../vscodestyling';
 import { IGradle2020IPCReceive, IGradle2020IPCSend } from './gradle2020importpagetypes';
 import { validateProject, validateTeamNumber } from './sharedpages';
 
@@ -78,3 +79,5 @@ window.addEventListener('load', (_: Event) => {
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
 });
+
+applyVsCodeStyling();

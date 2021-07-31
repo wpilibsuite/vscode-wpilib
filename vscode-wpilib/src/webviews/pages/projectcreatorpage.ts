@@ -1,5 +1,6 @@
 'use strict';
 
+import applyVsCodeStyling from '../vscodestyling';
 import { IProjectIPCReceive, IProjectIPCSend, ProjectType } from './projectcreatorpagetypes';
 import { validateProject, validateTeamNumber } from './sharedpages';
 
@@ -134,3 +135,5 @@ window.addEventListener('load', (_: Event) => {
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('generateProject')!.onclick = generateProject;
 });
+
+applyVsCodeStyling();
