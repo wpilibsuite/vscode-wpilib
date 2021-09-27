@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { downloadDocs } from './docsapi';
 import { localize as i18n } from './locale';
-import { getMainLogFile, logger } from './logger';
+import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
@@ -62,10 +62,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     }
     const preferences = preferencesApi.getPreferences(workspace);
     await externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
-  }));
-
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.openCommandPalette', async () => {
-    await vscode.commands.executeCommand('workbench.action.quickOpen', '>WPILib ');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
@@ -359,14 +355,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
     await ToolAPI.InstallToolsFromGradle(workspace, externalApi);
-  }));
-
-  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.showLogFolder', async () => {
-    let mainLog = getMainLogFile();
-    if (!await existsAsync(mainLog)) {
-      mainLog = path.dirname(mainLog);
-    }
-    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.runGradleCommand', async () => {
