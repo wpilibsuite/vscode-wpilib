@@ -1,3 +1,5 @@
+import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
+
 plugins {
     id "cpp"
     id "google-test-test-suite"
@@ -5,34 +7,22 @@ plugins {
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
-// This is added by GradleRIO's backing project EmbeddedTools.
+// This is added by GradleRIO's backing project DeployUtils.
 deploy {
     targets {
-        roboRIO("roborio") {
-            // Team number is loaded either from the .wpilib/wpilib_preferences.json
-            // or from command line. If not found an exception will be thrown.
-            // You can use getTeamOrDefault(team) instead of getTeamNumber if you
-            // want to store a team number in this file.
-            team = frc.getTeamNumber()
-        }
-    }
-    artifacts {
-        frcNativeArtifact('frcCpp') {
-            targets << "roborio"
-            component = 'frcUserProgram'
-            // Debug can be overridden by command line, for use with VSCode
-            debug = frc.getDebugOrDefault(false)
-        }
-        // Built in artifact to deploy arbitrary files to the roboRIO.
-        fileTreeArtifact('frcStaticFileDeploy') {
-            // The directory below is the local directory to deploy
-            files = fileTree(dir: 'src/main/deploy')
-            // Deploy to RoboRIO target, into /home/lvuser/deploy
-            targets << "roborio"
-            directory = '/home/lvuser/deploy'
+        roborio(RoboRIO) {
+            team = project.frc.getTeamNumber()
+            debug = false // TODO make this automated
+
+            frcNativeArtifact('frcCpp') {
+            }
+
+            // TODO add static file artifact
         }
     }
 }
+
+def deployArtifact = deploy.targets.roborio.artifacts.frcCpp
 
 // Set this to true to include the src folder in the include directories passed
 // to the compiler. Some eclipse project imports depend on this behavior.
@@ -43,22 +33,20 @@ def includeSrcInIncludeRoot = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
 
-// Enable simulation gui support. Must check the box in vscode to enable support
-// upon debugging
-dependencies {
-    simulation wpi.deps.sim.gui(wpi.platforms.desktop, true)
-    simulation wpi.deps.sim.driverstation(wpi.platforms.desktop, true)
+// Set to true to run simulation in debug mode
+wpi.cpp.debugSimulation = false
 
-    // Websocket extensions require additional configuration.
-    // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, true)
-    // simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, true)
-}
+// Default enable simgui
+wpi.sim.addGui().defaultEnabled = true
+// Enable DS but not by default
+wpi.sim.addDriverstation()
 
 // Simulation configuration (e.g. environment variables).
-sim {
-    // Sets the websocket client remote host.
-    // envVar "HALSIMWS_HOST", "10.0.0.2"
-}
+// TODO add sim vars
+// sim {
+//     // Sets the websocket client remote host.
+//     // envVar "HALSIMWS_HOST", "10.0.0.2"
+// }
 
 model {
     components {
@@ -81,9 +69,17 @@ model {
                 }
             }
 
+            // Set deploy task to deploy this component
+            deployArtifact.component = it
+
+            // Enable run tasks for this component
+            wpi.cpp.enableExternalTasks(it)
+
+            // Enable simulation for this component
+            wpi.sim.enable(it)
             // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-            wpi.deps.vendor.cpp(it)
-            wpi.deps.wpilib(it)
+            wpi.cpp.vendor.cpp(it)
+            wpi.cpp.deps.wpilib(it)
         }
     }
     testSuites {
@@ -97,9 +93,12 @@ model {
                 }
             }
 
-            wpi.deps.vendor.cpp(it)
-            wpi.deps.wpilib(it)
-            wpi.deps.googleTest(it)
+            // Enable run tasks for this component
+            wpi.cpp.enableExternalTasks(it)
+
+            wpi.cpp.vendor.cpp(it)
+            wpi.cpp.deps.wpilib(it)
+            wpi.cpp.deps.googleTest(it)
         }
     }
 }

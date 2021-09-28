@@ -185,11 +185,11 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        if (prefs.getProjectYear() !== '2021') {
-          const importPersistantState = new PersistentFolderState('wpilib.2021persist', false, w.uri.fsPath);
+        if (prefs.getProjectYear() !== '2022alpha') {
+          const importPersistantState = new PersistentFolderState('wpilib.2022alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2021?.'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2022alpha?.'), {
               modal: true,
             }, 'Yes', 'No', 'No, Don\'t ask again');
             if (upgradeResult === 'Yes') {
