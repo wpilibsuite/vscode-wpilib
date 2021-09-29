@@ -10,31 +10,27 @@ plugins {
 // imports this is enabled by default. For new projects, its disabled
 def includeSrcInIncludeRoot = false
 
-// Set this to true to enable desktop support.
-def includeDesktopSupport = true
+// TODO enable Romi support in GradleRIO (ws client missing)
+// // Enable simulation gui support. Must check the box in vscode to enable support
+// // upon debugging
+// dependencies {
+//     simulation wpi.deps.sim.gui(wpi.platforms.desktop, true)
+//     simulation wpi.deps.sim.driverstation(wpi.platforms.desktop, true)
 
-// Enable simulation gui support. Must check the box in vscode to enable support
-// upon debugging
-dependencies {
-    simulation wpi.deps.sim.gui(wpi.platforms.desktop, true)
-    simulation wpi.deps.sim.driverstation(wpi.platforms.desktop, true)
+//     // Websocket extensions require additional configuration.
+//     // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, true)
+//     simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, true)
+// }
 
-    // Websocket extensions require additional configuration.
-    // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, true)
-    simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, true)
-}
-
-// Set the websocket remote host (the Romi IP address).
-sim {
-  envVar "HALSIMWS_HOST", "10.0.0.2"
-}
+// // Set the websocket remote host (the Romi IP address).
+// sim {
+//   envVar "HALSIMWS_HOST", "10.0.0.2"
+// }
 
 model {
     components {
         frcUserProgram(NativeExecutableSpec) {
-            if (includeDesktopSupport) {
-                targetPlatform wpi.platforms.desktop
-            }
+            targetPlatform wpi.platforms.desktop
 
             sources.cpp {
                 source {
@@ -50,8 +46,8 @@ model {
             }
 
             // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-            wpi.deps.vendor.cpp(it)
-            wpi.deps.wpilib(it)
+            wpi.cpp.vendor.cpp(it)
+            wpi.cpp.deps.wpilib(it)
         }
     }
     testSuites {
@@ -65,9 +61,9 @@ model {
                 }
             }
 
-            wpi.deps.vendor.cpp(it)
-            wpi.deps.wpilib(it)
-            wpi.deps.googleTest(it)
+            wpi.cpp.vendor.cpp(it)
+            wpi.cpp.deps.wpilib(it)
+            wpi.cpp.deps.googleTest(it)
         }
     }
 }
