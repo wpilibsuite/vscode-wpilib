@@ -2,6 +2,7 @@
 
 /* tslint:disable:prefer-conditional-expression */
 import { IErrorMessage, IIPCSendMessage, IPrintMessage, MessageType, ReceiveTypes, SendTypes } from 'wpilib-riolog';
+import applyVsCodeStyling from '../../webviews/vscodestyling';
 import { checkResize, scrollImpl, sendMessage } from '../script/implscript';
 
 let paused = false;
@@ -496,6 +497,7 @@ function createButton(id: string, text: string, callback: () => void): HTMLLIEle
   const button = document.createElement('button');
   button.id = id;
   button.style.width = '100%';
+  button.style.marginBottom = '2px';
   button.appendChild(document.createTextNode(text));
   button.addEventListener('click', callback);
   li.appendChild(button);
@@ -548,15 +550,16 @@ function setLivePage() {
   rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
   rightList.appendChild(createButton('savelot', 'Save Log', onSaveLog));
   const teamNumberUl = document.createElement('li');
+  teamNumberUl.style.display = 'flex';
+  teamNumberUl.style.flexDirection = 'flex-row';
+  teamNumberUl.style.marginBottom = '2px';
   const teamNumberI = document.createElement('input');
   teamNumberI.id = 'teamNumber';
   teamNumberI.type = 'number';
-  teamNumberI.style.width = '50%';
+  teamNumberI.style.flexGrow = '1';
   const teamNumberB = document.createElement('button');
   teamNumberB.id = 'changeTeamNumber';
-  teamNumberB.style.width = '24.9%';
-  teamNumberB.style.right = '0';
-  teamNumberB.style.position = 'fixed';
+  teamNumberB.style.flexGrow = '1';
   teamNumberB.addEventListener('click', onChangeTeamNumber);
   teamNumberB.appendChild(document.createTextNode('Set Team Number'));
   teamNumberUl.appendChild(teamNumberI);
@@ -566,6 +569,8 @@ function setLivePage() {
   if (autoReconnect !== true) {
     onAutoReconnect();
   }
+
+  applyVsCodeStyling();
 }
 
 export function setViewerPage() {

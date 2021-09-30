@@ -1,5 +1,6 @@
 'use strict';
 
+import applyVsCodeStyling from '../vscodestyling';
 import { IEclipseIPCReceive, IEclipseIPCSend } from './eclipseimportpagetypes';
 import { validateProject, validateTeamNumber } from './sharedpages';
 
@@ -74,3 +75,5 @@ window.addEventListener('load', (_: Event) => {
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
 });
+
+applyVsCodeStyling();
