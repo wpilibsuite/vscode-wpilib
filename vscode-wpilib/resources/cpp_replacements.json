@@ -1,8 +1,8 @@
 [
-    {
-        "fileMatcher": "**/*{.cpp,.c,.cc,.h,.hh,.hpp}",
-        "replacements": [
-            { "from": "frc2/Timer.h", "to": "frc/Timer.h" }
-        ]
-    }
+  {
+    "fileMatcher": "**/*{.cpp,.c,.cc,.h,.hh,.hpp}",
+    "replacements": [
+      { "from": "frc2/Timer.h", "to": "frc/Timer.h" }
+    ]
+  }
 ]
