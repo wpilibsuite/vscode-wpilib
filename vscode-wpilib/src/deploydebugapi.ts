@@ -40,7 +40,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       } else {
         await this.deployDebugAPI.debugCode(workspace, undefined);
       }
-      resolve();
+      resolve(undefined);
     });
   }
 

@@ -14,6 +14,25 @@ interface ICppDebugInfo {
   artifact: string;
 }
 
+interface ICppSimExtensions {
+  name: string;
+  libName: string;
+  defaultEnabled: boolean
+}
+
+interface ICppSimulateInfo {
+  type: string;
+  name: string;
+  extensions: ICppSimExtensions[];
+  launchfile: string;
+  clang: boolean;
+  env?: Map<string, string>;
+  srcpaths: string[];
+  headerpaths: string[];
+  libpaths: string[];
+  libsrcpaths: string[];
+}
+
 interface ICppDebugCommand {
   name?: string;
   extensions: string;
@@ -196,15 +215,16 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
                            __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
-    const command = 'simulateExternalCpp ' + args.join(' ');
+    // TODO Support release, and fix this task name
+    const command = 'simulateExternalNative ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Simulate', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
 
-    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'desktopinfo.json'), 'utf8');
-    const parsedSimulateInfo: ICppDebugCommand[] = jsonc.parse(simulateInfo) as ICppDebugCommand[];
+    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'sim', 'debug_native.json'), 'utf8');
+    const parsedSimulateInfo: ICppSimulateInfo[] = jsonc.parse(simulateInfo) as ICppSimulateInfo[];
     if (parsedSimulateInfo.length === 0) {
       await vscode.window.showInformationMessage('No debug configurations found. Do you have desktop builds enabled?', {
         modal: true,
@@ -213,10 +233,10 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
     let targetSimulateInfo = parsedSimulateInfo[0];
     if (parsedSimulateInfo.length > 1) {
-      const arr: CppQuickPick<ICppDebugCommand>[] = [];
+      const arr: CppQuickPick<ICppSimulateInfo>[] = [];
       for (const i of parsedSimulateInfo) {
         // tslint:disable-next-line:no-non-null-assertion
-        arr.push(new CppQuickPick<ICppDebugCommand>(i, i.name!));
+        arr.push(new CppQuickPick<ICppSimulateInfo>(i, i.name!));
       }
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
@@ -232,17 +252,18 @@ class SimulateCodeDeployer implements ICodeDeployer {
     if (targetSimulateInfo.extensions.length > 0) {
       if (this.preferences.getPreferences(workspace).getSkipSelectSimulateExtension()) {
         for (const e of targetSimulateInfo.extensions) {
-          extensions += e;
-          extensions += path.delimiter;
+          if (e.defaultEnabled) {
+            extensions += e.libName;
+            extensions += path.delimiter;
+          }
         }
       } else {
-        const pickedByDefault = this.preferences.getPreferences(workspace).getSelectDefaultSimulateExtension();
         const extList = [];
         for (const e of targetSimulateInfo.extensions) {
           extList.push({
-            label: path.basename(e),
-            path: e,
-            picked: pickedByDefault,
+            label: e.name,
+            path: e.libName,
+            picked: e.defaultEnabled,
           });
         }
         const quickPick = await vscode.window.showQuickPick(extList, {
@@ -259,7 +280,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     if (!getIsWindows()) {
-      const set = new Set<string>(targetSimulateInfo.debugpaths);
+      const set = new Set<string>(targetSimulateInfo.libpaths);
 
       let soPath = '';
 
@@ -285,7 +306,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       await startUnixSimulation(config);
     } else {
       const config: IWindowsSimulateCommands = {
-        debugPaths: targetSimulateInfo.debugpaths,
+        debugPaths: targetSimulateInfo.libpaths,
         environment: targetSimulateInfo.env,
         extensions,
         launchfile: targetSimulateInfo.launchfile,
