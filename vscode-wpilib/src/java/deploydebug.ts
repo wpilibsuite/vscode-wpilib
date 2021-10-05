@@ -22,7 +22,7 @@ interface ITargetInfo {
 interface IJavaSimExtensions {
   name: string;
   libName: string;
-  defaultEnabled: boolean
+  defaultEnabled: boolean;
 }
 
 interface IJavaSimulateInfo {
