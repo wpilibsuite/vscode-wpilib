@@ -17,7 +17,7 @@ interface ICppDebugInfo {
 interface ICppSimExtensions {
   name: string;
   libName: string;
-  defaultEnabled: boolean
+  defaultEnabled: boolean;
 }
 
 interface ICppSimulateInfo {
@@ -215,7 +215,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
                            __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
-    // TODO Support release, and fix this task name
+    // Support release, and fix this task name
     const command = 'simulateExternalNative ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Simulate', this.executeApi, prefs);
@@ -235,8 +235,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     if (parsedSimulateInfo.length > 1) {
       const arr: CppQuickPick<ICppSimulateInfo>[] = [];
       for (const i of parsedSimulateInfo) {
-        // tslint:disable-next-line:no-non-null-assertion
-        arr.push(new CppQuickPick<ICppSimulateInfo>(i, i.name!));
+        arr.push(new CppQuickPick<ICppSimulateInfo>(i, i.name));
       }
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
@@ -291,8 +290,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       soPath = soPath.substring(0, soPath.length - 1);
 
       const config: IUnixSimulateCommands = {
-        // tslint:disable-next-line:no-non-null-assertion
-        clang: targetSimulateInfo.clang!,
+        clang: targetSimulateInfo.clang,
         environment: targetSimulateInfo.env,
         executablePath: targetSimulateInfo.launchfile,
         extensions,
