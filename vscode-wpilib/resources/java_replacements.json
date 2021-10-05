@@ -1,0 +1,8 @@
+[
+    {
+        "fileMatcher": "**/*{.java}",
+        "replacements": [
+            { "from": "edu.wpi.cscore", "to": "edu.wpi.first.cscore" }
+        ]
+    }
+]
