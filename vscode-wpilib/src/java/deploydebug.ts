@@ -19,13 +19,19 @@ interface ITargetInfo {
   port: string;
 }
 
+interface IJavaSimExtensions {
+  name: string;
+  libName: string;
+  defaultEnabled: boolean;
+}
+
 interface IJavaSimulateInfo {
   name: string;
+  type: string;
+  extensions: IJavaSimExtensions[];
   env?: Map<string, string>;
-  extensions: string[];
-  librarydir: string;
-  mainclass: string;
-  robotclass: string;
+  libraryDir: string;
+  mainClassName: string;
 }
 
 class JavaQuickPick<T> implements vscode.QuickPickItem {
@@ -176,14 +182,15 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
                            __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
-    const command = 'simulateExternalJava ' + args.join(' ');
+    // TODO Support release mode simulation
+    const command = 'simulateExternalJavaDebug ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Simulate', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
 
-    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'desktopinfo.json'), 'utf8');
+    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'sim', 'debug_java.json'), 'utf8');
     const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(simulateInfo) as IJavaSimulateInfo[];
     if (parsedSimulateInfo.length === 0) {
       await vscode.window.showInformationMessage('No debug configurations found. Do you have desktop builds enabled?', {
@@ -211,17 +218,18 @@ class SimulateCodeDeployer implements ICodeDeployer {
     if (targetSimulateInfo.extensions.length > 0) {
       if (this.preferences.getPreferences(workspace).getSkipSelectSimulateExtension()) {
         for (const e of targetSimulateInfo.extensions) {
-          extensions += e;
-          extensions += path.delimiter;
+          if (e.defaultEnabled) {
+            extensions += e.libName;
+            extensions += path.delimiter;
+          }
         }
       } else {
-        const pickedByDefault = this.preferences.getPreferences(workspace).getSelectDefaultSimulateExtension();
         const extList = [];
         for (const e of targetSimulateInfo.extensions) {
           extList.push({
-            label: path.basename(e),
-            path: e,
-            picked: pickedByDefault,
+            label: e.name,
+            path: e.libName,
+            picked: e.defaultEnabled,
           });
         }
         const quickPick = await vscode.window.showQuickPick(extList, {
@@ -240,9 +248,8 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const config: ISimulateCommands = {
       environment: targetSimulateInfo.env,
       extensions,
-      librarydir: targetSimulateInfo.librarydir,
-      mainclass: targetSimulateInfo.mainclass,
-      robotclass: targetSimulateInfo.robotclass,
+      librarydir: targetSimulateInfo.libraryDir,
+      mainclass: targetSimulateInfo.mainClassName,
       stopOnEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
       workspace,
     };
