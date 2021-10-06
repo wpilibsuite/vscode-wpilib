@@ -22,7 +22,6 @@
 	"wpilibcore.openCommandPalette.title": "Open WPILib Command Palette",
 	"wpilibcore.refreshCppProperties.title": "Refresh C++ Intellisense",
 	"wpilibcore.selectCppToolchain.title": "Select Current C++ Toolchain",
-	"wpilibcore.importEclipseProject.title": "Import a WPILib Eclipse project",
 	"wpilibcore.importGradle2020Project.title": "Import a WPILib 2020 Gradle project",
 	"wpilibcore.createNewProject.title": "Create a new project",
 	"wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",

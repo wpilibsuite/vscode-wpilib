@@ -32,7 +32,6 @@ import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './ut
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
-import { EclipseImport } from './webviews/eclipseimport';
 import { Gradle2020Import } from './webviews/gradle2020import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
@@ -353,15 +352,6 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(help);
   } catch (err) {
     logger.error('error creating help window provider', err);
-    creationError = true;
-  }
-
-  try {
-    // Create the eclipse import provider
-    const eclipseimport = await EclipseImport.Create(extensionResourceLocation);
-    context.subscriptions.push(eclipseimport);
-  } catch (err) {
-    logger.error('error creating eclipse importer', err);
     creationError = true;
   }
 
