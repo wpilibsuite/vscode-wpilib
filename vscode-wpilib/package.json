@@ -39,7 +39,6 @@
         "onCommand:wpilibcore.refreshCppProperties",
         "onCommand:wpilibcore.selectCppToolchain",
         "onCommand:wpilibcore.selectCppBinaryTypes",
-        "onCommand:wpilibcore.importEclipseProject",
         "onCommand:wpilibcore.importGradle2020Project",
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
@@ -297,11 +296,6 @@
                 "title": "%wpilibcore.selectCppBinaryTypes.title%",
                 "category": "WPILib C++",
                 "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.importEclipseProject",
-                "title": "%wpilibcore.importEclipseProject.title%",
-                "category": "WPILib"
             },
             {
                 "command": "wpilibcore.importGradle2020Project",
