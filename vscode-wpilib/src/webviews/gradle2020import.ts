@@ -21,7 +21,7 @@ export class Gradle2020Import extends WebViewBase {
   private hasEnabledHandler: boolean = false;
 
   private constructor(resourceRoot: string) {
-    super('wpilibgradle2020import', 'WPILib Gradle2020 Import', resourceRoot);
+    super('wpilibgradle2020import', 'WPILib Gradle 2020/2021 Import', resourceRoot);
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2020Project', () => {
       return this.startWebpage();
