@@ -215,8 +215,8 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
                            __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
-    // Support release, and fix this task name
-    const command = 'simulateExternalNative ' + args.join(' ');
+    // Support release
+    const command = 'simulateExternalNativeDebug ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Simulate', this.executeApi, prefs);
     if (result !== 0) {
