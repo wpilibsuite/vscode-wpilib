@@ -1,6 +1,6 @@
 [
   {
-    "fileMatcher": "**/*{.java}",
+    "fileMatcher": "**/*.java",
     "flags": "g",
     "replacements": [
       { "from": "edu[.]wpi[.]cscore[.]AxisCamera", "to": "edu.wpi.first.cscore.AxisCamera" },
