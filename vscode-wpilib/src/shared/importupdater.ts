@@ -50,7 +50,7 @@ export async function ImportUpdate(srcDir: string, updateFile: string): Promise<
           } else {
             let dataOut = dataIn;
             for (const replace of updater.replacements) {
-              dataOut = dataIn.replace(new RegExp(replace.from, updater.flags), replace.to);
+              dataOut = dataOut.replace(new RegExp(replace.from, updater.flags), replace.to);
             }
             fs.writeFile(file, dataOut, 'utf8', (err1) => {
               if (err1) {
