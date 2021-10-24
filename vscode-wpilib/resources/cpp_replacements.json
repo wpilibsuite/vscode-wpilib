@@ -29,7 +29,11 @@
       { "from": "frc[\\\\/]smartdashboard[\\\\/]SendableRegistry[.]h", "to": "wpi/sendable/SendableRegistry.h" },
       { "from": "frc[\\\\/]LinearFilter[.]h", "to": "frc/filter/LinearFilter.h" },
       { "from": "frc[\\\\/]MedianFilter[.]h", "to": "frc/filter/MedianFilter.h" },
-      { "from": "frc[\\\\/]SlewRateLimiter[.]h", "to": "frc/filter/SlewRateLimiter.h" }
+      { "from": "frc[\\\\/]SlewRateLimiter[.]h", "to": "frc/filter/SlewRateLimiter.h" },
+      { "from": "frc::Sendable\\b", "to": "wpi::Sendable" },
+      { "from": "frc::SendableBuilder", "to": "wpi::SendableBuilder" },
+      { "from": "frc::SendableHelper", "to": "wpi::SendableHelper" },
+      { "from": "frc::SendableRegistry", "to": "wpi::SendableRegistry" }
     ]
   }
 ]
