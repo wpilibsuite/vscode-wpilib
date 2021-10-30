@@ -33,7 +33,13 @@
       { "from": "frc::Sendable\\b", "to": "wpi::Sendable" },
       { "from": "frc::SendableBuilder", "to": "wpi::SendableBuilder" },
       { "from": "frc::SendableHelper", "to": "wpi::SendableHelper" },
-      { "from": "frc::SendableRegistry", "to": "wpi::SendableRegistry" }
+      { "from": "frc::SendableRegistry", "to": "wpi::SendableRegistry" },
+      { "from": "frc::CameraServer::GetInstance[(][)]->", "to": "frc::CameraServer::" },
+      { "from": "frc::DriverStation::GetInstance[(][)][.]", "to": "frc::DriverStation::" },
+      { "from": "frc::LiveWindow::GetInstance[(][)]->", "to": "frc::LiveWindow::" },
+      { "from": "frc::Preferences::GetInstance[(][)]->", "to": "frc::Preferences::" },
+      { "from": "frc::SendableRegistry::GetInstance[(][)][.]", "to": "wpi::SendableRegistry::" },
+      { "from": "wpi::SendableRegistry::GetInstance[(][)][.]", "to": "wpi::SendableRegistry::" },
     ]
   }
 ]
