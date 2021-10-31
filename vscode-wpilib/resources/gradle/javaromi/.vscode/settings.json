@@ -14,5 +14,16 @@
     "**/.factorypath": true,
     "**/*~": true
   },
-  "wpilib.skipSelectSimulateExtension": true
+  "wpilib.skipSelectSimulateExtension": true,
+  "java.test.config": [
+    {
+        "name": "WPIlibUnitTests",
+        "workingDirectory": "${workspaceFolder}/build/jni/debug",
+        "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/debug" ],
+        "env": { "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/debug" ,
+          "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/debug" }
+        
+    },
+  ],
+  "java.test.defaultConfig": "WPIlibUnitTests"
 }
