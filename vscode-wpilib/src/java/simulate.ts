@@ -22,7 +22,7 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     HALSIM_EXTENSIONS: commands.extensions,
   };
   if (getIsWindows()) {
-    env.PATH = commands.librarydir;
+    env.PATH = commands.librarydir + ';' + process.env.SYSTEMROOT + '\\system32\\';
   } else {
     env.DYLD_LIBRARY_PATH = commands.librarydir;
     env.LD_LIBRARY_PATH = commands.librarydir;
