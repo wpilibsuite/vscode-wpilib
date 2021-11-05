@@ -182,15 +182,15 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
   public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
                            __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
-    // TODO Support release mode simulation
-    const command = 'simulateExternalJavaDebug ' + args.join(' ');
+    // TODO Support debug JNI mode simulation
+    const command = 'simulateExternalJavaRelease ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Simulate', this.executeApi, prefs);
     if (result !== 0) {
       return false;
     }
 
-    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'sim', 'debug_java.json'), 'utf8');
+    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'sim', 'release_java.json'), 'utf8');
     const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(simulateInfo) as IJavaSimulateInfo[];
     if (parsedSimulateInfo.length === 0) {
       await vscode.window.showInformationMessage('No debug configurations found. Do you have desktop builds enabled?', {
