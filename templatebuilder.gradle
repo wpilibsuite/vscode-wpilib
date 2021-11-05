@@ -1,0 +1,171 @@
+import groovy.json.JsonSlurper
+import java.util.regex.Pattern
+
+def gradleBaseFolder = project.file('vscode-wpilib/resources/gradle')
+def sharedGradleBase = new File(gradleBaseFolder, 'shared')
+def templateJavaFolder = project.file('vscode-wpilib/resources/java/src/templates')
+def examplesJavaFolder = project.file('vscode-wpilib/resources/java/src/examples')
+def templateCppFolder = project.file('vscode-wpilib/resources/cpp/src/templates')
+def examplesCppFolder = project.file('vscode-wpilib/resources/cpp/src/examples')
+
+ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
+    def jsonSlurper = new JsonSlurper()
+    def obj = jsonSlurper.parseText(templateFile)
+
+    def gradleVersion = new File(gradleBaseFolder, 'version.txt').text.trim()
+
+    obj.each { template ->
+
+        def outputFolder = new File(outputDir, template.foldername)
+        def templateFolder = new File(templateFolderRaw, template.foldername)
+        outputFolder.mkdirs()
+        def gradleBase = new File(gradleBaseFolder, template.gradlebase)
+        // Copy gradle base
+        project.copy {
+            from gradleBase
+            into outputFolder
+        }
+        // Copy shared
+        project.copy {
+            from sharedGradleBase
+            into outputFolder
+        }
+        def srcFolder = new File(outputFolder, 'src/main/java/frc/robot')
+        // Copy source
+        project.copy {
+            from templateFolder
+            into srcFolder
+        }
+
+        def replacePackageFrom = "edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)";
+        def replacePackageTo = 'frc.robot';
+
+        project.fileTree(outputFolder).matching {
+            include '**/*.java'
+            include '**/*.gradle'
+        }.each {
+            def text = it.text
+            text = text.replaceAll(replacePackageFrom, replacePackageTo)
+            it.text = text
+        }
+
+        def buildGradle = project.file(new File(outputFolder, 'build.gradle'))
+        buildGradle.text =
+            buildGradle.text
+                .replace('###ROBOTCLASSREPLACE###', "frc.robot.${template.mainclass}")
+                .replace('###GRADLERIOREPLACE###', gradleVersion)
+
+    }
+}
+
+ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
+    def jsonSlurper = new JsonSlurper()
+    def obj = jsonSlurper.parseText(templateFile)
+
+    def gradleVersion = new File(gradleBaseFolder, 'version.txt').text.trim()
+
+    obj.each { template ->
+
+        def outputFolder = new File(outputDir, template.foldername)
+        def templateFolder = new File(templateFolderRaw, template.foldername)
+        outputFolder.mkdirs()
+        def gradleBase = new File(gradleBaseFolder, template.gradlebase)
+        // Copy gradle base
+        project.copy {
+            from gradleBase
+            into outputFolder
+        }
+        // Copy shared
+        project.copy {
+            from sharedGradleBase
+            into outputFolder
+        }
+        def srcFolder = new File(outputFolder, 'src/main')
+        // Copy source
+        project.copy {
+            from templateFolder
+            into srcFolder
+        }
+
+        def replacePackageFrom = "edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)";
+        def replacePackageTo = 'frc.robot';
+
+        project.fileTree(outputFolder).matching {
+            include '**/*.java'
+            include '**/*.gradle'
+        }.each {
+            def text = it.text
+            text = text.replaceAll(replacePackageFrom, replacePackageTo)
+            it.text = text
+        }
+
+        def buildGradle = project.file(new File(outputFolder, 'build.gradle'))
+        buildGradle.text =
+            buildGradle.text
+                .replace('###GRADLERIOREPLACE###', gradleVersion)
+
+    }
+}
+
+task generateTemplatesFolder {
+    dependsOn copyFromVsCodeToStandaloneResources
+
+    def outputDir = new File(project.buildDir, "templates")
+
+    outputs.dir outputDir
+
+    outputs.upToDateWhen {false}
+
+    doLast {
+        project.buildDir.mkdirs()
+
+        project.delete {
+            delete outputDir
+        }
+
+        // Load all java templates
+        def templateFile = new File(templateJavaFolder, 'templates.json').text
+        def templateFileCpp = new File(templateCppFolder, 'templates.json').text
+
+        generateJava(templateFile, new File(outputDir, 'java'), templateJavaFolder)
+        generateCpp(templateFileCpp, new File(outputDir, 'cpp'), templateCppFolder)
+    }
+}
+
+task generateTemplatesZip(type: Zip) {
+    dependsOn generateTemplatesFolder
+    from new File(project.buildDir, "templates")
+    archiveFileName = 'templates.zip'
+}
+
+task generateExamplesFolder {
+    dependsOn copyFromVsCodeToStandaloneResources
+
+    def outputDir = new File(project.buildDir, "examples")
+
+    outputs.dir outputDir
+
+    outputs.upToDateWhen {false}
+
+    doLast {
+        project.buildDir.mkdirs()
+
+        project.delete {
+            delete outputDir
+        }
+
+        // Load all java templates
+        def templateFile = new File(examplesJavaFolder, 'examples.json').text
+        def templateFileCpp = new File(examplesCppFolder, 'examples.json').text
+
+        generateJava(templateFile, new File(outputDir, 'java'), examplesJavaFolder)
+        generateCpp(templateFileCpp, new File(outputDir, 'cpp'), examplesCppFolder)
+    }
+}
+
+task generateExamplesZip(type: Zip) {
+    dependsOn generateExamplesFolder
+    from new File(project.buildDir, "examples")
+    archiveFileName = 'examples.zip'
+}
+
