@@ -130,7 +130,12 @@
       { "from": "edu[.]wpi[.]first[.]wpiutil[.]RuntimeDetector", "to": "edu.wpi.first.util.RuntimeDetector" },
       { "from": "edu[.]wpi[.]first[.]wpiutil[.]RuntimeLoader", "to": "edu.wpi.first.util.RuntimeLoader" },
       { "from": "edu[.]wpi[.]first[.]wpiutil[.]WPIUtilJNI", "to": "edu.wpi.first.util.WPIUtilJNI" },
-      { "from": "edu[.]wpi[.]first[.]wpiutil[.]net[.]PortForwarder", "to": "edu.wpi.first.util.net.PortForwarder" }
+      { "from": "edu[.]wpi[.]first[.]wpiutil[.]net[.]PortForwarder", "to": "edu.wpi.first.util.net.PortForwarder" },
+      { "from": "CameraServer[.]getInstance[(][)][.]", "to": "CameraServer." },
+      { "from": "DriverStation[.]getInstance[(][)][.]", "to": "DriverStation." },
+      { "from": "LiveWindow[.]getInstance[(][)][.]", "to": "LiveWindow." },
+      { "from": "Preferences[.]getInstance[(][)][.]", "to": "Preferences." },
+      { "from": "SendableRegistry[.]getInstance[(][)][.]", "to": "SendableRegistry." }
     ]
   }
 ]
