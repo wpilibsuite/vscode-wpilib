@@ -30,7 +30,7 @@ export class ExecuteAPI implements IExecuteAPI {
           if (this.runners[i].cancelled) {
             this.runners[i].condition.set(-1);
           } else {
-            this.runners[i].condition.set(e.exitCode);
+            this.runners[i].condition.set(e.exitCode ?? -1);
           }
           this.runners.splice(i, 1);
           break;

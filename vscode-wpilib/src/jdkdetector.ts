@@ -28,7 +28,7 @@ function parseMajorVersion(content: string): number {
   return javaVersion;
 }
 
-function getJavaVersion(javaHome: string): Promise<number> {
+export function getJavaVersion(javaHome: string): Promise<number> {
   return new Promise((resolve) => {
     cp.execFile(path.join(javaHome, 'bin', 'java'), ['-version'], {}, (_, __, stderr) => {
       const javaVersion = parseMajorVersion(stderr);

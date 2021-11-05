@@ -175,6 +175,8 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
       }));
     }
 
+    await Promise.all(promiseArray);
+
     await ncpAsync(fromGradleFolder, toFolder, {
       filter: (cf): boolean => {
         const rooted = path.relative(fromGradleFolder, cf);

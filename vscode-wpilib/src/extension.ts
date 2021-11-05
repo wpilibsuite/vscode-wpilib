@@ -19,7 +19,7 @@ import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
 import { localize as i18n } from './locale';
-import { closeLogger, logger, setLoggerDirectory } from './logger';
+import { closeLogger, getMainLogFile, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
@@ -32,7 +32,6 @@ import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './ut
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
-import { EclipseImport } from './webviews/eclipseimport';
 import { Gradle2020Import } from './webviews/gradle2020import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
@@ -97,35 +96,11 @@ class ExternalAPI implements IExternalAPI {
 
 let updatePromptCount = 0;
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export async function activate(context: vscode.ExtensionContext) {
-  setExtensionContext(context);
-
-  // Resources folder is used for gradle template along with HTML files
-  const extensionResourceLocation = path.join(context.extensionPath, 'resources');
-
-  if (vscode.extensions.getExtension('wpifirst.vscode-wpilib') !== undefined) {
-    const alphaError = await AlphaError.Create(extensionResourceLocation);
-    alphaError.displayPage();
-    context.subscriptions.push(alphaError);
-    return;
-  }
-
-  // The external API can be used by other extensions that want to use our
-  // functionality. Its definition is provided in shared/externalapi.ts.
-  // That file can be copied to another project.
-  const externalApi = await ExternalAPI.Create(extensionResourceLocation);
-
-  const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
-
-  const logPath = path.join(frcHomeDir, 'logs');
-  try {
-    await mkdirpAsync(logPath);
-    setLoggerDirectory(logPath);
-  } catch (err) {
-    logger.error('Error creating logger', err);
-  }
+async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.ExtensionContext,
+                                  creationError: boolean, extensionResourceLocation: string,
+                                  gradle2020import: Gradle2020Import | undefined,
+                                  help: Help | undefined) {
+  // Only trusted workspace code can occur below here
 
   let jdkLoc = await findJdkPath(externalApi);
 
@@ -142,48 +117,6 @@ export async function activate(context: vscode.ExtensionContext) {
   await activateCpp(context, externalApi);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
-
-  let creationError: boolean = false;
-
-  let help: Help | undefined;
-
-  try {
-    // Create the help window provider
-    help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
-    context.subscriptions.push(help);
-  } catch (err) {
-    logger.error('error creating help window provider', err);
-    creationError = true;
-  }
-
-  try {
-    // Create the eclipse import provider
-    const eclipseimport = await EclipseImport.Create(extensionResourceLocation);
-    context.subscriptions.push(eclipseimport);
-  } catch (err) {
-    logger.error('error creating eclipse importer', err);
-    creationError = true;
-  }
-
-  let gradle2020import: Gradle2020Import | undefined;
-
-  try {
-    // Create the gradle 2020 import provider
-    gradle2020import = await Gradle2020Import.Create(extensionResourceLocation);
-    context.subscriptions.push(gradle2020import);
-  } catch (err) {
-    logger.error('error creating gradle 2020 importer', err);
-    creationError = true;
-  }
-
-  try {
-    // Create the new project creator provider
-    const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
-    context.subscriptions.push(projectcreator);
-  } catch (err) {
-    logger.error('error creating project creator', err);
-    creationError = true;
-  }
 
   try {
     // Add built in tools
@@ -251,11 +184,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        if (prefs.getProjectYear() !== '2021') {
-          const importPersistantState = new PersistentFolderState('wpilib.2021persist', false, w.uri.fsPath);
+        if (prefs.getProjectYear() !== '2022alpha') {
+          const importPersistantState = new PersistentFolderState('wpilib.2022alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2021?.'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2022alpha?.'), {
               modal: true,
             }, 'Yes', 'No', 'No, Don\'t ask again');
             if (upgradeResult === 'Yes') {
@@ -375,6 +308,99 @@ export async function activate(context: vscode.ExtensionContext) {
   if (updatePromptCount === 0) {
     ApiProvider.promptForUpdates = true;
   }
+
+  return externalApi;
+}
+
+// this method is called when your extension is activated
+// your extension is activated the very first time the command is executed
+export async function activate(context: vscode.ExtensionContext) {
+  setExtensionContext(context);
+
+  // Resources folder is used for gradle template along with HTML files
+  const extensionResourceLocation = path.join(context.extensionPath, 'resources');
+
+  if (vscode.extensions.getExtension('wpifirst.vscode-wpilib') !== undefined) {
+    const alphaError = await AlphaError.Create(extensionResourceLocation);
+    alphaError.displayPage();
+    context.subscriptions.push(alphaError);
+    return;
+  }
+
+  // The external API can be used by other extensions that want to use our
+  // functionality. Its definition is provided in shared/externalapi.ts.
+  // That file can be copied to another project.
+  const externalApi = await ExternalAPI.Create(extensionResourceLocation);
+
+  const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+
+  const logPath = path.join(frcHomeDir, 'logs');
+  try {
+    await mkdirpAsync(logPath);
+    setLoggerDirectory(logPath);
+  } catch (err) {
+    logger.error('Error creating logger', err);
+  }
+
+  let creationError: boolean = false;
+
+  let help: Help | undefined;
+
+  try {
+    // Create the help window provider
+    help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
+    context.subscriptions.push(help);
+  } catch (err) {
+    logger.error('error creating help window provider', err);
+    creationError = true;
+  }
+
+  let gradle2020import: Gradle2020Import | undefined;
+
+  try {
+    // Create the gradle 2020 import provider
+    gradle2020import = await Gradle2020Import.Create(extensionResourceLocation);
+    context.subscriptions.push(gradle2020import);
+  } catch (err) {
+    logger.error('error creating gradle 2020 importer', err);
+    creationError = true;
+  }
+
+  try {
+    // Create the new project creator provider
+    const projectcreator = await ProjectCreator.Create(externalApi.getExampleTemplateAPI(), extensionResourceLocation);
+    context.subscriptions.push(projectcreator);
+  } catch (err) {
+    logger.error('error creating project creator', err);
+    creationError = true;
+  }
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.showLogFolder', async () => {
+    let mainLog = getMainLogFile();
+    if (!await existsAsync(mainLog)) {
+      mainLog = path.dirname(mainLog);
+    }
+    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.openCommandPalette', async () => {
+    await vscode.commands.executeCommand('workbench.action.quickOpen', '>WPILib ');
+  }));
+
+  if (!vscode.workspace.isTrusted) {
+    if (creationError) {
+      vscode.window.showErrorMessage('A portion of WPILib failed to initialize. See log for details');
+    }
+
+    vscode.workspace.onDidGrantWorkspaceTrust(async () => {
+      await handleAfterTrusted(externalApi, context, creationError, extensionResourceLocation, gradle2020import, help);
+
+
+    });
+    return externalApi;
+  }
+
+  await handleAfterTrusted(externalApi, context, creationError, extensionResourceLocation, gradle2020import, help);
 
   return externalApi;
 }

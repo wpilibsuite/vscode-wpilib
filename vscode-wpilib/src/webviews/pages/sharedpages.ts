@@ -5,7 +5,7 @@ declare global {
     interface Window { i18nTrans: (domain: string, message: string, ...args: any[]) => string; }
 }
 
-export function validateProject() {
+export function validateProject(): boolean {
   const elem = document.getElementById('projectName') as HTMLButtonElement;
   const s = elem.value;
   const match = s.match(/\w[\w-]*$/gm);
@@ -14,14 +14,16 @@ export function validateProject() {
     pdiv.innerText = window.i18nTrans('ui', 'Invalid project name');
     pdiv.classList.add('error');
     elem.classList.add('error');
+    return false;
   } else {
     pdiv.innerText = window.i18nTrans('ui', 'Project Name');
     pdiv.classList.remove('error');
     elem.classList.remove('error');
+    return true;
   }
 }
 
-export function validateTeamNumber() {
+export function validateTeamNumber(): boolean {
   const elem = document.getElementById('teamNumber') as HTMLInputElement;
   const s = elem.value;
   const match = s.match(/^\d{1,5}$/gm);
@@ -30,9 +32,11 @@ export function validateTeamNumber() {
     pdiv.innerText = window.i18nTrans('ui', 'Invalid team number');
     pdiv.classList.add('error');
     elem.classList.add('error');
+    return false;
   } else {
     pdiv.innerText = window.i18nTrans('ui', 'Team Number');
     pdiv.classList.remove('error');
     elem.classList.remove('error');
+    return true;
   }
 }

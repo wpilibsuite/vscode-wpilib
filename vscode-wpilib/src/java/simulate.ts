@@ -8,7 +8,6 @@ export interface ISimulateCommands {
   environment?: IEnvMap;
   librarydir: string;
   mainclass: string;
-  robotclass: string;
   stopOnEntry: boolean;
   workspace: vscode.WorkspaceFolder;
 }
@@ -23,7 +22,7 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     HALSIM_EXTENSIONS: commands.extensions,
   };
   if (getIsWindows()) {
-    env.PATH = commands.librarydir;
+    env.PATH = commands.librarydir + ';' + process.env.SYSTEMROOT + '\\system32\\';
   } else {
     env.DYLD_LIBRARY_PATH = commands.librarydir;
     env.LD_LIBRARY_PATH = commands.librarydir;
@@ -37,7 +36,6 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
   }
 
   const config = {
-    args: commands.robotclass,
     console: 'integratedTerminal',
     cwd: commands.workspace.uri.fsPath,
     env,
