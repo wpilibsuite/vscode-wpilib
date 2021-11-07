@@ -1,5 +1,3 @@
-import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
-
 plugins {
     id "c"
     id "cpp"
@@ -11,14 +9,27 @@ plugins {
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
     targets {
-        roborio(RoboRIO) {
+        roborio(getTargetTypeClass('RoboRIO')) {
+            // Team number is loaded either from the .wpilib/wpilib_preferences.json
+            // or from command line. If not found an exception will be thrown.
+            // You can use getTeamOrDefault(team) instead of getTeamNumber if you
+            // want to store a team number in this file.
             team = project.frc.getTeamNumber()
-            debug = false // TODO make this automated
+            debug = project.frc.getDebugOrDefault(false)
 
-            frcNativeArtifact('frcCpp') {
+            artifacts {
+                // First part is artifact name, 2nd is artifact type
+                // getTargetTypeClass is a shortcut to get the class type using a string
+
+                frcCpp(getArtifactTypeClass('FRCNativeArtifact')) {
+                }
+
+                // Static files artifact
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('src/main/deploy')
+                    directory = '/home/lvuser/deploy'
+                }
             }
-
-            // TODO add static file artifact
         }
     }
 }
@@ -35,13 +46,6 @@ wpi.cpp.debugSimulation = false
 wpi.sim.addGui().defaultEnabled = true
 // Enable DS but not by default
 wpi.sim.addDriverstation()
-
-// Simulation configuration (e.g. environment variables).
-// TODO add sim vars
-// sim {
-//     // Sets the websocket client remote host.
-//     // envVar "HALSIMWS_HOST", "10.0.0.2"
-// }
 
 model {
     components {

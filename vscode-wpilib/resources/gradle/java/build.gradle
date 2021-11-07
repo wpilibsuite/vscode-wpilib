@@ -14,15 +14,26 @@ def ROBOT_MAIN_CLASS = "###ROBOTCLASSREPLACE###"
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
     targets {
-        roborio(RoboRIO) {
+        roborio(getTargetTypeClass('RoboRIO')) {
             // Team number is loaded either from the .wpilib/wpilib_preferences.json
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
             // want to store a team number in this file.
             team = project.frc.getTeamNumber()
-            debug = false
+            debug = project.frc.getDebugOrDefault(false)
 
-            frcJavaArtifact('frcJava') {
+            artifacts {
+                // First part is artifact name, 2nd is artifact type
+                // getTargetTypeClass is a shortcut to get the class type using a string
+
+                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                }
+
+                // Static files artifact
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('src/main/deploy')
+                    directory = '/home/lvuser/deploy'
+                }
             }
         }
     }
@@ -30,7 +41,7 @@ deploy {
 
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
-// Set to true to use debug for JNI
+// Set to true to use debug for JNI.
 wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
@@ -76,10 +87,3 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
-
-// Simulation configuration (e.g. environment variables).
-// TODO add sim vars
-// sim {
-//     // Sets the websocket client remote host.
-//     // envVar "HALSIMWS_HOST", "10.0.0.2"
-// }
