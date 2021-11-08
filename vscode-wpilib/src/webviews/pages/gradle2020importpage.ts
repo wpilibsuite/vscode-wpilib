@@ -52,6 +52,7 @@ window.addEventListener('message', (event) => {
       const doc = document.getElementById('projectName') as HTMLInputElement;
       doc.value = data.data;
       doc.disabled = false;
+      validateProject();
       break;
     case 'newproject':
       const elem = document.getElementById('projectFolder') as HTMLInputElement;
@@ -60,6 +61,7 @@ window.addEventListener('message', (event) => {
     case 'teamnumber':
       const tn = document.getElementById('teamNumber') as HTMLInputElement;
       tn.value = data.data;
+      validateTeamNumber();
       break;
     default:
       break;

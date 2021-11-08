@@ -19,8 +19,7 @@ wpilibcore.help.title: 打开 WPILib 帮助
 wpilibcore.openCommandPalette.title: 打开 WPILib 的命令面板
 wpilibcore.refreshCppProperties.title: 更新 Gradle C++ 属性
 wpilibcore.selectCppToolchain.title: 选择当前的 C++ 工具链
-wpilibcore.importEclipseProject.title: 将 Eclipse 项目迁移到 VSCode
-wpilibcore.importGradle2020Project.title: 将 Gradle 2020 项目迁移到 VSCode
+wpilibcore.importGradle2020Project.title: 将 Gradle 2020/2021 项目迁移到 VSCode
 wpilibcore.createNewProject.title: 创建一个新项目
 wpilibcore.manageVendorLibs.title: 管理外部供应商库
 wpilibcore.setJavaHome.title: 设置 Java 环境
@@ -35,3 +34,4 @@ wpilibcore.setOffline.title: 在离线模式中 更改 部署/调试命令 外�
 wpilibcore.selectCppBinaryTypes.title: 选择 C++ Intellisense Binary Types
 wpilibcore.openApiDocumentation.title: 打开 API 文档
 wpilibcore.getProjectInformation.title: 显示项目信息
+wpilibcore.untrustedWorkspace.title: This workspace is untrusted. Only new project creation is supported

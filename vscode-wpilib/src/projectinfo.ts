@@ -8,6 +8,7 @@ import { logger } from './logger';
 import { extensionContext, readFileAsync } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
 import { WPILibUpdates } from './wpilibupdates';
+import { findJdkPath, getJavaVersion } from './jdkdetector';
 
 export interface IVendorLibraryPair {
   name: string;
@@ -61,13 +62,18 @@ export class ProjectInfoGatherer {
       return;
     }
     const projectInfo = await this.getProjectInfo(wp);
+    const jdkLoc = await findJdkPath(this.externalApi);
+    const jdkVer = (jdkLoc === undefined) ? 'unknown' : await getJavaVersion(jdkLoc);
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
+VS Code Version: ${vscode.version}
 WPILib Extension Version: ${projectInfo.wpilibExtensionVersion}
 C++ Extension Version: ${projectInfo.cppExtensionVersion}
 Java Extension Version: ${projectInfo.javaExtensionVersion}
 Java Debug Extension Version: ${projectInfo.javaDebugExtensionVersion}
 Java Dependencies Extension Version ${projectInfo.javaDependenciesExtensionVersion}
+Java Version: ${jdkVer}
+Java Location: ${jdkLoc}
 Vendor Libraries:
 `;
 

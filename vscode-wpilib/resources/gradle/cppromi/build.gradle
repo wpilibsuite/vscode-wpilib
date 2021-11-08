@@ -4,37 +4,19 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
-// Set this to true to include the src folder in the include directories passed
-// to the compiler. Some eclipse project imports depend on this behavior.
-// We recommend leaving this disabled if possible. Note for eclipse project
-// imports this is enabled by default. For new projects, its disabled
-def includeSrcInIncludeRoot = false
+// Simulation configuration (e.g. environment variables).
+wpi.sim.addGui().defaultEnabled = true
+wpi.sim.addDriverstation()
 
-// Set this to true to enable desktop support.
-def includeDesktopSupport = true
-
-// Enable simulation gui support. Must check the box in vscode to enable support
-// upon debugging
-dependencies {
-    simulation wpi.deps.sim.gui(wpi.platforms.desktop, true)
-    simulation wpi.deps.sim.driverstation(wpi.platforms.desktop, true)
-
-    // Websocket extensions require additional configuration.
-    // simulation wpi.deps.sim.ws_server(wpi.platforms.desktop, true)
-    simulation wpi.deps.sim.ws_client(wpi.platforms.desktop, true)
-}
-
-// Set the websocket remote host (the Romi IP address).
-sim {
-  envVar "HALSIMWS_HOST", "10.0.0.2"
-}
+//Sets the websocket client remote host.
+wpi.sim.envVar("HALSIMWS_HOST", "10.0.0.2")
+wpi.sim.addWebsocketsServer().defaultEnabled = true
+wpi.sim.addWebsocketsClient().defaultEnabled = true
 
 model {
     components {
         frcUserProgram(NativeExecutableSpec) {
-            if (includeDesktopSupport) {
-                targetPlatform wpi.platforms.desktop
-            }
+            targetPlatform wpi.platforms.desktop
 
             sources.cpp {
                 source {
@@ -43,15 +25,16 @@ model {
                 }
                 exportedHeaders {
                     srcDir 'src/main/include'
-                    if (includeSrcInIncludeRoot) {
-                        srcDir 'src/main/cpp'
-                    }
                 }
             }
 
+            wpi.cpp.enableExternalTasks(it)
+
+            wpi.sim.enable(it)
+
             // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-            wpi.deps.vendor.cpp(it)
-            wpi.deps.wpilib(it)
+            wpi.cpp.vendor.cpp(it)
+            wpi.cpp.deps.wpilib(it)
         }
     }
     testSuites {
@@ -65,9 +48,11 @@ model {
                 }
             }
 
-            wpi.deps.vendor.cpp(it)
-            wpi.deps.wpilib(it)
-            wpi.deps.googleTest(it)
+            wpi.cpp.enableExternalTasks(it)
+
+            wpi.cpp.vendor.cpp(it)
+            wpi.cpp.deps.wpilib(it)
+            wpi.cpp.deps.googleTest(it)
         }
     }
 }

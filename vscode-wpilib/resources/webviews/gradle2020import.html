@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>WPILib 2020 Project Import</title>
+  <title>WPILib 2020/2021 Project Import</title>
   <style>
     .error {
       color: red;
@@ -17,7 +17,7 @@
 <body>
   <img src="replaceresource/resources/wpilib.svg" width="100" />
 
-  <h1>Welcome to WPILib 2020 Project Importer</h1>
+  <h1>Welcome to WPILib 2020/2021 Project Importer</h1>
 
   The import process copies your project source files from the current directory to a new directory and completely regenerates the gradle files. If you made non-standard updates to the build.gradle, you will need to make those changes again. For this reason, in place upgrades are not supported. It is also necessary to import vendor libraries again, since last year's vendor libraries must be updated to be compatible with this year's projects. See <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-overview/importing-gradle-project.html">Importing a Gradle Project</a> on frc-docs for more details.
   <br/>
@@ -34,7 +34,7 @@
   <button id="projectSelectButton">Select a new project folder</button>
   <br/>
   <br/>
-  <div id="projectnamediv" class="error"><b>Project Name</b>
+  <div id="projectnamediv" class="error"><b>Project Name</b></div>
     <input id="projectName" type="text" class="error" style="width: 100%; margin-top: 10px; margin-bottom: 10px" disabled/>
     When you select a gradle project above, it will insert the project name, however, it may be customized.
   <br/>
@@ -43,7 +43,6 @@
   <br/>
   This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be checked. Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project Name
   <br/>
-  </div>
   <br/>
   <div id="teamnumberdiv" class="error"><b>Team Number</b></div>
   <input id="teamNumber" class="error" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"

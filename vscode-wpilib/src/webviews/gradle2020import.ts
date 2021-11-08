@@ -6,6 +6,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
+import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { existsAsync, extensionContext, mkdirpAsync, promptForProjectOpen, readFileAsync, writeFileAsync } from '../utilities';
 import { IGradle2020IPCData, IGradle2020IPCReceive, IGradle2020IPCSend } from './pages/gradle2020importpagetypes';
@@ -21,7 +22,7 @@ export class Gradle2020Import extends WebViewBase {
   private hasEnabledHandler: boolean = false;
 
   private constructor(resourceRoot: string) {
-    super('wpilibgradle2020import', 'WPILib Gradle2020 Import', resourceRoot);
+    super('wpilibgradle2020import', 'WPILib Gradle 2020/2021 Import', resourceRoot);
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2020Project', () => {
       return this.startWebpage();
@@ -255,6 +256,12 @@ export class Gradle2020Import extends WebViewBase {
     const parsed = JSON.parse(await readFileAsync(jsonFilePath, 'utf8')) as IPreferencesJson;
     parsed.teamNumber = parseInt(data.teamNumber, 10);
     await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
+
+    let replacementFile = path.join(resourceRoot, 'java_replacements.json');
+    if (cpp) {
+      replacementFile = path.join(resourceRoot, 'cpp_replacements.json');
+    }
+    await ImportUpdate(toFolder, replacementFile);
 
     await promptForProjectOpen(vscode.Uri.file(toFolder));
   }
