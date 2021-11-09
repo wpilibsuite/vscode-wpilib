@@ -535,8 +535,8 @@ export class ApiProvider implements CustomConfigurationProvider {
                       defines: macros,
                       includePath: includePaths,
                       intelliSenseMode: tc.msvc ? 'msvc-x64' : tc.gcc ? 'gcc-x64' : 'clang-x64',
-                      // tslint:disable-next-line:no-non-null-assertion
-                      standard: sb.langVersion!,
+                      // tslint:disable-next-line:no-non-null-assertion no-any
+                      standard: sb.langVersion! as any,
                     },
                     uri: uriPath,
                   });
@@ -574,8 +574,8 @@ export class ApiProvider implements CustomConfigurationProvider {
                       defines: macros,
                       includePath: includePaths,
                       intelliSenseMode: tc.msvc ? 'msvc-x64' : tc.gcc ? 'gcc-x64' : 'clang-x64',
-                      // tslint:disable-next-line:no-non-null-assertion
-                      standard: sb.langVersion!,
+                      // tslint:disable-next-line:no-non-null-assertion no-any
+                      standard: sb.langVersion! as any,
                     },
                     uri: uriPath,
                   });
