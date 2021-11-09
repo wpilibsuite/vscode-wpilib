@@ -31,7 +31,7 @@ function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
-function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined {
+function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined {
   const lowerArg = arg.toLowerCase();
   if (lowerArg.startsWith('-std') || lowerArg.startsWith('/std')) {
     if (lowerArg.indexOf('++') > 0) {
@@ -53,7 +53,9 @@ function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c++98' | 'c++0
       }
     } else {
       // C mode
-      if (lowerArg.indexOf('11') >= 0) {
+      if (lowerArg.indexOf('17') >= 0) {
+        return 'c17';
+      } else if (lowerArg.indexOf('11') >= 0) {
         return 'c11';
       } else if (lowerArg.indexOf('99') >= 0) {
         return 'c99';
