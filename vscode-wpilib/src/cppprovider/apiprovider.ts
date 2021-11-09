@@ -31,12 +31,14 @@ function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
-function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined {
+function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | undefined {
   const lowerArg = arg.toLowerCase();
   if (lowerArg.startsWith('-std') || lowerArg.startsWith('/std')) {
     if (lowerArg.indexOf('++') > 0) {
       // C++ mode
-      if (lowerArg.indexOf('17') >= 0 || lowerArg.indexOf('1z') >= 0) {
+      if (lowerArg.indexOf('latest') >= 0 || lowerArg.indexOf('20') >= 0) {
+        return 'c++20';
+      } else if (lowerArg.indexOf('17') >= 0 || lowerArg.indexOf('1z') >= 0) {
         return 'c++17';
       } else if (lowerArg.indexOf('14') >= 0 || lowerArg.indexOf('1y') >= 0) {
         return 'c++14';
