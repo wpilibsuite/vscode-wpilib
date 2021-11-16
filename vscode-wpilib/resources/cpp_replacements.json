@@ -39,7 +39,9 @@
       { "from": "frc::LiveWindow::GetInstance[(][)]->", "to": "frc::LiveWindow::" },
       { "from": "frc::Preferences::GetInstance[(][)]->", "to": "frc::Preferences::" },
       { "from": "frc::SendableRegistry::GetInstance[(][)][.]", "to": "wpi::SendableRegistry::" },
-      { "from": "wpi::SendableRegistry::GetInstance[(][)][.]", "to": "wpi::SendableRegistry::" }
+      { "from": "wpi::SendableRegistry::GetInstance[(][)][.]", "to": "wpi::SendableRegistry::" },
+      { "from": "wpi[\\\\/]math", "to": "wpi/numbers" },
+      { "from": "wpi::math::", "to": "wpi::numbers::" }
     ]
   }
 ]
