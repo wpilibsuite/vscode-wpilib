@@ -169,7 +169,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       soLibPath: soPath,
       srcPaths: new Set<string>(srcArrs),
       sysroot,
-      target: targetInfoParsed.target + ":" + targetInfoParsed.port.toString(10),
+      target: targetInfoParsed.target + ':' + targetInfoParsed.port.toString(10),
       workspace,
     };
 
