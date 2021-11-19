@@ -10,8 +10,8 @@ import { IUnixSimulateCommands, startUnixSimulation } from './simulateunix';
 import { IWindowsSimulateCommands, startWindowsSimulation } from './simulatewindows';
 
 interface ICppDebugInfo {
-  debugfile: string;
-  artifact: string;
+  name: string;
+  path: string;
 }
 
 interface ICppSimExtensions {
@@ -34,18 +34,16 @@ interface ICppSimulateInfo {
 }
 
 interface ICppDebugCommand {
-  name?: string;
-  extensions: string;
-  clang?: boolean;
-  launchfile: string;
+  type: string;
+  name: string;
+  port: number;
   target: string;
+  launchfile: string;
   gdb: string;
-  env?: Map<string, string>;
-  sysroot: string | null;
+  sysroot: string | undefined;
   srcpaths: string[];
   headerpaths: string[];
   libpaths: string[];
-  debugpaths: string[];
   libsrcpaths: string[];
 }
 
@@ -91,10 +89,10 @@ class DebugCodeDeployer implements ICodeDeployer {
       return false;
     }
 
-    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'), 'utf8');
+    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'), 'utf8');
     const parsedDebugInfo: ICppDebugInfo[] = jsonc.parse(debugInfo) as ICppDebugInfo[];
     if (parsedDebugInfo.length === 0) {
-      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
+      await vscode.window.showInformationMessage('No target configurations found. Is this a robot project?', {
         modal: true,
       });
       return false;
@@ -103,7 +101,36 @@ class DebugCodeDeployer implements ICodeDeployer {
     if (parsedDebugInfo.length > 1) {
       const arr: CppQuickPick<ICppDebugInfo>[] = [];
       for (const i of parsedDebugInfo) {
-        arr.push(new CppQuickPick<ICppDebugInfo>(i, i.artifact));
+        arr.push(new CppQuickPick<ICppDebugInfo>(i, i.name));
+      }
+      const picked = await vscode.window.showQuickPick(arr, {
+        placeHolder: 'Select a target',
+      });
+      if (picked === undefined) {
+        vscode.window.showInformationMessage('Target cancelled');
+        return false;
+      }
+      targetDebugInfo = picked.debugInfo;
+    }
+
+    const debugPath = targetDebugInfo.path;
+
+    const targetReadInfo = await readFileAsync(debugPath, 'utf8');
+    const targetInfoArray: ICppDebugCommand[] = jsonc.parse(targetReadInfo) as ICppDebugCommand[];
+
+    if (targetInfoArray.length === 0) {
+      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
+        modal: true,
+      });
+      return false;
+    }
+
+    // TODO Filter this off of type
+    let targetInfoParsed = targetInfoArray[0];
+    if (targetInfoArray.length > 1) {
+      const arr: CppQuickPick<ICppDebugCommand>[] = [];
+      for (const i of targetInfoArray) {
+        arr.push(new CppQuickPick<ICppDebugCommand>(i, i.name));
       }
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
@@ -112,13 +139,8 @@ class DebugCodeDeployer implements ICodeDeployer {
         vscode.window.showInformationMessage('Artifact cancelled');
         return false;
       }
-      targetDebugInfo = picked.debugInfo;
+      targetInfoParsed = picked.debugInfo;
     }
-
-    const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
-
-    const targetReadInfo = await readFileAsync(debugPath, 'utf8');
-    const targetInfoParsed: ICppDebugCommand = jsonc.parse(targetReadInfo) as ICppDebugCommand;
 
     const set = new Set<string>(targetInfoParsed.libpaths);
 
@@ -132,7 +154,7 @@ class DebugCodeDeployer implements ICodeDeployer {
 
     let sysroot = '';
 
-    if (targetInfoParsed.sysroot !== null) {
+    if (targetInfoParsed.sysroot !== undefined) {
       sysroot = targetInfoParsed.sysroot;
     }
 
@@ -147,7 +169,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       soLibPath: soPath,
       srcPaths: new Set<string>(srcArrs),
       sysroot,
-      target: targetInfoParsed.target,
+      target: targetInfoParsed.target + ":" + targetInfoParsed.port.toString(10),
       workspace,
     };
 
