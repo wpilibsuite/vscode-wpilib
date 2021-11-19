@@ -31,7 +31,7 @@ interface IJavaSimulateInfo {
   name: string;
   type: string;
   extensions: IJavaSimExtensions[];
-  env?: Map<string, string>;
+  environment?: Map<string, string>;
   libraryDir: string;
   mainClassName: string;
 }
@@ -272,7 +272,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     const config: ISimulateCommands = {
-      environment: targetSimulateInfo.env,
+      environment: targetSimulateInfo.environment,
       extensions,
       librarydir: targetSimulateInfo.libraryDir,
       mainclass: targetSimulateInfo.mainClassName,

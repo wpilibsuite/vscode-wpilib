@@ -26,7 +26,7 @@ interface ICppSimulateInfo {
   extensions: ICppSimExtensions[];
   launchfile: string;
   clang: boolean;
-  env?: Map<string, string>;
+  environment?: Map<string, string>;
   srcpaths: string[];
   headerpaths: string[];
   libpaths: string[];
@@ -313,7 +313,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
 
       const config: IUnixSimulateCommands = {
         clang: targetSimulateInfo.clang,
-        environment: targetSimulateInfo.env,
+        environment: targetSimulateInfo.environment,
         executablePath: targetSimulateInfo.launchfile,
         extensions,
         ldPath: path.dirname(targetSimulateInfo.launchfile),    // gradle puts all the libs in the same dir as the executable
@@ -327,7 +327,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     } else {
       const config: IWindowsSimulateCommands = {
         debugPaths: targetSimulateInfo.libpaths,
-        environment: targetSimulateInfo.env,
+        environment: targetSimulateInfo.environment,
         extensions,
         launchfile: targetSimulateInfo.launchfile,
         srcPaths: targetSimulateInfo.srcpaths,
