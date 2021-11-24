@@ -6,7 +6,7 @@
 	"wpilibcore.testCode.title": "Test Robot Code",
 	"wpilibcore.deployCode.title": "Deploy Robot Code",
 	"wpilibcore.debugCode.title": "Debug Robot Code",
-	"wpilibcore.simulateCode.title": "Simulate Robot Code on Desktop",
+	"wpilibcore.simulateCode.title": "Simulate Robot Code",
 	"wpilibcore.setLanguage.title": "Change Language Setting",
 	"wpilibcore.setAutoSave.title": "Change Auto Save On Deploy Setting",
 	"wpilibcore.setSkipTests.title": "Change Skip Tests On Deploy Setting",
