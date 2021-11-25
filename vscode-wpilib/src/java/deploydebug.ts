@@ -9,14 +9,16 @@ import { IDebugCommands, startDebugging } from './debug';
 import { ISimulateCommands, startSimulation } from './simulate';
 
 interface IJavaDebugInfo {
-  debugfile: string;
-  project: string;
-  artifact: string;
+  name: string;
+  path: string;
 }
 
 interface ITargetInfo {
-  ipAddress: string;
-  port: string;
+  type: string;
+  name: string;
+  port: number;
+  target: string;
+  project: string;
 }
 
 interface IJavaSimExtensions {
@@ -29,7 +31,7 @@ interface IJavaSimulateInfo {
   name: string;
   type: string;
   extensions: IJavaSimExtensions[];
-  env?: Map<string, string>;
+  environment?: Map<string, string>;
   libraryDir: string;
   mainClassName: string;
 }
@@ -79,7 +81,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       return false;
     }
 
-    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debuginfo.json'), 'utf8');
+    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'), 'utf8');
     const parsedDebugInfo: IJavaDebugInfo[] = jsonc.parse(debugInfo) as IJavaDebugInfo[];
     if (parsedDebugInfo.length === 0) {
       await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
@@ -91,7 +93,36 @@ class DebugCodeDeployer implements ICodeDeployer {
     if (parsedDebugInfo.length > 1) {
       const arr: JavaQuickPick<IJavaDebugInfo>[] = [];
       for (const i of parsedDebugInfo) {
-        arr.push(new JavaQuickPick<IJavaDebugInfo>(i, i.artifact));
+        arr.push(new JavaQuickPick<IJavaDebugInfo>(i, i.name));
+      }
+      const picked = await vscode.window.showQuickPick(arr, {
+        placeHolder: 'Select a target',
+      });
+      if (picked === undefined) {
+        vscode.window.showInformationMessage('Target cancelled');
+        return false;
+      }
+      targetDebugInfo = picked.debugInfo;
+    }
+
+    const debugPath = targetDebugInfo.path;
+
+    const targetReadInfo = await readFileAsync(debugPath, 'utf8');
+    const targetInfoArray = jsonc.parse(targetReadInfo) as ITargetInfo[];
+
+    if (targetInfoArray.length === 0) {
+      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
+        modal: true,
+      });
+      return false;
+    }
+
+    // TODO Filter this off of type
+    let targetInfoParsed = targetInfoArray[0];
+    if (targetInfoArray.length > 1) {
+      const arr: JavaQuickPick<ITargetInfo>[] = [];
+      for (const i of targetInfoArray) {
+        arr.push(new JavaQuickPick<ITargetInfo>(i, i.name));
       }
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
@@ -100,18 +131,13 @@ class DebugCodeDeployer implements ICodeDeployer {
         vscode.window.showInformationMessage('Artifact cancelled');
         return false;
       }
-      targetDebugInfo = picked.debugInfo;
+      targetInfoParsed = picked.debugInfo;
     }
 
-    const debugPath = path.join(workspace.uri.fsPath, 'build', 'debug', targetDebugInfo.debugfile);
-
-    const targetReadInfo = await readFileAsync(debugPath, 'utf8');
-    const targetInfoParsed = jsonc.parse(targetReadInfo) as ITargetInfo;
-
     const config: IDebugCommands = {
-      project: targetDebugInfo.project,
-      serverAddress: targetInfoParsed.ipAddress,
-      serverPort: targetInfoParsed.port,
+      project: targetInfoParsed.project,
+      serverAddress: targetInfoParsed.target,
+      serverPort: targetInfoParsed.port.toString(10),
       workspace,
     };
 
@@ -246,7 +272,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     const config: ISimulateCommands = {
-      environment: targetSimulateInfo.env,
+      environment: targetSimulateInfo.environment,
       extensions,
       librarydir: targetSimulateInfo.libraryDir,
       mainclass: targetSimulateInfo.mainClassName,
