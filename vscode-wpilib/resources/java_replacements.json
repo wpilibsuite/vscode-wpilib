@@ -136,7 +136,8 @@
       { "from": "DriverStation[.]getInstance[(][)][.]", "to": "DriverStation." },
       { "from": "LiveWindow[.]getInstance[(][)][.]", "to": "LiveWindow." },
       { "from": "Preferences[.]getInstance[(][)][.]", "to": "Preferences." },
-      { "from": "SendableRegistry[.]getInstance[(][)][.]", "to": "SendableRegistry." }
+      { "from": "SendableRegistry[.]getInstance[(][)][.]", "to": "SendableRegistry." },
+      { "from": "[.]get(\\w*)[(]Hand[.]k(\\w*)[)]", "to": ".get$2$1()" }
     ]
   }
 ]
