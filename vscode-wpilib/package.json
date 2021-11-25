@@ -415,8 +415,13 @@
                     "group": "wpilib@3"
                 },
                 {
-                    "command": "wpilibcore.startTool",
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.simulateCode",
                     "group": "wpilib@4"
+                },
+                {
+                    "command": "wpilibcore.startTool",
+                    "group": "wpilib@5"
                 }
             ],
             "explorer/context": [
