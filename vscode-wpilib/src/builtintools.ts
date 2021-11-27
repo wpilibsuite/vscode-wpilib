@@ -2,7 +2,7 @@
 
 import * as cp from 'child_process';
 import * as path from 'path';
-import { IExternalAPI, IToolRunner, IUtilitiesAPI } from 'vscode-wpilibapi';
+import { IExternalAPI, IPreferencesAPI, IToolRunner, IUtilitiesAPI } from 'vscode-wpilibapi';
 import { existsAsync, getIsWindows, readFileAsync } from './utilities';
 
 interface ITool {
@@ -18,33 +18,31 @@ interface IEnumerateResult {
 class VbsToolRunner implements IToolRunner {
   private toolScript: string;
   private name: string;
+  private preferences: IPreferencesAPI;
 
-  public constructor(toolScript: string, name: string) {
+  public constructor(toolScript: string, name: string, preferences: IPreferencesAPI) {
     this.toolScript = toolScript;
     this.name = name;
+    this.preferences = preferences;
   }
 
-  public runTool(): Promise<boolean> {
+  public async runTool(): Promise<boolean> {
+    const wp = await this.preferences.getFirstOrSelectedWorkspace();
     return new Promise<boolean>((resolve, _reject) => {
-      if (getIsWindows()) {
-        // If windows, run the vbs script
-        cp.exec(`wscript.exe ${this.toolScript}`, (err) => {
-          if (err) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
-        });
-      } else {
-        // Unix, run as python
-        cp.exec(`python ${this.toolScript}`, (err) => {
-          if (err) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
-        });
+      let cmd = getIsWindows() ? `wscript.exe ${this.toolScript}` : `python ${this.toolScript}`;
+
+      if (wp !== undefined) {
+        const toolStoreFolder = path.join(wp.uri.fsPath, `.${this.name}`);
+        cmd += ` "${toolStoreFolder}"`;
       }
+
+      cp.exec(cmd, (err) => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
     });
   }
   public getDisplayName(): string {
@@ -66,13 +64,13 @@ export class BuiltinTools {
         const toolPath = path.join(homeTools.dir, ht.name + '.vbs');
         if (await existsAsync(toolPath)) {
           // Tool exists, add it
-          toolApi.addTool(new VbsToolRunner(toolPath, ht.name));
+          toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
         }
       } else {
         const toolPath = path.join(homeTools.dir, ht.name + '.py');
         if (await existsAsync(toolPath)) {
           // Tool exists, add it
-          toolApi.addTool(new VbsToolRunner(toolPath, ht.name));
+          toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
         }
       }
     }
