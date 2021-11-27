@@ -32,7 +32,8 @@ class VbsToolRunner implements IToolRunner {
       let cmd = getIsWindows() ? `wscript.exe ${this.toolScript} ` : `python ${this.toolScript}`;
 
       if (wp !== undefined) {
-        cmd += ` ${wp.uri.fsPath}`;
+        const toolStoreFolder = path.join(wp.uri.fsPath, `.${this.name}`);
+        cmd += ` ${toolStoreFolder}`;
       }
 
       cp.exec(cmd, (err) => {
