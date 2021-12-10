@@ -37,7 +37,7 @@ export async function startWindowsSimulation(commands: IWindowsSimulateCommands)
       name: 'HALSIM_EXTENSIONS',
       value: commands.extensions,
     }],
-    console: "integratedTerminal",
+    console: 'integratedTerminal',
     name: 'WPILib C++ Simulate',
     program: commands.launchfile,
     request: 'launch',

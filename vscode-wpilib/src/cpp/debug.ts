@@ -17,7 +17,7 @@ export async function startDebugging(commands: IDebugCommands): Promise<void> {
     MIMode: 'gdb',
     additionalSOLibSearchPath: commands.soLibPath,
     cwd: commands.workspace.uri.fsPath,
-    console: true,
+    console: 'integratedTerminal',
     miDebuggerPath: commands.gdbPath,
     miDebuggerServerAddress: commands.target,
     name: 'wpilibCppDebug',

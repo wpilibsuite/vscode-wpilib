@@ -31,7 +31,7 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
     }, {
       name: 'DYLD_FALLBACK_LIBRARY_PATH', value: commands.ldPath,
     }],
-    console: "integratedTerminal",
+    console: 'integratedTerminal',
     name: 'WPILib C++ Simulate',
     program: commands.executablePath,
     request: 'launch',
