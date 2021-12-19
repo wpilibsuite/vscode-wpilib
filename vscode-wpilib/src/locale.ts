@@ -109,7 +109,9 @@ export function loadLocaleFile(domain: string) {
     logger.log(`[Locale] Loaded ${domain}@${options.language}`);
   } catch (e) {
     localeCache[domain] = {}; // suppress errors when finding messages in non-existence domain
-    logger.error(`[Locale] Failed to load ${domain}@${options.language}.`, e);
+    if (domain !== 'en-us') {
+      logger.error(`[Locale] Failed to load ${domain}@${options.language}.`, e);
+    }
   }
   return localeCache[domain];
 }
