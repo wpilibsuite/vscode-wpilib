@@ -2,6 +2,7 @@
 
 import * as electron from 'electron';
 import * as path from 'path';
+import { logger } from './logger';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { deleteFileAsync, existsAsync, readdirAsync } from './utilities';
@@ -108,7 +109,14 @@ class VendorLibraries extends VendorLibrariesBase {
   }
 
   public async installOnlineDependency(dir: string, url: string) {
-    const file = await this.loadFileFromUrl(url);
+    let file;
+    try {
+      file = await this.loadFileFromUrl(url);
+    } catch (err) {
+      logger.log('Error fetching file', err);
+      alert ('Failure ' + err);
+      return;
+    }
     if (file !== undefined) {
       // Load existing libraries
       const existing = await this.getDependencies(this.getVendorFolder(dir));
