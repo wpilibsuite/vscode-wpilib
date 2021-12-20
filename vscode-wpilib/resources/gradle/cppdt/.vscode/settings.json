@@ -1,5 +1,6 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
+  "http.systemCertificates": false,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

@@ -184,6 +184,11 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
+        if (prefs.getProjectYear() === 'intellisense') {
+          logger.log('Intellisense only build project found');
+          continue;
+        }
+
         if (prefs.getProjectYear() !== '2022') {
           const importPersistantState = new PersistentFolderState('wpilib.2022persist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {

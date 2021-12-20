@@ -2,6 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { logger } from './logger';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { localize as i18n } from './locale';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
@@ -186,7 +187,12 @@ export class VendorLibraries extends VendorLibrariesBase {
 
     if (installedDeps.length !== 0) {
       const promises = installedDeps.map((dep) => {
-        return this.loadFileFromUrl(dep.jsonUrl);
+        try {
+          return this.loadFileFromUrl(dep.jsonUrl);
+        } catch (err) {
+          logger.log('Error fetching file', err);
+          return undefined;
+        }
       });
       const results = (await Promise.all(promises)).filter((x) => x !== undefined) as IJsonDependency[];
       const updatable = [];
@@ -295,30 +301,28 @@ export class VendorLibraries extends VendorLibrariesBase {
 
     if (result) {
       const file = await this.loadFileFromUrl(result);
-      if (file !== undefined) {
-        // Load existing libraries
-        const existing = await this.getInstalledDependencies(workspace);
+      // Load existing libraries
+      const existing = await this.getInstalledDependencies(workspace);
 
-        for (const dep of existing) {
-          if (dep.uuid === file.uuid) {
-            vscode.window.showWarningMessage(i18n('message', 'Library already installed'));
-            return;
-          }
+      for (const dep of existing) {
+        if (dep.uuid === file.uuid) {
+          vscode.window.showWarningMessage(i18n('message', 'Library already installed'));
+          return;
         }
+      }
 
-        const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
-        if (success) {
-          const buildRes = await vscode.window.showInformationMessage(i18n('message',
-            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-            'Would you like to do this now?'), {
-              modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-          if (buildRes === i18n('ui', 'Yes')) {
-            await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
-          }
-        } else {
-          vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
+      const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
+      if (success) {
+        const buildRes = await vscode.window.showInformationMessage(i18n('message',
+          'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+          'Would you like to do this now?'), {
+            modal: true,
+          }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+        if (buildRes === i18n('ui', 'Yes')) {
+          await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
         }
+      } else {
+        vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
       }
     }
   }
