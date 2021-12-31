@@ -1,6 +1,5 @@
 {
   "java.configuration.updateBuildConfiguration": "disabled",
-  "http.systemCertificates": false,
   "java.import.gradle.enabled": false,
   "files.exclude": {
     "**/.git": true,
