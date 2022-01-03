@@ -29,7 +29,7 @@ class VbsToolRunner implements IToolRunner {
   public async runTool(): Promise<boolean> {
     const wp = await this.preferences.getFirstOrSelectedWorkspace();
     return new Promise<boolean>((resolve, _reject) => {
-      let cmd = getIsWindows() ? `wscript.exe ${this.toolScript}` : `python ${this.toolScript}`;
+      let cmd = getIsWindows() ? `wscript.exe ${this.toolScript}` : `python3 ${this.toolScript}`;
 
       if (wp !== undefined) {
         const toolStoreFolder = path.join(wp.uri.fsPath, `.${this.name}`);
