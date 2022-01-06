@@ -193,7 +193,7 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
           const importPersistantState = new PersistentFolderState('wpilib.2022persist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2022?.'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2022?'), {
               modal: true,
             }, 'Yes', 'No', 'No, Don\'t ask again');
             if (upgradeResult === 'Yes') {
