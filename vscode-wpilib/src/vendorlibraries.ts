@@ -186,9 +186,12 @@ export class VendorLibraries extends VendorLibrariesBase {
     const installedDeps = await this.getInstalledDependencies(workspace);
 
     if (installedDeps.length !== 0) {
-      const promises = installedDeps.map((dep) => {
+      const promises = installedDeps.map(async (dep) => {
+        if (dep.jsonUrl === undefined || dep.jsonUrl.length === 0) {
+          return undefined;
+        }
         try {
-          return this.loadFileFromUrl(dep.jsonUrl);
+          return await this.loadFileFromUrl(dep.jsonUrl);
         } catch (err) {
           logger.log('Error fetching file', err);
           return undefined;
