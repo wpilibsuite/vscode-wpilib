@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { copyFileAsync, mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
@@ -91,7 +92,12 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
 
     const vendorDir = path.join(toFolder, 'vendordeps');
     await mkdirpAsync(vendorDir);
-    const commandName = oldCommands ? 'WPILibOldCommands.json' : 'WPILibNewCommands.json';
+    if (oldCommands) {
+      await vscode.window.showErrorMessage(i18n('message', 'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'), {
+        modal: true,
+      });
+    }
+    const commandName = 'WPILibNewCommands.json';
     const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
     await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
 
@@ -231,7 +237,12 @@ to get a proper path relative to the deploy directory.` ]));
 
     const vendorDir = path.join(toFolder, 'vendordeps');
     await mkdirpAsync(vendorDir);
-    const commandName = oldCommands ? 'WPILibOldCommands.json' : 'WPILibNewCommands.json';
+    if (oldCommands) {
+      await vscode.window.showErrorMessage(i18n('message', 'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'), {
+        modal: true,
+      });
+    }
+    const commandName = 'WPILibNewCommands.json';
     const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
     await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
 
