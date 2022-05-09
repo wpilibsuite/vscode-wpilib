@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as path from 'path';
-import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { copyFileAsync, mkdirpAsync, ncpAsync, readdirAsync, readFileAsync, writeFileAsync } from '../utilities';
@@ -10,7 +9,7 @@ import { setExecutePermissions } from './permissions';
 type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
 export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                      addCpp: boolean, directGradleImport: boolean, oldCommands: boolean): Promise<boolean> {
+                                      addCpp: boolean, directGradleImport: boolean): Promise<boolean> {
   try {
     const existingFiles = await readdirAsync(toFolder);
     if (existingFiles.length > 0) {
@@ -92,11 +91,7 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
 
     const vendorDir = path.join(toFolder, 'vendordeps');
     await mkdirpAsync(vendorDir);
-    if (oldCommands) {
-      await vscode.window.showErrorMessage(i18n('message', 'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'), {
-        modal: true,
-      });
-    }
+
     const commandName = 'WPILibNewCommands.json';
     const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
     await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
@@ -109,7 +104,7 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
 }
 
 export async function generateCopyJava(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean, oldCommands: boolean,
+                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean,
                                        packageReplaceString?: string | undefined): Promise<boolean> {
   try {
     const existingFiles = await readdirAsync(toFolder);
@@ -237,11 +232,6 @@ to get a proper path relative to the deploy directory.` ]));
 
     const vendorDir = path.join(toFolder, 'vendordeps');
     await mkdirpAsync(vendorDir);
-    if (oldCommands) {
-      await vscode.window.showErrorMessage(i18n('message', 'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'), {
-        modal: true,
-      });
-    }
     const commandName = 'WPILibNewCommands.json';
     const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
     await copyFileAsync(vendorFile, path.join(vendorDir, commandName));

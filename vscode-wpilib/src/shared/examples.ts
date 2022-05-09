@@ -46,13 +46,13 @@ export class Examples {
               if (java) {
                 if (!await generateCopyJava(resourceRoot, path.join(examplesFolder, e.foldername),
                   path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'),
-                  false, e.commandversion !== 2)) {
+                  false)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               } else {
                 if (!await generateCopyCpp(resourceRoot, path.join(examplesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false, e.commandversion !== 2)) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
