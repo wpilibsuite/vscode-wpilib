@@ -227,15 +227,21 @@ export class Gradle2020Import extends WebViewBase {
     const resourceRoot = path.join(extensionContext.extensionPath, 'resources');
     const commandsJsonPath = path.join(oldProjectPath, 'vendordeps', 'WPILibOldCommands.json');
 
+    if (fs.existsSync(commandsJsonPath)) {
+      await vscode.window.showErrorMessage(i18n('message', 'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'), {
+        modal: true,
+      });
+    }
+
     let success = false;
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, 'cpp');
       success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
-                                       false, true, fs.existsSync(commandsJsonPath));
+                                       false, true);
     } else {
       const gradlePath = path.join(gradleBasePath, 'java');
       success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
-                                       javaRobotPackage, '', true, fs.existsSync(commandsJsonPath));
+                                       javaRobotPackage, '', true);
     }
 
     if (!success) {

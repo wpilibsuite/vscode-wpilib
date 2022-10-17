@@ -69,17 +69,10 @@ def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
   overwrite true
 }
 
-def downloadOldCommands = tasks.register('downloadOldCommands', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibOldCommands/WPILibOldCommands.json'
-  dest 'vscode-wpilib/resources/vendordeps/WPILibOldCommands.json'
-  overwrite true
-}
-
 task copyFromVsCodeToStandaloneResources(type: Copy) {
     dependsOn extractCppDependencies
     dependsOn extractJavaDependencies
     dependsOn downloadNewCommands
-    dependsOn downloadOldCommands
     from ('vscode-wpilib/resources/java') {
         into 'java'
     }
