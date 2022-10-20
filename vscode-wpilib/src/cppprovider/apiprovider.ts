@@ -31,7 +31,8 @@ function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
-function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | 'c++23' | undefined {
+function getVersionFromArg(arg: string):
+    'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | 'c++23' | undefined {
   const lowerArg = arg.toLowerCase();
   if (lowerArg.startsWith('-std') || lowerArg.startsWith('/std')) {
     if (lowerArg.indexOf('++') > 0) {
@@ -169,7 +170,7 @@ export class ApiProvider implements CustomConfigurationProvider {
     return false;
   }
   public async provideFolderBrowseConfiguration(_: vscode.Uri, __?: vscode.CancellationToken | undefined)
-      : Promise<WorkspaceBrowseConfiguration> {
+    : Promise<WorkspaceBrowseConfiguration> {
     throw new Error('Method not supported.');
   }
 
