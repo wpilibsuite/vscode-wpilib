@@ -110,7 +110,7 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
     }
     setJavaHome(jdkLoc);
   } else {
-    vscode.window.showErrorMessage(i18n('message', 'Java 11 required, but not found. Might have compilation errors.'));
+    vscode.window.showErrorMessage(i18n('message', 'Java 17 required, but not found. Might have compilation errors.'));
   }
 
   // Activate the C++ parts of the extension
