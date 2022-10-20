@@ -31,12 +31,15 @@ function normalizeDriveLetter(pth: string): string {
   return pth;
 }
 
-function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | undefined {
+function getVersionFromArg(arg: string):
+    'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | 'c++23' | undefined {
   const lowerArg = arg.toLowerCase();
   if (lowerArg.startsWith('-std') || lowerArg.startsWith('/std')) {
     if (lowerArg.indexOf('++') > 0) {
       // C++ mode
-      if (lowerArg.indexOf('latest') >= 0 || lowerArg.indexOf('20') >= 0) {
+      if (lowerArg.indexOf('23') >= 0 || lowerArg.indexOf('2b') > 0) {
+        return 'c++23';
+      } else if (lowerArg.indexOf('latest') >= 0 || lowerArg.indexOf('20') >= 0 || lowerArg.indexOf('2a') > 0) {
         return 'c++20';
       } else if (lowerArg.indexOf('17') >= 0 || lowerArg.indexOf('1z') >= 0) {
         return 'c++17';
@@ -44,14 +47,12 @@ function getVersionFromArg(arg: string): 'c89' | 'c99' | 'c11' | 'c17' | 'c++98'
         return 'c++14';
       } else if (lowerArg.indexOf('11') >= 0 || lowerArg.indexOf('1x') >= 0) {
         return 'c++11';
-      } else if (lowerArg.indexOf('20') >= 0 || lowerArg.indexOf('2a') > 0) {
-        return 'c++17'; // For now, 20 not supported
       } else if (lowerArg.indexOf('03') >= 0) {
         return 'c++03';
       } else if (lowerArg.indexOf('98') >= 0) {
         return 'c++98';
       } else {
-        return 'c++14';
+        return 'c++20';
       }
     } else {
       // C mode
@@ -163,6 +164,14 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.setupWatchers();
 
     this.loadConfigs().catch();
+  }
+
+  public async canProvideBrowseConfigurationsPerFolder(_?: vscode.CancellationToken | undefined): Promise<boolean> {
+    return false;
+  }
+  public async provideFolderBrowseConfiguration(_: vscode.Uri, __?: vscode.CancellationToken | undefined)
+    : Promise<WorkspaceBrowseConfiguration> {
+    throw new Error('Method not supported.');
   }
 
   public async canProvideBrowseConfiguration(_?: vscode.CancellationToken | undefined): Promise<boolean> {
@@ -536,7 +545,6 @@ export class ApiProvider implements CustomConfigurationProvider {
                       compilerPath: tc.cppPath,
                       defines: macros,
                       includePath: includePaths,
-                      intelliSenseMode: tc.msvc ? 'msvc-x64' : tc.gcc ? 'gcc-x64' : 'clang-x64',
                       // tslint:disable-next-line:no-non-null-assertion no-any
                       standard: sb.langVersion! as any,
                     },
@@ -575,7 +583,6 @@ export class ApiProvider implements CustomConfigurationProvider {
                       compilerPath: tc.cPath,
                       defines: macros,
                       includePath: includePaths,
-                      intelliSenseMode: tc.msvc ? 'msvc-x64' : tc.gcc ? 'gcc-x64' : 'clang-x64',
                       // tslint:disable-next-line:no-non-null-assertion no-any
                       standard: sb.langVersion! as any,
                     },
@@ -601,8 +608,7 @@ export class ApiProvider implements CustomConfigurationProvider {
                 compilerPath: tc.cppPath,
                 defines: macros,
                 includePath: includePaths,
-                intelliSenseMode: tc.msvc ? 'msvc-x64' : 'clang-x64',
-                standard: 'c++14',
+                standard: 'c++20',
               },
               uri: uriPath,
             });
