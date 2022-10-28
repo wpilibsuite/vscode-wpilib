@@ -32,6 +32,7 @@ function importProjectButtonClick() {
   vscode.postMessage({
     data: {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
+      romi: (document.getElementById('romiCB') as HTMLInputElement).checked,
       fromProps: (document.getElementById('gradle2020Input') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
