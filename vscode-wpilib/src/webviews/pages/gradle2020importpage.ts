@@ -79,4 +79,6 @@ window.addEventListener('load', (_: Event) => {
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
+
+  vscode.postMessage({ type: 'loaded' });
 });
