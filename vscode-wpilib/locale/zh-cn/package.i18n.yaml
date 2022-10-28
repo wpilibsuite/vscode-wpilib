@@ -6,7 +6,7 @@ wpilibcore.testCode.title: 测试机器人代码
 wpilibcore.deployCode.title: 部署机器人代码
 wpilibcore.debugCode.title: 调试机器人代码
 wpilibcore.simulateCode.title: 在电脑上模拟运行机器人代码
-wpilibcore.simulateHwCode.title: Hardware SW Robot Code
+wpilibcore.simulateHwCode.title: Hardware Sim Robot Code
 wpilibcore.setLanguage.title: 设置语言
 wpilibcore.setAutoSave.title: 设置部署时自动保存
 wpilibcore.setSkipTests.title: 设置是否跳过测试API
