@@ -24,6 +24,7 @@
         "onCommand:wpilibcore.deployCode",
         "onCommand:wpilibcore.debugCode",
         "onCommand:wpilibcore.simulateCode",
+        "onCommand:wpilibcore.simulateHwCode",
         "onCommand:wpilibcore.setLanguage",
         "onCommand:wpilibcore.setAutoSave",
         "onCommand:wpilibcore.setSkipTests",
@@ -76,6 +77,10 @@
                             "desktop": {
                                 "type": "boolean",
                                 "description": "True for desktop, false for roboRIO"
+                            },
+                            "hwsim": {
+                                "type": "boolean",
+                                "description": "True for hw sim, false for sw sim"
                             }
                         }
                     }
@@ -202,6 +207,12 @@
             {
                 "command": "wpilibcore.simulateCode",
                 "title": "%wpilibcore.simulateCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.simulateHwCode",
+                "title": "%wpilibcore.simulateHwCode.title%",
                 "category": "WPILib",
                 "enablement": "isWorkspaceTrusted"
             },
@@ -420,8 +431,13 @@
                     "group": "wpilib@4"
                 },
                 {
-                    "command": "wpilibcore.startTool",
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.simulateHwCode",
                     "group": "wpilib@5"
+                },
+                {
+                    "command": "wpilibcore.startTool",
+                    "group": "wpilib@6"
                 }
             ],
             "explorer/context": [

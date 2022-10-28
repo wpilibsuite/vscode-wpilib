@@ -34,9 +34,18 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       logger.log('debugger has no desktop argument. Assuming roboRIO');
     }
 
+    let hwsim = false;
+    if ('hwsim' in config) {
+      hwsim = config.hwsim as boolean;
+    }
+
     return new Promise<undefined>(async (resolve) => {
       if (desktop) {
-        await this.deployDebugAPI.simulateCode(workspace, undefined);
+        if (hwsim) {
+          await this.deployDebugAPI.simulateCode(workspace, undefined, '-PhwSim');
+        } else {
+          await this.deployDebugAPI.simulateCode(workspace, undefined);
+        }
       } else {
         await this.deployDebugAPI.debugCode(workspace, undefined);
       }
