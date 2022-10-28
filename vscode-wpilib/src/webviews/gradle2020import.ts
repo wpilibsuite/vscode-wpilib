@@ -19,8 +19,6 @@ export class Gradle2020Import extends WebViewBase {
     return cimport;
   }
 
-  private hasEnabledHandler: boolean = false;
-
   private constructor(resourceRoot: string) {
     super('wpilibgradle2020import', 'WPILib Gradle 2020-2022 Import', resourceRoot);
 
@@ -40,8 +38,7 @@ export class Gradle2020Import extends WebViewBase {
       enableScripts: true,
       retainContextWhenHidden: true,
     });
-    if (this.webview && !this.hasEnabledHandler) {
-      this.hasEnabledHandler = true;
+    if (this.webview) {
       this.webview.webview.onDidReceiveMessage(async (data: IGradle2020IPCReceive) => {
         switch (data.type) {
           case 'gradle2020':
