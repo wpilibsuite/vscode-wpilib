@@ -19,6 +19,8 @@ export class Gradle2020Import extends WebViewBase {
     return cimport;
   }
 
+  private onLoad?: () => Promise<void>;
+
   private constructor(resourceRoot: string) {
     super('wpilibgradle2020import', 'WPILib Gradle 2020-2022 Import', resourceRoot);
 
@@ -30,7 +32,7 @@ export class Gradle2020Import extends WebViewBase {
   public async startWithProject(projectRoot: vscode.Uri) {
     await this.startWebpage();
     const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
-    return this.handleProject(project);
+    return this.handleProject(project, true);
   }
 
   private async startWebpage() {
@@ -41,6 +43,13 @@ export class Gradle2020Import extends WebViewBase {
     if (this.webview) {
       this.webview.webview.onDidReceiveMessage(async (data: IGradle2020IPCReceive) => {
         switch (data.type) {
+          case 'loaded':
+            const copy = this.onLoad;
+            this.onLoad = undefined;
+            if (copy) {
+              await copy();
+            }
+            break;
           case 'gradle2020':
             await this.handleGradle2020Button();
             break;
@@ -67,7 +76,7 @@ export class Gradle2020Import extends WebViewBase {
     }
   }
 
-  private async handleProject(oldProject: vscode.Uri) {
+  private async handleProject(oldProject: vscode.Uri, occursBeforeLoad: boolean) {
     const oldProjectPath = path.dirname(oldProject.fsPath);
 
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
@@ -80,7 +89,7 @@ export class Gradle2020Import extends WebViewBase {
       teamNumber = wpilibJsonFileParsed.teamNumber.toString(10);
     }
 
-    if (this.webview) {
+    this.onLoad = async () => {
       await this.postMessage({
         data: oldProject.fsPath,
         type: 'gradle2020',
@@ -99,6 +108,12 @@ export class Gradle2020Import extends WebViewBase {
           type: 'teamnumber',
         });
       }
+    };
+
+    if (!occursBeforeLoad) {
+      const copy = this.onLoad;
+      this.onLoad = undefined;
+      await copy();
     }
   }
 
@@ -119,7 +134,7 @@ export class Gradle2020Import extends WebViewBase {
       return;
     }
 
-    return this.handleProject(oldProject[0]);
+    return this.handleProject(oldProject[0], false);
   }
 
   private async handleNewProjectLoc() {
