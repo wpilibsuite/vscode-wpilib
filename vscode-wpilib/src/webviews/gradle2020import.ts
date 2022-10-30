@@ -19,7 +19,6 @@ export class Gradle2020Import extends WebViewBase {
     return cimport;
   }
 
-  private hasEnabledHandler: boolean = false;
   private onLoad?: () => Promise<void>;
 
   private constructor(resourceRoot: string) {
@@ -41,8 +40,7 @@ export class Gradle2020Import extends WebViewBase {
       enableScripts: true,
       retainContextWhenHidden: true,
     });
-    if (this.webview && !this.hasEnabledHandler) {
-      this.hasEnabledHandler = true;
+    if (this.webview) {
       this.webview.webview.onDidReceiveMessage(async (data: IGradle2020IPCReceive) => {
         console.log('message ' + data.type)
         switch (data.type) {
@@ -250,11 +248,11 @@ export class Gradle2020Import extends WebViewBase {
 
     let success = false;
     if (cpp) {
-      const gradlePath = path.join(gradleBasePath, 'cpp');
+      const gradlePath = path.join(gradleBasePath, data.romi ? 'cppromi' : 'cpp');
       success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
                                        false, true);
     } else {
-      const gradlePath = path.join(gradleBasePath, 'java');
+      const gradlePath = path.join(gradleBasePath, data.romi ? 'javaromi' : 'java');
       success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
                                        javaRobotPackage, '', true);
     }
