@@ -42,10 +42,9 @@ export class Gradle2020Import extends WebViewBase {
     });
     if (this.webview) {
       this.webview.webview.onDidReceiveMessage(async (data: IGradle2020IPCReceive) => {
-        console.log('message ' + data.type)
         switch (data.type) {
           case 'loaded':
-            let copy = this.onLoad
+            const copy = this.onLoad;
             this.onLoad = undefined;
             if (copy) {
               await copy();
@@ -112,7 +111,7 @@ export class Gradle2020Import extends WebViewBase {
     };
 
     if (!occursBeforeLoad) {
-      let copy = this.onLoad;
+      const copy = this.onLoad;
       this.onLoad = undefined;
       await copy();
     }
