@@ -107,10 +107,20 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const preferencesApi = externalApi.getPreferencesAPI();
     const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
     if (workspace === undefined) {
-      vscode.window.showInformationMessage(i18n('message', 'Cannot simulate number in an empty workspace'));
+      vscode.window.showInformationMessage(i18n('message', 'Cannot simulate code in an empty workspace'));
       return;
     }
     await externalApi.getDeployDebugAPI().simulateCode(workspace, source);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.simulateHwCode', async (source: vscode.Uri | undefined) => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage(i18n('message', 'Cannot simulate code in an empty workspace'));
+      return;
+    }
+    await externalApi.getDeployDebugAPI().simulateCode(workspace, source, '-PhwSim');
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.testCode', async (source: vscode.Uri | undefined) => {
