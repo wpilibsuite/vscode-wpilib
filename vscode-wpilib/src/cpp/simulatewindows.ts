@@ -21,17 +21,18 @@ interface IEnvMap {
 }
 
 export async function simulateWindowsWindbgX(commands: IWindowsSimulateCommands, executor: IExecuteAPI): Promise<void> {
-  let env:  { [key: string]: string } = {
+  const env:  { [key: string]: string } = {
     HALSIM_EXTENSIONS: commands.extensions,
   };
   if (commands.environment !== undefined) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
+      // tslint:disable-next-line: no-any
       env[envVar] = value;
     }
   }
   logger.log('C++ WinDbg Simulation', commands.launchfile, commands.workspace.uri.fsPath, env);
-  await executor.executeCommand("WinDbgX " + commands.launchfile, "windbgx", commands.workspace.uri.fsPath, commands.workspace, env);
+  await executor.executeCommand('WinDbgX ' + commands.launchfile, 'windbgx', commands.workspace.uri.fsPath, commands.workspace, env);
 }
 
 export async function startWindowsSimulation(commands: IWindowsSimulateCommands, executor: IExecuteAPI): Promise<void> {
