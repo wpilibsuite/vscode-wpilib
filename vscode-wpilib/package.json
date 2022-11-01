@@ -31,6 +31,7 @@
         "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
         "onCommand:wpilibcore.setOffline",
         "onCommand:wpilibcore.setStopSimulationOnEntry",
+        "onCommand:wpilibcore.setUseWinDbgX",
         "onCommand:wpilibcore.setStartRioLog",
         "onCommand:wpilibcore.setDeployOffline",
         "onCommand:wpilibcore.createCommand",
@@ -153,8 +154,14 @@
                 },
                 "wpilib.stopSimulationOnEntry": {
                     "type": "boolean",
-                    "default": "false",
+                    "default": false,
                     "description": "Set to make simulation code stop automatically on entry",
+                    "scope": "resource"
+                },
+                "wpilib.useWindbgX": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use WinDbg Preview (from store) as C++ debugger (Windows only)",
                     "scope": "resource"
                 }
             }
@@ -249,6 +256,12 @@
             {
                 "command": "wpilibcore.setStopSimulationOnEntry",
                 "title": "%wpilibcore.setStopSimulationOnEntry.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setUseWinDbgX",
+                "title": "%wpilibcore.setUseWinDbgX.title%",
                 "category": "WPILib",
                 "enablement": "isWorkspaceTrusted"
             },
