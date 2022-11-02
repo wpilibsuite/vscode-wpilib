@@ -335,7 +335,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
         workspace,
       };
 
-      await startWindowsSimulation(config);
+      await startWindowsSimulation(config, this.executeApi);
     }
     return true;
   }

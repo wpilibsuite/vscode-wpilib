@@ -195,7 +195,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
     const result = await globalProjectSettingUpdate(i18n('message', 'Skip tests on deploy? Currently {0}', preferences.getSkipTests()));
     if (result === undefined) {
-      logger.log('Invalid selection for settting skip tests');
+      logger.log('Invalid selection for setting skip tests');
       return;
     }
 
@@ -257,7 +257,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const result = await globalProjectSettingUpdate(i18n('message',
       'Run commands other then deploy in offline mode? Currently {0}', preferences.getOffline()));
     if (result === undefined) {
-      logger.log('Invalid selection for settting offline');
+      logger.log('Invalid selection for setting offline');
       return;
     }
 
@@ -277,7 +277,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const result = await globalProjectSettingUpdate(i18n('message',
       'Run deploy command in offline mode? Currently {0}', preferences.getDeployOffline()));
     if (result === undefined) {
-      logger.log('Invalid selection for settting deploy offline');
+      logger.log('Invalid selection for setting deploy offline');
       return;
     }
 
@@ -297,11 +297,39 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     const result = await globalProjectSettingUpdate(i18n('message',
       'Stop simulation debugging on entry? Currently {0}', preferences.getStopSimulationOnEntry()));
     if (result === undefined) {
-      logger.log('Invalid selection for settting stop simulation on entry');
+      logger.log('Invalid selection for setting stop simulation on entry');
       return;
     }
 
     await preferences.setStopSimulationOnEntry(result.yes, result.global);
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setUseWinDbgX', async () => {
+    const preferencesApi = externalApi.getPreferencesAPI();
+    const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+    if (workspace === undefined) {
+      vscode.window.showInformationMessage(i18n('message', 'Cannot set windbgx in an empty workspace'));
+      return;
+    }
+
+    const wpConfiguration = vscode.workspace.getConfiguration('wpilib', workspace.uri);
+    let res = wpConfiguration.get<boolean>('useWindbgX');
+    if (res === undefined) {
+      res = false;
+    }
+
+    const result = await globalProjectSettingUpdate(i18n('message',
+      'Use WinDbg Preview (from store) for windows debugging? Currently {0}', res));
+    if (result === undefined) {
+      logger.log('Invalid selection for setting Use WinDbg Preview');
+      return;
+    }
+
+    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
+    if (!result.global) {
+      target = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    return wpConfiguration.update('useWindbgX', result.yes, target);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.setAutoSave', async () => {

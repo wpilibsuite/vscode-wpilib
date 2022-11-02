@@ -2,6 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { IExecuteAPI } from 'vscode-wpilibapi';
 import { logger } from '../logger';
 
 export interface IWindowsSimulateCommands {
@@ -19,7 +20,27 @@ interface IEnvMap {
   [key: string]: any;
 }
 
-export async function startWindowsSimulation(commands: IWindowsSimulateCommands): Promise<void> {
+export async function simulateWindowsWindbgX(commands: IWindowsSimulateCommands, executor: IExecuteAPI): Promise<void> {
+  const env:  { [key: string]: string } = {
+    HALSIM_EXTENSIONS: commands.extensions,
+  };
+  if (commands.environment !== undefined) {
+    for (const envVar of Object.keys(commands.environment)) {
+      const value = commands.environment[envVar];
+      // tslint:disable-next-line: no-unsafe-any
+      env[envVar] = value;
+    }
+  }
+  logger.log('C++ WinDbg Simulation', commands.launchfile, commands.workspace.uri.fsPath, env);
+  await executor.executeCommand('WinDbgX ' + commands.launchfile, 'windbgx', commands.workspace.uri.fsPath, commands.workspace, env);
+}
+
+export async function startWindowsSimulation(commands: IWindowsSimulateCommands, executor: IExecuteAPI): Promise<void> {
+  const wpConfiguration = vscode.workspace.getConfiguration('wpilib', commands.workspace.uri);
+  const res = wpConfiguration.get<boolean>('useWindbgX');
+  if (res === true) {
+    return simulateWindowsWindbgX(commands, executor);
+  }
 
   let symbolSearchPath = '';
 
