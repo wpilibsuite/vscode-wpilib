@@ -27,7 +27,7 @@ export async function simulateWindowsWindbgX(commands: IWindowsSimulateCommands,
   if (commands.environment !== undefined) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
-      // tslint:disable-next-line: no-any
+      // tslint:disable-next-line: no-unsafe-any
       env[envVar] = value;
     }
   }
