@@ -84,6 +84,10 @@ Vendor Libraries:
 
     vscode.window.showInformationMessage(infoString, {
       modal: true,
+    }, 'Copy').then(action => {
+      if (action === 'Copy') {
+        vscode.env.clipboard.writeText(infoString);
+      }
     });
   }
 
