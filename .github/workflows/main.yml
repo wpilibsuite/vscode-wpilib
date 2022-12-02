@@ -5,17 +5,18 @@ on: [pull_request, push]
 jobs:
   build-mac:
     name: Build - macOS
-    runs-on: macos-latest
+    runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: '10.x'
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: 'zulu'
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -59,7 +60,7 @@ jobs:
       - run: tar -C build/wpilibutility-darwin-x64 -pcvzf wpilibutility-mac.tar.gz .
         working-directory: wpilib-utility-standalone
         name: Create Archive
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Mac
           path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-mac.tar.gz
@@ -68,15 +69,16 @@ jobs:
     name: Build - Linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: '10.x'
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: 'zulu'
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -89,7 +91,7 @@ jobs:
       - run: tar -C build/wpilibutility-linux-x64 -pcvzf wpilibutility-linux.tar.gz .
         working-directory: wpilib-utility-standalone
         name: Archive Utility
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Linux
           path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-linux.tar.gz
@@ -98,15 +100,16 @@ jobs:
     name: Build - Windows Standalone
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: '10.x'
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: 'zulu'
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -119,7 +122,7 @@ jobs:
       - run: Compress-Archive -Path wpilibutility-win32-ia32\* -DestinationPath wpilibutility-windows.zip
         working-directory: wpilib-utility-standalone/build
         shell: powershell
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: WindowsStandalone
           path: ${{ github.workspace }}/wpilib-utility-standalone/build/wpilibutility-windows.zip
@@ -128,15 +131,16 @@ jobs:
     name: Build - Windows VSIX
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: '10.x'
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: 'zulu'
       - run: ./gradlew build updateVersions updateAllDependencies generateTemplateZip generateExamplesZip -PbuildServer
         name: Build with Gradle
       - run: |
@@ -148,11 +152,11 @@ jobs:
           npm run vscePackage
         working-directory: vscode-wpilib
         name: Build VSIX
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: WindowsVSIX
           path: ${{ github.workspace }}/**/*.vsix
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Distributions
           path: ${{ github.workspace }}/build/distributions/*
@@ -163,12 +167,12 @@ jobs:
     needs: [build-mac, build-linux, build-windows, build-windows-vsix]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         name: Download Artifacts
         with:
           path: artifacts
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v3
         name: Release
         with:
           body_path: ${{ github.workspace }}/.github/ReleaseBody.txt
