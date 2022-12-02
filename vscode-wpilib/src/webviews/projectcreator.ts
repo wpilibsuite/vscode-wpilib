@@ -72,8 +72,12 @@ export class ProjectCreator extends WebViewBase {
       vscode.window.showErrorMessage(i18n('message', 'Can only extract to absolute path'));
       return;
     }
-    await this.exampleTemplateApi.createProject(data.projectType === ProjectType.Template, data.language, data.base, data.toFolder, data.newFolder,
-      data.projectName, parseInt(data.teamNumber, 10));
+    const successful = await this.exampleTemplateApi.createProject(data.projectType === ProjectType.Template, data.language, data.base,
+      data.toFolder, data.newFolder, data.projectName, parseInt(data.teamNumber, 10));
+
+    if (!successful) {
+      return;
+    }
 
     const toFolder = data.newFolder ? path.join(data.toFolder, data.projectName) : data.toFolder;
 

@@ -5,6 +5,7 @@ import { mkdirpAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
 import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
 import { IPreferencesJson } from './preferencesjson';
+import  { localize as i18n } from '../locale';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
   private templates: ICreatorQuickPick[] = [];
@@ -78,6 +79,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
         }
       }
     }
+    vscode.window.showErrorMessage(i18n('message', 'Please select project type, language, and base.'));
     return false;
   }
 
