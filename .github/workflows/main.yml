@@ -172,7 +172,7 @@ jobs:
         name: Download Artifacts
         with:
           path: artifacts
-      - uses: softprops/action-gh-release@v3
+      - uses: softprops/action-gh-release@v1
         name: Release
         with:
           body_path: ${{ github.workspace }}/.github/ReleaseBody.txt
