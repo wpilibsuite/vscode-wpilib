@@ -46,9 +46,9 @@ export class ProjectInfoGatherer {
     this.externalApi = externalApi;
 
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
-    this.statusBar.text = "WPILib";
-    this.statusBar.tooltip = "Open WPILib Project Information";
-    this.statusBar.command = "wpilibcore.getProjectInformation";
+    this.statusBar.text = 'WPILib';
+    this.statusBar.tooltip = 'Open WPILib Project Information';
+    this.statusBar.command = 'wpilibcore.getProjectInformation';
     this.disposables.push(this.statusBar);
 
     const workspaces = vscode.workspace.workspaceFolders;
