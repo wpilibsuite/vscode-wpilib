@@ -353,7 +353,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   try {
     // Create the help window provider
-    help = await Help.Create(externalApi.getPreferencesAPI(), extensionResourceLocation);
+    help = await Help.Create(extensionResourceLocation);
     context.subscriptions.push(help);
   } catch (err) {
     logger.error('error creating help window provider', err);
