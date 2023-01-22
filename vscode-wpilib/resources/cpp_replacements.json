@@ -42,7 +42,11 @@
       { "from": "wpi::SendableRegistry::GetInstance[(][)][.]", "to": "wpi::SendableRegistry::" },
       { "from": "wpi[\\\\/]math", "to": "wpi/numbers" },
       { "from": "wpi::math::", "to": "wpi::numbers::" },
-      { "from": "([.>])Get(\\w*)[(]frc::GenericHID::JoystickHand::k(\\w*)Hand[)]", "to": "$1Get$3$2()" }
+      { "from": "([.>])Get(\\w*)[(]frc::GenericHID::JoystickHand::k(\\w*)Hand[)]", "to": "$1Get$3$2()" },
+      { "from": "wpi[\\\\/]numbers", "to": "numbers" },
+      { "from": "wpi::numbers::", "to": "std::numbers::" },
+      { "from": "wpi[\\\\/]span", "to": "span" },
+      { "from": "wpi::span::", "to": "std::span::" }
     ]
   }
 ]
