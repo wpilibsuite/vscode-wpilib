@@ -46,7 +46,7 @@
       { "from": "wpi[\\\\/]numbers", "to": "numbers" },
       { "from": "wpi::numbers::", "to": "std::numbers::" },
       { "from": "wpi[\\\\/]span", "to": "span" },
-      { "from": "wpi::span::", "to": "std::span::" }
+      { "from": "wpi::span<", "to": "std::span<" }
     ]
   }
 ]
