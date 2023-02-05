@@ -38,11 +38,29 @@ export class ProjectInfoGatherer {
   private wpilibUpdates: WPILibUpdates;
   private externalApi: IExternalAPI;
   private disposables: vscode.Disposable[] = [];
+  private statusBar: vscode.StatusBarItem;
 
   public constructor(vendorLibraries: VendorLibraries, wpilibUpdates: WPILibUpdates, externalApi: IExternalAPI) {
     this.vendorLibraries = vendorLibraries;
     this.wpilibUpdates = wpilibUpdates;
     this.externalApi = externalApi;
+
+    this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
+    this.statusBar.text = 'WPILib';
+    this.statusBar.tooltip = 'Open WPILib Project Information';
+    this.statusBar.command = 'wpilibcore.getProjectInformation';
+    this.disposables.push(this.statusBar);
+
+    const workspaces = vscode.workspace.workspaceFolders;
+    if (workspaces !== undefined) {
+      for (const wp of workspaces) {
+        const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
+        if (prefs.getIsWPILibProject()) {
+          this.statusBar.show();
+          break;
+        }
+      }
+    }
 
     this.disposables.push(vscode.commands.registerCommand('wpilibcore.getProjectInformation', async () => {
       await this.displayProjectInfo();
