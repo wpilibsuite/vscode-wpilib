@@ -1,5 +1,5 @@
 # For Beta Teams Only
 
-This release is for beta teams only. Please download the latest stable release (v2022.4.1) if you are not a beta team. You can find v2022.4.1 at https://github.com/wpilibsuite/vscode-wpilib/releases/tag/v2022.4.1
+This release is for beta teams only. Please download the latest stable release (v2023.4.3) if you are not a beta team. You can find v2023.4.3 at https://github.com/wpilibsuite/vscode-wpilib/releases/tag/v2023.4.3
 
-However, it is strongly recommended to use the full installer at https://github.com/wpilibsuite/allwpilib/releases/tag/v2022.4.1
+However, it is strongly recommended to use the full installer at https://github.com/wpilibsuite/allwpilib/releases/tag/v2023.4.3
