@@ -56,7 +56,19 @@ function selectProjectBase() {
 
 function selectProjectFolder() {
   (document.activeElement as HTMLElement).blur();
-  vscode.postMessage({ type: 'newproject' });
+  vscode.postMessage({
+    type: 'newproject',
+    data: {
+      base: '',
+      desktop: false,
+      language,
+      newFolder: false,
+      projectName: '',
+      projectType,
+      teamNumber: '',
+      toFolder: (document.getElementById('projectFolder') as HTMLInputElement).value,
+    }
+  });
 }
 
 function generateProject() {
