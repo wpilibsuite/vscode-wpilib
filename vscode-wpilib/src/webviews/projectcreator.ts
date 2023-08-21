@@ -8,6 +8,7 @@ import { setDesktopEnabled } from '../shared/generator';
 import { extensionContext, promptForProjectOpen } from '../utilities';
 import { IProjectIPCData, IProjectIPCReceive, IProjectIPCSend, ProjectType } from './pages/projectcreatorpagetypes';
 import { WebViewBase } from './webviewbase';
+import { Uri } from '../vscodeshim';
 
 export class ProjectCreator extends WebViewBase {
   public static async Create(exampleTemplateApi: IExampleTemplateAPI, resourceRoot: string): Promise<ProjectCreator> {
@@ -31,7 +32,9 @@ export class ProjectCreator extends WebViewBase {
         this.webview.webview.onDidReceiveMessage(async (data: IProjectIPCReceive) => {
           switch (data.type) {
             case 'newproject':
-              await this.handleNewProjectLoc();
+              if (data.data) {
+                await this.handleNewProjectLoc(data.data);
+              }
               break;
             case 'projecttype':
               await this.handleProjectType();
@@ -130,12 +133,13 @@ export class ProjectCreator extends WebViewBase {
     }
   }
 
-  private async handleNewProjectLoc() {
+  private async handleNewProjectLoc(data: IProjectIPCData) {
     const open: vscode.OpenDialogOptions = {
       canSelectFiles: false,
       canSelectFolders: true,
       canSelectMany: false,
       openLabel: i18n('ui', 'Select Folder'),
+      defaultUri: data.toFolder.length > 0 ? Uri.file(data.toFolder) : undefined
     };
     const result = await vscode.window.showOpenDialog(open);
 
