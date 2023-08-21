@@ -189,11 +189,11 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2023') {
-          const importPersistantState = new PersistentFolderState('wpilib.2023persist', false, w.uri.fsPath);
+        if (prefs.getProjectYear() !== '2024alpha') {
+          const importPersistantState = new PersistentFolderState('wpilib.2024Alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2023?'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2024?'), {
               modal: true,
             }, 'Yes', 'No', 'No, Don\'t ask again');
             if (upgradeResult === 'Yes') {

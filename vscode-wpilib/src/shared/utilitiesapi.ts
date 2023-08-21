@@ -9,7 +9,7 @@ export class UtilitiesAPI implements IUtilitiesAPI {
   private wpilibHome: string | undefined;
 
   public getFrcYear(): string {
-    return '2023';
+    return '2024';
   }
   public getWPILibHomeDir(): string {
     if (this.wpilibHome) {
