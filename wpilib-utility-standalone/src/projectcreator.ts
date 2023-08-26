@@ -1,6 +1,6 @@
 'use strict';
 
-import * as electron from 'electron';
+import * as remote from '@electron/remote';
 import * as path from 'path';
 import { Examples } from './shared/examples';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
@@ -13,8 +13,8 @@ import { promptForProjectOpen } from './utilities';
 import { validateProject, validateTeamNumber } from './validators';
 import * as vscode from './vscodeshim';
 
-const dialog = electron.remote.dialog;
-const bWindow = electron.remote.getCurrentWindow();
+const dialog = remote.dialog;
+const bWindow = remote.getCurrentWindow();
 
 let exampleTemplateApi: ExampleTemplateAPI;
 
@@ -22,7 +22,7 @@ export async function projectSelectButtonClick(): Promise<void> {
   (document.activeElement as HTMLElement).blur();
   const paths = await dialog.showOpenDialog(bWindow, {
     buttonLabel: 'Select Folder',
-    defaultPath: electron.remote.app.getPath('documents'),
+    defaultPath: remote.app.getPath('documents'),
     message: 'Select a folder to put the project in',
     properties: [
       'openDirectory',
@@ -129,7 +129,6 @@ async function handleProjectGenerate(template: boolean, language: string, base: 
   await promptForProjectOpen(vscode.Uri.file(toFolder));
 }
 
-const remote = electron.remote;
 // const dialog = remote.dialog;
 const app = remote.app;
 // const shell = electron.shell;

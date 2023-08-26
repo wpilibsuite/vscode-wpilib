@@ -1,11 +1,9 @@
 'use strict';
 
-import * as electron from 'electron';
+import * as remote from '@electron/remote';
 import { IIPCReceiveMessage, RioLogWindow } from 'wpilib-riolog';
 import { LiveRioConsoleProvider, RioLogWebviewProvider, RioLogWindowView } from '../electronimpl';
 import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
-
-const remote = electron.remote;
 
 export function checkResize() {
     checkResizeImpl(document.documentElement);

@@ -54,7 +54,8 @@
 		"no-unsafe-any": true,
 		"no-unbound-method": true,
 		"no-var-keyword": true,
-		"eofline": true
+		"eofline": true,
+		"no-submodule-imports": [true, "@electron/remote/main"]
 	},
 	"defaultSeverity": "error"
 }

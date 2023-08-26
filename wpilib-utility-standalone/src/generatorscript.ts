@@ -1,9 +1,9 @@
 import * as electron from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as remote from '@electron/remote';
 import { generateCopyCpp, generateCopyJava } from './shared/generator';
 
-const remote = electron.remote;
 const dialog = remote.dialog;
 const app = remote.app;
 const shell = electron.shell;

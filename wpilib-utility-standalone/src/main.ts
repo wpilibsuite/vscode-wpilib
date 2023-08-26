@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron';
+import * as remoteMain from '@electron/remote/main';
 // import * as path from 'path';
 // import * as url from 'url';
 
@@ -11,11 +12,12 @@ async function createWindow() {
     height: 250,
     title: 'WPILib Utility',
     webPreferences: {
-      enableRemoteModule: true,
       nodeIntegration: true,
     },
     width: 350,
   });
+
+  remoteMain.enable(mainWindow.webContents);
 
   await mainWindow.loadFile('index.html');
 

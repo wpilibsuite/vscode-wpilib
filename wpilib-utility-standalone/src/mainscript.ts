@@ -1,6 +1,4 @@
-
-import * as electron from 'electron';
-const remote = electron.remote;
+import * as remote from '@electron/remote';
 
 document.addEventListener('keydown', (e) => {
   if (e.which === 123) {
