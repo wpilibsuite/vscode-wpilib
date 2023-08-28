@@ -546,6 +546,6 @@
         "winston": "^3.3.3",
         "winston-transport": "^4.4.0",
         "wpilib-riolog": "^0.2.0",
-        "xml2js": "^0.4.23"
+        "xml2js": "^0.6.2"
     }
 }
