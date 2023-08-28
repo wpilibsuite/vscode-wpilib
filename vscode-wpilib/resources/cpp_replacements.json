@@ -47,8 +47,8 @@
       { "from": "wpi::numbers::", "to": "std::numbers::" },
       { "from": "wpi[\\\\/]span", "to": "span" },
       { "from": "wpi::span<", "to": "std::span<" },
-      { "from": "frc::CommandBase", "to": "frc::Command" },
-      { "from": "frc::SubsystemBase", "to": "frc::Subsystem" }
+      { "from": "frc2::CommandBase", "to": "frc2::Command" },
+      { "from": "frc2::SubsystemBase", "to": "frc2::Subsystem" }
       { "from": "frc2[\\\\/]command[\\\\/]CommandBase[.]h", "to": "frc2/command/Command.h" },
       { "from": "frc2[\\\\/]command[\\\\/]SubsystemBase[.]h", "to": "frc2/command/Subsystem.h" }
     ]
