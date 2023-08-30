@@ -39,15 +39,31 @@ export function getJavaVersion(javaHome: string): Promise<number> {
 
 export async function findJdkPath(api: IExternalAPI): Promise<string | undefined> {
   // Check for java property, as thats easily user settable, and we want it to win
-  const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
+  const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('jdt.ls.java.home');
   if (vscodeJavaHome) {
     try {
       const javaVersion = await getJavaVersion(vscodeJavaHome);
       if (javaVersion >= 17) {
-        logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeJavaHome}`);
+        logger.log(`Found jdt.ls.java.home Version: ${javaVersion} at ${vscodeJavaHome}`);
         return vscodeJavaHome;
       } else {
-        logger.info(`Bad Java version ${javaVersion} at ${vscodeJavaHome}`);
+        logger.info(`Bad Java version ${javaVersion} at ${vscodeJavaHome} from jdt.ls.java.home Version`);
+      }
+    } catch (err) {
+      logger.log('Error loading java from jdt.ls.java.home, skipping', err);
+    }
+  }
+
+  // Check for deprecated java property, as that was used before 2024
+  const vscodeOldJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
+  if (vscodeOldJavaHome) {
+    try {
+      const javaVersion = await getJavaVersion(vscodeOldJavaHome);
+      if (javaVersion >= 17) {
+        logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeOldJavaHome}`);
+        return vscodeOldJavaHome;
+      } else {
+        logger.info(`Bad Java version ${javaVersion} at ${vscodeOldJavaHome} from java.home`);
       }
     } catch (err) {
       logger.log('Error loading java from java.home, skipping', err);
@@ -80,7 +96,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
         logger.log(`Found Java Home Version: ${javaVersion} at ${javaHome}`);
         return javaHome;
       } else {
-        logger.info(`Bad Java version ${javaVersion} at ${javaHome}`);
+        logger.info(`Bad Java version ${javaVersion} at ${javaHome} from JAVA_HOME`);
       }
     } catch (err) {
       logger.log('Error loading java from JAVA_HOME, skipping', err);
@@ -96,7 +112,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
         logger.log(`Found Java Home Version: ${javaVersion} at ${jdkHome}`);
         return jdkHome;
       } else {
-        logger.info(`Bad Java version ${javaVersion} at ${jdkHome}`);
+        logger.info(`Bad Java version ${javaVersion} at ${jdkHome} from JDK_HOME`);
       }
     } catch (err) {
       logger.log('Error loading java from JDK_HOME, skipping', err);
