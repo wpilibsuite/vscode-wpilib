@@ -119,7 +119,7 @@ jobs:
           npm run packageWindows
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
-      - run: Compress-Archive -Path wpilibutility-win32-ia32\* -DestinationPath wpilibutility-windows.zip
+      - run: Compress-Archive -Path wpilibutility-win32-x64\* -DestinationPath wpilibutility-windows.zip
         working-directory: wpilib-utility-standalone/build
         shell: powershell
       - uses: actions/upload-artifact@v3
