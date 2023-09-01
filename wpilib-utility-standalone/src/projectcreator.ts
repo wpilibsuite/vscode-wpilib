@@ -135,7 +135,7 @@ const app = remote.app;
 // const shell = electron.shell;
 const basepath = app.getAppPath();
 
-console.log(basepath);
+console.log('BasePath: ' + basepath);
 
 let resourceRoot = path.join(basepath, 'resources');
 if (basepath.indexOf('default_app.asar') >= 0) {
@@ -168,14 +168,14 @@ window.addEventListener('load', async () => {
   disposables.push(javaExamples);
   disposables.push(javaTemplates);
 
-  console.log(projectRootPath);
-  console.log(gradleRoot);
+  console.log('ProjectRootPath: ' + projectRootPath);
+  console.log('GradleRoot: ' + gradleRoot);
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.which === 123) {
+  if (e.key === '{') {
     bWindow.webContents.openDevTools();
-  } else if (e.which === 116) {
+  } else if (e.key === 't') {
     location.reload();
   }
 });
