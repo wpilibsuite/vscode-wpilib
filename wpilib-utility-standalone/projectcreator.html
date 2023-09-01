@@ -43,29 +43,33 @@
   </select>
 
   <br/>
-  <br/> Select a folder to place the new project into.
+  <br/> <span STYLE="font-weight:bold">Base Folder.</span> <span>Select a base folder to place the new project into.</span>
   <br/>
   <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
   <br/>
   <button onclick="exports.projectSelectButtonClick();">Select a new project folder</button>
-  <br/>
-  <br/> Create new folder? Highly recommended to be checked
+  <br/> <span data-i18n-trans STYLE="font-weight:bold">Create a new folder?</span>
   <input id="newFolderCB" type="checkbox" checked/>
   <br/>
+  <span>This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be checked. Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project Name</span>
   <br/>
-  <div id="projectnamediv" class="error">Enter a project name</div>
+  <div id="projectnamediv" class="error" STYLE="font-weight:bold">Project Name</div>
   <input id="projectName" class="error" oninput="validators.validateProject(document.getElementById('projectName'), document.getElementById('projectnamediv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
-  <div id="teamnumberdiv" class="error">Enter a team number</div>
+  <div id="teamnumberdiv" class="error" STYLE="font-weight:bold">Team Number</div>
   <input id="teamNumber" class="error" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
   />
   <br/>
   <div id="desktopdiv">
-    This is needed for simulation and unit testing support, however there are some cases where this will do
-    some unexpected things during build. In addition, not all vendor libraries support desktop.
-    This option can be set with the command "WPILib: Set Desktop Support" at any time.
+    <span STYLE="font-weight:bold">Enable Desktop Support</span>
     <input id="desktopCB" type="checkbox" />
+    <br/>
+    <span data-i18n-trans data-i18n-key="hintDesktopSupport">
+      This is needed for simulation and unit testing support, however there are some cases where this will do
+      some unexpected things during build. In addition, not all vendor libraries support desktop.
+      This option can be set with the command "WPILib: Set Desktop Support" at any time.
+    </span>
   </div>
   <br/>
 
