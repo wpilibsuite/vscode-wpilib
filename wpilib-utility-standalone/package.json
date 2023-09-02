@@ -10,8 +10,8 @@
     "watch": "tsc -watch -p ./",
     "packageWindows": "electron-packager . wpilibutility --platform=win32 --overwrite --out ./build",
     "packageLinux": "electron-packager . wpilibutility --platform=linux --overwrite --out ./build",
-    "packageMac": "electron-packager . wpilibutility --platform=darwin --overwrite --out ./build",
-    "signMac": "electron-osx-sign build/wpilibutility-darwin-x64/wpilibutility.app --entitlements=macOS/WPILibStandaloneUtility.entitlements --entitlements-inherit=macOS/WPILibStandaloneUtility.entitlements --hardened-runtime=true --no-gatekeeper-assess"
+    "packageMac": "electron-packager . wpilibutility --platform=darwin --arch=universal --overwrite --out ./build",
+    "signMac": "electron-osx-sign build/wpilibutility-darwin-universal/wpilibutility.app --entitlements=macOS/WPILibStandaloneUtility.entitlements --entitlements-inherit=macOS/WPILibStandaloneUtility.entitlements --hardened-runtime=true --no-gatekeeper-assess"
   },
   "main": "out/main.js",
   "repository": "https://github.com/wpilibsuite/vscode-wpilib",
