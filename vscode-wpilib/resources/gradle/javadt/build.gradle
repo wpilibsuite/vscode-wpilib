@@ -3,6 +3,11 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 def ROBOT_MAIN_CLASS = "###ROBOTCLASSREPLACE###"
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
