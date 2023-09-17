@@ -139,8 +139,7 @@
       { "from": "Preferences[.]getInstance[(][)][.]", "to": "Preferences." },
       { "from": "SendableRegistry[.]getInstance[(][)][.]", "to": "SendableRegistry." },
       { "from": "[.]get(\\w*)[(](?:GenericHID[.])?Hand[.]k(\\w*)[)]", "to": ".get$2$1()" },
-      { "from": "CommandBase", "to": "Command" },
-      { "from": "SubsystemBase", "to": "Subsystem" }
+      { "from": "CommandBase", "to": "Command" }
     ]
   }
 ]
