@@ -15,6 +15,7 @@ export interface ITemplateJsonLayout {
   foldername: string;
   gradlebase: string;
   commandversion: number;
+  extravendordeps?: string[];
 }
 
 export class Templates {
@@ -31,6 +32,7 @@ export class Templates {
       }
       const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
       for (const e of templates) {
+        const extraVendordeps: string[] = (e.extravendordeps !== undefined) ? e.extravendordeps : [];
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {
             return java ? 'java' : 'cpp';
@@ -46,13 +48,13 @@ export class Templates {
               if (java) {
                 if (!await generateCopyJava(resourceRoot, path.join(templatesFolder, e.foldername),
                   path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'),
-                  false)) {
+                  false, extraVendordeps)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               } else {
                 if (!await generateCopyCpp(resourceRoot, path.join(templatesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false)) {
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false, extraVendordeps)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }

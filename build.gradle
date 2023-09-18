@@ -73,10 +73,24 @@ def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
   overwrite true
 }
 
+def downloadRomiVendordep = tasks.register('downloadRomiVendordep', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/romiVendordep/RomiVendordep.json'
+  dest 'vscode-wpilib/resources/vendordeps/RomiVendordep.json'
+  overwrite true
+}
+
+def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/xrpVendordep/XRPVendordep.json'
+  dest 'vscode-wpilib/resources/vendordeps/XRPVendordep.json'
+  overwrite true
+}
+
 task copyFromVsCodeToStandaloneResources(type: Copy) {
     dependsOn extractCppDependencies
     dependsOn extractJavaDependencies
     dependsOn downloadNewCommands
+    dependsOn downloadRomiVendordep
+    dependsOn downloadXRPVendordep
     from ('vscode-wpilib/resources/java') {
         into 'java'
     }

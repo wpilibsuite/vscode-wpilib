@@ -41,11 +41,9 @@ test {
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
-//Sets the websocket client remote host.
-wpi.sim.envVar("HALSIMWS_HOST", "192.168.42.1")
-wpi.sim.envVar("HALSIMWS_FILTERS", "AIO,DIO,DriverStation,Encoder,Gyro,XRPMotor,XRPServo")
-wpi.sim.addWebsocketsServer().defaultEnabled = true
-wpi.sim.addWebsocketsClient().defaultEnabled = true
+//Sets the XRP Client Host
+wpi.sim.envVar("HALSIMXRP_HOST", "192.168.42.1")
+wpi.sim.addXRPClient().defaultEnabled = true
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
