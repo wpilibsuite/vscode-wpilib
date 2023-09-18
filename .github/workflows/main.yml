@@ -44,7 +44,7 @@ jobs:
       - name: Notarize Standalone Utility
         uses: wpilibsuite/xcode-notarize@v1
         with:
-          product-path: "wpilib-utility-standalone/build/wpilibutility-darwin-x64/wpilibutility.app"
+          product-path: "wpilib-utility-standalone/build/wpilibutility-darwin-universal/wpilibutility.app"
           primary-bundle-id: edu.wpi.first.wpilibutility
           appstore-connect-username: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
           appstore-connect-password: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
@@ -53,11 +53,11 @@ jobs:
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
       - name: Staple Notarization Ticket
         run: xcrun stapler staple -v wpilibutility.app
-        working-directory: wpilib-utility-standalone/build/wpilibutility-darwin-x64
+        working-directory: wpilib-utility-standalone/build/wpilibutility-darwin-universal
         if: |
           (github.repository_owner == 'wpilibsuite') &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-      - run: tar -C build/wpilibutility-darwin-x64 -pcvzf wpilibutility-mac.tar.gz .
+      - run: tar -C build/wpilibutility-darwin-universal -pcvzf wpilibutility-mac.tar.gz .
         working-directory: wpilib-utility-standalone
         name: Create Archive
       - uses: actions/upload-artifact@v3
