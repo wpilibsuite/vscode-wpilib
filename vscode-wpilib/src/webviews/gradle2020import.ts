@@ -249,11 +249,11 @@ export class Gradle2020Import extends WebViewBase {
     if (cpp) {
       const gradlePath = path.join(gradleBasePath, data.romi ? 'cppromi' : 'cpp');
       success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
-                                       false, true);
+                                       false, true, []);
     } else {
       const gradlePath = path.join(gradleBasePath, data.romi ? 'javaromi' : 'java');
       success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), gradlePath, toFolder,
-                                       javaRobotPackage, '', true);
+                                       javaRobotPackage, '', true, []);
     }
 
     if (!success) {

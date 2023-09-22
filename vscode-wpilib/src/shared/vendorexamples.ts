@@ -21,6 +21,7 @@ interface IJsonExample {
   packagetoreplace?: string | undefined;
   dependencies: string[];
   foldername: string;
+  extravendordeps?: string[];
 }
 
 // tslint:disable-next-line:no-any
@@ -57,6 +58,7 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               // Only handle java and cpp
               continue;
             }
+            const extraVendordeps: string[] = (ex.extravendordeps !== undefined) ? ex.extravendordeps : [];
             const provider: IExampleTemplateCreator = {
               getLanguage(): string {
                 return ex.language;
@@ -72,13 +74,13 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
                   if (ex.language === 'java') {
                     if (!await generateCopyJava(shimmedResourceRoot, path.join(exampleDir, ex.foldername),
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
-                      path.join('frc', 'robot'), false, ex.packagetoreplace)) {
+                      path.join('frc', 'robot'), false, extraVendordeps, ex.packagetoreplace)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   } else {
                     if (!await generateCopyCpp(shimmedResourceRoot, path.join(exampleDir, ex.foldername),
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false)) {
+                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false, extraVendordeps)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }

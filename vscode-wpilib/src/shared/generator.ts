@@ -9,7 +9,7 @@ import { setExecutePermissions } from './permissions';
 type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
 export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                      addCpp: boolean, directGradleImport: boolean): Promise<boolean> {
+                                      addCpp: boolean, directGradleImport: boolean, extraVendordeps: string[]): Promise<boolean> {
   try {
     const existingFiles = await readdirAsync(toFolder);
     if (existingFiles.length > 0) {
@@ -96,6 +96,18 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
     const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
     await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
 
+    for (const vendordep of extraVendordeps) {
+      if (vendordep === 'romi') {
+        const romiVendordepName = 'RomiVendordep.json';
+        const romiVendordepFile = path.join(path.dirname(resourcesFolder), 'vendordeps', romiVendordepName);
+        await copyFileAsync(romiVendordepFile, path.join(vendorDir, romiVendordepName));
+      } else if (vendordep === 'xrp') {
+        const xrpVendordepName = 'XRPVendordep.json';
+        const xrpVendordepFile = path.join(path.dirname(resourcesFolder), 'vendordeps', xrpVendordepName);
+        await copyFileAsync(xrpVendordepFile, path.join(vendorDir, xrpVendordepName));
+      }
+    }
+
     return true;
   } catch (e) {
     logger.error('Project creation failure', e);
@@ -104,7 +116,7 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
 }
 
 export async function generateCopyJava(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean,
+                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean, extraVendordeps: string[],
                                        packageReplaceString?: string | undefined): Promise<boolean> {
   try {
     const existingFiles = await readdirAsync(toFolder);
@@ -235,6 +247,18 @@ to get a proper path relative to the deploy directory.` ]));
     const commandName = 'WPILibNewCommands.json';
     const vendorFile = path.join(path.dirname(resourcesFolder), 'vendordeps', commandName);
     await copyFileAsync(vendorFile, path.join(vendorDir, commandName));
+
+    for (const vendordep of extraVendordeps) {
+      if (vendordep === 'romi') {
+        const romiVendordepName = 'RomiVendordep.json';
+        const romiVendordepFile = path.join(path.dirname(resourcesFolder), 'vendordeps', romiVendordepName);
+        await copyFileAsync(romiVendordepFile, path.join(vendorDir, romiVendordepName));
+      } else if (vendordep === 'xrp') {
+        const xrpVendordepName = 'XRPVendordep.json';
+        const xrpVendordepFile = path.join(path.dirname(resourcesFolder), 'vendordeps', xrpVendordepName);
+        await copyFileAsync(xrpVendordepFile, path.join(vendorDir, xrpVendordepName));
+      }
+    }
 
     return true;
   } catch (e) {
