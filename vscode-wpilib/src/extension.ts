@@ -36,6 +36,7 @@ import { Gradle2020Import } from './webviews/gradle2020import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
+import { activatePython } from './python/python';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
@@ -117,6 +118,8 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
   await activateCpp(context, externalApi);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
+  // Activate the python parts of the extension
+  await activatePython(context, externalApi);
 
   try {
     // Add built in tools
