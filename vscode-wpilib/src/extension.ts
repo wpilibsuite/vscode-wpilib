@@ -189,7 +189,7 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2024alpha') {
+        if (prefs.getProjectYear() !== '2024beta') {
           const importPersistantState = new PersistentFolderState('wpilib.2024Alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
