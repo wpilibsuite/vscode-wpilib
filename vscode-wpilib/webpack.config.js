@@ -31,7 +31,8 @@ module.exports = [{
   },
   output: {
     path: path.resolve(__dirname, 'resources', 'dist'),
-    filename: '[name].js'
+    filename: '[name].js',
+    hashFunction: "sha256"
   }
 },  {
   target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
@@ -42,6 +43,7 @@ module.exports = [{
       filename: 'extension.js',
       libraryTarget: "commonjs2",
       devtoolModuleFilenameTemplate: "../[resource-path]",
+      hashFunction: "sha256"
   },
   devtool: 'source-map',
   externals: {

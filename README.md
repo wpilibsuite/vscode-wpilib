@@ -6,7 +6,7 @@ This repository contains the WPILib VS Code extension, along with the standalone
 
 
 ## Build Dependencies
-* Node JS - Tested with Node 16.
+* Node JS - Tested with Node 18.
 * Java - Tested with Java 17
 * VS Code - For development/debugging.
   * TS Lint Extension
