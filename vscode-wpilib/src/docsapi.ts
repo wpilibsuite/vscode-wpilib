@@ -13,9 +13,9 @@ export async function downloadDocs(repoRoot: string, ext: string,  rootFolder: s
   try {
     const answer = await vscode.window.showInformationMessage(
       i18n('message', 'Documentation not installed locally. Would you like to download it?'),
-      { modal: true }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+      { modal: true }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
 
-    if (answer === i18n('ui', 'Yes')) {
+    if (answer?.title === i18n('ui', 'Yes')) {
 
       disposable = vscode.window.setStatusBarMessage(i18n('message', 'Downloading Maven MetaData'));
 

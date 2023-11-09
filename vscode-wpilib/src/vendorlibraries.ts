@@ -168,8 +168,8 @@ export class VendorLibraries extends VendorLibrariesBase {
             'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
             'Would you like to do this now?'), {
               modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-            if (buildRes === i18n('ui', 'Yes')) {
+            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+            if (buildRes?.title === i18n('ui', 'Yes')) {
               await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
             }
           }
@@ -231,8 +231,8 @@ export class VendorLibraries extends VendorLibrariesBase {
             'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
             'Would you like to do this now?'), {
               modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-            if (buildRes === i18n('ui', 'Yes')) {
+            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+            if (buildRes?.title === i18n('ui', 'Yes')) {
               await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
             }
           }
@@ -284,8 +284,8 @@ export class VendorLibraries extends VendorLibrariesBase {
           'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
           'Would you like to do this now?'), {
             modal: true,
-          }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-          if (buildRes === i18n('ui', 'Yes')) {
+          }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+          if (buildRes?.title === i18n('ui', 'Yes')) {
             await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
           }
         }
@@ -320,8 +320,8 @@ export class VendorLibraries extends VendorLibrariesBase {
           'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
           'Would you like to do this now?'), {
             modal: true,
-          }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-        if (buildRes === i18n('ui', 'Yes')) {
+          }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+        if (buildRes?.title === i18n('ui', 'Yes')) {
           await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
         }
       } else {
