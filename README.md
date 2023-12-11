@@ -1,6 +1,6 @@
 # VS Code WPILib
 
-![CI](https://github.com/wpilibsuite/vscode-wpilib/workflows/CI/badge.svg)
+[![CI](https://github.com/wpilibsuite/vscode-wpilib/actions/workflows/main.yml/badge.svg)](https://github.com/wpilibsuite/vscode-wpilib/actions/workflows/main.yml)
 
 This repository contains the WPILib VS Code extension, along with the standalone electron project that contains some of the functionality of the extension.
 
