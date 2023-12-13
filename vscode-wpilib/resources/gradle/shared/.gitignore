@@ -171,10 +171,8 @@ out/
 # Simulation GUI and other tools window save file
 *-window.json
 
-# Common data logging files
-*.wpilog
-*.hoot
-*.mcap
+# Simulation data log directory
+logs/
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
