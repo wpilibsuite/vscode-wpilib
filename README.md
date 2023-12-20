@@ -1,12 +1,12 @@
 # VS Code WPILib
 
-![CI](https://github.com/wpilibsuite/vscode-wpilib/workflows/CI/badge.svg)
+[![CI](https://github.com/wpilibsuite/vscode-wpilib/actions/workflows/main.yml/badge.svg)](https://github.com/wpilibsuite/vscode-wpilib/actions/workflows/main.yml)
 
 This repository contains the WPILib VS Code extension, along with the standalone electron project that contains some of the functionality of the extension.
 
 
 ## Build Dependencies
-* Node JS - Tested with Node 16.
+* Node JS - Tested with Node 18.
 * Java - Tested with Java 17
 * VS Code - For development/debugging.
   * TS Lint Extension

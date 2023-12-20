@@ -1,7 +1,7 @@
 'use strict';
 
 import { IGradle2020IPCReceive, IGradle2020IPCSend } from './gradle2020importpagetypes';
-import { validateProject, validateTeamNumber } from './sharedpages';
+import { validateProject, validateTeamNumber, validateProjectFolder } from './sharedpages';
 
 interface IVsCodeApi {
   postMessage(message: IGradle2020IPCReceive): void;
@@ -24,7 +24,8 @@ function projectSelectButtonClick() {
 function importProjectButtonClick() {
   const isValidTeam = validateTeamNumber();
   const isValidProject = validateProject();
-  if (!isValidTeam || !isValidProject) {
+  const isValidFolder = validateProjectFolder();
+  if (!isValidTeam || !isValidProject || !isValidFolder) {
     return;
   }
 
@@ -58,6 +59,7 @@ window.addEventListener('message', (event) => {
     case 'newproject':
       const elem = document.getElementById('projectFolder') as HTMLInputElement;
       elem.value = data.data;
+      validateProjectFolder();
       break;
     case 'teamnumber':
       const tn = document.getElementById('teamNumber') as HTMLInputElement;
@@ -80,6 +82,8 @@ window.addEventListener('load', (_: Event) => {
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
+  // tslint:disable-next-line:no-non-null-assertion
+  document.getElementById('projectFolder')!.oninput = validateProjectFolder;
 
   vscode.postMessage({ type: 'loaded' });
 });

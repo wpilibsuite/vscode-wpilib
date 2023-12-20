@@ -136,12 +136,12 @@ export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolea
   const openSelection = await vscode.window.showInformationMessage(i18n('message',
       'Project successfully created. Would you like to open the folder?'), {
     modal: true,
-  }, i18n('ui', 'Yes (Current Window)'), i18n('ui', 'Yes (New Window)'), i18n('ui', 'No'));
+  }, {title: i18n('ui', 'Yes (Current Window)')}, {title: i18n('ui', 'Yes (New Window)')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
   if (openSelection === undefined) {
     return true;
-  } else if (openSelection === i18n('ui', 'Yes (Current Window)')) {
+  } else if (openSelection.title === i18n('ui', 'Yes (Current Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
-  } else if (openSelection === i18n('ui', 'Yes (New Window)')) {
+  } else if (openSelection.title === i18n('ui', 'Yes (New Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
   } else {
     return true;

@@ -395,8 +395,8 @@ export class ApiProvider implements CustomConfigurationProvider {
     if (selections.length === 0) {
       const configResult = await vscode.window.showInformationMessage('No intellisense configured. Would you like to enable intellisense?', {
         modal: true,
-      }, 'Yes', 'No');
-      if (configResult === 'Yes') {
+      }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true});
+      if (configResult?.title === 'Yes') {
         await this.runGradleRefresh();
       }
       return;
@@ -467,8 +467,9 @@ export class ApiProvider implements CustomConfigurationProvider {
     if (!ApiProvider.promptForUpdates) {
       return;
     }
-    const result = await vscode.window.showInformationMessage('Intellisense configurations might have been updated. Refresh them now?', 'Yes', 'No');
-    if (result && result === 'Yes') {
+    const result = await vscode.window.showInformationMessage('Intellisense configurations might have been updated. Refresh them now?',
+      {title: 'Yes'}, {title: 'No', isCloseAffordance: true});
+    if (result && result.title === 'Yes') {
       await this.runGradleRefresh();
     }
   }

@@ -19,24 +19,25 @@ interface IUpdatePair {
 
 class UpdatePair implements IUpdatePair, vscode.MessageItem {
   public title: string;
-  public isCloseAffordance: boolean = true;
+  public isCloseAffordance: boolean;
   public yes: boolean;
   public global: boolean;
 
-  public constructor(title: string, yes: boolean, global: boolean) {
+  public constructor(title: string, yes: boolean, global: boolean, close: boolean) {
     this.title = title;
     this.yes = yes;
     this.global = global;
+    this.isCloseAffordance = close;
   }
 }
 
 async function globalProjectSettingUpdate(message: string): Promise<IUpdatePair | undefined> {
   const opts: UpdatePair[] = [
-    new UpdatePair(i18n('ui', 'Yes (Project)'), true, false),
-    new UpdatePair(i18n('ui', 'Yes (Global)'), true, true),
-    new UpdatePair(i18n('ui', 'No (Project)'), false, false),
-    new UpdatePair(i18n('ui', 'No (Global)'), false, true),
-    new UpdatePair(i18n('ui', 'Cancel'), false, false),
+    new UpdatePair(i18n('ui', 'Yes (Project)'), true, false, false),
+    new UpdatePair(i18n('ui', 'Yes (Global)'), true, true, false),
+    new UpdatePair(i18n('ui', 'No (Project)'), false, false, false),
+    new UpdatePair(i18n('ui', 'No (Global)'), false, true, false),
+    new UpdatePair(i18n('ui', 'Cancel'), false, false, true),
   ];
 
   const result = await vscode.window.showInformationMessage<UpdatePair>(message, {modal: true}, ...opts);

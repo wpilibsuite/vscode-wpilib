@@ -207,8 +207,8 @@ export class Gradle2020Import extends WebViewBase {
       } else {
         const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
           modal: true,
-        }, 'Yes', 'No');
-        if (res !== 'Yes') {
+        }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true});
+        if (res?.title !== 'Yes') {
           await vscode.window.showErrorMessage('Project Import Failed');
           return;
         }
@@ -216,8 +216,8 @@ export class Gradle2020Import extends WebViewBase {
     } else if (!cpp) {
       const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
         modal: true,
-      }, 'Yes', 'No');
-      if (res !== 'Yes') {
+      }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true});
+      if (res?.title !== 'Yes') {
         await vscode.window.showErrorMessage('Project Import Failed');
         return;
       }

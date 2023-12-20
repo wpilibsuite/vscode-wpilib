@@ -192,18 +192,18 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2024alpha') {
+        if (prefs.getProjectYear() !== '2024beta') {
           const importPersistantState = new PersistentFolderState('wpilib.2024Alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
               'This project is not compatible with this version of the extension. Would you like to import this project into 2024?'), {
               modal: true,
-            }, 'Yes', 'No', 'No, Don\'t ask again');
-            if (upgradeResult === 'Yes') {
+            }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true}, {title: 'No, Don\'t ask again'});
+            if (upgradeResult?.title === 'Yes') {
               if (gradle2020import) {
                 await gradle2020import.startWithProject(w.uri);
               }
-            } else if (upgradeResult === 'No, Don\'t ask again') {
+            } else if (upgradeResult?.title === 'No, Don\'t ask again') {
               importPersistantState.Value = true;
             }
           }
@@ -223,8 +223,8 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
               'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
               'Would you like to do this now?'), {
               modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'No'));
-            if (result !== i18n('ui', 'Yes')) {
+            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+            if (result?.title !== i18n('ui', 'Yes')) {
               runBuild = false;
             }
           }
@@ -268,11 +268,11 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
               'The correct folder was found in a subfolder, ' +
               'Would you like to open it? Selecting no will cause many tasks to not work.'), {
               modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
-            if (openResult === i18n('ui', 'Yes')) {
+            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true}, {title: i18n('ui', 'No, Don\'t ask again for this folder')});
+            if (openResult?.title === i18n('ui', 'Yes')) {
               const wpRoot = vscode.Uri.file(path.dirname(path.dirname(wpilibFiles[0].fsPath)));
               await vscode.commands.executeCommand('vscode.openFolder', wpRoot, false);
-            } else if (openResult === i18n('ui', 'No, Don\'t ask again for this folder')) {
+            } else if (openResult?.title === i18n('ui', 'No, Don\'t ask again for this folder')) {
               persistentState.Value = true;
             }
           } else if (wpilibFiles.length > 1) {
@@ -281,8 +281,8 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
               'Multiple possible subfolders found, ' +
               'Would you like to open one? Selecting no will cause many tasks to not work.', {
               modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again for this folder'));
-            if (openResult === i18n('ui', 'Yes')) {
+            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true}, {title: i18n('ui', 'No, Don\'t ask again for this folder')});
+            if (openResult?.title === i18n('ui', 'Yes')) {
               const list = wpilibFiles.map((value) => {
                 const fullRoot = path.dirname(path.dirname(value.fsPath));
                 const baseFolder = path.basename(fullRoot);
@@ -297,7 +297,7 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
               if (picked !== undefined) {
                 await vscode.commands.executeCommand('vscode.openFolder', picked.fullFolder, false);
               }
-            } else if (openResult === i18n('ui', 'No, Don\'t ask again for this folder')) {
+            } else if (openResult?.title === i18n('ui', 'No, Don\'t ask again for this folder')) {
               persistentState.Value = true;
             }
           }

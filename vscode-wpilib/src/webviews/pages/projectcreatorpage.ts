@@ -1,7 +1,7 @@
 'use strict';
 
 import { IProjectIPCReceive, IProjectIPCSend, ProjectType } from './projectcreatorpagetypes';
-import { validateProject, validateTeamNumber } from './sharedpages';
+import { validateProject, validateTeamNumber, validateProjectFolder } from './sharedpages';
 
 interface IVsCodeApi {
   postMessage(message: IProjectIPCReceive): void;
@@ -74,7 +74,8 @@ function selectProjectFolder() {
 function generateProject() {
   const isValidTeam = validateTeamNumber();
   const isValidProject = validateProject();
-  if (!isValidTeam || !isValidProject) {
+  const isValidFolder = validateProjectFolder();
+  if (!isValidTeam || !isValidProject || !isValidFolder) {
     return;
   }
 
@@ -103,6 +104,7 @@ window.addEventListener('message', (event) => {
     case 'newproject':
       const elem = document.getElementById('projectFolder') as HTMLInputElement;
       elem.value = data.data as string;
+      validateProjectFolder();
       break;
     case 'projecttype':
       projectType = data.data as ProjectType;
@@ -148,4 +150,6 @@ window.addEventListener('load', (_: Event) => {
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
   // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('generateProject')!.onclick = generateProject;
+  // tslint:disable-next-line:no-non-null-assertion
+  document.getElementById('projectFolder')!.onchange = validateProjectFolder;
 });
