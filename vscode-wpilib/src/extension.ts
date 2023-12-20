@@ -15,7 +15,7 @@ import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
 import { DeployDebugAPI } from './deploydebugapi';
-import { ExecuteAPI } from './executor';
+import { ExecuteAPI, IExecuteAPIEx } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
 import { localize as i18n } from './locale';
@@ -38,8 +38,12 @@ import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
 import { activatePython } from './python/python';
 
+export interface IExternalAPIEx extends IExternalAPI {
+  getExecuteAPIEx(): IExecuteAPIEx;
+}
+
 // External API class to implement the IExternalAPI interface
-class ExternalAPI implements IExternalAPI {
+class ExternalAPI implements IExternalAPI, IExternalAPIEx {
   // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
@@ -92,6 +96,9 @@ class ExternalAPI implements IExternalAPI {
   }
   public getUtilitiesAPI(): UtilitiesAPI {
     return this.utilitiesApi;
+  }
+  public getExecuteAPIEx(): IExecuteAPIEx {
+    return this.executeApi;
   }
 }
 
