@@ -1,11 +1,9 @@
 'use strict';
-import * as electron from 'electron';
+import { dialog } from "@electron/remote";
 import { EventEmitter } from 'events';
 import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
          IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';
 import { writeFileAsync } from '../utilities';
-
-const dialog = electron.remote.dialog;
 
 export class RioLogWindowView extends EventEmitter implements IWindowView {
   private fromMain: (data: IIPCSendMessage) => Promise<void>;

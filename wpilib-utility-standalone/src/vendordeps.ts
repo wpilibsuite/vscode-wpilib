@@ -1,14 +1,13 @@
 'use strict';
 
-import * as electron from 'electron';
+import { app, dialog, getCurrentWindow } from "@electron/remote";
 import * as path from 'path';
 import { logger } from './logger';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { deleteFileAsync, existsAsync, readdirAsync } from './utilities';
 
-const dialog = electron.remote.dialog;
-const bWindow = electron.remote.getCurrentWindow();
+const bWindow = getCurrentWindow();
 
 class VendorLibraries extends VendorLibrariesBase {
   public constructor() {
@@ -143,7 +142,7 @@ const vendorLibs = new VendorLibraries();
 export async function selectProjectButton(): Promise<void> {
   const paths = await dialog.showOpenDialog(bWindow, {
     buttonLabel: 'Select Project (build.gradle)',
-    defaultPath: electron.remote.app.getPath('documents'),
+    defaultPath: app.getPath('documents'),
     filters: [
       { name: 'Build Files', extensions: ['gradle'] },
     ],
