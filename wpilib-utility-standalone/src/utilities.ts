@@ -1,7 +1,7 @@
 'use strict';
 
 import * as electron from 'electron';
-import { dialog } from "@electron/remote";
+import { dialog } from '@electron/remote';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';

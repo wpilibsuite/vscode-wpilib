@@ -1,6 +1,6 @@
 'use strict';
 
-import { getCurrentWindow } from "@electron/remote";
+import { getCurrentWindow } from '@electron/remote';
 import { IIPCReceiveMessage, RioLogWindow } from 'wpilib-riolog';
 import { LiveRioConsoleProvider, RioLogWebviewProvider, RioLogWindowView } from '../electronimpl';
 import { checkResizeImpl, handleMessage } from '../shared/sharedscript';

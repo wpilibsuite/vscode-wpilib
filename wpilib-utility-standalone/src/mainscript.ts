@@ -1,4 +1,4 @@
-import { getCurrentWindow } from "@electron/remote";
+import { getCurrentWindow } from '@electron/remote';
 
 document.addEventListener('keydown', (e) => {
   if (e.which === 123) {

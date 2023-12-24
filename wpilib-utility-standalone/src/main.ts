@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 // import * as path from 'path';
 // import * as url from 'url';
-import { initialize, enable } from "@electron/remote/main";
+import { initialize, enable } from '@electron/remote/main';
 initialize();
 
 let mainWindow: Electron.BrowserWindow | undefined;

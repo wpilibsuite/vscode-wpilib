@@ -1,5 +1,5 @@
 import * as electron from 'electron';
-import { app, dialog, getCurrentWindow } from "@electron/remote";
+import { app, dialog, getCurrentWindow } from '@electron/remote';
 import * as fs from 'fs';
 import * as path from 'path';
 import { generateCopyCpp, generateCopyJava } from './shared/generator';

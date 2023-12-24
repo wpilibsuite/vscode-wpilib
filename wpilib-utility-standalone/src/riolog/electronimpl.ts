@@ -1,5 +1,5 @@
 'use strict';
-import { dialog } from "@electron/remote";
+import { dialog } from '@electron/remote';
 import { EventEmitter } from 'events';
 import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
          IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';

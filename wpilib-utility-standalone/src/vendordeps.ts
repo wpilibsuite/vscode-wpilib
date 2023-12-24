@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, dialog, getCurrentWindow } from "@electron/remote";
+import { app, dialog, getCurrentWindow } from '@electron/remote';
 import * as path from 'path';
 import { logger } from './logger';
 import { UtilitiesAPI } from './shared/utilitiesapi';
