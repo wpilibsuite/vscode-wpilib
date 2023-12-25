@@ -1,6 +1,5 @@
 'use strict';
 
-// tslint:disable-next-line:interface-name
 export interface QuickPickItem {
   label: string;
   description: string;
@@ -17,14 +16,12 @@ export class Uri {
   }
 }
 
-// tslint:disable-next-line:no-namespace
 export namespace window {
   export function showErrorMessage(_message: string) {
     // TODO
   }
 }
 
-// tslint:disable-next-line:interface-name
 export interface ExtensionContext {
   storagePath: string | undefined;
 }

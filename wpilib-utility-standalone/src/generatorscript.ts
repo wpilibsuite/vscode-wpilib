@@ -54,11 +54,7 @@ window.addEventListener('load', async () => {
   ];
 
   for (const languageDetails of languages) {
-    let language;
-    let templatesEventHandler;
-    let examplesEventHandler;
-
-    [language, templatesEventHandler, examplesEventHandler] = languageDetails;
+    const [language, templatesEventHandler, examplesEventHandler] = languageDetails;
 
     const languageLowerCase = language.toLocaleLowerCase();
 
