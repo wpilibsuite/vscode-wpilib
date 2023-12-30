@@ -163,7 +163,7 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
     if (fromTemplateTestFolder !== undefined) {
       const testFiles = await new Promise<string[]>((resolve, reject) => {
         glob('**/*{.java,.gradle}', {
-          cwd: codePath,
+          cwd: testPath,
           nodir: true,
           nomount: true,
         }, (err, matches) => {
