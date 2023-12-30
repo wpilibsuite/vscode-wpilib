@@ -72,15 +72,15 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               async generate(folderInto: vscode.Uri): Promise<boolean> {
                 try {
                   if (ex.language === 'java') {
-                    if (!await generateCopyJava(shimmedResourceRoot, path.join(exampleDir, ex.foldername),
+                    if (!await generateCopyJava(shimmedResourceRoot, path.join(exampleDir, ex.foldername), undefined,
                       path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
                       path.join('frc', 'robot'), false, extraVendordeps, ex.packagetoreplace)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
                   } else {
-                    if (!await generateCopyCpp(shimmedResourceRoot, path.join(exampleDir, ex.foldername),
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, false, extraVendordeps)) {
+                    if (!await generateCopyCpp(shimmedResourceRoot, path.join(exampleDir, ex.foldername), undefined,
+                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, extraVendordeps)) {
                       vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                       return false;
                     }
