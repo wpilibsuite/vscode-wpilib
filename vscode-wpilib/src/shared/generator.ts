@@ -160,22 +160,6 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
       });
     });
 
-    if (fromTemplateTestFolder !== undefined) {
-      const testFiles = await new Promise<string[]>((resolve, reject) => {
-        glob('**/*{.java,.gradle}', {
-          cwd: testPath,
-          nodir: true,
-          nomount: true,
-        }, (err, matches) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(matches);
-          }
-        });
-      });
-      files.push(...testFiles);
-    }
     // Package replace inside the template
 
     const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)';
@@ -213,6 +197,45 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
           }
         });
       }));
+    }
+
+    if (fromTemplateTestFolder !== undefined) {
+      const testFiles = await new Promise<string[]>((resolve, reject) => {
+        glob('**/*{.java,.gradle}', {
+          cwd: testPath,
+          nodir: true,
+          nomount: true,
+        }, (err, matches) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(matches);
+          }
+        });
+      });
+
+      for (const f of testFiles) {
+        const file = path.join(testPath, f);
+        promiseArray.push(new Promise<void>((resolve, reject) => {
+          fs.readFile(file, 'utf8', (err, dataIn) => {
+            if (err) {
+              reject(err);
+            } else {
+              let dataOut = dataIn.replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo);
+              if (packageReplaceString !== undefined) {
+                dataOut = dataOut.replace(new RegExp(packageReplaceString, 'g'), replacePackageTo);
+              }
+              fs.writeFile(file, dataOut, 'utf8', (err1) => {
+                if (err1) {
+                  reject(err);
+                } else {
+                  resolve();
+                }
+              });
+            }
+          });
+        }));
+      }
     }
 
     await Promise.all(promiseArray);
