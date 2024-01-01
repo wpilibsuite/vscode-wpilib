@@ -13,8 +13,7 @@ export interface ISimulateCommands {
 }
 
 interface IEnvMap {
-  // tslint:disable-next-line: no-any
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export async function startSimulation(commands: ISimulateCommands): Promise<void> {

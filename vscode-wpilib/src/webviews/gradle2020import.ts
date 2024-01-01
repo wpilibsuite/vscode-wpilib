@@ -200,7 +200,7 @@ export class Gradle2020Import extends WebViewBase {
 
     if (await existsAsync(gradleFile) && !cpp) {
       const gradleContents = await readFileAsync(gradleFile, 'utf8');
-      const mainClassRegex = 'def ROBOT_MAIN_CLASS = \"(.+)\"';
+      const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
       const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
       if (regexRes !== null && regexRes.length === 2) {
         javaRobotPackage = regexRes[1];

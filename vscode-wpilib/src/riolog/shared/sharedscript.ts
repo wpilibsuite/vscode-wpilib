@@ -408,10 +408,8 @@ window.addEventListener('resize', () => {
   checkResize();
 });
 
-// tslint:disable-next-line:no-any
-function handleFileSelect(evt: any) {
-  // tslint:disable-next-line:no-unsafe-any
-  const files: FileList = evt.target.files; // filelist
+function handleFileSelect(evt: Event) {
+  const files = (evt.target as HTMLInputElement).files!;
   const firstFile = files[0];
   const reader = new FileReader();
   reader.onload = (loaded: Event) => {

@@ -237,7 +237,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
       p.dispose();
       try {
         await p.promise;
-      // tslint:disable-next-line:no-empty
+      // eslint-disable-next-line no-empty
       } catch {
       }
     }
@@ -249,7 +249,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
         p.dispose();
         try {
           await p.promise;
-        // tslint:disable-next-line:no-empty
+        // eslint-disable-next-line no-empty
         } catch {
         }
       }

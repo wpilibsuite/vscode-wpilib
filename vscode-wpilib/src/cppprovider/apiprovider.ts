@@ -546,8 +546,7 @@ export class ApiProvider implements CustomConfigurationProvider {
                       compilerPath: tc.cppPath,
                       defines: macros,
                       includePath: includePaths,
-                      // tslint:disable-next-line:no-non-null-assertion no-any
-                      standard: sb.langVersion! as any,
+                      standard: sb.langVersion!,
                     },
                     uri: uriPath,
                   });
@@ -584,8 +583,7 @@ export class ApiProvider implements CustomConfigurationProvider {
                       compilerPath: tc.cPath,
                       defines: macros,
                       includePath: includePaths,
-                      // tslint:disable-next-line:no-non-null-assertion no-any
-                      standard: sb.langVersion! as any,
+                      standard: sb.langVersion!,
                     },
                     uri: uriPath,
                   });

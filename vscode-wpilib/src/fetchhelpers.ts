@@ -35,8 +35,7 @@ export async function downloadFileToStream(url: string, destPath: string): Promi
   let timer: NodeJS.Timeout;
 
   return new Promise<string>((resolve, reject) => {
-    // tslint:disable-next-line:no-any
-    const errorHandler = (error: any) => {
+    const errorHandler = (error: unknown) => {
       reject({reason: 'Unable to download file', meta: {url, error}});
     };
 

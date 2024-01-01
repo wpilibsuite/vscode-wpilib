@@ -90,7 +90,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     return socket;
   }
 
-  private handleBuffer(data: Buffer) {
+  handleBuffer(data: Buffer) {
     while (data.length > 0) {
       if (this.dataStore.frameSize === maxFrameSize) {
         if (this.dataStore.count < 2) {
