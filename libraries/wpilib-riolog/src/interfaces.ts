@@ -40,24 +40,19 @@ export interface IWindowView extends EventEmitter, IDisposable {
   postMessage(message: IIPCSendMessage): Promise<boolean>;
   handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean>;
 
-  // tslint:disable-next-line:ban-types
   addListener(event: string, listener: (...args: unknown[]) => void): this;
   addListener(event: 'didReceiveMessage', listener: (message: IIPCReceiveMessage) => void): this;
   addListener(event: 'didDispose', listener: () => void): this;
-  // tslint:disable-next-line:unified-signatures
   addListener(event: 'windowActive', listener: () => void): this;
 
-  // tslint:disable-next-line:ban-types
   on(event: string, listener: (...args: unknown[]) => void): this;
   on(event: 'didReceiveMessage', listener: (message: IIPCReceiveMessage) => void): this;
   on(event: 'didDispose', listener: () => void): this;
-  // tslint:disable-next-line:unified-signatures
   on(event: 'windowActive', listener: () => void): this;
 
   emit(event: string | symbol, ...args: unknown[]): boolean;
   emit(event: 'didReceiveMessage', message: IIPCReceiveMessage): boolean;
   emit(event: 'didDispose'): boolean;
-  // tslint:disable-next-line:unified-signatures
   emit(event: 'windowActive'): boolean;
 }
 
@@ -70,12 +65,10 @@ export interface IRioConsole extends EventEmitter, IDisposable {
   getAutoReconnect(): boolean;
   setTeamNumber(teamNumber: number): void;
 
-  // tslint:disable-next-line:ban-types
   addListener(event: string, listener: (...args: unknown[]) => void): this;
   addListener(event: 'message', listener: (message: IIPCSendMessage) => void): this;
   addListener(event: 'connectionChanged', listener: (connected: boolean) => void): this;
 
-  // tslint:disable-next-line:ban-types
   on(event: string, listener: (...args: unknown[]) => void): this;
   on(event: 'message', listener: (message: IPrintMessage | IErrorMessage) => void): this;
   on(event: 'connectionChanged', listener: (connected: boolean) => void): this;

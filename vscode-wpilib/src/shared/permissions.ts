@@ -11,9 +11,7 @@ export function setExecutePermissions(file: string): Promise<void> {
       if (err) {
         reject(err);
       } else {
-        // tslint:disable-next-line:no-bitwise
         let mode = stat.mode & 0xFFFF;
-        // tslint:disable-next-line:no-bitwise
         mode |= fs.constants.S_IXUSR | fs.constants.S_IXGRP | fs.constants.S_IXOTH;
         fs.chmod(file, mode, (err2) => {
           if (err2) {

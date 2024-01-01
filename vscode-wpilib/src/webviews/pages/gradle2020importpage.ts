@@ -72,17 +72,11 @@ window.addEventListener('message', (event) => {
 });
 
 window.addEventListener('load', (_: Event) => {
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('gradle2020SelectButton')!.onclick = gradle2020SelectButtonClick;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectSelectButton')!.onclick = projectSelectButtonClick;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectName')!.oninput = validateProject;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectFolder')!.oninput = validateProjectFolder;
 
   vscode.postMessage({ type: 'loaded' });

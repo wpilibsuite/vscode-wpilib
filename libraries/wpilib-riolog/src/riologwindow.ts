@@ -1,6 +1,5 @@
 'use strict';
 
-// tslint:disable-next-line:max-line-length
 import { IDisposable, IIPCReceiveMessage, IRioConsole, IRioConsoleProvider, IWindowProvider, IWindowView, ReceiveTypes, SendTypes } from './interfaces';
 import { IErrorMessage, IPrintMessage } from './message';
 

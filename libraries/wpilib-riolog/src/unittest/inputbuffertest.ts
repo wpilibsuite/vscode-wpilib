@@ -79,7 +79,6 @@ suite('Input Error Buffer Tests', () => {
   [true, false].forEach((x) => {
     test(`Split Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole = new riolog.RioConsole();
-      // tslint:disable-next-line:no-any
       const message: IErrorMessage = {
         callStack: 'Test',
         details: 'Hello',
@@ -97,9 +96,7 @@ suite('Input Error Buffer Tests', () => {
       const buf = getBufferFromError(message);
       const bufa = buf.slice(0, 10);
       const bufb = buf.slice(10);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufa);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufb);
     });
   });
@@ -107,7 +104,6 @@ suite('Input Error Buffer Tests', () => {
   [true, false].forEach((x) => {
     test(`Split Length Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole = new riolog.RioConsole();
-      // tslint:disable-next-line:no-any
       const message: IErrorMessage = {
         callStack: 'Test',
         details: 'Hello',
@@ -125,9 +121,7 @@ suite('Input Error Buffer Tests', () => {
       const buf = getBufferFromError(message);
       const bufa = buf.slice(0, 1);
       const bufb = buf.slice(1);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufa);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufb);
     });
   });
@@ -135,7 +129,6 @@ suite('Input Error Buffer Tests', () => {
   [true, false].forEach((x) => {
     test(`Split Length 2 Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole = new riolog.RioConsole();
-      // tslint:disable-next-line:no-any
       const message: IErrorMessage = {
         callStack: 'Test',
         details: 'Hello',
@@ -154,11 +147,8 @@ suite('Input Error Buffer Tests', () => {
       const bufa = buf.slice(0, 1);
       const bufb = buf.slice(1, 2);
       const bufc = buf.slice(2);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufa);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufb);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufc);
     });
   });
@@ -166,7 +156,6 @@ suite('Input Error Buffer Tests', () => {
   [true, false].forEach((x) => {
     test(`Double Split Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
       const rioconsole = new riolog.RioConsole();
-      // tslint:disable-next-line:no-any
       const message: IErrorMessage = {
         callStack: 'Test',
         details: 'Hello',
@@ -190,12 +179,9 @@ suite('Input Error Buffer Tests', () => {
       const bufa = newBuf.slice(0, buf.length - 10);
       const bufb = newBuf.slice(buf.length - 10, buf.length + 10);
       const bufc = newBuf.slice(buf.length + 10);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufa);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufb);
       assert.strictEqual(1, count);
-      // tslint:disable-next-line: no-unsafe-any
       rioconsole.handleBuffer(bufc);
       assert.strictEqual(2, count);
     });

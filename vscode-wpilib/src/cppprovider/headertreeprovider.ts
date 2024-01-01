@@ -97,7 +97,6 @@ export class FileStat implements vscode.FileStat {
   }
 }
 
-// tslint:disable-next-line:interface-name
 interface Entry {
   uri: vscode.Uri;
   type: vscode.FileType;

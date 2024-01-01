@@ -179,7 +179,6 @@ export class Gradle2020Import extends WebViewBase {
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
         cpp = false;
       } else {
-        // tslint:disable-next-line: max-line-length
         await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
           modal: true,
         });
@@ -187,7 +186,6 @@ export class Gradle2020Import extends WebViewBase {
       }
     } else {
       // Error
-      // tslint:disable-next-line: max-line-length
       await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
         modal: true,
       });

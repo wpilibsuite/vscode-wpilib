@@ -102,7 +102,6 @@ export class RioConsole extends EventEmitter implements IRioConsole {
             return;
           }
         }
-        // tslint:disable-next-line:no-bitwise
         this.dataStore.frameSize = (this.dataStore.buf[0] << 8) | this.dataStore.buf[1];
       }
       {
