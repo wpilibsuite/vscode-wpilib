@@ -2,6 +2,8 @@
 
 ## Features
 
+This extension is not supported from the VS Code Marketplace. Please use the WPILib Installer
+
 This extension provides the WPILib support for FRC teams in VS Code. For documentation on how to program FRC robots using the WPILib libraries, see the [WPILib documentation website](https://docs.wpilib.org/en/stable/).
 
 ## Requirements
@@ -15,4 +17,3 @@ TODO
 ## Known Issues
 
 ## Release Notes
-
