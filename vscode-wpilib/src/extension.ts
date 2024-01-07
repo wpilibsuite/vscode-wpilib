@@ -28,7 +28,7 @@ import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
-import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './utilities';
+import { existsAsync, mkdirpAsync, readFileAsync, setExtensionContext, setJavaHome, writeFileAsync } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { AlphaError } from './webviews/alphaerror';
@@ -205,6 +205,24 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
             }
           }
           continue;
+        }
+
+        const projectFix202411 = new PersistentFolderState('wpilib.202411ProjectFix', false, w.uri.fsPath);
+        if (projectFix202411.Value === false && prefs.getCurrentLanguage() === 'java') {
+          try {
+            let gradleBuildFile = await readFileAsync(path.join(w.uri.fsPath, 'build.gradle'), 'utf8');
+            if (gradleBuildFile.indexOf("testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'") >= 0
+                && gradleBuildFile.indexOf("testRuntimeOnly 'org.junit.platform:junit-platform-launcher'") >= 0) {
+              gradleBuildFile =gradleBuildFile.replace("testRuntimeOnly 'org.junit.platform:junit-platform-launcher'", "testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.1'")
+              await writeFileAsync(path.join(w.uri.fsPath, 'build.gradle'), gradleBuildFile);
+              projectFix202411.Value = true;
+              await vscode.window.showInformationMessage("Project was updated to fix java test dependnecy issues. Please commit the change. This change will not trigger again if changes are not saved", {
+                modal: true
+              });
+            }
+          } catch {
+
+          }
         }
 
         if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
