@@ -216,7 +216,7 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
               gradleBuildFile =gradleBuildFile.replace("testRuntimeOnly 'org.junit.platform:junit-platform-launcher'", "testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.1'")
               await writeFileAsync(path.join(w.uri.fsPath, 'build.gradle'), gradleBuildFile);
               projectFix202411.Value = true;
-              await vscode.window.showInformationMessage("Project was updated to fix java test dependnecy issues. Please commit the change. This change will not trigger again if changes are not saved", {
+              await vscode.window.showInformationMessage("Project was updated to fix java test dependency issues. Please commit the change. This change will not trigger again if changes are not saved", {
                 modal: true
               });
             }
