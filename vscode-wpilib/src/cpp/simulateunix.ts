@@ -6,17 +6,12 @@ export interface IUnixSimulateCommands {
   executablePath: string;
   extensions: string;
   workspace: vscode.WorkspaceFolder;
-  environment?: IEnvMap;
+  environment?: { [key: string]: string };
   stopAtEntry: boolean;
   clang: boolean;
   soLibPath: string;
   ldPath: string;
   srcPaths: Set<string>;
-}
-
-interface IEnvMap {
-  // tslint:disable-next-line: no-any
-  [key: string]: any;
 }
 
 export async function startUnixSimulation(commands: IUnixSimulateCommands): Promise<void> {
@@ -47,7 +42,6 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
   };
 
   for (const a of commands.srcPaths) {
-    /* tslint:disable-next-line:no-unsafe-any */
     config.setupCommands.push({
       text: 'dir ' + a,
     });
@@ -56,7 +50,6 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
   if (commands.environment !== undefined) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
-      /* tslint:disable-next-line:no-unsafe-any */
       config.environment.push({
         name: envVar,
         value,

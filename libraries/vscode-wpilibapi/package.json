@@ -10,13 +10,15 @@
   "devDependencies": {
     "@types/node": "^10.2.0",
     "@types/vscode": "1.26.0",
-    "typescript": "^3.9.5",
-    "tslint": "^6.1.2"
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "typescript": "^3.9.5"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",
     "compile": "tsc -p ./",
-    "lint": "tslint -c tslint.json -p tsconfig.json"
+    "lint": "eslint ."
   },
   "keywords": [
     "vscode",

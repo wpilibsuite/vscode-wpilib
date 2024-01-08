@@ -29,7 +29,6 @@ async function extensionVersion(extension: vscode.Extension<unknown> | undefined
   if (extension === undefined) {
     return 'Not Installed';
   }
-  // tslint:disable-next-line: no-unsafe-any
   return extension.packageJSON.version;
 }
 
@@ -125,7 +124,6 @@ Vendor Libraries:
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFileAsync(extensionPackageJson, 'utf8');
-    // tslint:disable-next-line: no-unsafe-any
     const currentVsCodeVersion: string = json.parse(packageJson).version;
 
     const projectInfo: IProjectInfo = {

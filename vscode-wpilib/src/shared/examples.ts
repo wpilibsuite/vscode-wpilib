@@ -77,7 +77,6 @@ export class Examples {
     });
   }
 
-  // tslint:disable-next-line:no-empty
   public dispose() {
 
   }

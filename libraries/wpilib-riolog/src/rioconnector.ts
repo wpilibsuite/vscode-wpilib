@@ -17,7 +17,6 @@ async function properRace<T>(promises: Promise<T>[]): Promise<T> {
   } catch (index) {
     // The promise has rejected, remove it from the list of promises and just continue the race.
     console.log('reject promise');
-    // tslint:disable-next-line:no-unsafe-any
     const p = promises.splice(index, 1)[0];
     p.catch((e) => console.log('A promise has been rejected, but awaiting others', e));
     return properRace(promises);
@@ -102,13 +101,9 @@ function getSocketFromDS(port: number): ISocketPromisePair {
       }
       let ipAddr = '';
       const ip = parsed.robotIP;
-      // tslint:disable-next-line:no-bitwise
       ipAddr += ((ip >> 24) & 0xff) + '.';
-      // tslint:disable-next-line:no-bitwise
       ipAddr += ((ip >> 16) & 0xff) + '.';
-      // tslint:disable-next-line:no-bitwise
       ipAddr += ((ip >> 8) & 0xff) + '.';
-      // tslint:disable-next-line:no-bitwise
       ipAddr += (ip & 0xff);
       s.on('error', (_) => {
         console.log('failed connection to ' + ip + ' at ' + port);
@@ -237,7 +232,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
       p.dispose();
       try {
         await p.promise;
-      // tslint:disable-next-line:no-empty
+      // eslint-disable-next-line no-empty
       } catch {
       }
     }
@@ -249,7 +244,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
         p.dispose();
         try {
           await p.promise;
-        // tslint:disable-next-line:no-empty
+        // eslint-disable-next-line no-empty
         } catch {
         }
       }

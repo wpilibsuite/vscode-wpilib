@@ -3,8 +3,7 @@
 // import { logger } from '../../logger';
 
 declare global {
-    // tslint:disable-next-line:interface-name no-any
-    interface Window { i18nTrans: (domain: string, message: string, ...args: any[]) => string; }
+    interface Window { i18nTrans: (domain: string, message: string, ...args: unknown[]) => string; }
 }
 
 export function validateProject(): boolean {

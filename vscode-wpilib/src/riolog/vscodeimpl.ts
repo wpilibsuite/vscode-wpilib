@@ -89,7 +89,6 @@ export class RioLogHTMLProvider implements IHTMLProvider {
     // And get the special URI to use with the webview
     const scriptResourcePath = webview.asWebviewUri(onDiskPath);
 
-    // tslint:disable-next-line:no-non-null-assertion
     let html = this.html!;
     html += '\r\n<script src="';
     html += scriptResourcePath.toString();
@@ -114,7 +113,6 @@ export class RioLogWebviewProvider implements IWindowProvider {
 
   public createWindowView(): IWindowView {
     const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
-    // tslint:disable-next-line:no-non-null-assertion
     wv.setHTML(this.htmlProvider!.getHTML(wv.getWebview()));
     return wv;
   }

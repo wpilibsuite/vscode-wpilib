@@ -1,6 +1,4 @@
-// tslint:disable:no-any
-
-export default function format(message: string, args: any[]): string {
+export default function format(message: string, args: unknown[]): string {
   let result: string;
 
   if (args.length === 0) {

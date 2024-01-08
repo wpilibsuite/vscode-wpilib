@@ -5,14 +5,10 @@ import { MESSAGE } from 'triple-beam';
 import * as winston from 'winston';
 
 export interface ILogger {
-  // tslint:disable-next-line:no-any
-  error(message: string, ...meta: any[]): void;
-  // tslint:disable-next-line:no-any
-  warn(message: string, ...meta: any[]): void;
-  // tslint:disable-next-line:no-any
-  info(message: string, ...meta: any[]): void;
-  // tslint:disable-next-line:no-any
-  log(message: string, ...meta: any[]): void;
+  error(message: string, ...meta: unknown[]): void;
+  warn(message: string, ...meta: unknown[]): void;
+  info(message: string, ...meta: unknown[]): void;
+  log(message: string, ...meta: unknown[]): void;
 }
 
 const myFormat = winston.format.printf((info) => {
@@ -54,20 +50,16 @@ export function setLoggerDirectory(dirname: string) {
 }
 
 class LoggerImpl implements ILogger {
-  // tslint:disable-next-line:no-any
-  public error(message: string, ...meta: any[]): void {
+  public error(message: string, ...meta: unknown[]): void {
     winstonLogger.log('error', message, meta);
   }
-  // tslint:disable-next-line:no-any
-  public warn(message: string, ...meta: any[]): void {
+  public warn(message: string, ...meta: unknown[]): void {
     winstonLogger.log('warn', message, meta);
   }
-  // tslint:disable-next-line:no-any
-  public info(message: string, ...meta: any[]): void {
+  public info(message: string, ...meta: unknown[]): void {
     winstonLogger.log('info', message, meta);
   }
-  // tslint:disable-next-line:no-any
-  public log(message: string, ...meta: any[]): void {
+  public log(message: string, ...meta: unknown[]): void {
     winstonLogger.log('verbose', message, meta);
   }
 }

@@ -76,7 +76,6 @@ export function onShowWarnings() {
     return;
   }
   const items = ul.getElementsByTagName('li');
-  // tslint:disable-next-line:prefer-for-of
   for (let i = 0; i < items.length; ++i) {
     if (items[i].dataset.type === 'warning') {
       if (showWarnings === true) {
@@ -107,7 +106,6 @@ export function onShowPrints() {
     return;
   }
   const items = ul.getElementsByTagName('li');
-  // tslint:disable-next-line:prefer-for-of
   for (let i = 0; i < items.length; ++i) {
     if (items[i].dataset.type === 'print') {
       if (showPrints === true) {
@@ -166,13 +164,11 @@ export function onShowTimestamps() {
     return;
   }
   const items = ul.getElementsByTagName('li');
-  // tslint:disable-next-line:prefer-for-of
   for (let i = 0; i < items.length; ++i) {
     const spans = items[i].getElementsByTagName('span');
     if (spans === undefined) {
       continue;
     }
-    // tslint:disable-next-line:prefer-for-of
     for (let j = 0; j < spans.length; j++) {
       const span = spans[j];
       if (span.hasAttribute('data-timestamp')) {
@@ -195,7 +191,6 @@ export function onSaveLog() {
   const items = ul.getElementsByTagName('li');
   const logs: string[] = [];
 
-  // tslint:disable-next-line:prefer-for-of
   for (let i = 0; i < items.length; ++i) {
     const m = items[i].dataset.message;
     if (m === undefined) {
@@ -408,10 +403,8 @@ window.addEventListener('resize', () => {
   checkResize();
 });
 
-// tslint:disable-next-line:no-any
-function handleFileSelect(evt: any) {
-  // tslint:disable-next-line:no-unsafe-any
-  const files: FileList = evt.target.files; // filelist
+function handleFileSelect(evt: Event) {
+  const files = (evt.target as HTMLInputElement).files!;
   const firstFile = files[0];
   const reader = new FileReader();
   reader.onload = (loaded: Event) => {

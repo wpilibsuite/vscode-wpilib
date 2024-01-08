@@ -33,7 +33,6 @@ export function getMavenMetadata(xmlFile: string): Promise<IMavenMetaData> {
         reject(err);
         return;
       }
-      // tslint:disable-next-line:no-unsafe-any
       resolve(result as IMavenMetaData);
     });
   });

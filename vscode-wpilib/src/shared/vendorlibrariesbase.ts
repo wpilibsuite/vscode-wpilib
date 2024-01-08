@@ -14,8 +14,7 @@ export interface IJsonDependency {
   fileName: string;
 }
 
-// tslint:disable-next-line:no-any
-export function isJsonDependency(arg: any): arg is IJsonDependency {
+export function isJsonDependency(arg: unknown): arg is IJsonDependency {
   const jsonDep = arg as IJsonDependency;
 
   return jsonDep.jsonUrl !== undefined && jsonDep.name !== undefined

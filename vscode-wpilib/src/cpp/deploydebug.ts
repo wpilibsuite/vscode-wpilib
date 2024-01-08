@@ -26,7 +26,7 @@ interface ICppSimulateInfo {
   extensions: ICppSimExtensions[];
   launchfile: string;
   clang: boolean;
-  environment?: Map<string, string>;
+  environment?: { [key: string]: string };
   srcpaths: string[];
   headerpaths: string[];
   libpaths: string[];

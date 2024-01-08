@@ -90,7 +90,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     return socket;
   }
 
-  private handleBuffer(data: Buffer) {
+  handleBuffer(data: Buffer) {
     while (data.length > 0) {
       if (this.dataStore.frameSize === maxFrameSize) {
         if (this.dataStore.count < 2) {
@@ -102,7 +102,6 @@ export class RioConsole extends EventEmitter implements IRioConsole {
             return;
           }
         }
-        // tslint:disable-next-line:no-bitwise
         this.dataStore.frameSize = (this.dataStore.buf[0] << 8) | this.dataStore.buf[1];
       }
       {
