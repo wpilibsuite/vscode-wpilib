@@ -175,7 +175,7 @@ window.addEventListener('load', async () => {
 document.addEventListener('keydown', (e) => {
   if (e.key === '{') {
     bWindow.webContents.openDevTools();
-  } else if (e.key === 't') {
+  } else if (e.key === '}') {
     location.reload();
   }
 });

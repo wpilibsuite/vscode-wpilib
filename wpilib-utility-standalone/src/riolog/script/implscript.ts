@@ -24,9 +24,9 @@ export function sendMessage(message: IIPCReceiveMessage) {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (e.which === 123) {
+    if (e.key === '{') {
         remote.getCurrentWindow().webContents.toggleDevTools();
-    } else if (e.which === 116) {
+    } else if (e.key === '}') {
         location.reload();
     }
 });
