@@ -3,9 +3,9 @@ import * as electron from 'electron';
 const remote = electron.remote;
 
 document.addEventListener('keydown', (e) => {
-  if (e.which === 123) {
+  if (e.key === '{') {
     remote.getCurrentWindow().webContents.openDevTools();
-  } else if (e.which === 116) {
+  } else if (e.key === '}') {
     location.reload();
   }
 });
