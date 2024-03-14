@@ -47,8 +47,8 @@ export class WPILibUpdates {
     const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
     if (newVersion !== undefined && persistentState.Value === false) {
       const result = await vscode.window.showInformationMessage
-        (i18n('message', `WPILib project update ({0}) found, would you like to install it? ` +
-          `{1} currently installed`, newVersion, grVersion), {
+        (i18n('message', `This project is currently using WPILib version ({1}). Would you like to update the project` +
+          `to WPILib version {0}?`, newVersion, grVersion), {
             modal: true,
           }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again'));
       if (result !== undefined && result === i18n('ui', 'Yes')) {
@@ -78,8 +78,8 @@ export class WPILibUpdates {
       return false;
     } else {
       const result = await vscode.window.showInformationMessage
-        (i18n('message', `WPILib project update ({0}) found, would you like to install it? ` +
-          `{1} currently installed`, newVersion.newVersion, grVersion), {
+        (i18n('message', `This project is currently using WPILib version ({1}). Would you like to update the project` +
+        `to WPILib version {0}?`, newVersion.newVersion, grVersion), {
             modal: true,
           }, i18n('ui', 'Yes'), i18n('ui', 'No'));
       if (result !== undefined && result === i18n('ui', 'Yes')) {
