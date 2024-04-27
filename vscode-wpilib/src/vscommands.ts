@@ -502,4 +502,17 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       }
     }
   }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.runGradleClean', async () => {
+    const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
+    if (wp === undefined) {
+      vscode.window.showInformationMessage(i18n('message', 'Cannot run command on empty workspace'));
+      return;
+    }
+    const prefs = externalApi.getPreferencesAPI().getPreferences(wp);
+    const result = await gradleRun('clean', wp.uri.fsPath, wp, 'Gradle Command', externalApi.getExecuteAPI(), prefs);
+    if (result !== 0) {
+      vscode.window.showInformationMessage(i18n('message', 'Command ({0}) returned code: {1}', 'clean', result));
+    }
+  }));
 }
