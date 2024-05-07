@@ -34,6 +34,12 @@ deploy {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
                 }
+
+                // sources
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('build/sources.zip')
+                    directory = '/home/lvuser/'
+                }
             }
         }
     }
