@@ -36,6 +36,7 @@ import { Gradle2020Import } from './webviews/gradle2020import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
+import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
@@ -158,6 +159,21 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
     logger.error('error creating project info gatherer', err);
     creationError = true;
   }
+
+  const provider = new DependencyViewProvider(context.extensionUri, projectInfo);
+
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, provider));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('wpilib.addDependency', () => {
+			provider.addDependency();
+		}));
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('wpilib.clearDependencies', () => {
+			provider.clearDependencies();
+		}));
 
   // Create all of our commands that the extension runs
   createVsCommands(context, externalApi);
