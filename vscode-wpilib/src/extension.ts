@@ -160,20 +160,33 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
     creationError = true;
   }
 
-  const provider = new DependencyViewProvider(context.extensionUri, projectInfo);
+  let depProvider: DependencyViewProvider | undefined;
 
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, provider));
+  try {
+    if (projectInfo !== undefined && vendorLibs !== undefined) {
+      depProvider = new DependencyViewProvider(context.extensionUri, projectInfo, vendorLibs);
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('wpilib.addDependency', () => {
-			provider.addDependency();
-		}));
+      context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider));
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('wpilib.clearDependencies', () => {
-			provider.clearDependencies();
-		}));
+      if (depProvider !== undefined) {
+        context.subscriptions.push(
+          vscode.commands.registerCommand('wpilib.addDependency', () => {
+            depProvider?.addDependency();
+          }));
+      
+        context.subscriptions.push(
+          vscode.commands.registerCommand('wpilib.clearDependencies', () => {
+            depProvider?.clearDependencies();
+          }))
+      }
+
+      context.subscriptions.push(depProvider);
+    }
+  } catch (err) {
+    logger.error('error creating dependency view', err);
+    creationError = true;
+  }
 
   // Create all of our commands that the extension runs
   createVsCommands(context, externalApi);

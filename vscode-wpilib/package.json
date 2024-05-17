@@ -422,7 +422,7 @@
             "wpilib-vendordeps": [
                 {
 					"type": "webview",
-					"id": "calicoColors.colorsView",
+					"id": "wpilib.dependencyView",
 					"name": "WPILib Vendor Dependencies",
                     "icon": "media/wpilib.png"
 				}
