@@ -100,6 +100,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
+    let deps: IJsonDependency[] = []; 
 
     if (installedDeps.length !== 0) {
       const arr = installedDeps.map((jdep) => {
@@ -111,22 +112,32 @@ export class VendorLibraries extends VendorLibrariesBase {
       });
 
       if (toRemove !== undefined) {
-        const url = this.getWpVendorFolder(workspace);
-        const files = await readdirAsync(url);
-        for (const file of files) {
-          const fullPath = path.join(url, file);
-          const result = await this.readFile(fullPath);
-          if (result !== undefined) {
-            for (const ti of toRemove) {
-              if (ti.dep.uuid === result.uuid) {
-                await deleteFileAsync(fullPath);
-              }
+        for (const ti of toRemove) {
+          deps.push(ti.dep);
+        }
+      }      
+
+      this.uninstallVendorLibraries(deps, workspace);
+    } else {
+      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+    }
+  }
+
+  private async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder) {
+    if (toRemove !== undefined) {
+      const url = this.getWpVendorFolder(workspace);
+      const files = await readdirAsync(url);
+      for (const file of files) {
+        const fullPath = path.join(url, file);
+        const result = await this.readFile(fullPath);
+        if (result !== undefined) {
+          for (const ti of toRemove) {
+            if (ti.uuid === result.uuid) {
+              await deleteFileAsync(fullPath);
             }
           }
         }
       }
-    } else {
-      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
     }
   }
 

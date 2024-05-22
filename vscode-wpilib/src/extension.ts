@@ -164,7 +164,7 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
 
   try {
     if (projectInfo !== undefined && vendorLibs !== undefined) {
-      depProvider = new DependencyViewProvider(context.extensionUri, projectInfo, vendorLibs);
+      depProvider = new DependencyViewProvider(context.extensionUri, projectInfo, vendorLibs, externalApi);
 
       context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider));

@@ -1,7 +1,21 @@
 import * as vscode from 'vscode';
+import * as fetch from 'node-fetch';
 import { ProjectInfoGatherer, IProjectInfo } from './projectinfo';
-import { logger } from './logger';
 import { VendorLibraries } from './vendorlibraries';
+import { IJsonDependency } from './shared/vendorlibrariesbase';
+import { IExternalAPI } from 'vscode-wpilibapi';
+import { isNewerVersion } from './versions';
+
+export interface IJsonList {
+  url: string;
+	name: string;
+  version: string;
+  uuid: string;
+  description: string;
+  website: string;
+}
+
+export interface IDepInstalled { name: string, currentVersion: string, versions: string[], action: string }
 
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'wpilib.dependencyView';
@@ -9,20 +23,22 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 	private vendorLibraries: VendorLibraries;
 	private viewInfo: IProjectInfo | undefined;
 	private disposables: vscode.Disposable[] = [];
+	private installedDeps: IJsonDependency[] = [];
+	private availableDeps: IJsonList[] = [];
+	private installedList: IDepInstalled[] = [];
+	private externalApi: IExternalAPI;
 
 	private _view?: vscode.WebviewView;
 
 	constructor(
 		private readonly _extensionUri: vscode.Uri,
 		projectInfo: ProjectInfoGatherer,
-		vendorLibraries: VendorLibraries
+		vendorLibraries: VendorLibraries,
+		externalAPI: IExternalAPI
 	) {
 		this.projectInfo = projectInfo;
 		this.vendorLibraries = vendorLibraries;
-
-/* 		this.disposables.push(vscode.commands.registerCommand('wpilibcore.getProjectInformation', async () => {
-      logger.log('disposing dependency view');
-    })); */
+		this.externalApi = externalAPI;
 	}
 
 	public async resolveWebviewView(
@@ -41,7 +57,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 			]
 		};
 
-		if (this.projectInfo) {
+		let workspace: vscode.WorkspaceFolder | undefined;
+		if (this.projectInfo && workspace) {
 			this.viewInfo = await this.projectInfo.getViewInfo();
 		}
 
@@ -79,189 +96,215 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-/* 	private _getHtmlForWebview(webview: vscode.Webview) {
-		// Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
+	public async refresh() {
+		let workspace: vscode.WorkspaceFolder | undefined;
+		if (workspace !== undefined) {
+			this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
 
-		// Do the same for the stylesheet.
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
-		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
+			// Check for internet connection
+			if (true) {
+				// Check Github for the VendorDep list
+				if (this.installedDeps.length !== 0) {
+					this.availableDeps = await this.getAvailableDependencies();
+					const updatableDeps = [];
+					for (const ad of this.availableDeps) {
+						for (const id of this.installedDeps) {
+							if (id.uuid === ad.uuid) {
+								// Maybe update available
+								if (isNewerVersion(ad.version, id.version)) {
+									
+								}
+								continue;
+							}
+						}
+					}
+				}
+			}
+		}
 
-		// Use a nonce to only allow a specific script to be run.
-		const nonce = getNonce();
+		if (this._view) {
+			this._view.webview.postMessage({ type: 'updateDependencies', data: this.installedList });
+		}
+	}
 
-		return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
+	public async getAvailableDependencies(): Promise<IJsonList[]> {
+		const ghURL = `https://github.com/wpilibsuite/vendor-json-repo/blob/master/${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`
 
-				<!--
-					Use a content security policy to only allow loading styles from our extension directory,
-					and only allow scripts that have a specific nonce.
-					(See the 'webview-sample' extension sample for img-src content security policy examples)
-				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+		return await this.loadFileFromUrl(ghURL);
+	}
 
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-				<link href="${styleResetUri}" rel="stylesheet">
-				<link href="${styleVSCodeUri}" rel="stylesheet">
-				<link href="${styleMainUri}" rel="stylesheet">
-
-				<title>Cat Colors</title>
-			</head>
-			<body>
-				<ul class="color-list">
-				</ul>
-
-				<button class="add-color-button">Add Color</button>
-
-				<script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
-			</html>`;
-	} */
+	protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {
+    const response = await fetch.default(url, {
+      timeout: 5000,
+    });
+    if (response === undefined) {
+      throw new Error('Failed to fetch file');
+    }
+    if (response.status >= 200 && response.status <= 300) {
+      const text = await response.text();
+      const json = JSON.parse(text);
+      if (this.isJsonList(json)) {
+        return json;
+      } else {
+        throw new Error('Incorrect JSON format');
+      }
+    } else {
+      throw new Error('Bad status ' + response.status);
+    }
+  }
+	
+	private isJsonList(jsonDep: any): jsonDep is IJsonList[] {	
+		return jsonDep.url !== undefined && jsonDep.name !== undefined
+					 && jsonDep.uuid !== undefined && jsonDep.version !== undefined
+					 && jsonDep.description !== undefined && jsonDep.website !== undefined;
+	}
 
 	private _getHtmlForWebview(webview: vscode.Webview): string {
 		// Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 
-		// Do the same for the stylesheet.
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
-		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
-
-		// Fake data for installed vendor dependencies
-		const installedDependencies = [
+    // Fake data for installed vendor dependencies
+    const installedDependencies = [
 				{ name: 'CTRE-Phoenix', version: 'v6', action: 'Update' },
 				{ name: 'REV-Software', version: 'v5', action: 'Uninstall' },
 				{ name: 'WPI-Lib', version: 'v4', action: 'Update' },
 				{ name: 'NavX-Sensor', version: 'v3', action: 'Uninstall' }
 		];
 
-		// Fake data for available dependencies
-		const availableDependencies = [
-				{
-						name: 'PhotonLib',
-						author: 'PhotonVision',
-						downloads: 743,
-						description: 'Accompanying library for using PhotonVision on a coprocessor'
-				},
-				{
-						name: 'VendorLib1',
-						author: 'Author1',
-						downloads: 500,
-						description: 'Description for VendorLib1'
-				},
-				{
-						name: 'VendorLib2',
-						author: 'Author2',
-						downloads: 300,
-						description: 'Description for VendorLib2'
-				},
-				{
-						name: 'VendorLib3',
-						author: 'Author3',
-						downloads: 200,
-						description: 'Description for VendorLib3'
-				},
-				{
-						name: 'VendorLib4',
-						author: 'Author4',
-						downloads: 1000,
-						description: 'Description for VendorLib4'
-				},
-				{
-						name: 'VendorLib5',
-						author: 'Author5',
-						downloads: 750,
-						description: 'Description for VendorLib5'
-				},
-				{
-						name: 'VendorLib6',
-						author: 'Author6',
-						downloads: 650,
-						description: 'Description for VendorLib6'
-				},
-				{
-						name: 'VendorLib7',
-						author: 'Author7',
-						downloads: 550,
-						description: 'Description for VendorLib7'
-				},
-				{
-						name: 'VendorLib8',
-						author: 'Author8',
-						downloads: 450,
-						description: 'Description for VendorLib8'
-				}
-		];
+    // Fake data for available dependencies
+    const availableDependencies = [
+        {
+            name: 'PhotonLib',
+            author: 'PhotonVision',
+            downloads: 743,
+            description: 'Accompanying library for using PhotonVision on a coprocessor'
+        },
+        {
+            name: 'VendorLib1',
+            author: 'Author1',
+            downloads: 500,
+            description: 'Description for VendorLib1'
+        },
+        {
+            name: 'VendorLib2',
+            author: 'Author2',
+            downloads: 300,
+            description: 'Description for VendorLib2'
+        },
+        {
+            name: 'VendorLib3',
+            author: 'Author3',
+            downloads: 200,
+            description: 'Description for VendorLib3'
+        },
+        {
+            name: 'VendorLib4',
+            author: 'Author4',
+            downloads: 1000,
+            description: 'Description for VendorLib4'
+        },
+        {
+            name: 'VendorLib5',
+            author: 'Author5',
+            downloads: 750,
+            description: 'Description for VendorLib5'
+        },
+        {
+            name: 'VendorLib6',
+            author: 'Author6',
+            downloads: 650,
+            description: 'Description for VendorLib6'
+        },
+        {
+            name: 'VendorLib7',
+            author: 'Author7',
+            downloads: 550,
+            description: 'Description for VendorLib7'
+        },
+        {
+            name: 'VendorLib8',
+            author: 'Author8',
+            downloads: 450,
+            description: 'Description for VendorLib8'
+        }
+    ];
 
-		// Create HTML for installed dependencies
-		let installedHtml = '<h2>Installed Vendor Dependencies</h2>';
-		installedDependencies.forEach(dep => {
-				installedHtml += `
-						<div>
-								<span>${dep.name} (${dep.version})</span>
-								<select>
-										<option value="v1">v1</option>
-										<option value="v2">v2</option>
-										<option value="v3">v3</option>
-										<option value="v4">v4</option>
-										<option value="v5">v5</option>
-										<option value="v6">v6</option>
-								</select>
-								<button>${dep.action}</button>
-						</div>
-				`;
-		});
+    // Create HTML for installed dependencies
+    let installedHtml = '<h2>Installed Vendor Dependencies</h2>';
+    installedDependencies.forEach((dep, index) => {
+        installedHtml += `
+            <div class="installed-dependency">
+                <span>${dep.name}</span>
+                <select id="version-select-${index}">
+                </select>
+                <button>${dep.action}</button>
+            </div>
+        `;
+    });
 
-		// Create HTML for available dependencies
-		let availableHtml = '<h2>Available Dependencies</h2>';
-		availableDependencies.forEach(dep => {
-				availableHtml += `
-						<div>
-								<div>${dep.name} by ${dep.author} (${dep.downloads} downloads)</div>
-								<div>${dep.description}</div>
-						</div>
-				`;
-		});
+    // Create HTML for available dependencies
+    let availableHtml = '<h2>Available Dependencies</h2>';
+    availableDependencies.forEach(dep => {
+        availableHtml += `
+            <div class="available-dependency">
+                <div class="top-line">
+                    <span class="name">${dep.name}</span>
+                    <span class="downloads">${dep.downloads}<span class="icon">⬇️</span></span>
+                </div>
+                <div class="details">${dep.author} - ${dep.description}</div>
+            </div>
+        `;
+    });
 
-		// Return the complete HTML
-		return `
-				<!DOCTYPE html>
-				<html lang="en">
-
+    // Return the complete HTML
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
 				<head>
-						<link href="${styleResetUri}" rel="stylesheet">
-						<link href="${styleVSCodeUri}" rel="stylesheet">
-						<link href="${styleMainUri}" rel="stylesheet">
-
-						<meta charset="UTF-8">
-						<meta name="viewport" content="width=device-width, initial-scale=1.0">
-						<title>Vendor Dependencies</title>
-						<style>
-								body {
-										font-family: Arial, sans-serif;
-										margin: 20px;
-								}
-								.installed-dependency, .available-dependency {
-										margin-bottom: 10px;
-								}
-								hr {
-										margin: 40px 0;
-										border: none;
-										border-top: 1px solid #ccc;
-								}
-						</style>
-				</head>
-				<body>
-						${installedHtml}
-						<hr>
-						${availableHtml}
-				</body>
-				</html>
-		`;
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Vendor Dependencies</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                }
+                .installed-dependency, .available-dependency {
+                    margin-bottom: 10px;
+                }
+                hr {
+                    margin: 40px 0;
+                    border: none;
+                    border-top: 1px solid #ccc;
+                }
+                .top-line {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .name {
+                    font-weight: bold;
+                }
+                .downloads {
+                    display: flex;
+                    align-items: center;
+                }
+                .icon {
+                    margin-left: 5px;
+                }
+                .details {
+                    margin-top: 5px;
+                }
+            </style>
+        </head>
+        <body>
+            ${installedHtml}
+            <hr>
+            ${availableHtml}
+						<script src="${scriptUri}"></script>
+        </body>
+        </html>
+    `;
 	}
 }
 
