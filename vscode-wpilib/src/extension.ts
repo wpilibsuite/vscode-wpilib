@@ -175,9 +175,14 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
             depProvider?.addDependency();
           }));
       
+/*         context.subscriptions.push(
+          vscode.commands.registerCommand('wpilib.removeDependency', () => {
+            depProvider?.removeDependency();
+          })) */
+
         context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.clearDependencies', () => {
-            depProvider?.clearDependencies();
+          vscode.commands.registerCommand('wpilib.updateDependencies', () => {
+            depProvider?.updateDependencies();
           }))
       }
 
