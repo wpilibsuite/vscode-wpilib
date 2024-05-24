@@ -115,14 +115,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 this.availableDeps = await this.getAvailableDependencies();
                 const updatableDeps = [];
                 for (const id of this.installedDeps) {
-                    let versionList = [];
+                    let versionList = [{version: id.version, buttonText: 'To Latest'}];
                     for (const ad of this.availableDeps) {
                         if (id.uuid === ad.uuid) {
                             // Populate version array with version and button text
                             if (isNewerVersion(ad.version, id.version)) {
                                 versionList.push({version: ad.version, buttonText: 'Update'});
                             } else if (ad.version === id.version) {
-                                versionList.push({version: ad.version, buttonText: 'To Latest'});
                             } else {
                                 versionList.push({version: ad.version, buttonText: 'Downgrade'});
                             }
@@ -145,6 +144,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 this.availableDepsList[foundDep] = dep;
             }
         });
+
+        // Make sure the installed version is in the list
+
 
         this.updateDependencies();
 	}
@@ -200,99 +202,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 		// Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 
-        // Fake data for installed vendor dependencies
-        const installedDependencies = [
-                    { name: 'CTRE-Phoenix', version: 'v6', action: 'Update' },
-                    { name: 'REV-Software', version: 'v5', action: 'Uninstall' },
-                    { name: 'WPI-Lib', version: 'v4', action: 'Update' },
-                    { name: 'NavX-Sensor', version: 'v3', action: 'Uninstall' }
-            ];
-
-        // Fake data for available dependencies
-        const availableDependencies = [
-            {
-                name: 'PhotonLib',
-                author: 'PhotonVision',
-                downloads: 743,
-                description: 'Accompanying library for using PhotonVision on a coprocessor'
-            },
-            {
-                name: 'VendorLib1',
-                author: 'Author1',
-                downloads: 500,
-                description: 'Description for VendorLib1'
-            },
-            {
-                name: 'VendorLib2',
-                author: 'Author2',
-                downloads: 300,
-                description: 'Description for VendorLib2'
-            },
-            {
-                name: 'VendorLib3',
-                author: 'Author3',
-                downloads: 200,
-                description: 'Description for VendorLib3'
-            },
-            {
-                name: 'VendorLib4',
-                author: 'Author4',
-                downloads: 1000,
-                description: 'Description for VendorLib4'
-            },
-            {
-                name: 'VendorLib5',
-                author: 'Author5',
-                downloads: 750,
-                description: 'Description for VendorLib5'
-            },
-            {
-                name: 'VendorLib6',
-                author: 'Author6',
-                downloads: 650,
-                description: 'Description for VendorLib6'
-            },
-            {
-                name: 'VendorLib7',
-                author: 'Author7',
-                downloads: 550,
-                description: 'Description for VendorLib7'
-            },
-            {
-                name: 'VendorLib8',
-                author: 'Author8',
-                downloads: 450,
-                description: 'Description for VendorLib8'
-            }
-        ];
-
-        // Create HTML for installed dependencies
-        let installedHtml = '<h2>Installed Vendor Dependencies</h2>';
-        installedDependencies.forEach((dep, index) => {
-            installedHtml += `
-                <div class="installed-dependency">
-                    <span>${dep.name}</span>
-                    <select id="version-select-${index}">
-                    </select>
-                    <button id="version-action-${index}"></button>
-                </div>
-            `;
-        });
-
-        // Create HTML for available dependencies
-        let availableHtml = '<h2>Available Dependencies</h2>';
-        availableDependencies.forEach(dep => {
-            availableHtml += `
-                <div class="available-dependency">
-                    <div class="top-line">
-                        <span class="name">${dep.name}</span>
-                        <span class="downloads">${dep.downloads}<span class="icon">⬇️</span></span>
-                    </div>
-                    <div class="details">${dep.author} - ${dep.description}</div>
-                </div>
-            `;
-        });
-
         // Return the complete HTML
         return `
             <!DOCTYPE html>
@@ -335,21 +244,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 </style>
             </head>
             <body>
-                ${installedHtml}
+                <div id="installed-dependencies"></div>            
                 <hr>
-                ${availableHtml}
+                <div id="available-dependencies"></div>
                 <script src="${scriptUri}"></script>
             </body>
             </html>
         `;
     }
 }
-
-/* function getNonce() {
-	let text = '';
-	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-	for (let i = 0; i < 32; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
-	}
-	return text;
-} */
