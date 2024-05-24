@@ -29,6 +29,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     private availableDepsList: IJsonList[] = [];
 	private installedList: IDepInstalled[] = [];
 	private externalApi: IExternalAPI;
+    private ghURL = `https://raw.githubusercontent.com/jasondaming/vendor-json-repo/ctre2024/`;
 
 	private _view?: vscode.WebviewView;
 
@@ -77,11 +78,25 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
 		webviewView.webview.onDidReceiveMessage(data => {
 			switch (data.type) {
-				case 'colorSelected':
+				case 'install':
 					{
-						vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`#${data.value}`));
+						this.availableDeps.find(available => data.version === available.version)
+                        const url = 'test';
+                        this.vendorLibraries.installDependency(await this.vendorLibraries.getJsonDepURL(url), this.vendorLibraries.getWpVendorFolder(wp), true);
 						break;
 					}
+                case 'uninstall':
+                    {
+                        const uninstall = [this.installedDeps[parseInt(data.index, 10)]];
+                        this.vendorLibraries.uninstallVendorLibraries(uninstall, wp);
+                    }
+                case 'update':
+                    {
+                        // Match both the name and the version
+                        var avail = this.availableDeps.find(available => (data.version === available.version && this.installedList[data.index].name === available.name));
+                        var dep = await this.vendorLibraries.getJsonDepURL(this.ghURL + avail?.path);
+                        this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(wp), true);
+                    }
 			}
 		});
 	}
@@ -166,9 +181,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
 
 	public async getAvailableDependencies(): Promise<IJsonList[]> {
-		const ghURL = `https://raw.githubusercontent.com/jasondaming/vendor-json-repo/ctre2024/${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`
+		const listURL = this.ghURL + `${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`
 
-		return await this.loadFileFromUrl(ghURL);
+		return await this.loadFileFromUrl(listURL);
 	}
 
 	protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {

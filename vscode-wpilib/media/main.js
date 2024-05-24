@@ -3,10 +3,12 @@
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
 (function () {
-    function populateDropDowns(data) {
-        const dropdowns = document.querySelectorAll('select[id^="version-select-"]');
-        const buttons = document.querySelectorAll('button[id^="version-action-"]')
+    const vscode = acquireVsCodeApi();
+    let dropdowns;
+    let buttons;
+    let message;
 
+    function populateDropDowns(data) {
         dropdowns.forEach((dropdown, index) => {
             const versions = data[index].versionInfo;
             versions.forEach((versionTuple, i) => {
@@ -62,11 +64,49 @@
 
     // Add event listeners to the buttons
     function addEventListeners() {
-        document.querySelectorAll('.update-btn').forEach(button => {
+        // Handle messages sent from the extension to the webview
+        window.addEventListener('message', event => {
+            message = event.data; // The json data that the extension sent
+            switch (message.type) {
+                case 'updateDependencies':
+                    {
+                        const installedHTML = generateInstalledHTML(message.installed);
+                        const availableHTML = generateAvailableHTML(message.available);
+
+                        const installedContainer = document.getElementById('installed-dependencies');
+                        const availableContainer = document.getElementById('available-dependencies');
+
+                        if (installedContainer) {
+                            installedContainer.innerHTML = installedHTML;
+                        } else {
+                            console.error('Element with ID "installed-dependencies" not found.');
+                        }
+
+                        if (availableContainer) {
+                            availableContainer.innerHTML = availableHTML;
+                        } else {
+                            console.error('Element with ID "available-dependencies" not found.');
+                        }
+
+                        dropdowns = document.querySelectorAll('select[id^="version-select-"]');
+                        buttons = document.querySelectorAll('button[id^="version-action-"]');
+                        addDropdownListeners();
+                        populateDropDowns(message.installed);
+                        break;
+                    }
+            }
+        });
+
+        document.querySelectorAll('button[id^="version-action-"]').forEach(button => {
             button.addEventListener('click', () => {
-                const name = button.getAttribute('data-name');
-                // Handle update logic here
-                console.log(`Updating ${name}`);
+                const action = button.getAttribute('data-name');
+                const index = getStringUntilFirstDashFromRight(action);
+                const drop = document.getElementById("version-select-" + index);
+                if (drop && drop instanceof HTMLSelectElement) {
+                    var selectedText = drop.options[drop.selectedIndex].text;
+                    // Handle update logic here
+                    vscode.postMessage({ type: 'update', version: selectedText, index: index });
+                }
             });
         });
     
@@ -79,35 +119,33 @@
         });
     }
 
-    // Handle messages sent from the extension to the webview
-    window.addEventListener('message', event => {
-        const message = event.data; // The json data that the extension sent
-        switch (message.type) {
-            case 'updateDependencies':
-                {
-                    const installedHTML = generateInstalledHTML(message.installed);
-                    const availableHTML = generateAvailableHTML(message.available);
+    function addDropdownListeners() {
+        // Add event listener for the dropdown
+        dropdowns.forEach((dropdown, index) =>
+            dropdown.addEventListener('change', () => {
+                const versions = message.installed[index].versionInfo;
+                var selectedText = dropdown.options[dropdown.selectedIndex].text;
+                const version = versions.find(versionTuple => versionTuple.version === selectedText);
+                // Change button text based on selected dropdown value
+                buttons[index].textContent = version.buttonText;
 
-                    const installedContainer = document.getElementById('installed-dependencies');
-                    const availableContainer = document.getElementById('available-dependencies');
+                if (dropdown.selectedIndex === 0) {
+                    //This is the first element of the version array thus the most current
+                    buttons[index].disabled = true;
+                } else {
+                    buttons[index].disabled = false;
+            }
+            })
+        );
+    }
 
-                    if (installedContainer) {
-                        installedContainer.innerHTML = installedHTML;
-                    } else {
-                        console.error('Element with ID "installed-dependencies" not found.');
-                    }
-
-                    if (availableContainer) {
-                        availableContainer.innerHTML = availableHTML;
-                    } else {
-                        console.error('Element with ID "available-dependencies" not found.');
-                    }
-
-                    populateDropDowns(message.installed);
-                    break;
-                }
+    function getStringUntilFirstDashFromRight(str) {
+        const index = str.lastIndexOf("-");
+        if (index === -1) {
+            return str; // No dash found, return the whole string
         }
-    });
+        return str.substring(0, index);
+    }
+
+    addEventListeners();
 }());
-
-

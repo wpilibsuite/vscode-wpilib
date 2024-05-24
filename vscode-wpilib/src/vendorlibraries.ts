@@ -98,6 +98,10 @@ export class VendorLibraries extends VendorLibrariesBase {
     return this.getInstalledDependencies(workspace);
   }
 
+  public async getJsonDepURL(url: string): Promise<IJsonDependency> {
+    return await this.loadFileFromUrl(url);
+  }
+
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
     let deps: IJsonDependency[] = []; 
@@ -123,7 +127,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     }
   }
 
-  private async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder) {
+  public async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder) {
     if (toRemove !== undefined) {
       const url = this.getWpVendorFolder(workspace);
       const files = await readdirAsync(url);
@@ -341,7 +345,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     }
   }
 
-  private getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
+  public getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
     return this.getVendorFolder(workspace.uri.fsPath);
   }
 
