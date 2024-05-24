@@ -95,7 +95,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
 	public updateDependencies() {
 		if (this._view) {
-			this._view.webview.postMessage({ type: 'updateDependecies', installed: this.installedList, available: this.availableDepsList });
+			this._view.webview.postMessage({ type: 'updateDependencies', installed: this.installedList, available: this.availableDepsList });
 		}
 	}
 
