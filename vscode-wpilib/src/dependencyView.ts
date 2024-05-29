@@ -30,6 +30,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 	private installedList: IDepInstalled[] = [];
 	private externalApi: IExternalAPI;
     private ghURL = `https://raw.githubusercontent.com/jasondaming/vendor-json-repo/ctre2024/`;
+    private wp: vscode.WorkspaceFolder | undefined;
 
 	private _view?: vscode.WebviewView;
 
@@ -60,8 +61,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 			]
 		};
 
-        const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-        if (wp === undefined) {
+        this.wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
+        if (this.wp === undefined) {
             logger.warn('no workspace');
             return;
         }
@@ -70,7 +71,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 			this.viewInfo = await this.projectInfo.getViewInfo();
 		}
 
-        this.refresh(wp);
+        this.refresh(this.wp);
+        webviewView.onDidChangeVisibility(() => {
+                if (this.wp) {
+                    this.refresh(this.wp);
+                }
+        });    
 
 		this.viewInfo?.vendorLibraries.forEach(item => console.log(item.name.concat(" / ", item.version)));
 
@@ -80,30 +86,55 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 			switch (data.type) {
 				case 'install':
 					{
-						this.availableDeps.find(available => data.version === available.version)
-                        const url = 'test';
-                        this.vendorLibraries.installDependency(await this.vendorLibraries.getJsonDepURL(url), this.vendorLibraries.getWpVendorFolder(wp), true);
-						break;
+                        this.install(data.index);
 					}
                 case 'uninstall':
                     {
                         const uninstall = [this.installedDeps[parseInt(data.index, 10)]];
-                        this.vendorLibraries.uninstallVendorLibraries(uninstall, wp);
+                        if (this.wp) {
+                            this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
+                        }
                     }
                 case 'update':
                     {
-                        // Match both the name and the version
-                        var avail = this.availableDeps.find(available => (data.version === available.version && this.installedList[data.index].name === available.name));
-                        var dep = await this.vendorLibraries.getJsonDepURL(this.ghURL + avail?.path);
-                        this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(wp), true);
+                        this.update(data.version, data.index);
                     }
 			}
 		});
 	}
 
+    private async update(version: string, indexString: string) {
+        var index = parseInt(indexString, 10)
+        // Make sure we have a workspace
+        if (this.wp) {
+            // If the version matches the current version then we want to update to latest
+            if (version === this.installedList[index].currentVersion) {
+                // Get the version of the first element of the array AKA the latest version
+                var versionToInstall = this.installedList[index].versionInfo[0].version;
+            } else {
+                // It isn't the current version so user must have specified something else
+                var versionToInstall = version;
+            }
+
+            // Match both the name and the version
+            const avail = this.availableDeps.find(available => (versionToInstall === available.version && this.installedList[index].name === available.name));
+            if (avail) {
+                const dep = await this.vendorLibraries.getJsonDepURL(this.ghURL + avail.path);
+                this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+            }
+        }
+    }
+
+    private async install(index: string) {
+        const avail = this.availableDepsList[parseInt(index, 10)];
+        if (avail && this.wp) {
+            const dep = await this.vendorLibraries.getJsonDepURL(this.ghURL + avail.path);
+            this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+        }
+    }
+
 	public addDependency() {
 		if (this._view) {
-			this._view.show?.(true);
 			this._view.webview.postMessage({ type: 'addDependency' });
 		}
 	}
@@ -128,7 +159,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             // Check Github for the VendorDep list
             if (this.installedDeps.length !== 0) {
                 this.availableDeps = await this.getAvailableDependencies();
-                const updatableDeps = [];
+                this.installedList = [];
                 for (const id of this.installedDeps) {
                     let versionList = [{version: id.version, buttonText: 'To Latest'}];
                     for (const ad of this.availableDeps) {
@@ -152,11 +183,18 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
         // We need to group the available deps and filter out the installed ones
         this.availableDeps.forEach(dep => {
-            let foundDep = this.availableDepsList.findIndex(depend => depend.uuid === dep.uuid);
-            if (foundDep < 0) {
-                this.availableDepsList.push(dep);
-            } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
-                this.availableDepsList[foundDep] = dep;
+            // See if the dep is one of the installed deps if so don't add it
+            let installedDep = this.installedDeps.findIndex(depend => depend.uuid === dep.uuid);
+            if (installedDep < 0) {
+                // Check to see if it is already in the available list
+                let foundDep = this.availableDepsList.findIndex(depend => depend.uuid === dep.uuid);
+                if (foundDep < 0) {
+                    // Not in the list so just add it
+                    this.availableDepsList.push(dep);
+                } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
+                    // It was in the list but this version is newer so lets use that
+                    this.availableDepsList[foundDep] = dep;
+                }
             }
         });
 

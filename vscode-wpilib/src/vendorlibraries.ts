@@ -99,7 +99,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public async getJsonDepURL(url: string): Promise<IJsonDependency> {
-    return await this.loadFileFromUrl(url);
+    return this.loadFileFromUrl(url);
   }
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {

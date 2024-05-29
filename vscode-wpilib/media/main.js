@@ -96,27 +96,14 @@
                     }
             }
         });
-
-        document.querySelectorAll('button[id^="version-action-"]').forEach(button => {
-            button.addEventListener('click', () => {
-                const action = button.getAttribute('data-name');
-                const index = getStringUntilFirstDashFromRight(action);
-                const drop = document.getElementById("version-select-" + index);
-                if (drop && drop instanceof HTMLSelectElement) {
-                    var selectedText = drop.options[drop.selectedIndex].text;
-                    // Handle update logic here
-                    vscode.postMessage({ type: 'update', version: selectedText, index: index });
-                }
-            });
-        });
     
-        document.querySelectorAll('.install-btn').forEach(button => {
+/*         document.querySelectorAll('.install-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const name = button.getAttribute('data-name');
                 // Handle install logic here
                 console.log(`Installing ${name}`);
             });
-        });
+        }); */
     }
 
     function addDropdownListeners() {
@@ -129,7 +116,7 @@
                 // Change button text based on selected dropdown value
                 buttons[index].textContent = version.buttonText;
 
-                if (dropdown.selectedIndex === 0) {
+                if (dropdown.selectedIndex === 0 && dropdown.version) {
                     //This is the first element of the version array thus the most current
                     buttons[index].disabled = true;
                 } else {
@@ -137,6 +124,19 @@
             }
             })
         );
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.getAttribute('id');
+                const index = getStringUntilFirstDashFromRight(action);
+                const drop = document.getElementById("version-select-" + index);
+                if (drop && drop instanceof HTMLSelectElement) {
+                    var selectedText = drop.options[drop.selectedIndex].text;
+                    // Handle update logic here
+                    vscode.postMessage({ type: 'update', version: selectedText, index: index });
+                }
+            });
+        });
     }
 
     function getStringUntilFirstDashFromRight(str) {
@@ -144,7 +144,7 @@
         if (index === -1) {
             return str; // No dash found, return the whole string
         }
-        return str.substring(0, index);
+        return str.substring(index + 1);
     }
 
     addEventListeners();
