@@ -7,6 +7,8 @@
     let dropdowns;
     let buttons;
     let message;
+    let uninstalls;
+    let installs;
 
     function populateDropDowns(data) {
         dropdowns.forEach((dropdown, index) => {
@@ -39,6 +41,9 @@
                     <select id="version-select-${index}">
                     </select>
                     <button id="version-action-${index}"></button>
+                    <button id="uninstall-action-${index}" class="uninstall-button" data-dependency="${dep.name}">
+                        <img src="trash-can-solid.svg" alt="Uninstall">
+                    </button>
                 </div>
             `;
         });
@@ -49,11 +54,11 @@
     function generateAvailableHTML(available) {
         // Create HTML for available dependencies
         let availableHtml = '<h2>Available Dependencies</h2>';
-        available.forEach(dep => {
+        available.forEach((dep, index) => {
             availableHtml += `
                 <div class="available-dependency">
                     <div class="top-line">
-                        <span class="name">${dep.name}</span>
+                        <span class="name">${dep.name}</span><button id="install-action-${index}">Install</button>
                     </div>
                     <div class="details">${dep.version} - ${dep.description}</div>
                 </div>
@@ -90,6 +95,8 @@
 
                         dropdowns = document.querySelectorAll('select[id^="version-select-"]');
                         buttons = document.querySelectorAll('button[id^="version-action-"]');
+                        uninstalls = document.querySelectorAll('button[id^="uninstall-action-"]');
+                        installs = document.querySelectorAll('button[id^="install-action-"]');
                         addDropdownListeners();
                         populateDropDowns(message.installed);
                         break;
@@ -135,6 +142,22 @@
                     // Handle update logic here
                     vscode.postMessage({ type: 'update', version: selectedText, index: index });
                 }
+            });
+        });
+
+        uninstalls.forEach(uninstall => {
+            uninstall.addEventListener('click', () => {
+                const action = uninstall.getAttribute('id');
+                const index = getStringUntilFirstDashFromRight(action);
+                vscode.postMessage({ type: 'uninstall', index: index });
+            });
+        });
+
+        installs.forEach(install => {
+            install.addEventListener('click', () => {
+                const action = install.getAttribute('id');
+                const index = getStringUntilFirstDashFromRight(action);
+                vscode.postMessage({ type: 'install', index: index });
             });
         });
     }

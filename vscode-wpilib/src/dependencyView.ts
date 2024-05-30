@@ -57,7 +57,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 			enableScripts: true,
 
 			localResourceRoots: [
-				this._extensionUri
+				this._extensionUri,
+                vscode.Uri.joinPath(this._extensionUri, 'media', 'trash-can-solid.svg')
 			]
 		};
 
@@ -87,13 +88,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 				case 'install':
 					{
                         this.install(data.index);
+                        break;
 					}
                 case 'uninstall':
                     {
-                        const uninstall = [this.installedDeps[parseInt(data.index, 10)]];
-                        if (this.wp) {
-                            this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
-                        }
+                        this.uninstall(data.index);
+                        break;
                     }
                 case 'update':
                     {
@@ -120,8 +120,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             const avail = this.availableDeps.find(available => (versionToInstall === available.version && this.installedList[index].name === available.name));
             if (avail) {
                 const dep = await this.vendorLibraries.getJsonDepURL(this.ghURL + avail.path);
-                this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
             }
+            this.refresh(this.wp);
         }
     }
 
@@ -129,9 +130,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         const avail = this.availableDepsList[parseInt(index, 10)];
         if (avail && this.wp) {
             const dep = await this.vendorLibraries.getJsonDepURL(this.ghURL + avail.path);
-            this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+            await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+            this.refresh(this.wp);
         }
     }
+
+    private async uninstall(index: string) {
+        const uninstall = [this.installedDeps[parseInt(index, 10)]];
+        if (this.wp) {
+            await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
+            this.refresh(this.wp);
+        }
+    }
+        
 
 	public addDependency() {
 		if (this._view) {
