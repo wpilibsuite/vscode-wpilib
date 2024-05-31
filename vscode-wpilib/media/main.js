@@ -32,18 +32,22 @@
 
     // Function to generate HTML for installed dependencies
     function generateInstalledHTML(installed) {
+        const trash = document.getElementById('trashicon')?.innerHTML
         // Create HTML for installed dependencies
         let installedHtml = '<h2>Installed VendorDeps</h2>';
         installed.forEach((dep, index) => {
             installedHtml += `
                 <div class="installed-dependency">
-                    <span>${dep.name}</span>
-                    <select id="version-select-${index}">
-                    </select>
-                    <button id="version-action-${index}"></button>
-                    <button id="uninstall-action-${index}" class="uninstall-button" data-dependency="${dep.name}">
-                        <img src="trash-can-solid.svg" alt="Uninstall">
-                    </button>
+                    <div class="top-line">
+                        <span>${dep.name}</span><span>${dep.currentVersion}</span>
+                    </div>
+                    <div class="update">
+                        <select id="version-select-${index}"></select>
+                        <button id="version-action-${index}"></button>
+                        <button id="uninstall-action-${index}" class="uninstall-button" data-dependency="${dep.name}">
+                            <img src=${trash} alt="Uninstall">
+                        </button>
+                    </div>
                 </div>
             `;
         });
@@ -123,7 +127,7 @@
                 // Change button text based on selected dropdown value
                 buttons[index].textContent = version.buttonText;
 
-                if (dropdown.selectedIndex === 0 && dropdown.version) {
+                if (dropdown.selectedIndex === 0 && version.version === message.installed[index].currentVersion) {
                     //This is the first element of the version array thus the most current
                     buttons[index].disabled = true;
                 } else {
@@ -159,6 +163,14 @@
                 const index = getStringUntilFirstDashFromRight(action);
                 vscode.postMessage({ type: 'install', index: index });
             });
+        });
+
+        document.getElementById('updateall-action')?.addEventListener('click', () => {
+            vscode.postMessage({ type: 'updateall' })
+        });
+
+        document.getElementById('refresh-action')?.addEventListener('click', () => {
+            vscode.postMessage({ type: 'refresh' })
         });
     }
 
