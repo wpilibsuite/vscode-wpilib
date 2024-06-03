@@ -104,7 +104,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
-    let deps: IJsonDependency[] = []; 
+    const deps: IJsonDependency[] = [];
 
     if (installedDeps.length !== 0) {
       const arr = installedDeps.map((jdep) => {
@@ -119,9 +119,9 @@ export class VendorLibraries extends VendorLibrariesBase {
         for (const ti of toRemove) {
           deps.push(ti.dep);
         }
-      }      
+      }
 
-      this.uninstallVendorLibraries(deps, workspace);
+      void this.uninstallVendorLibraries(deps, workspace);
     } else {
       vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
     }

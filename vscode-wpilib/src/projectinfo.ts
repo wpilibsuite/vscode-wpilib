@@ -114,7 +114,7 @@ Vendor Libraries:
     if (wp === undefined) {
       return wp;
     }
-    return await this.getProjectInfo(wp);
+    return this.getProjectInfo(wp);
   }
 
   private async getProjectInfo(workspace: vscode.WorkspaceFolder): Promise<IProjectInfo> {
