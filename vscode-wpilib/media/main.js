@@ -108,13 +108,13 @@
             }
         });
     
-/*         document.querySelectorAll('.install-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const name = button.getAttribute('data-name');
-                // Handle install logic here
-                console.log(`Installing ${name}`);
-            });
-        }); */
+        document.getElementById('updateall-action')?.addEventListener('click', () => {
+            vscode.postMessage({ type: 'updateall' })
+        });
+
+        document.getElementById('refresh-action')?.addEventListener('click', () => {
+            vscode.postMessage({ type: 'refresh' })
+        });
     }
 
     function addDropdownListeners() {
@@ -163,14 +163,6 @@
                 const index = getStringUntilFirstDashFromRight(action);
                 vscode.postMessage({ type: 'install', index: index });
             });
-        });
-
-        document.getElementById('updateall-action')?.addEventListener('click', () => {
-            vscode.postMessage({ type: 'updateall' })
-        });
-
-        document.getElementById('refresh-action')?.addEventListener('click', () => {
-            vscode.postMessage({ type: 'refresh' })
         });
     }
 
