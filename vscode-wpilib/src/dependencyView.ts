@@ -6,6 +6,7 @@ import { IJsonDependency } from './shared/vendorlibrariesbase';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { isNewerVersion } from './versions';
 import { logger } from './logger';
+import { localize as i18n } from './locale';
 
 export interface IJsonList {
   path: string;
@@ -196,7 +197,18 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (dep) {
-        await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+        const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+
+        if (success) {
+          const buildRes = await vscode.window.showInformationMessage(i18n('message',
+            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
+            'Would you like to do this now?'), {
+              modal: false,
+            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+          if (buildRes?.title === i18n('ui', 'Yes')) {
+            await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+          }
+        }
       }
     }
   }
@@ -229,15 +241,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       // Check Github for the VendorDep list
       if (this.installedDeps.length !== 0) {
         for (const id of this.installedDeps) {
-          let versionList = [{version: id.version, buttonText: 'To Latest'}];
+          let versionList = [{version: id.version, buttonText: i18n('ui', 'To Latest')}];
           for (const ad of this.availableDeps) {
             if (id.uuid === ad.uuid) {
               // Populate version array with version and button text
               if (id.version !== ad.version) {
                 if (isNewerVersion(ad.version, id.version)) {
-                  versionList.push({version: ad.version, buttonText: 'Update'});
+                  versionList.push({version: ad.version, buttonText: i18n('ui', 'Update')});
                 } else {
-                  versionList.push({version: ad.version, buttonText: 'Downgrade'});
+                  versionList.push({version: ad.version, buttonText: i18n('ui', 'Downgrade')});
                 }
               }
             }
@@ -325,12 +337,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach(homedep => {
       const depList: IJsonList = {
-          path: homedep.jsonUrl,
-          name: homedep.name,
-          version: homedep.version,
-          uuid: homedep.uuid,
-          description: 'Loaded from Local Copy',
-          website: 'Loaded from Local Copy'
+          path: i18n('ui', homedep.jsonUrl),
+          name: i18n('ui', homedep.name),
+          version: i18n('ui', homedep.version),
+          uuid: i18n('ui', homedep.uuid),
+          description: i18n('ui', 'Loaded from Local Copy'),
+          website: i18n('ui', 'Loaded from Local Copy')
       };
       const found = this.onlineDeps.find(onlinedep => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version);
       if (!found) {
