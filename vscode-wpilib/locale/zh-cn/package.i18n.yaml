@@ -37,3 +37,4 @@ wpilibcore.selectCppBinaryTypes.title: 选择 C++ Intellisense Binary Types
 wpilibcore.openApiDocumentation.title: 打开 API 文档
 wpilibcore.getProjectInformation.title: 显示项目信息
 wpilibcore.untrustedWorkspace.title: This workspace is untrusted. Only new project creation is supported
+wpilibcore.runGradleClean.title: Run Gradle Clean
