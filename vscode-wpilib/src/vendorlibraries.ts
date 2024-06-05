@@ -98,8 +98,13 @@ export class VendorLibraries extends VendorLibrariesBase {
     return this.getInstalledDependencies(workspace);
   }
 
+  public async getJsonDepURL(url: string): Promise<IJsonDependency> {
+    return this.loadFileFromUrl(url);
+  }
+
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
+    const deps: IJsonDependency[] = [];
 
     if (installedDeps.length !== 0) {
       const arr = installedDeps.map((jdep) => {
@@ -111,22 +116,32 @@ export class VendorLibraries extends VendorLibrariesBase {
       });
 
       if (toRemove !== undefined) {
-        const url = this.getWpVendorFolder(workspace);
-        const files = await readdirAsync(url);
-        for (const file of files) {
-          const fullPath = path.join(url, file);
-          const result = await this.readFile(fullPath);
-          if (result !== undefined) {
-            for (const ti of toRemove) {
-              if (ti.dep.uuid === result.uuid) {
-                await deleteFileAsync(fullPath);
-              }
+        for (const ti of toRemove) {
+          deps.push(ti.dep);
+        }
+      }
+
+      void this.uninstallVendorLibraries(deps, workspace);
+    } else {
+      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+    }
+  }
+
+  public async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder) {
+    if (toRemove !== undefined) {
+      const url = this.getWpVendorFolder(workspace);
+      const files = await readdirAsync(url);
+      for (const file of files) {
+        const fullPath = path.join(url, file);
+        const result = await this.readFile(fullPath);
+        if (result !== undefined) {
+          for (const ti of toRemove) {
+            if (ti.uuid === result.uuid) {
+              await deleteFileAsync(fullPath);
             }
           }
         }
       }
-    } else {
-      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
     }
   }
 
@@ -330,7 +345,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     }
   }
 
-  private getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
+  public getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
     return this.getVendorFolder(workspace.uri.fsPath);
   }
 
