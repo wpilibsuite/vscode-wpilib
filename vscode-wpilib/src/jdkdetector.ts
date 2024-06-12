@@ -2,6 +2,7 @@
 
 import * as cp from 'child_process';
 import * as path from 'path';
+import { platform } from 'process';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { logger } from './logger';
@@ -117,6 +118,22 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
     } catch (err) {
       logger.log('Error loading java from JDK_HOME, skipping', err);
     }
+  }
+
+  try {
+    const javaBinHomeCommand = (platform === 'win32') ? 'java -XshowSettings:properties -version 2>&1 | findstr "java.home"' : 'java -XshowSettings:properties -version 2>&1 > /dev/null | grep "java.home"';
+
+    const javaBinHomeCommandOutput = cp.execSync(javaBinHomeCommand).toString();
+    const javaBinHome = javaBinHomeCommandOutput.substring(javaBinHomeCommandOutput.indexOf('java.home = ') + 'java.home = '.length).trim();
+    const javaVersion = await getJavaVersion(javaBinHome);
+    if (javaVersion >= 11) {
+      logger.log(`Found Java Home Version: ${javaVersion} at ${javaBinHome}`);
+      return javaBinHome;
+    } else {
+      logger.info(`Bad Java version ${javaVersion} at ${javaBinHome}`);
+    }
+  } catch (err) {
+    logger.log('Error loading java from the java binary\'s home, skipping', err);
   }
 
   return undefined;
