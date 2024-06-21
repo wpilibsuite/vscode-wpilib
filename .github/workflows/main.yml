@@ -27,7 +27,7 @@ jobs:
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
       - name: Import Developer ID Certificate
-        uses: wpilibsuite/import-signing-certificate@v1
+        uses: wpilibsuite/import-signing-certificate@v2
         with:
           certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -42,7 +42,7 @@ jobs:
           (github.repository_owner == 'wpilibsuite') &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
       - name: Notarize Standalone Utility
-        uses: wpilibsuite/xcode-notarize@v2
+        uses: wpilibsuite/xcode-notarize@v3
         with:
           product-path: "wpilib-utility-standalone/build/wpilibutility-darwin-universal/wpilibutility.app"
           appstore-connect-username: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
