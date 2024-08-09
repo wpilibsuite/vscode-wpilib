@@ -8,8 +8,9 @@ import { setExecutePermissions } from './permissions';
 
 type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
-export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                      addCpp: boolean, directGradleImport: boolean, extraVendordeps: string[]): Promise<boolean> {
+export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromTemplateTestFolder: string | undefined,
+                                      fromGradleFolder: string, toFolder: string, directGradleImport: boolean, extraVendordeps: string[]):
+                                      Promise<boolean> {
   try {
     const existingFiles = await readdirAsync(toFolder);
     if (existingFiles.length > 0) {
@@ -18,11 +19,11 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
     }
 
     let codePath = path.join(toFolder, 'src', 'main');
-    if (addCpp) {
-      codePath = path.join(codePath, 'cpp');
-    } else if (directGradleImport) {
+    const testPath = path.join(toFolder, 'src', 'test');
+    if (directGradleImport) {
       codePath = path.join(toFolder, 'src');
     }
+
 
     const gradleRioFrom = '###GRADLERIOREPLACE###';
 
@@ -36,6 +37,9 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
       await ncpAsync(fromTemplateFolder, codePath);
     } else {
       await fromTemplateFolder(codePath, toFolder);
+    }
+    if (fromTemplateTestFolder !== undefined) {
+      await ncpAsync(fromTemplateTestFolder, testPath);
     }
     await ncpAsync(fromGradleFolder, toFolder, {
       filter: (cf): boolean => {
@@ -115,9 +119,10 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
   }
 }
 
-export async function generateCopyJava(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromGradleFolder: string, toFolder: string,
-                                       robotClassTo: string, copyRoot: string, directGradleImport: boolean, extraVendordeps: string[],
-                                       packageReplaceString?: string | undefined): Promise<boolean> {
+export async function generateCopyJava(resourcesFolder: string, fromTemplateFolder: string | CopyCallback, fromTemplateTestFolder: string | undefined,
+                                       fromGradleFolder: string, toFolder: string, robotClassTo: string, copyRoot: string,
+                                       directGradleImport: boolean, extraVendordeps: string[], packageReplaceString?: string | undefined):
+                                       Promise<boolean> {
   try {
     const existingFiles = await readdirAsync(toFolder);
     if (existingFiles.length > 0) {
@@ -125,7 +130,9 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
     }
 
     const rootCodePath = path.join(toFolder, 'src', 'main', 'java');
+    const rootTestPath = path.join(toFolder, 'src', 'test', 'java');
     let codePath = path.join(rootCodePath, copyRoot);
+    const testPath = path.join(rootTestPath, copyRoot);
     if (directGradleImport) {
       codePath = path.join(toFolder, 'src');
     }
@@ -134,6 +141,9 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
       await ncpAsync(fromTemplateFolder, codePath);
     } else {
       await fromTemplateFolder(codePath, toFolder);
+    }
+    if (fromTemplateTestFolder !== undefined) {
+      await ncpAsync(fromTemplateTestFolder, testPath);
     }
 
     const files = await new Promise<string[]>((resolve, reject) => {
@@ -149,6 +159,7 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
         }
       });
     });
+
     // Package replace inside the template
 
     const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)';
@@ -186,6 +197,45 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
           }
         });
       }));
+    }
+
+    if (fromTemplateTestFolder !== undefined) {
+      const testFiles = await new Promise<string[]>((resolve, reject) => {
+        glob('**/*{.java,.gradle}', {
+          cwd: testPath,
+          nodir: true,
+          nomount: true,
+        }, (err, matches) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(matches);
+          }
+        });
+      });
+
+      for (const f of testFiles) {
+        const file = path.join(testPath, f);
+        promiseArray.push(new Promise<void>((resolve, reject) => {
+          fs.readFile(file, 'utf8', (err, dataIn) => {
+            if (err) {
+              reject(err);
+            } else {
+              let dataOut = dataIn.replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo);
+              if (packageReplaceString !== undefined) {
+                dataOut = dataOut.replace(new RegExp(packageReplaceString, 'g'), replacePackageTo);
+              }
+              fs.writeFile(file, dataOut, 'utf8', (err1) => {
+                if (err1) {
+                  reject(err);
+                } else {
+                  resolve();
+                }
+              });
+            }
+          });
+        }));
+      }
     }
 
     await Promise.all(promiseArray);

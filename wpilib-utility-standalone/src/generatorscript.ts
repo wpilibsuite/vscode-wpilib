@@ -179,9 +179,9 @@ function displayItems(toDisplay: IDisplayJSON[], rootFolder: string, java: boole
 }
 
 document.addEventListener('keydown', (e) => {
-  if (e.which === 123) {
+  if (e.key === '{') {
     getCurrentWindow().webContents.toggleDevTools();
-  } else if (e.which === 116) {
+  } else if (e.key === '}') {
     location.reload();
   }
 });
@@ -205,7 +205,7 @@ async function handleCppCreate(_item: IDisplayJSON, _srcRoot: string): Promise<v
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  const result = await generateCopyCpp(resourceRoot, templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder, false, false, []);
+  const result = await generateCopyCpp(resourceRoot, templateFolder, undefined, path.join(gradleRoot, _item.gradlebase), toFolder, false, []);
   if (!result) {
     await dialog.showMessageBox({
       message: 'Cannot extract into non empty directory',
@@ -222,7 +222,7 @@ async function handleJavaCreate(_item: IDisplayJSON, _srcRoot: string): Promise<
   const toFolder = dirArr[0];
 
   const templateFolder = path.join(_srcRoot, _item.foldername);
-  const result = await generateCopyJava(resourceRoot, templateFolder, path.join(gradleRoot, _item.gradlebase), toFolder,
+  const result = await generateCopyJava(resourceRoot, templateFolder, undefined, path.join(gradleRoot, _item.gradlebase), toFolder,
                                         'frc.robot.Robot', path.join('frc', 'robot'), false, []);
 
   if (!result) {
