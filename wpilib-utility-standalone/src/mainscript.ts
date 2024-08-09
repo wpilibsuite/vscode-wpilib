@@ -1,9 +1,9 @@
 import { getCurrentWindow } from '@electron/remote';
 
 document.addEventListener('keydown', (e) => {
-  if (e.which === 123) {
+  if (e.key === '{') {
     getCurrentWindow().webContents.openDevTools();
-  } else if (e.which === 116) {
+  } else if (e.key === '}') {
     location.reload();
   }
 });

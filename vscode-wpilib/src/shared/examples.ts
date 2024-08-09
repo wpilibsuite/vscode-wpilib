@@ -16,6 +16,7 @@ export interface IExampleJsonLayout {
   gradlebase: string;
   commandversion: number;
   extravendordeps?: string[];
+  hasunittests?: boolean;
 }
 
 export class Examples {
@@ -23,6 +24,7 @@ export class Examples {
 
   constructor(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
     const examplesFolder = path.join(resourceRoot, 'src', 'examples');
+    const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
     const resourceFile = path.join(examplesFolder, this.exampleResourceName);
     const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
     fs.readFile(resourceFile, 'utf8', (err, data) => {
@@ -45,16 +47,20 @@ export class Examples {
           },
           async generate(folderInto: vscode.Uri): Promise<boolean> {
             try {
+              let testFolder;
+              if (e.hasunittests === true) {
+                testFolder = path.join(examplesTestFolder, e.foldername);
+              }
               if (java) {
-                if (!await generateCopyJava(resourceRoot, path.join(examplesFolder, e.foldername),
+                if (!await generateCopyJava(resourceRoot, path.join(examplesFolder, e.foldername), testFolder,
                   path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'),
                   false, extraVendordeps)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
               } else {
-                if (!await generateCopyCpp(resourceRoot, path.join(examplesFolder, e.foldername),
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, false, extraVendordeps)) {
+                if (!await generateCopyCpp(resourceRoot, path.join(examplesFolder, e.foldername), testFolder,
+                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, extraVendordeps)) {
                   vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
                   return false;
                 }
