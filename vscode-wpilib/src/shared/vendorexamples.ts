@@ -24,8 +24,7 @@ interface IJsonExample {
   extravendordeps?: string[];
 }
 
-// tslint:disable-next-line:no-any
-function isJsonExample(arg: any): arg is IJsonExample {
+function isJsonExample(arg: unknown): arg is IJsonExample {
   const jsonDep = arg as IJsonExample;
 
   return jsonDep.name !== undefined && jsonDep.description !== undefined
