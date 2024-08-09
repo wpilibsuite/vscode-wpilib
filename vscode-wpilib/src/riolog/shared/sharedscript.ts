@@ -409,6 +409,7 @@ window.addEventListener('resize', () => {
 });
 
 function handleFileSelect(evt: Event) {
+  // tslint:disable-next-line:no-non-null-assertion
   const files = (evt.target as HTMLInputElement).files!;
   const firstFile = files[0];
   const reader = new FileReader();
