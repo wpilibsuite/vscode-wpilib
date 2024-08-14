@@ -15,8 +15,8 @@ jobs:
           node-version: '18.x'
       - uses: actions/setup-java@v4
         with:
-          java-version: 11
-          distribution: 'zulu'
+          java-version: 17
+          distribution: 'temurin'
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -77,8 +77,8 @@ jobs:
           node-version: '18.x'
       - uses: actions/setup-java@v4
         with:
-          java-version: 11
-          distribution: 'zulu'
+          java-version: 17
+          distribution: 'temurin'
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -108,8 +108,8 @@ jobs:
           node-version: '18.x'
       - uses: actions/setup-java@v4
         with:
-          java-version: 11
-          distribution: 'zulu'
+          java-version: 17
+          distribution: 'temurin'
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -139,8 +139,8 @@ jobs:
           node-version: '18.x'
       - uses: actions/setup-java@v4
         with:
-          java-version: 11
-          distribution: 'zulu'
+          java-version: 17
+          distribution: 'temurin'
       - run: ./gradlew build updateVersions updateAllDependencies generateTemplateZip generateExamplesZip -PbuildServer
         name: Build with Gradle
       - run: |
