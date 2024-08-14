@@ -382,8 +382,8 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       return;
     }
     const javaConfig = vscode.workspace.getConfiguration('java');
-    await javaConfig.update('home', javaHome, vscode.ConfigurationTarget.Global);
-    await vscode.window.showInformationMessage(i18n('message', 'Successfully set java.home'));
+    await javaConfig.update('jdt.ls.java.home', javaHome, vscode.ConfigurationTarget.Global);
+    await vscode.window.showInformationMessage(i18n('message', 'Successfully set java.jdt.ls.java.home'));
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {
