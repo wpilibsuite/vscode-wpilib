@@ -52,7 +52,8 @@
         "onCommand:wpilibcore.resetAutoUpdate",
         "onCommand:wpilibcore.changeDesktop",
         "onCommand:wpilibcore.openApiDocumentation",
-        "onCommand:wpilibcore.getProjectInformation"
+        "onCommand:wpilibcore.getProjectInformation",
+        "onCommand:wpilibcore.runGradleClean"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -389,6 +390,12 @@
                 "title": "%wpilibcore.getProjectInformation.title%",
                 "category": "WPILib",
                 "enablement": "isWPILibProject && isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.runGradleClean",
+                "title": "%wpilibcore.runGradleClean.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
             }
         ],
         "views": {
