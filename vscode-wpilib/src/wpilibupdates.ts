@@ -12,7 +12,7 @@ import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './util
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
-  return /(id\s*?[\"|\']edu\.wpi\.first\.GradleRIO[\"|\'].*?version\s*?[\"|\'])(.+?)([\"|\'])/g;
+  return /(id\s*?["|']edu\.wpi\.first\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
 }
 
 interface IOnlineTuple {
@@ -46,8 +46,8 @@ export class WPILibUpdates {
     const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
     const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
     if (newVersion !== undefined && persistentState.Value === false) {
-      const result = await vscode.window.showInformationMessage
-        (i18n('message', `This project is currently using WPILib version ({1}). Would you like to update the project ` +
+      const result = await vscode.window.showInformationMessage(i18n('message',
+          `This project is currently using WPILib version ({1}). Would you like to update the project ` +
           `to WPILib version {0}?`, newVersion, grVersion), {
             modal: true,
           }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again'));
@@ -77,8 +77,8 @@ export class WPILibUpdates {
       vscode.window.showInformationMessage(i18n('message', 'No WPILib Update Found'));
       return false;
     } else {
-      const result = await vscode.window.showInformationMessage
-        (i18n('message', `This project is currently using WPILib version ({1}). Would you like to update the project ` +
+      const result = await vscode.window.showInformationMessage(i18n('message', 
+        `This project is currently using WPILib version ({1}). Would you like to update the project ` +
         `to WPILib version {0}?`, newVersion.newVersion, grVersion), {
             modal: true,
           }, i18n('ui', 'Yes'), i18n('ui', 'No'));
@@ -195,7 +195,7 @@ export class WPILibUpdates {
             if (err) {
               reject(err);
             } else {
-              // tslint:disable-next-line:no-unsafe-any
+              
               resolve(result.metadata.versioning[0].versions[0].version);
             }
           });

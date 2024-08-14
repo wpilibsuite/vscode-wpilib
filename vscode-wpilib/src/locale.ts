@@ -1,8 +1,5 @@
 /* `vscode-nls` is really hard to use, so we implement i18n here. */
 
-// many `any` used in locale functions, disabled for whole file
-// tslint:disable:no-any
-
 import * as fs from 'fs';
 import * as path from 'path';
 import format from './formatter';
@@ -32,33 +29,23 @@ let options: {
   languagePackId?: string;
 };
 
-function isString(value: any): value is string {
-  return toString.call(value) === '[object String]';
-}
-function isBoolean(value: any): value is boolean {
-  return value === true || value === false;
-}
-function isDefined(value: any): boolean {
-  return typeof value !== 'undefined';
-}
-
-function readJsonFileSync<T = any>(filename: string): T {
+function readJsonFileSync<T = unknown>(filename: string): T {
   return JSON.parse(fs.readFileSync(filename, 'utf8')) as T;
 }
 
 function initializeSettings() {
   options = { locale: undefined, language: undefined, languagePackSupport: false };
-  if (isString(process.env.VSCODE_NLS_CONFIG)) {
+  if (typeof process.env.VSCODE_NLS_CONFIG === 'string') {
     try {
       const vscodeOptions = JSON.parse(process.env.VSCODE_NLS_CONFIG) as IVSCodeNlsConfig;
       let language: string | undefined;
       if (vscodeOptions.availableLanguages) {
         const value = vscodeOptions.availableLanguages['*'];
-        if (isString(value)) {
+        if (typeof value == 'string') {
           language = value;
         }
       }
-      if (isString(vscodeOptions.locale)) {
+      if (typeof vscodeOptions.locale === 'string') {
         options.locale = vscodeOptions.locale.toLowerCase();
       }
       if (language === undefined) {
@@ -67,10 +54,10 @@ function initializeSettings() {
         options.language = language;
       }
 
-      if (isBoolean(vscodeOptions._languagePackSupport)) {
+      if (typeof vscodeOptions._languagePackSupport === 'boolean') {
         options.languagePackSupport = vscodeOptions._languagePackSupport;
       }
-      if (isString(vscodeOptions._languagePackId)) {
+      if (typeof vscodeOptions._languagePackId === 'string') {
         options.languagePackId = vscodeOptions._languagePackId;
       }
     } catch {
@@ -95,7 +82,7 @@ export function getLocaleFilePath(domain: string) {
 }
 
 export function loadLocaleFile(domain: string) {
-  if (isDefined(localeCache[domain])) {
+  if (typeof localeCache[domain] !== 'undefined') {
     logger.log(`[Locale] ${domain}@${options.language} is already loaded, using cached one.`);
     return localeCache[domain];
   }
@@ -119,12 +106,12 @@ export function loadLocaleFile(domain: string) {
 /**
  * When `message` takes an array, it will be treated as [translationKey, fallbackMessage]
  */
-export function localize(domain: string, message: string | string[], ...args: any[]) {
-  if (!isDefined(localeCache[domain])) {
+export function localize(domain: string, message: string | string[], ...args: unknown[]) {
+  if (!(typeof localeCache[domain] !== 'undefined')) {
     loadLocaleFile(domain);
   }
   let key: string;
-  if (isString(message)) {
+  if (typeof message === 'string') {
     key = message;
   } else if (message.length === 2) {
     key = message[0];
@@ -132,7 +119,7 @@ export function localize(domain: string, message: string | string[], ...args: an
   } else {
     throw new Error('Invalid message');
   }
-  if (isDefined(localeCache[domain][key])) {
+  if (typeof localeCache[domain][key] !== 'undefined') {
     message = localeCache[domain][key];
   }
   return format(message, args);

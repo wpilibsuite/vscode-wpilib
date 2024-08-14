@@ -1,6 +1,7 @@
 'use strict';
 
 import * as electron from 'electron';
+import { dialog } from '@electron/remote';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as ncp from 'ncp';
@@ -8,8 +9,6 @@ import * as path from 'path';
 import * as temp from 'temp';
 import * as util from 'util';
 import * as vscode from './vscodeshim';
-
-const dialog = electron.remote.dialog;
 
 export function getIsWindows(): boolean {
   const nodePlatform: NodeJS.Platform = process.platform;

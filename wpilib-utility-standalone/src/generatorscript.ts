@@ -1,11 +1,9 @@
 import * as electron from 'electron';
+import { app, dialog, getCurrentWindow } from '@electron/remote';
 import * as fs from 'fs';
 import * as path from 'path';
 import { generateCopyCpp, generateCopyJava } from './shared/generator';
 
-const remote = electron.remote;
-const dialog = remote.dialog;
-const app = remote.app;
 const shell = electron.shell;
 const basepath = app.getAppPath();
 
@@ -56,11 +54,7 @@ window.addEventListener('load', async () => {
   ];
 
   for (const languageDetails of languages) {
-    let language;
-    let templatesEventHandler;
-    let examplesEventHandler;
-
-    [language, templatesEventHandler, examplesEventHandler] = languageDetails;
+    const [language, templatesEventHandler, examplesEventHandler] = languageDetails;
 
     const languageLowerCase = language.toLocaleLowerCase();
 
@@ -186,7 +180,7 @@ function displayItems(toDisplay: IDisplayJSON[], rootFolder: string, java: boole
 
 document.addEventListener('keydown', (e) => {
   if (e.key === '{') {
-    remote.getCurrentWindow().webContents.toggleDevTools();
+    getCurrentWindow().webContents.toggleDevTools();
   } else if (e.key === '}') {
     location.reload();
   }

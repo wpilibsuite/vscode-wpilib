@@ -1,10 +1,8 @@
-
-import * as electron from 'electron';
-const remote = electron.remote;
+import { getCurrentWindow } from '@electron/remote';
 
 document.addEventListener('keydown', (e) => {
   if (e.key === '{') {
-    remote.getCurrentWindow().webContents.openDevTools();
+    getCurrentWindow().webContents.openDevTools();
   } else if (e.key === '}') {
     location.reload();
   }
@@ -20,7 +18,7 @@ window.addEventListener('load', () => {
   const rioLogButton = document.createElement('button');
   rioLogButton.appendChild(document.createTextNode('Start RioLog'));
   rioLogButton.addEventListener('click', async () => {
-    const bWindow = remote.getCurrentWindow();
+    const bWindow = getCurrentWindow();
 
     bWindow.setSize(800, 600);
     bWindow.setTitle('RioLog');
@@ -36,7 +34,7 @@ window.addEventListener('load', () => {
   const generatorButton = document.createElement('button');
   generatorButton.appendChild(document.createTextNode('Start New Project Generator'));
   generatorButton.addEventListener('click', async () => {
-    const bWindow = remote.getCurrentWindow();
+    const bWindow = getCurrentWindow();
 
     bWindow.setSize(800, 600);
     bWindow.setTitle('New Project Generator');
@@ -50,7 +48,7 @@ window.addEventListener('load', () => {
   const vendorDepsButton = document.createElement('button');
   vendorDepsButton.appendChild(document.createTextNode('Start Vendor Deps Manager'));
   vendorDepsButton.addEventListener('click', async () => {
-    const bWindow = remote.getCurrentWindow();
+    const bWindow = getCurrentWindow();
 
     bWindow.setSize(800, 600);
     bWindow.setTitle('Vendor Deps Manager');

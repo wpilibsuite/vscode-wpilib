@@ -1,6 +1,3 @@
-// many `any` used in locale functions, disabled for whole file
-// tslint:disable:no-any
-
 import format from '../formatter';
 
 interface ITranslationMap {
@@ -12,13 +9,9 @@ const localeDomains: {
 } = {};
 let defaultDomain: string;
 
-function isString(value: any): value is string {
-  return toString.call(value) === '[object String]';
-}
-
-function localize(domain: string, message: string | string[], ...args: any[]) {
+function localize(domain: string, message: string | string[], ...args: unknown[]) {
   let key: string;
-  if (isString(message)) {
+  if (typeof message == "string") {
     key = message;
   } else if (message.length === 2) {
     key = message[0];
@@ -41,6 +34,7 @@ window.addEventListener('load', () => {
       return;
     }
     const domain = domainAttr.value;
+    /* eslint-disable no-extra-boolean-cast */
     if (!!e.attributes.getNamedItem('data-default-domain')) {
       defaultDomain = domain;
     }
@@ -64,5 +58,7 @@ window.addEventListener('load', () => {
   });
 });
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 (window as any).i18nTrans = localize;
+/* eslint-disable @typescript-eslint/no-explicit-any */
 (window as any).__I18N_LOCALE_DOMAINS = localeDomains;

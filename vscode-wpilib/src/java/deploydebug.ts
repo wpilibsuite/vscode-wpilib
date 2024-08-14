@@ -31,7 +31,7 @@ interface IJavaSimulateInfo {
   name: string;
   type: string;
   extensions: IJavaSimExtensions[];
-  environment?: Map<string, string>;
+  environment?: { [key: string]: string };
   libraryDir: string;
   mainClassName: string;
 }

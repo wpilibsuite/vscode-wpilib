@@ -79,7 +79,6 @@ export class ErrorMessage implements IMessage {
     tmp = this.getSizedString(data, count);
     this.callStack = tmp.data;
     count += tmp.byteLength;
-    // tslint:disable-next-line:no-bitwise
     this.messageType = (this.flags & 1) !== 0 ? MessageType.Error : MessageType.Warning;
   }
 

@@ -1,44 +1,19 @@
 'use strict';
 
-import { TransformableInfo } from 'logform';
 import * as path from 'path';
 import { MESSAGE } from 'triple-beam';
-import * as vscode from 'vscode';
 import * as winston from 'winston';
-import * as Transport from 'winston-transport';
 
 export interface ILogger {
-  // tslint:disable-next-line:no-any
-  error(message: string, ...meta: any[]): void;
-  // tslint:disable-next-line:no-any
-  warn(message: string, ...meta: any[]): void;
-  // tslint:disable-next-line:no-any
-  info(message: string, ...meta: any[]): void;
-  // tslint:disable-next-line:no-any
-  log(message: string, ...meta: any[]): void;
+  error(message: string, ...meta: unknown[]): void;
+  warn(message: string, ...meta: unknown[]): void;
+  info(message: string, ...meta: unknown[]): void;
+  log(message: string, ...meta: unknown[]): void;
 }
 
 const myFormat = winston.format.printf((info) => {
   return `${info.timestamp} ${info[MESSAGE]}`;
 });
-
-class OutputTransport extends Transport {
-  private outputChannel: vscode.OutputChannel;
-  public constructor() {
-    super();
-    this.outputChannel = vscode.window.createOutputChannel('WPILib Log');
-  }
-
-  public log(info: TransformableInfo, next: () => void) {
-    setImmediate(() => {
-      this.emit('logged', info);
-    });
-
-    this.outputChannel.appendLine(info[MESSAGE] as string);
-
-    next();
-  }
-}
 
 const winstonLogger = winston.createLogger({
   exitOnError: false,
@@ -49,7 +24,7 @@ const winstonLogger = winston.createLogger({
   ),
   level: 'verbose',
   transports: [
-    new OutputTransport(),
+    new winston.transports.Console(),
   ],
 });
 
@@ -63,10 +38,10 @@ export function getMainLogFile(): string {
 }
 
 export function setLoggerDirectory(dirname: string) {
-  mainLogFile = path.join(dirname, 'wpiliblog.txt');
+  mainLogFile = path.join(dirname, 'wpilibtoollog.txt');
   winstonLogger.add(new winston.transports.File({
     dirname,
-    filename: 'wpiliblog.txt',
+    filename: 'wpilibtoollog.txt',
     level: 'verbose',
     maxFiles: 3,
     maxsize: 1000000,
@@ -75,20 +50,16 @@ export function setLoggerDirectory(dirname: string) {
 }
 
 class LoggerImpl implements ILogger {
-  // tslint:disable-next-line:no-any
-  public error(message: string, ...meta: any[]): void {
+  public error(message: string, ...meta: unknown[]): void {
     winstonLogger.log('error', message, meta);
   }
-  // tslint:disable-next-line:no-any
-  public warn(message: string, ...meta: any[]): void {
+  public warn(message: string, ...meta: unknown[]): void {
     winstonLogger.log('warn', message, meta);
   }
-  // tslint:disable-next-line:no-any
-  public info(message: string, ...meta: any[]): void {
+  public info(message: string, ...meta: unknown[]): void {
     winstonLogger.log('info', message, meta);
   }
-  // tslint:disable-next-line:no-any
-  public log(message: string, ...meta: any[]): void {
+  public log(message: string, ...meta: unknown[]): void {
     winstonLogger.log('verbose', message, meta);
   }
 }

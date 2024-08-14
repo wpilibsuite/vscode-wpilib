@@ -1,6 +1,8 @@
 import { app, BrowserWindow } from 'electron';
 // import * as path from 'path';
 // import * as url from 'url';
+import { initialize, enable } from '@electron/remote/main';
+initialize();
 
 let mainWindow: Electron.BrowserWindow | undefined;
 
@@ -11,11 +13,12 @@ async function createWindow() {
     height: 250,
     title: 'WPILib Utility',
     webPreferences: {
-      enableRemoteModule: true,
+      contextIsolation: false,
       nodeIntegration: true,
     },
     width: 350,
   });
+  enable(mainWindow.webContents);
 
   await mainWindow.loadFile('index.html');
 

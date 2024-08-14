@@ -154,11 +154,8 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.disposables.push(this.binaryTypeStatusBar);
 
-    // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange, this));
-    // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange, this));
-    // tslint:disable-next-line:no-unbound-method
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
 
     this.setupWatchers();
@@ -439,16 +436,12 @@ export class ApiProvider implements CustomConfigurationProvider {
       this.gradleWatcher = vscode.workspace.createFileSystemWatcher(gradlePattern);
       this.disposables.push(this.gradleWatcher);
 
-      // tslint:disable-next-line:no-unbound-method
       this.gradleWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
 
-      // tslint:disable-next-line:no-unbound-method
       this.gradleWatcher.onDidCreate(this.couldBeUpdated, this, this.disposables);
 
-      // tslint:disable-next-line:no-unbound-method
       this.gradleWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
 
-      // tslint:disable-next-line:no-unbound-method
       onVendorDepsChanged(async (wp) => {
         if (wp.index === this.workspace.index) {
           await this.couldBeUpdated();
@@ -547,8 +540,7 @@ export class ApiProvider implements CustomConfigurationProvider {
                       defines: macros,
                       includePath: includePaths,
                       compilerArgs: args,
-                      // tslint:disable-next-line:no-non-null-assertion no-any
-                      standard: sb.langVersion! as any,
+                      standard: sb.langVersion!,
                     },
                     uri: uriPath,
                   });
@@ -586,8 +578,7 @@ export class ApiProvider implements CustomConfigurationProvider {
                       defines: macros,
                       includePath: includePaths,
                       compilerArgs: args,
-                      // tslint:disable-next-line:no-non-null-assertion no-any
-                      standard: sb.langVersion! as any,
+                      standard: sb.langVersion!,
                     },
                     uri: uriPath,
                   });

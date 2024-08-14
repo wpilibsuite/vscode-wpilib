@@ -136,20 +136,12 @@ window.addEventListener('message', (event) => {
 });
 
 window.addEventListener('load', (_: Event) => {
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectType')!.onclick = selectProjectType;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('language')!.onclick = selectLanguage;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectBase')!.onclick = selectProjectBase;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectSelectButton')!.onclick = selectProjectFolder;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectName')!.oninput = validateProject;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('generateProject')!.onclick = generateProject;
-  // tslint:disable-next-line:no-non-null-assertion
   document.getElementById('projectFolder')!.onchange = validateProjectFolder;
 });
