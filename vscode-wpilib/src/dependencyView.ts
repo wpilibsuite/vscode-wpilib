@@ -200,14 +200,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
 
         if (success) {
-          const buildRes = await vscode.window.showInformationMessage(i18n('message',
-            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-            'Would you like to do this now?'), {
-              modal: false,
-            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
-          if (buildRes?.title === i18n('ui', 'Yes')) {
-            await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
-          }
+          this.vendorLibraries.offerBuild(this.wp);
         }
       }
     }

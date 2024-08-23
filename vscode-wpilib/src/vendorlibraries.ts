@@ -129,6 +129,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   public async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder) {
     if (toRemove !== undefined) {
+      let anySucceeded = false;
       const url = this.getWpVendorFolder(workspace);
       const files = await readdirAsync(url);
       for (const file of files) {
@@ -138,9 +139,14 @@ export class VendorLibraries extends VendorLibrariesBase {
           for (const ti of toRemove) {
             if (ti.uuid === result.uuid) {
               await deleteFileAsync(fullPath);
+              anySucceeded = true;
             }
           }
         }
+      }
+
+      if (anySucceeded) {
+        this.offerBuild(workspace);
       }
     }
   }
@@ -179,14 +185,7 @@ export class VendorLibraries extends VendorLibrariesBase {
             }
           }
           if (anySucceeded) {
-            const buildRes = await vscode.window.showInformationMessage(i18n('message',
-            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-            'Would you like to do this now?'), {
-              modal: true,
-            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
-            if (buildRes?.title === i18n('ui', 'Yes')) {
-              await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
-            }
+            this.offerBuild(workspace);
           }
         }
       } else {
@@ -242,14 +241,7 @@ export class VendorLibraries extends VendorLibrariesBase {
             }
           }
           if (anySucceeded) {
-            const buildRes = await vscode.window.showInformationMessage(i18n('message',
-            'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-            'Would you like to do this now?'), {
-              modal: true,
-            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
-            if (buildRes?.title === i18n('ui', 'Yes')) {
-              await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
-            }
+            this.offerBuild(workspace);
           }
         }
       } else {
@@ -295,14 +287,7 @@ export class VendorLibraries extends VendorLibrariesBase {
           }
         }
         if (anySucceeded) {
-          const buildRes = await vscode.window.showInformationMessage(i18n('message',
-          'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-          'Would you like to do this now?'), {
-            modal: true,
-          }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
-          if (buildRes?.title === i18n('ui', 'Yes')) {
-            await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
-          }
+          this.offerBuild(workspace);
         }
       }
     } else {
@@ -331,14 +316,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
       const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
       if (success) {
-        const buildRes = await vscode.window.showInformationMessage(i18n('message',
-          'It is recommended to run a "Build" after a vendor update to ensure dependencies are installed correctly. ' +
-          'Would you like to do this now?'), {
-            modal: true,
-          }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
-        if (buildRes?.title === i18n('ui', 'Yes')) {
-          await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
-        }
+        this.offerBuild(workspace);
       } else {
         vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
       }
@@ -351,6 +329,17 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
     return this.getDependencies(this.getWpVendorFolder(workspace));
+  }
+
+  public async offerBuild(workspace: vscode.WorkspaceFolder) {
+    const buildRes = await vscode.window.showInformationMessage(i18n('message',
+      'It is recommended to run a "Build" after a vendor update. ' +
+      'Would you like to do this now?'), {
+        modal: false,
+      }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+    if (buildRes?.title === i18n('ui', 'Yes')) {
+      await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+    }
   }
 }
 
