@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "publisher": "wpilibsuite",
     "license": "BSD-3-Clause",
-    "icon": "wpilib-128.png",
+    "icon": "wpilib-icon-128.png",
     "engines": {
         "vscode": "^1.57.0"
     },
@@ -102,7 +102,7 @@
                 "wpilib.additionalGradleArguments": {
                     "type": "string",
                     "default": "",
-                    "description": "For debugging only, passes extra arguments to gradle invokations",
+                    "description": "For debugging only, passes extra arguments to gradle invocations",
                     "scope": "resource"
                 },
                 "wpilib.autoSaveOnDeploy": {
@@ -184,7 +184,7 @@
                 "command": "wpilibcore.startTool",
                 "title": "%wpilibcore.startTool.title%",
                 "category": "WPILib",
-                "icon": "resources/wpilib.svg",
+                "icon": "resources/wpilib-icon.svg",
                 "enablement": "isWorkspaceTrusted"
             },
             {
@@ -203,7 +203,7 @@
                 "command": "wpilibcore.deployCode",
                 "title": "%wpilibcore.deployCode.title%",
                 "category": "WPILib",
-                "icon": "resources/wpilib.svg",
+                "icon": "resources/wpilib-icon.svg",
                 "enablement": "isWorkspaceTrusted"
             },
             {
@@ -282,27 +282,27 @@
                 "command": "wpilibcore.createCommand",
                 "title": "%wpilibcore.createCommand.title%",
                 "category": "WPILib",
-                "icon": "resources/wpilib.svg",
+                "icon": "resources/wpilib-icon.svg",
                 "enablement": "isWorkspaceTrusted"
             },
             {
                 "command": "wpilibcore.cancelTasks",
                 "title": "%wpilibcore.cancelTasks.title%",
                 "category": "WPILib",
-                "icon": "resources/wpilib.svg",
+                "icon": "resources/wpilib-icon.svg",
                 "enablement": "isWorkspaceTrusted"
             },
             {
                 "command": "wpilibcore.help",
                 "title": "%wpilibcore.help.title%",
                 "category": "WPILib",
-                "icon": "resources/wpilib.svg"
+                "icon": "resources/wpilib-icon.svg"
             },
             {
                 "command": "wpilibcore.openCommandPalette",
                 "title": "%wpilibcore.openCommandPalette.title%",
                 "category": "WPILib",
-                "icon": "resources/wpilib.svg"
+                "icon": "resources/wpilib-icon.svg"
             },
             {
                 "command": "wpilibcore.refreshCppProperties",
