@@ -116,7 +116,7 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
   private wpilibIcon: vscode.Uri;
 
   constructor(resourceRoot: string) {
-    this.wpilibIcon = vscode.Uri.file(path.join(resourceRoot, 'wpilib.svg'));
+    this.wpilibIcon = vscode.Uri.file(path.join(resourceRoot, 'wpilib-icon.svg'));
     this._onDidChangeFile = new vscode.EventEmitter<Entry | undefined | null>();
   }
 
