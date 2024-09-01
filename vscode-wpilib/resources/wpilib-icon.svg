@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="900"
+   height="900"
+   viewBox="0 0 238.12447 238.12416"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="wpilib-icon.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   inkscape:export-filename="24wpilib-vert-indiv.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.77091849"
+     inkscape:cx="453.35532"
+     inkscape:cy="563.61341"
+     inkscape:window-width="3200"
+     inkscape:window-height="1721"
+     inkscape:window-x="1911"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8" />
+  <g
+     id="text19"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     transform="translate(-1.5669633,102.61871)" />
+  <g
+     id="text29"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     transform="translate(-1.5669633,102.61871)" />
+  <g
+     id="text35"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     transform="translate(-1.5669633,102.61871)" />
+  <g
+     id="text52"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25.3999px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     transform="translate(-1.5669633,102.61871)" />
+  <g
+     id="flowRoot66"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     transform="translate(-1.5669633,102.61871)" />
+  <g
+     id="text4514"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.3999px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     transform="translate(-1.5669633,102.61871)" />
+  <g
+     id="g10"
+     transform="matrix(4.4763239,0,0,4.7111031,0.43515434,-262.66882)">
+    <polygon
+       class="st0"
+       points="27.71,83.14 24.44,97.67 12.55,97.67 0.04,81.59 12.55,65.51 23.79,65.51 23.79,68.54 14.04,68.54 3.89,81.59 14.04,94.63 22.01,94.63 24.6,83.14 "
+       id="polygon6"
+       style="fill:#aa182c" />
+    <polygon
+       class="st1"
+       points="52.94,81.59 40.44,97.67 29.2,97.67 29.2,94.63 38.95,94.63 49.1,81.59 38.95,68.54 30.99,68.54 28.4,80.04 25.29,80.04 28.56,65.51 40.44,65.51 "
+       id="polygon7"
+       style="fill:#4d4e4e" />
+    <g
+       id="g9">
+      <polygon
+         class="st0"
+         points="19.23,91.38 19.04,91.53 15.51,91.53 7.82,81.59 15.51,71.64 19.34,71.64 11.66,81.59 "
+         id="polygon8"
+         style="fill:#aa182c" />
+      <polygon
+         class="st1"
+         points="33.76,91.38 33.96,91.53 37.48,91.53 45.17,81.59 37.48,71.64 33.66,71.64 41.34,81.59 "
+         id="polygon9"
+         style="fill:#4d4e4e" />
+    </g>
+  </g>
+</svg>

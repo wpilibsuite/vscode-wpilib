@@ -8,9 +8,9 @@
         "lint": "eslint .",
         "start": "npm run compile && electron ./out/main.js",
         "watch": "tsc -watch -p ./",
-        "packageWindows": "electron-packager . wpilibutility --platform=win32 --overwrite --out ./build",
-        "packageLinux": "electron-packager . wpilibutility --platform=linux --overwrite --out ./build",
-        "packageMac": "electron-packager . wpilibutility --platform=darwin --arch=universal --overwrite --out ./build",
+        "packageWindows": "electron-packager . wpilibutility --platform=win32 --overwrite --icon=icon.ico --out ./build",
+        "packageLinux": "electron-packager . wpilibutility --platform=linux --overwrite --icon=icon.png --out ./build",
+        "packageMac": "electron-packager . wpilibutility --platform=darwin --arch=universal --icon=icon.icns --overwrite --out ./build",
         "signMac": "electron-osx-sign build/wpilibutility-darwin-universal/wpilibutility.app --entitlements=macOS/WPILibStandaloneUtility.entitlements --entitlements-inherit=macOS/WPILibStandaloneUtility.entitlements --hardened-runtime=true --no-gatekeeper-assess"
     },
     "main": "out/main.js",
@@ -18,6 +18,7 @@
     "keywords": [],
     "author": "WPILib Suite",
     "license": "BSD-3-Clause",
+    "icon": "icon.png",
     "devDependencies": {
         "@types/glob": "^7.2.0",
         "@types/mkdirp": "^1.0.2",

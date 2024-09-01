@@ -56,7 +56,7 @@ export abstract class WebViewBase {
                         reveal?: boolean, options?: vscode.WebviewPanelOptions & vscode.WebviewOptions) {
     if (this.webview === undefined) {
       this.webview = vscode.window.createWebviewPanel(this.veiwType, this.title, showOptions, options);
-      this.webview.iconPath = vscode.Uri.file(path.join(this.resourceRoot, 'wpilib-128.png'));
+      this.webview.iconPath = vscode.Uri.file(path.join(this.resourceRoot, 'wpilib-icon-128.png'));
       this.replaceResources(this.webview.webview);
       this.webview.webview.html = this.html;
       this.webview.onDidDispose(() => {
