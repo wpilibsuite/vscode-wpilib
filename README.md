@@ -15,8 +15,8 @@ This repository contains the WPILib VS Code extension, along with the standalone
 
 ## Setting up Dependencies
 In order to properly build, there is some setup that needs to occur.
-1. Go into `vscode-wpilib` and run `npm install`
-2. Go into into `wpilib-utility-standalone` and run `npm install`
+1. Go into `vscode-wpilib` and run `pnpm install`
+2. Go into into `wpilib-utility-standalone` and run `pnpm install`
 3. From the root, run `./gradlew updateAllDependencies`. This will grab the templates and examples from WPILib, and move the shared dependencies from the vscode extension to the standalone utility. This command will need to be reran any time you update the shared dependencies in the vscode project.
 4. Open the root folder in VS Code.
 
@@ -28,7 +28,7 @@ Once you have the project open in VS Code, there are 5 debugging targets set up.
 * `Standalone: Renderer` Will attach to the standalone projects renderer process
 * `Standalone: All` Will launch the standalone project, and attach to the renderer. This will attach 2 separate debuggers.
 
-In addition, each project has a `compile` and a `lint` npm command. These will compile and lint their respective projects. Please run these before submitting any PR, as CI will check these. In addition, VS Code's lint does not detect the same lint errors as running lint manually would.
+In addition, each project has a `compile` and a `lint` pnpm command. These will compile and lint their respective projects. Please run these before submitting any PR, as CI will check these. In addition, VS Code's lint does not detect the same lint errors as running lint manually would.
 
 ## Testing
 We highly recommend you do any testing by launching in the debugger. Unlike Eclipse, local building is not required to update WPILib versions, so building files to install is not exactly a simple setup. We will be posting instructions for this later, but not currently.

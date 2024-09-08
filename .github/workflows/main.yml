@@ -17,13 +17,16 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
-          npm install
-          npm run compile
-          npm run lint
-          npm run packageMac
+          pnpm install
+          pnpm run compile
+          pnpm run lint
+          pnpm run packageMac
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
       - name: Import Developer ID Certificate
@@ -36,7 +39,7 @@ jobs:
           (github.repository_owner == 'wpilibsuite') &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
       - name: Sign Standalone Utility
-        run: npm run signMac
+        run: pnpm run signMac
         working-directory: wpilib-utility-standalone
         if: |
           (github.repository_owner == 'wpilibsuite') &&
@@ -79,13 +82,16 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
-          npm install
-          npm run compile
-          npm run lint
-          npm run packageLinux
+          pnpm install
+          pnpm run compile
+          pnpm run lint
+          pnpm run packageLinux
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
       - run: tar -C build/wpilibutility-linux-x64 -pcvzf wpilibutility-linux.tar.gz .
@@ -106,6 +112,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18.x'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - uses: actions/setup-java@v4
         with:
           java-version: 17
@@ -113,10 +122,10 @@ jobs:
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
-          npm install
-          npm run compile
-          npm run lint
-          npm run packageWindows
+          pnpm install
+          pnpm run compile
+          pnpm run lint
+          pnpm run packageWindows
         name: Build Standalone Utility
         working-directory: wpilib-utility-standalone
       - run: Compress-Archive -Path wpilibutility-win32-x64\* -DestinationPath wpilibutility-windows.zip
@@ -141,15 +150,18 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - run: ./gradlew build updateVersions updateAllDependencies generateTemplateZip generateExamplesZip -PbuildServer
         name: Build with Gradle
       - run: |
-          npm install
-          npm run lint
-          npm run unittest
-          npm run gulp
-          npm run webpack
-          npm run vscePackage
+          pnpm install
+          pnpm run lint
+          pnpm run unittest
+          pnpm run gulp
+          pnpm run webpack
+          pnpm run vscePackage
         working-directory: vscode-wpilib
         name: Build VSIX
       - uses: actions/upload-artifact@v4
