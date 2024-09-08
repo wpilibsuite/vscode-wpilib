@@ -81,7 +81,7 @@ export async function generateProjectButtonClick() {
   const langSelect = document.getElementById('languageSelect') as HTMLSelectElement;
   const baseSelect = document.getElementById('projectBaseSelect') as HTMLSelectElement;
 
-  if (typeSelect.value === 'base' || langSelect.type === 'base') {
+  if (typeSelect.value === 'base' || langSelect.value === 'base') {
     alert('project type or language not selected');
     return;
   }
