@@ -11,7 +11,6 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import { BuildTestAPI } from './buildtestapi';
 import { BuiltinTools } from './builtintools';
-import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
 import { DeployDebugAPI } from './deploydebugapi';
@@ -53,13 +52,11 @@ class ExternalAPI implements IExternalAPI {
   private readonly buildTestApi: BuildTestAPI;
   private readonly preferencesApi: PreferencesAPI;
   private readonly exampleTemplateApi: ExampleTemplateAPI;
-  private readonly commandApi: CommandAPI;
   private readonly executeApi: ExecuteAPI;
   private readonly utilitiesApi: UtilitiesAPI;
 
   private constructor(preferencesApi: PreferencesAPI, deployDebugApi: DeployDebugAPI, buildTestApi: BuildTestAPI) {
     this.exampleTemplateApi = new ExampleTemplateAPI();
-    this.commandApi = new CommandAPI();
     this.executeApi = new ExecuteAPI();
     this.preferencesApi = preferencesApi;
     this.deployDebugApi = deployDebugApi;
@@ -79,9 +76,6 @@ class ExternalAPI implements IExternalAPI {
   }
   public getPreferencesAPI(): PreferencesAPI {
     return this.preferencesApi;
-  }
-  public getCommandAPI(): CommandAPI {
-    return this.commandApi;
   }
   public getBuildTestAPI(): BuildTestAPI {
     return this.buildTestApi;
