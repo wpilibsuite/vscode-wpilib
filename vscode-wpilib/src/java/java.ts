@@ -18,9 +18,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'java');
 
-  const preferences = coreExports.getPreferencesAPI();
   const exampleTemplate = coreExports.getExampleTemplateAPI();
-  const commandApi = coreExports.getCommandAPI();
 
   let allowDebug = true;
 

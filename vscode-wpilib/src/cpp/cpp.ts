@@ -20,9 +20,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'cpp');
 
-  const preferences = coreExports.getPreferencesAPI();
   const exampleTemplate = coreExports.getExampleTemplateAPI();
-  const commandApi = coreExports.getCommandAPI();
 
   let allowDebug = true;
 
