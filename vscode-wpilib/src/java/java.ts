@@ -10,6 +10,7 @@ import { Templates } from '../shared/templates';
 import { existsAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
+import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
 
 // this method is called when your extension is activated
@@ -40,6 +41,10 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   // Setup debug and deploy
   const deployDebug = new DeployDebug(coreExports, allowDebug);
   context.subscriptions.push(deployDebug);
+
+  // Setup commands
+  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
+  context.subscriptions.push(commands);
 
   // Setup examples and template
   const examples: Examples = new Examples(extensionResourceLocation, true, exampleTemplate);
