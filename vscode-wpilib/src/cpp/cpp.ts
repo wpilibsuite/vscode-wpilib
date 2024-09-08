@@ -9,7 +9,6 @@ import { logger } from '../logger';
 import { Examples } from '../shared/examples';
 import { Templates } from '../shared/templates';
 import { BuildTest } from './buildtest';
-import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
 
 // this method is called when your extension is activated
@@ -44,10 +43,6 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
 
   const deployDebug = new DeployDebug(coreExports, allowDebug);
   context.subscriptions.push(deployDebug);
-
-  // Setup commands
-  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
-  context.subscriptions.push(commands);
 
   // Setup examples and template
   const examples: Examples = new Examples(extensionResourceLocation, false, exampleTemplate);
