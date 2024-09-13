@@ -17,7 +17,12 @@ interface ITaskRunnerQuickPick {
   taskRunner: ITaskRunner;
 }
 
-export class ExecuteAPI implements IExecuteAPI {
+export interface IExecuteAPIEx {
+  executeProcessCommand(command: string, name: string, args: string[], rootDir: string, workspace: vscode.WorkspaceFolder): Promise<number>;
+  executePythonCommand(args: string[], rootDir: string, workspace: vscode.WorkspaceFolder, name: string): Promise<number>;
+}
+
+export class ExecuteAPI implements IExecuteAPI, IExecuteAPIEx {
   private runners: ITaskRunner[] = [];
 
   constructor() {
@@ -37,6 +42,34 @@ export class ExecuteAPI implements IExecuteAPI {
         }
       }
     });
+  }
+
+  public async executeProcessCommand(command: string, name: string, args: string[], rootDir: string,
+                                     workspace: vscode.WorkspaceFolder): Promise<number> {
+    const process = new vscode.ProcessExecution(command, args, {
+      cwd: rootDir
+    });
+    logger.log('executing process in workspace', process, workspace.uri.fsPath);
+
+    const task = new vscode.Task({ type: 'wpilibprocexec'}, workspace, name, 'wpilib', process);
+    task.presentationOptions.echo = true;
+    task.presentationOptions.clear = true;
+    const execution = await vscode.tasks.executeTask(task);
+    const runner: ITaskRunner = {
+      cancelled: false,
+      condition: new PromiseCondition(-1),
+      execution,
+
+    };
+    this.runners.push(runner);
+    return runner.condition.wait();
+  }
+
+  public async executePythonCommand(args: string[], rootDir: string, workspace: vscode.WorkspaceFolder, name: string): Promise<number> {
+    const configuration = vscode.workspace.getConfiguration('python', workspace.uri);
+    const interpreter: string = configuration.get('pythonPath', 'python');
+
+    return this.executeProcessCommand(interpreter, name, args, rootDir, workspace);
   }
 
   public async executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder,
