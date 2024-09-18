@@ -1,5 +1,5 @@
 // eslint.config.js
 module.exports =
   {
-      ignores: [".media/"]
+      ignores: [".media/", ".out/", ".resources/"]
   };
