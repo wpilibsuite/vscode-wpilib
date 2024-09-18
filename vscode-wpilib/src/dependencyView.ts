@@ -34,7 +34,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private installedList: IDepInstalled[] = [];
   private homeDeps: IJsonDependency[] = [];
   private externalApi: IExternalAPI;
-  private ghURL = `https://raw.githubusercontent.com/jasondaming/vendor-json-repo/ctre2024/`;
+  private ghURL = `https://raw.githubusercontent.com/wpilibsuite/vendor-json-repo/master/`;
   private wp: vscode.WorkspaceFolder | undefined;
 
   private _view?: vscode.WebviewView;
