@@ -108,6 +108,14 @@ Vendor Libraries:
     });
   }
 
+  public async getViewInfo(): Promise<IProjectInfo | undefined> {
+    const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
+    if (wp === undefined) {
+      return wp;
+    }
+    return this.getProjectInfo(wp);
+  }
+
   private async getProjectInfo(workspace: vscode.WorkspaceFolder): Promise<IProjectInfo> {
     const vendorLibs = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
 

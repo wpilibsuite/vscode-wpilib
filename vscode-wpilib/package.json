@@ -57,6 +57,15 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "viewsContainers": {
+			"activitybar": [
+				{
+					"id": "wpilib-vendordeps",
+					"title": "WPILib Vendor Dependencies",
+					"icon": "media/wpilib.png"
+				}
+			]
+		},
         "untrustedWorkspaces": {
             "supported": "limited",
             "description": "%wpilibcore.untrustedWorkspace.title%"
@@ -168,6 +177,17 @@
             }
         },
         "commands": [
+            {
+				"command": "calicoColors.addColor",
+				"category": "Calico Colors",
+				"title": "Add Color"
+			},
+			{
+				"command": "calicoColors.clearColors",
+				"category": "Calico Colors",
+				"title": "Clear Colors",
+				"icon": "$(clear-all)"
+			},
             {
                 "command": "wpilibcore.startRioLog",
                 "title": "%wpilibcore.startRioLog.title%",
@@ -405,7 +425,15 @@
                     "name": "C++ Dependencies",
                     "when": "isWPILibProvidedCpp"
                 }
-            ]
+            ],
+            "wpilib-vendordeps": [
+                {
+					"type": "webview",
+					"id": "wpilib.dependencyView",
+					"name": "WPILib Vendor Dependencies",
+                    "icon": "media/wpilib.png"
+				}
+			]
         },
         "keybindings": [
             {
