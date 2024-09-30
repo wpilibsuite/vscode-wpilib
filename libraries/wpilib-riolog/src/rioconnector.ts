@@ -29,8 +29,9 @@ interface IDriverStationData {
 }
 
 const constantIps: string[] = [
-  '172.22.11.2',
-  '127.0.0.1',
+  '172.22.11.2'
+  //, '127.0.0.1',
+  // Uncomment the above line for testing on localhost.
 ];
 
 const teamIps: string[] = [
@@ -239,6 +240,7 @@ export async function connectToRobot(port: number, teamNumber: number, timeout: 
   } else {
     // Kill all but me
     timer.cancel();
+    console.log("Using " + firstDone.remoteAddress + ", disposing others");
     for (const p of pairs) {
       if (firstDone !== p.socket) {
         p.dispose();

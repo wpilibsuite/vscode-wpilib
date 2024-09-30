@@ -1,6 +1,10 @@
+import org.apache.tools.ant.DirectoryScanner
+
 pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
     }
 }
+
+DirectoryScanner.removeDefaultExclude('**/.gitignore')

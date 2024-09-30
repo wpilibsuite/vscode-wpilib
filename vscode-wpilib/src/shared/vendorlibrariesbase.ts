@@ -71,7 +71,7 @@ export class VendorLibrariesBase {
     return true;
   }
 
-  protected getHomeDirDeps(): Promise<IJsonDependency[]> {
+  public getHomeDirDeps(): Promise<IJsonDependency[]> {
     return this.getDependencies(path.join(this.utilities.getWPILibHomeDir(), 'vendordeps'));
   }
 

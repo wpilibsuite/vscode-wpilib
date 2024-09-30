@@ -35,6 +35,7 @@ import { Gradle2020Import } from './webviews/gradle2020import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
+import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
@@ -158,6 +159,39 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
     creationError = true;
   }
 
+  let depProvider: DependencyViewProvider | undefined;
+
+  try {
+    if (projectInfo !== undefined && vendorLibs !== undefined) {
+      depProvider = new DependencyViewProvider(context.extensionUri, projectInfo, vendorLibs, externalApi);
+
+      context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider));
+
+      if (depProvider !== undefined) {
+        context.subscriptions.push(
+          vscode.commands.registerCommand('wpilib.addDependency', () => {
+            depProvider?.addDependency();
+          }));
+
+/*         context.subscriptions.push(
+          vscode.commands.registerCommand('wpilib.removeDependency', () => {
+            depProvider?.removeDependency();
+          })) */
+
+        context.subscriptions.push(
+          vscode.commands.registerCommand('wpilib.updateDependencies', () => {
+            depProvider?.updateDependencies();
+          }));
+      }
+
+      context.subscriptions.push(depProvider);
+    }
+  } catch (err) {
+    logger.error('error creating dependency view', err);
+    creationError = true;
+  }
+
   // Create all of our commands that the extension runs
   createVsCommands(context, externalApi);
 
@@ -188,11 +222,11 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2024') {
-          const importPersistantState = new PersistentFolderState('wpilib.2024Alphapersist', false, w.uri.fsPath);
+        if (prefs.getProjectYear() !== '2025Alpha') {
+          const importPersistantState = new PersistentFolderState('wpilib.2025Alphapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(i18n('message',
-              'This project is not compatible with this version of the extension. Would you like to import this project into 2024?'), {
+              'This project is not compatible with this version of the extension. Would you like to import this project into 2025Alpha?'), {
               modal: true,
             }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true}, {title: 'No, Don\'t ask again'});
             if (upgradeResult?.title === 'Yes') {
