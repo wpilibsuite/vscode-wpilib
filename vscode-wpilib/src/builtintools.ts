@@ -29,7 +29,7 @@ class VbsToolRunner implements IToolRunner {
   public async runTool(): Promise<boolean> {
     const wp = await this.preferences.getFirstOrSelectedWorkspace();
     return new Promise<boolean>((resolve, _reject) => {
-      let cmd = getIsWindows() ? `wscript.exe ${this.toolScript}` : `python3 ${this.toolScript}`;
+      let cmd = getIsWindows() ? `wscript.exe ${this.toolScript}` : `sh ${this.toolScript}`;
 
       if (wp !== undefined) {
         const toolStoreFolder = path.join(wp.uri.fsPath, `.${this.name}`);
@@ -67,7 +67,7 @@ export class BuiltinTools {
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
         }
       } else {
-        const toolPath = path.join(homeTools.dir, ht.name + '.py');
+        const toolPath = path.join(homeTools.dir, ht.name + '.sh');
         if (await existsAsync(toolPath)) {
           // Tool exists, add it
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
