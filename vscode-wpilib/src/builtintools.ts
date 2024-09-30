@@ -67,7 +67,7 @@ export class BuiltinTools {
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
         }
       } else {
-        const toolPath = path.join(homeTools.dir, ht.name + '.py');
+        const toolPath = path.join(homeTools.dir, ht.name + '.sh');
         if (await existsAsync(toolPath)) {
           // Tool exists, add it
           toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
