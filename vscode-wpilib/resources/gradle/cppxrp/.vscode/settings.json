@@ -15,6 +15,5 @@
     "**/*~": true
   },
   "C_Cpp.default.configurationProvider": "vscode-wpilib",
-  "wpilib.skipSelectSimulateExtension": true,
-  "C_Cpp.caseSensitiveFileSupport": "enabled",
+  "wpilib.skipSelectSimulateExtension": true
 }
