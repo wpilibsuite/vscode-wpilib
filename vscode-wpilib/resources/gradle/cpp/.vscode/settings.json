@@ -14,6 +14,5 @@
     "**/.factorypath": true,
     "**/*~": true
   },
-  "C_Cpp.default.configurationProvider": "vscode-wpilib",
-  "C_Cpp.caseSensitiveFileSupport": "enabled",
+  "C_Cpp.default.configurationProvider": "vscode-wpilib"
 }
