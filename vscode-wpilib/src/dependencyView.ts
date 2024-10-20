@@ -184,6 +184,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async uninstall(index: string) {
+    this.sortInstalledDeps();
     const uninstall = [this.installedDeps[parseInt(index, 10)]];
     if (this.wp) {
       const success = await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
@@ -307,6 +308,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private sortInstalled() {
     this.installedList.sort((a, b) => {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) {
+        return 1;
+      }
+      else if (a.name.toLowerCase() === b.name.toLowerCase()) {
+        return 0;
+      } else {
+        return -1;
+      }
+    });
+  }
+
+  private sortInstalledDeps() {
+    this.installedDeps.sort((a, b) => {
       if (a.name.toLowerCase() > b.name.toLowerCase()) {
         return 1;
       }
