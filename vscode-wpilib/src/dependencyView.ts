@@ -36,6 +36,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private externalApi: IExternalAPI;
   private ghURL = `https://raw.githubusercontent.com/wpilibsuite/vendor-json-repo/master/`;
   private wp: vscode.WorkspaceFolder | undefined;
+  private changed = 0;
 
   private _view?: vscode.WebviewView;
 
@@ -80,7 +81,16 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     void this.refresh(this.wp);
     webviewView.onDidChangeVisibility(() => {
       if (this.wp) {
-          void this.refresh(this.wp);
+          // If the webview becomes visible refresh it, invisible then check for changes
+          if (webviewView.visible) {
+            void this.refresh(this.wp);
+          } else {
+            if (this.changed > this.vendorLibraries.getLastBuild()) {
+              //this.vendorLibraries.offerBuild(this.wp, true);
+              this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+              this.changed = 0;
+            }
+          }
       }
     });
 
@@ -115,6 +125,17 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             {
                 if (this.wp) {
                     void this.refresh(this.wp);
+                }
+                break;
+            }
+          case 'blur':
+            {
+                if (this.wp) {
+                    if (this.changed > this.vendorLibraries.getLastBuild()) {
+                        //this.vendorLibraries.offerBuild(this.wp, true);
+                        this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+                        this.changed = 0;
+                    }
                 }
                 break;
             }
@@ -175,9 +196,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async uninstall(index: string) {
+    this.sortInstalledDeps();
     const uninstall = [this.installedDeps[parseInt(index, 10)]];
     if (this.wp) {
-      await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
+      const success = await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
+      if (success) {
+        this.changed = Date.now();
+      }
       await this.refresh(this.wp);
     }
   }
@@ -200,7 +225,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
 
         if (success) {
-          this.vendorLibraries.offerBuild(this.wp);
+          // this.vendorLibraries.offerBuild(this.wp);
+          this.changed = Date.now();
         }
       }
     }
@@ -294,6 +320,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private sortInstalled() {
     this.installedList.sort((a, b) => {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) {
+        return 1;
+      }
+      else if (a.name.toLowerCase() === b.name.toLowerCase()) {
+        return 0;
+      } else {
+        return -1;
+      }
+    });
+  }
+
+  private sortInstalledDeps() {
+    this.installedDeps.sort((a, b) => {
       if (a.name.toLowerCase() > b.name.toLowerCase()) {
         return 1;
       }

@@ -115,6 +115,11 @@
         document.getElementById('refresh-action')?.addEventListener('click', () => {
             vscode.postMessage({ type: 'refresh' })
         });
+
+        // Listen for focus events
+        window.addEventListener('blur', () => {
+            vscode.postMessage({ type: 'blur' });
+        });
     }
 
     function addDropdownListeners() {
