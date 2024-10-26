@@ -33,7 +33,8 @@ deploy {
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
-                }
+                    deleteOldFiles = false // Change to true to delete files on roboRIO that no
+                                           //  onger exist in deploy directory on roboRIO                }
             }
         }
     }
