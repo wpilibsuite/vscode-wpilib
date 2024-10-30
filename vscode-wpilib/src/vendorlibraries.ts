@@ -145,10 +145,6 @@ export class VendorLibraries extends VendorLibrariesBase {
           }
         }
       }
-
-      if (anySucceeded) {
-        // this.offerBuild(workspace);
-      }
     }
     return anySucceeded;
   }

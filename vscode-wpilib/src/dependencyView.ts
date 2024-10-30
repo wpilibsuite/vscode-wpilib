@@ -86,7 +86,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             void this.refresh(this.wp);
           } else {
             if (this.changed > this.vendorLibraries.getLastBuild()) {
-              //this.vendorLibraries.offerBuild(this.wp, true);
               this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
               this.changed = 0;
             }
@@ -132,7 +131,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             {
                 if (this.wp) {
                     if (this.changed > this.vendorLibraries.getLastBuild()) {
-                        //this.vendorLibraries.offerBuild(this.wp, true);
                         this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
                         this.changed = 0;
                     }
@@ -225,7 +223,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
 
         if (success) {
-          // this.vendorLibraries.offerBuild(this.wp);
           this.changed = Date.now();
         }
       }
