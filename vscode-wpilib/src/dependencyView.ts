@@ -207,17 +207,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private async getURLInstallDep(avail: IJsonList | undefined) {
     if (avail && this.wp) {
-      // Check to see if it is already a URL
-      let url = avail.path;
-      if (url.substring(0, 4) !== 'http') {
-        url = this.ghURL + url;
-      }
-      let dep;
-      try {
-        dep = await this.vendorLibraries.getJsonDepURL(url);
-      } catch {
-        dep = this.homeDeps.find(homdep => homdep.uuid === avail.uuid && homdep.version === avail.version);
-      }
+      const dep = await this.listToDependency(avail); 
 
       if (dep) {
         let conflictdep = undefined;
@@ -237,10 +227,38 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
           if (success) {
             this.changed = Date.now();
+
+            if (dep.requires) {
+              let reqDep = undefined;
+              // Check to see if there are required deps and install those too
+              for (const required of dep.requires) {
+                reqDep = this.availableDeps.find(requiredDep => requiredDep.uuid === required.uuid);
+                const newDep = await this.listToDependency(reqDep);
+                if (reqDep && newDep) {
+                  const success = await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                }
+              }
+            }
           }
         } else {
           vscode.window.showErrorMessage(i18n('message', '{0}', conflictdep.errorMessage), {modal: true});
         }
+      }
+    }
+  }
+
+  private async listToDependency(avail: IJsonList | undefined) {
+    if (avail && this.wp) {
+      // Check to see if it is already a URL
+      let url = avail.path;
+      if (url.substring(0, 4) !== 'http') {
+        url = this.ghURL + url;
+      }
+      let dep;
+      try {
+        return await this.vendorLibraries.getJsonDepURL(url);
+      } catch {
+        return this.homeDeps.find(homdep => homdep.uuid === avail.uuid && homdep.version === avail.version);
       }
     }
   }
