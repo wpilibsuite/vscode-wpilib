@@ -220,10 +220,26 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (dep) {
-        const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+        let conflictdep = undefined;
+        if (dep.conflictsWith) {
+          // Check to see if it conflicts with currently installed deps
+          for (const conflict of dep.conflictsWith) { 
+            if (this.installedDeps.find(installedDep => installedDep.uuid === conflict.uuid)) {
+              conflictdep = conflict;
+              break;
+            }
+          }
+        }
 
-        if (success) {
-          this.changed = Date.now();
+        // If no conflict is found install otherwise show dialog
+        if (!conflictdep) {
+          const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+
+          if (success) {
+            this.changed = Date.now();
+          }
+        } else {
+          vscode.window.showErrorMessage(i18n('message', '{0}', conflictdep.errorMessage), {modal: true});
         }
       }
     }
