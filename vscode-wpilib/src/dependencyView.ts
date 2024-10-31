@@ -235,7 +235,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 reqDep = this.availableDeps.find(requiredDep => requiredDep.uuid === required.uuid);
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  const success = await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                  await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
                 }
               }
             }
@@ -248,19 +248,20 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async listToDependency(avail: IJsonList | undefined) {
+    let dependency = undefined;
     if (avail && this.wp) {
       // Check to see if it is already a URL
       let url = avail.path;
       if (url.substring(0, 4) !== 'http') {
         url = this.ghURL + url;
       }
-      let dep;
       try {
-        return await this.vendorLibraries.getJsonDepURL(url);
+        dependency = await this.vendorLibraries.getJsonDepURL(url);
       } catch {
-        return this.homeDeps.find(homdep => homdep.uuid === avail.uuid && homdep.version === avail.version);
+        dependency = this.homeDeps.find(homdep => homdep.uuid === avail.uuid && homdep.version === avail.version);
       }
     }
+    return dependency;
   }
 
   public addDependency() {
