@@ -37,6 +37,7 @@ class LibraryQuickPick implements vscode.QuickPickItem {
 export class VendorLibraries extends VendorLibrariesBase {
   private disposables: vscode.Disposable[] = [];
   private externalApi: IExternalAPI;
+  private lastBuildTime = 1;
 
   constructor(externalApi: IExternalAPI) {
     super(externalApi.getUtilitiesAPI());
@@ -127,9 +128,9 @@ export class VendorLibraries extends VendorLibrariesBase {
     }
   }
 
-  public async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder) {
+  public async uninstallVendorLibraries(toRemove: IJsonDependency[] | undefined, workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    let anySucceeded = false;
     if (toRemove !== undefined) {
-      let anySucceeded = false;
       const url = this.getWpVendorFolder(workspace);
       const files = await readdirAsync(url);
       for (const file of files) {
@@ -144,11 +145,8 @@ export class VendorLibraries extends VendorLibrariesBase {
           }
         }
       }
-
-      if (anySucceeded) {
-        this.offerBuild(workspace);
-      }
     }
+    return anySucceeded;
   }
 
   private async offlineUpdates(workspace: vscode.WorkspaceFolder): Promise<void> {
@@ -185,7 +183,7 @@ export class VendorLibraries extends VendorLibrariesBase {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace);
+            this.offerBuild(workspace, true);
           }
         }
       } else {
@@ -241,7 +239,7 @@ export class VendorLibraries extends VendorLibrariesBase {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace);
+            this.offerBuild(workspace, true);
           }
         }
       } else {
@@ -287,7 +285,7 @@ export class VendorLibraries extends VendorLibrariesBase {
           }
         }
         if (anySucceeded) {
-          this.offerBuild(workspace);
+          this.offerBuild(workspace, true);
         }
       }
     } else {
@@ -316,7 +314,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
       const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
       if (success) {
-        this.offerBuild(workspace);
+        this.offerBuild(workspace, true);
       } else {
         vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
       }
@@ -331,15 +329,22 @@ export class VendorLibraries extends VendorLibrariesBase {
     return this.getDependencies(this.getWpVendorFolder(workspace));
   }
 
-  public async offerBuild(workspace: vscode.WorkspaceFolder) {
+  public async offerBuild(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {
     const buildRes = await vscode.window.showInformationMessage(i18n('message',
       'It is recommended to run a "Build" after a vendor update. ' +
       'Would you like to do this now?'), {
-        modal: false,
+        modal: modal
       }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
     if (buildRes?.title === i18n('ui', 'Yes')) {
       await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+      this.lastBuildTime = Date.now();
+      return true;
     }
+    return false;
+  }
+
+  public getLastBuild(): number {
+    return this.lastBuildTime;
   }
 }
 

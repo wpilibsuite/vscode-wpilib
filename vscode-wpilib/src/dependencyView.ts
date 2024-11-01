@@ -36,6 +36,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private externalApi: IExternalAPI;
   private ghURL = `https://raw.githubusercontent.com/wpilibsuite/vendor-json-repo/master/`;
   private wp: vscode.WorkspaceFolder | undefined;
+  private changed = 0;
 
   private _view?: vscode.WebviewView;
 
@@ -80,7 +81,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     void this.refresh(this.wp);
     webviewView.onDidChangeVisibility(() => {
       if (this.wp) {
-          void this.refresh(this.wp);
+          // If the webview becomes visible refresh it, invisible then check for changes
+          if (webviewView.visible) {
+            void this.refresh(this.wp);
+          } else {
+            if (this.changed > this.vendorLibraries.getLastBuild()) {
+              this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+              this.changed = 0;
+            }
+          }
       }
     });
 
@@ -115,6 +124,16 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             {
                 if (this.wp) {
                     void this.refresh(this.wp);
+                }
+                break;
+            }
+          case 'blur':
+            {
+                if (this.wp) {
+                    if (this.changed > this.vendorLibraries.getLastBuild()) {
+                        this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+                        this.changed = 0;
+                    }
                 }
                 break;
             }
@@ -175,35 +194,74 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async uninstall(index: string) {
+    this.sortInstalledDeps();
     const uninstall = [this.installedDeps[parseInt(index, 10)]];
     if (this.wp) {
-      await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
+      const success = await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
+      if (success) {
+        this.changed = Date.now();
+      }
       await this.refresh(this.wp);
     }
   }
 
   private async getURLInstallDep(avail: IJsonList | undefined) {
     if (avail && this.wp) {
+      const dep = await this.listToDependency(avail); 
+
+      if (dep) {
+        let conflictdep = undefined;
+        if (dep.conflictsWith) {
+          // Check to see if it conflicts with currently installed deps
+          for (const conflict of dep.conflictsWith) { 
+            if (this.installedDeps.find(installedDep => installedDep.uuid === conflict.uuid)) {
+              conflictdep = conflict;
+              break;
+            }
+          }
+        }
+
+        // If no conflict is found install otherwise show dialog
+        if (!conflictdep) {
+          const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+
+          if (success) {
+            this.changed = Date.now();
+
+            if (dep.requires) {
+              let reqDep = undefined;
+              // Check to see if there are required deps and install those too
+              for (const required of dep.requires) {
+                reqDep = this.availableDeps.find(requiredDep => requiredDep.uuid === required.uuid);
+                const newDep = await this.listToDependency(reqDep);
+                if (reqDep && newDep) {
+                  await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                }
+              }
+            }
+          }
+        } else {
+          vscode.window.showErrorMessage(i18n('message', '{0}', conflictdep.errorMessage), {modal: true});
+        }
+      }
+    }
+  }
+
+  private async listToDependency(avail: IJsonList | undefined) {
+    let dependency = undefined;
+    if (avail && this.wp) {
       // Check to see if it is already a URL
       let url = avail.path;
       if (url.substring(0, 4) !== 'http') {
         url = this.ghURL + url;
       }
-      let dep;
       try {
-        dep = await this.vendorLibraries.getJsonDepURL(url);
+        dependency = await this.vendorLibraries.getJsonDepURL(url);
       } catch {
-        dep = this.homeDeps.find(homdep => homdep.uuid === avail.uuid && homdep.version === avail.version);
-      }
-
-      if (dep) {
-        const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
-
-        if (success) {
-          this.vendorLibraries.offerBuild(this.wp);
-        }
+        dependency = this.homeDeps.find(homdep => homdep.uuid === avail.uuid && homdep.version === avail.version);
       }
     }
+    return dependency;
   }
 
   public addDependency() {
@@ -294,6 +352,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private sortInstalled() {
     this.installedList.sort((a, b) => {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) {
+        return 1;
+      }
+      else if (a.name.toLowerCase() === b.name.toLowerCase()) {
+        return 0;
+      } else {
+        return -1;
+      }
+    });
+  }
+
+  private sortInstalledDeps() {
+    this.installedDeps.sort((a, b) => {
       if (a.name.toLowerCase() > b.name.toLowerCase()) {
         return 1;
       }

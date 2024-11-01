@@ -12,6 +12,21 @@ export interface IJsonDependency {
   uuid: string;
   jsonUrl: string;
   fileName: string;
+  conflictsWith: IJsonConflicts[] | undefined;
+  requires: IJsonRequires[] | undefined;
+}
+
+export interface  IJsonRequires {
+  uuid: string;
+  errorMessage: string;
+  offlineFileName: string;
+  onlineUrl: string;
+}
+
+export interface IJsonConflicts {
+  uuid: string;
+  errorMessage: string;
+  offlineFileName: string;
 }
 
 export function isJsonDependency(arg: unknown): arg is IJsonDependency {
