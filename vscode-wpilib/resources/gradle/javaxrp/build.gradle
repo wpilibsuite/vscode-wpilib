@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "###GRADLERIOREPLACE###"
+    id "eclipse"
 }
 
 java {
@@ -60,4 +61,17 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+}
+
+// Prevent the eclipse compiler (used by the VS Code extension for intellisense and debugging)
+// from generating bad class files from annotation processors like Epilogue
+eclipse {
+    classpath {
+        containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+        file.whenMerged { cp ->
+            def entries = cp.entries;
+            def src = new org.gradle.plugins.ide.eclipse.model.SourceFolder('build/generated/sources/annotationProcessor/java/main/', null)
+            entries.add(src)
+        }
+    }
 }
