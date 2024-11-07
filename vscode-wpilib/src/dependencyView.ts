@@ -27,12 +27,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private vendorLibraries: VendorLibraries;
   private viewInfo: IProjectInfo | undefined;
   private disposables: vscode.Disposable[] = [];
-  private installedDeps: IJsonDependency[] = [];
-  private availableDeps: IJsonList[] = [];
-  private availableDepsList: IJsonList[] = [];
-  private onlineDeps: IJsonList[] = [];
-  private installedList: IDepInstalled[] = [];
-  private homeDeps: IJsonDependency[] = [];
+  private installedDeps: IJsonDependency[] = []; // The actual dep information that is installed
+  private availableDeps: IJsonList[] = []; // All available deps
+  private availableDepsList: IJsonList[] = []; // Only the deps that are not installed and the latest version
+  private onlineDeps: IJsonList[] = []; // The deps from the <year>.json file in the vendor-json-repo
+  private installedList: IDepInstalled[] = []; // To display deps in the installed list
+  private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
   private externalApi: IExternalAPI;
   private ghURL = `https://raw.githubusercontent.com/wpilibsuite/vendor-json-repo/master/`;
   private wp: vscode.WorkspaceFolder | undefined;
@@ -232,7 +232,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
               let reqDep = undefined;
               // Check to see if there are required deps and install those too
               for (const required of dep.requires) {
-                reqDep = this.availableDeps.find(requiredDep => requiredDep.uuid === required.uuid);
+                reqDep = this.availableDepsList.find(requiredDep => requiredDep.uuid === required.uuid);
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
                   await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
