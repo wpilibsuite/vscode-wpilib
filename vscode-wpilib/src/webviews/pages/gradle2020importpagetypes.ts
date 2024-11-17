@@ -3,6 +3,7 @@
 export interface IGradle2020IPCData {
   desktop: boolean;
   romi: boolean;
+  xrp: boolean;
   fromProps: string;
   toFolder: string;
   projectName: string;
