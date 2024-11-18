@@ -1,7 +1,7 @@
 'use strict';
 
 import { IGradle2020IPCReceive, IGradle2020IPCSend } from './gradle2020importpagetypes';
-import { validateProject, validateTeamNumber, validateProjectFolder } from './sharedpages';
+import { validateProject, validateTeamNumber, validateProjectFolder, validateXrpRomi } from './sharedpages';
 
 interface IVsCodeApi {
   postMessage(message: IGradle2020IPCReceive): void;
@@ -25,7 +25,8 @@ function importProjectButtonClick() {
   const isValidTeam = validateTeamNumber();
   const isValidProject = validateProject();
   const isValidFolder = validateProjectFolder();
-  if (!isValidTeam || !isValidProject || !isValidFolder) {
+  const isXrpRomiValid = validateXrpRomi();
+  if (!isValidTeam || !isValidProject || !isValidFolder || !isXrpRomiValid) {
     return;
   }
 
@@ -34,6 +35,7 @@ function importProjectButtonClick() {
     data: {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
       romi: (document.getElementById('romiCB') as HTMLInputElement).checked,
+      xrp: (document.getElementById('xrpCB') as HTMLInputElement).checked,
       fromProps: (document.getElementById('gradle2020Input') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
@@ -78,6 +80,8 @@ window.addEventListener('load', (_: Event) => {
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;
   document.getElementById('importProject')!.onclick = importProjectButtonClick;
   document.getElementById('projectFolder')!.oninput = validateProjectFolder;
+  document.getElementById('romiCB')!.onchange = validateXrpRomi;
+  document.getElementById('xrpCB')!.onchange = validateXrpRomi;
 
   vscode.postMessage({ type: 'loaded' });
 });

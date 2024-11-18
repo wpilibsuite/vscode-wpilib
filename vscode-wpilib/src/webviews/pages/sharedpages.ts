@@ -44,6 +44,25 @@ export function validateProjectFolder(): boolean {
   }
 }
 
+export function validateXrpRomi(): boolean {
+  const romiCB = document.getElementById('romiCB') as HTMLInputElement;
+  const romiCBValue = romiCB.checked;
+  const xrpCB = document.getElementById('xrpCB') as HTMLInputElement;
+  const xrpCBValue = xrpCB.checked;
+
+  const romiDiv = document.getElementById('romidiv') as HTMLDivElement;
+  const xrpDiv = document.getElementById('xrpdiv') as HTMLDivElement;
+  if (romiCBValue === true && xrpCBValue === true) {
+    romiDiv.classList.add('error');
+    xrpDiv.classList.add('error');
+    return false;
+  } else {
+    romiDiv.classList.remove('error');
+    xrpDiv.classList.remove('error');
+    return true;
+  }
+}
+
 export function validateTeamNumber(): boolean {
   const elem = document.getElementById('teamNumber') as HTMLInputElement;
   const s = elem.value;
