@@ -140,14 +140,20 @@
       { "from": "SendableRegistry[.]getInstance[(][)][.]", "to": "SendableRegistry." },
       { "from": "[.]get(\\w*)[(](?:GenericHID[.])?Hand[.]k(\\w*)[)]", "to": ".get$2$1()" },
       { "from": "CommandBase", "to": "Command" },
-      { "from": "import edu[.]wpi[.]first[.]units[.]measure[.]Measure;", "to": "" },
-      { "from": "edu[.]wpi[.]first[.]units[.](.*);", "to": "edu.wpi.first.units.measure.$1;" },
-      { "from": "edu[.]wpi[.]first[.]units[.]measure[.]Units[.](\\w*);", "to": "edu.wpi.first.units.Units.$1;" },
+      { "from": "edu[.]wpi[.]first[.]units[.]measure[.]Measure", "to": "edu.wpi.first.units.Measure" },
+      { "from": "edu[.]wpi[.]first[.]units[.](?!MutableMeasure|ImmutableMeasure|UnitBuilder|Measure)(.*);", "to": "edu.wpi.first.units.measure.$1;" },
+      { "from": "edu[.]wpi[.]first[.]units[.]measure[.]Units[.](.*);", "to": "edu.wpi.first.units.Units.$1;" },
+      { "from": "MutableMeasure<(\\w*)>", "to": "Mut$1" },
+      { "from": "MutableMeasure<Velocity<Distance>>", "to": "MutLinearVelocity" },
+      { "from": "MutableMeasure<Velocity<Angle>>", "to": "MutAngularVelocity" },
+      { "from": "MutableMeasure<Velocity<Velocity<Distance>>>", "to": "MutLinearAcceleration" },
+      { "from": "MutableMeasure<Velocity<Velocity<Angle>>>", "to": "MutAngularAcceleration" }
       { "from": "Measure<(\\w*)>", "to": "$1" },
       { "from": "Measure<Velocity<Distance>>", "to": "LinearVelocity" },
       { "from": "Measure<Velocity<Angle>>", "to": "AngularVelocity" },
       { "from": "Measure<Velocity<Velocity<Distance>>>", "to": "LinearAcceleration" },
-      { "from": "Measure<Velocity<Velocity<Angle>>>", "to": "AngularAcceleration" }
+      { "from": "Measure<Velocity<Velocity<Angle>>>", "to": "AngularAcceleration" },
+      { "from": "MutableMeasure.zero\\((\\w*)\\)", "to": "$1.mutable(0)" },
     ]
   }
 ]
