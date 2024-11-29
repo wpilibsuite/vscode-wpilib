@@ -25,5 +25,6 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests"
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "java.import.gradle.annotationProcessing.enabled": false
 }
