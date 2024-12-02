@@ -5,6 +5,7 @@ import { initialize, enable } from '@electron/remote/main';
 initialize();
 
 let mainWindow: Electron.BrowserWindow | undefined;
+app.commandLine.appendSwitch('--no-sandbox')
 
 async function createWindow() {
   // Create the browser window.
