@@ -3,25 +3,19 @@
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
 (function () {
+  // @ts-ignore
   const vscode = acquireVsCodeApi();
-  let dropdowns;
-  let buttons;
   let message;
-  let uninstalls;
-  let installs;
-
-
 
   // Function to generate HTML for installed dependencies
-  function generateInstalledHTML(installed, container) {
-    container.innerHTML = "";
+  function populateInstalledList(installed, container) {
     // Create HTML for installed dependencies
     const badge = Object.assign(document.createElement("vscode-badge"), {
       variant: "counter",
       slot: "decorations",
       textContent: installed.length,
     });
-    container.appendChild(badge);
+    container.replaceChildren(badge);
     installed.forEach((dep, index) => {
       const installedDep = Object.assign(document.createElement("div"), {
         className: "installed-dependency",
@@ -67,7 +61,6 @@
         }
         versionSelect.appendChild(option);
       });
-
 
       versionAction.addEventListener("click", () => {
         const action = versionAction.getAttribute("id");
@@ -125,14 +118,13 @@
   }
 
   // Function to generate HTML for available dependencies
-  function generateAvailableHTML(available, container) {
-    container.innerHTML = "";
-    // Create HTML for available dependencies
+  function populateAvailableList(available, container) {
     const badge = Object.assign(document.createElement("vscode-badge"), {
       variant: "counter",
       slot: "decorations",
       textContent: available.length,
     });
+    container.replaceChildren(badge);
     available.forEach((dep, index) => {
       const availableDep = Object.assign(document.createElement("div"), {
         className: "available-dependency",
@@ -181,7 +173,7 @@
           );
 
           if (installedContainer) {
-            generateInstalledHTML(message.installed, installedContainer);
+            populateInstalledList(message.installed, installedContainer);
           } else {
             console.error(
               'Element with ID "installed-dependencies" not found.'
@@ -189,7 +181,7 @@
           }
 
           if (availableContainer) {
-            generateAvailableHTML(message.available, availableContainer);
+            populateAvailableList(message.available, availableContainer);
           } else {
             console.error(
               'Element with ID "available-dependencies" not found.'
@@ -207,9 +199,6 @@
         vscode.postMessage({ type: "updateall" });
       });
 
-    document.getElementById("refresh-action")?.addEventListener("click", () => {
-      vscode.postMessage({ type: "refresh" });
-    });
 
     // Listen for focus events
     window.addEventListener("blur", () => {

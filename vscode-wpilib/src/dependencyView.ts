@@ -88,12 +88,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.viewInfo = await this.projectInfo.getViewInfo();
     }
 
-    void this.refresh(this.wp);
+    void this._refresh(this.wp);
     webviewView.onDidChangeVisibility(() => {
       if (this.wp) {
         // If the webview becomes visible refresh it, invisible then check for changes
         if (webviewView.visible) {
-          void this.refresh(this.wp);
+          void this._refresh(this.wp);
         } else {
           if (this.changed > this.vendorLibraries.getLastBuild()) {
             this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
@@ -126,12 +126,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           }
           case "updateall": {
             void this.updateall();
-            break;
-          }
-          case "refresh": {
-            if (this.wp) {
-              void this.refresh(this.wp);
-            }
             break;
           }
           case "blur": {
@@ -177,7 +171,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           this.installedList[index].name === available.name
       );
       await this.getURLInstallDep(avail);
-      await this.refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
@@ -198,7 +192,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         }
       }
 
-      await this.refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
@@ -206,7 +200,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     const avail = this.availableDepsList[parseInt(index, 10)];
     if (avail && this.wp) {
       await this.getURLInstallDep(avail);
-      await this.refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
@@ -221,7 +215,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       if (success) {
         this.changed = Date.now();
       }
-      await this.refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
@@ -326,7 +320,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public async refresh(workspace: vscode.WorkspaceFolder) {
+  private async _refresh(workspace: vscode.WorkspaceFolder) {
     this.installedDeps =
       await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
     this.installedList = [];
@@ -399,6 +393,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.sortAvailable();
 
       this.updateDependencies();
+    }
+  }
+  public async refresh() {
+    if (this.wp) {
+      void this._refresh(this.wp);
     }
   }
 
@@ -528,6 +527,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     };
 
     const scriptUri = createUri(`media/main.js`);
+    const styleUri = createUri(`media/main.css`);
     const elementsScriptUri = createUri(
       `node_modules/@vscode-elements/elements/dist/bundled.js`
     );
@@ -545,56 +545,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 <title>Vendor Dependencies</title>
                 <script src="${elementsScriptUri}" type="module"></script>
                 <link rel="stylesheet" href="${codiconsUri}"   id="vscode-codicon-stylesheet">
-
-                <style>
-                    body {
-                      scrollbar-gutter: stable;
-                    }
-                    .installed-dependency, .available-dependency {
-                        margin-bottom: 10px;
-                        &:last-of-type {
-                          margin-bottom: 40px;
-                        }
-                        &:first-of-type {
-                          margin-top: 10px;
-                        }
-                    }
-                    .top-line {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 8px;
-                    }
-                    .name {
-                        font-weight: bold;
-                    }
-                    .downloads {
-                        display: flex;
-                        align-items: center;
-                    }
-                    .icon {
-                        margin-left: 5px;
-                    }
-                    .details {
-                        margin-top: 5px;
-                    }
-                    .update {
-                        display: flex;
-                        gap: 4px;
-                    }
-                    .uninstall-button {
-                        padding: 4px;
-                        & > vscode-icon{
-                            margin-right: 4px!important;
-                            margin-left: 4px!important;
-                        }
-                    }
-
-                </style>
+                <link rel="stylesheet" href="${styleUri}">
             </head>
             <body>
                 <div class="top-line">
-                    <vscode-button id="updateall-action">Update All</vscode-button><vscode-button id="refresh-action">Refresh</vscode-button>
+                    <vscode-button id="updateall-action">Update All</vscode-button>
                 </div>
                 <vscode-collapsible title="Installed Dependencies" id="installed-dependencies" open></vscode-collapsible>
                 <vscode-collapsible title="Available Dependencies" id="available-dependencies" open></vscode-collapsible>
