@@ -58,14 +58,14 @@
     "main": "./out/extension",
     "contributes": {
         "viewsContainers": {
-			"activitybar": [
-				{
-					"id": "wpilib-vendordeps",
-					"title": "WPILib Vendor Dependencies",
-					"icon": "media/wpilib.png"
-				}
-			]
-		},
+            "activitybar": [
+                {
+                    "id": "wpilib-vendordeps",
+                    "title": "WPILib Vendor Dependencies",
+                    "icon": "media/wpilib.png"
+                }
+            ]
+        },
         "untrustedWorkspaces": {
             "supported": "limited",
             "description": "%wpilibcore.untrustedWorkspace.title%"
@@ -178,16 +178,16 @@
         },
         "commands": [
             {
-				"command": "calicoColors.addColor",
-				"category": "Calico Colors",
-				"title": "Add Color"
-			},
-			{
-				"command": "calicoColors.clearColors",
-				"category": "Calico Colors",
-				"title": "Clear Colors",
-				"icon": "$(clear-all)"
-			},
+                "command": "calicoColors.addColor",
+                "category": "Calico Colors",
+                "title": "Add Color"
+            },
+            {
+                "command": "calicoColors.clearColors",
+                "category": "Calico Colors",
+                "title": "Clear Colors",
+                "icon": "$(clear-all)"
+            },
             {
                 "command": "wpilibcore.startRioLog",
                 "title": "%wpilibcore.startRioLog.title%",
@@ -428,12 +428,12 @@
             ],
             "wpilib-vendordeps": [
                 {
-					"type": "webview",
-					"id": "wpilib.dependencyView",
-					"name": "WPILib Vendor Dependencies",
+                    "type": "webview",
+                    "id": "wpilib.dependencyView",
+                    "name": "WPILib Vendor Dependencies",
                     "icon": "media/wpilib.png"
-				}
-			]
+                }
+            ]
         },
         "keybindings": [
             {
@@ -566,6 +566,8 @@
         "webpack-cli": "^3.3.12"
     },
     "dependencies": {
+        "@vscode-elements/elements": "^1.9.0",
+        "@vscode/codicons": "^0.0.36",
         "extract-zip": "^2.0.1",
         "glob": "^7.1.6",
         "java-properties": "^1.0.2",
