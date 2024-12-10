@@ -16,8 +16,6 @@
     "activationEvents": [
         "workspaceContains:.wpilib/wpilib_preferences.json",
         "workspaceContains:build/vscodeconfig.json",
-        "onCommand:calicoColors.addColor",
-        "onCommand:calicoColors.clearColors",
         "onCommand:wpilibcore.startRioLog",
         "onCommand:wpilibcore.setTeamNumber",
         "onCommand:wpilibcore.startTool",
@@ -180,17 +178,6 @@
             }
         },
         "commands": [
-            {
-                "command": "calicoColors.addColor",
-                "category": "Calico Colors",
-                "title": "Add Color"
-            },
-            {
-                "command": "calicoColors.clearColors",
-                "category": "Calico Colors",
-                "title": "Clear Colors",
-                "icon": "$(clear-all)"
-            },
             {
                 "command": "wpilibcore.startRioLog",
                 "title": "%wpilibcore.startRioLog.title%",
