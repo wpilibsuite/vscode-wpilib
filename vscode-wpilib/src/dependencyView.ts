@@ -226,6 +226,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
 
           if (success) {
+            await vscode.commands.executeCommand('extension.showWebsite', avail.website, dep.name);
             this.changed = Date.now();
 
             if (dep.requires) {
@@ -235,7 +236,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 reqDep = this.availableDepsList.find(requiredDep => requiredDep.uuid === required.uuid);
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                  const reqsuccess = await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+
+                  if (reqsuccess) {
+                    await vscode.commands.executeCommand('extension.showWebsite', avail.website, dep.name);
+                  }
                 }
               }
             }
