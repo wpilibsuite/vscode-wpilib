@@ -53,7 +53,8 @@
         "onCommand:wpilibcore.changeDesktop",
         "onCommand:wpilibcore.openApiDocumentation",
         "onCommand:wpilibcore.getProjectInformation",
-        "onCommand:wpilibcore.runGradleClean"
+        "onCommand:wpilibcore.runGradleClean",
+        "onCommand:extension.showWebsite"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -177,17 +178,6 @@
             }
         },
         "commands": [
-            {
-				"command": "calicoColors.addColor",
-				"category": "Calico Colors",
-				"title": "Add Color"
-			},
-			{
-				"command": "calicoColors.clearColors",
-				"category": "Calico Colors",
-				"title": "Clear Colors",
-				"icon": "$(clear-all)"
-			},
             {
                 "command": "wpilibcore.startRioLog",
                 "title": "%wpilibcore.startRioLog.title%",
@@ -416,6 +406,10 @@
                 "title": "%wpilibcore.runGradleClean.title%",
                 "category": "WPILib",
                 "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "extension.showWebsite",
+                "title": "Show Website"
             }
         ],
         "views": {

@@ -433,10 +433,70 @@ export async function activate(context: vscode.ExtensionContext) {
 
   await handleAfterTrusted(externalApi, context, creationError, extensionResourceLocation, gradle2020import, help);
 
+  // Register the command with arguments
+  let disposable = vscode.commands.registerCommand(
+    'extension.showWebsite', 
+    (url: string, tabTitle: string) => {
+      // If no arguments were passed, you can prompt the user (optional):
+      if (!url) {
+        vscode.window.showErrorMessage('URL not provided!');
+        return;
+      }
+      if (!tabTitle) {
+        tabTitle = "My Website"; // fallback title if not provided
+      }
+
+      // Create and show a new webview panel
+      const panel = vscode.window.createWebviewPanel(
+        'myWebview',      // internal identifier
+        tabTitle,         // use the dynamic title
+        vscode.ViewColumn.One,
+        {
+          enableScripts: true,
+          retainContextWhenHidden: true
+        }
+      );
+
+      // Set the HTML content of the webview
+      panel.webview.html = getWebviewContent(url);
+    }
+  );
+
+  context.subscriptions.push(disposable);
+  
   return externalApi;
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
   closeLogger();
+}
+
+function getWebviewContent(url: string): string {
+  // Basic HTML that includes an iframe to your target website.
+  // NOTE: This will only work if the site allows iframes.
+  return `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body, html {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #fff;
+      }
+      iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="${url}" sandbox="allow-scripts allow-same-origin"></iframe>
+  </body>
+  </html>`;
 }
