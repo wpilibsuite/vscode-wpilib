@@ -5,7 +5,7 @@ body {
 .available-dependency {
   margin-bottom: 10px;
   &:last-of-type {
-    margin-bottom: 40px;
+    margin-bottom: 10px;
   }
   &:first-of-type {
     margin-top: 10px;
@@ -40,4 +40,8 @@ body {
     margin-right: 4px !important;
     margin-left: 4px !important;
   }
+}
+
+vscode-collapsible::part(body) {
+  overflow: visible;
 }
