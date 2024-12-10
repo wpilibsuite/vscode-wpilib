@@ -105,9 +105,10 @@
       uninstallAction.setAttribute("data-dependency", dep.name);
       uninstallAction.appendChild(
         Object.assign(document.createElement("vscode-icon"), {
-          name: "trash",
+          name: 'trash',
         })
       );
+    
       uninstallAction.addEventListener("click", () => {
         vscode.postMessage({ type: "uninstall", index: index });
       });

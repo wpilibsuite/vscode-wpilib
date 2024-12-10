@@ -7,7 +7,8 @@ import { IExternalAPI } from "vscode-wpilibapi";
 import { isNewerVersion } from "./versions";
 import { logger } from "./logger";
 import { localize as i18n } from "./locale";
-
+// @ts-ignore
+import elements from "!!raw-loader!@vscode-elements/elements/dist/bundled.js";
 export interface IJsonList {
   path: string;
   name: string;
@@ -528,12 +529,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
     const scriptUri = createUri(`media/main.js`);
     const styleUri = createUri(`media/main.css`);
-    const elementsScriptUri = createUri(
-      `node_modules/@vscode-elements/elements/dist/bundled.js`
-    );
-    const codiconsUri = createUri(
-      `node_modules/@vscode/codicons/dist/codicon.css`
-    );
+    const codiconUri = createUri(`media/icons.css`);
+
 
     // Return the complete HTML
     return `
@@ -543,9 +540,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Vendor Dependencies</title>
-                <script src="${elementsScriptUri}" type="module"></script>
-                <link rel="stylesheet" href="${codiconsUri}"   id="vscode-codicon-stylesheet">
+                <script type="module">
+                  ${elements}
+                </script>
                 <link rel="stylesheet" href="${styleUri}">
+                <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
             </head>
             <body>
                 <div class="top-line">

@@ -1,606 +1,609 @@
 {
-  "name": "vscode-wpilib",
-  "displayName": "WPILib",
-  "author": "WPILib Suite",
-  "description": "VSCode extension for WPILib Team Use",
-  "version": "0.1.0",
-  "publisher": "wpilibsuite",
-  "license": "BSD-3-Clause",
-  "icon": "wpilib-icon-128.png",
-  "engines": {
-    "vscode": "^1.57.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "workspaceContains:.wpilib/wpilib_preferences.json",
-    "workspaceContains:build/vscodeconfig.json",
-    "onCommand:wpilibcore.startRioLog",
-    "onCommand:wpilibcore.setTeamNumber",
-    "onCommand:wpilibcore.startTool",
-    "onCommand:wpilibcore.buildCode",
-    "onCommand:wpilibcore.testCode",
-    "onCommand:wpilibcore.deployCode",
-    "onCommand:wpilibcore.debugCode",
-    "onCommand:wpilibcore.simulateCode",
-    "onCommand:wpilibcore.simulateHwCode",
-    "onCommand:wpilibcore.setLanguage",
-    "onCommand:wpilibcore.setAutoSave",
-    "onCommand:wpilibcore.setSkipTests",
-    "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
-    "onCommand:wpilibcore.setOffline",
-    "onCommand:wpilibcore.setStopSimulationOnEntry",
-    "onCommand:wpilibcore.setUseWinDbgX",
-    "onCommand:wpilibcore.setStartRioLog",
-    "onCommand:wpilibcore.setDeployOffline",
-    "onCommand:wpilibcore.createCommand",
-    "onCommand:wpilibcore.cancelTasks",
-    "onCommand:wpilibcore.help",
-    "onCommand:wpilibcore.openCommandPalette",
-    "onCommand:wpilibcore.refreshCppProperties",
-    "onCommand:wpilibcore.selectCppToolchain",
-    "onCommand:wpilibcore.selectCppBinaryTypes",
-    "onCommand:wpilibcore.importGradle2020Project",
-    "onCommand:wpilibcore.createNewProject",
-    "onCommand:wpilibcore.manageVendorLibs",
-    "onCommand:wpilibcore.setJavaHome",
-    "onCommand:wpilibcore.checkForUpdates",
-    "onCommand:wpilibcore.installGradleTools",
-    "onCommand:wpilibcore.showLogFolder",
-    "onCommand:wpilibcore.runGradleCommand",
-    "onCommand:wpilibcore.resetAutoUpdate",
-    "onCommand:wpilibcore.changeDesktop",
-    "onCommand:wpilibcore.openApiDocumentation",
-    "onCommand:wpilibcore.getProjectInformation",
-    "onCommand:wpilibcore.runGradleClean"
-  ],
-  "main": "./out/extension",
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "wpilib-vendordeps",
-          "title": "WPILib Vendor Dependencies",
-          "icon": "media/wpilib.png"
-        }
-      ]
+    "name": "vscode-wpilib",
+    "displayName": "WPILib",
+    "author": "WPILib Suite",
+    "description": "VSCode extension for WPILib Team Use",
+    "version": "0.1.0",
+    "publisher": "wpilibsuite",
+    "license": "BSD-3-Clause",
+    "icon": "wpilib-icon-128.png",
+    "engines": {
+        "vscode": "^1.57.0"
     },
-    "untrustedWorkspaces": {
-      "supported": "limited",
-      "description": "%wpilibcore.untrustedWorkspace.title%"
-    },
-    "taskDefinitions": [
-      {
-        "type": "wpilibgradle"
-      }
+    "categories": [
+        "Other"
     ],
-    "debuggers": [
-      {
-        "type": "wpilib",
-        "label": "WPILib Debug",
-        "configurationAttributes": {
-          "launch": {
-            "required": [
-              "desktop"
-            ],
-            "properties": {
-              "desktop": {
-                "type": "boolean",
-                "description": "True for desktop, false for roboRIO"
-              },
-              "hwsim": {
-                "type": "boolean",
-                "description": "True for hw sim, false for sw sim"
-              }
+    "activationEvents": [
+        "workspaceContains:.wpilib/wpilib_preferences.json",
+        "workspaceContains:build/vscodeconfig.json",
+        "onCommand:calicoColors.addColor",
+        "onCommand:calicoColors.clearColors",
+        "onCommand:wpilibcore.startRioLog",
+        "onCommand:wpilibcore.setTeamNumber",
+        "onCommand:wpilibcore.startTool",
+        "onCommand:wpilibcore.buildCode",
+        "onCommand:wpilibcore.testCode",
+        "onCommand:wpilibcore.deployCode",
+        "onCommand:wpilibcore.debugCode",
+        "onCommand:wpilibcore.simulateCode",
+        "onCommand:wpilibcore.simulateHwCode",
+        "onCommand:wpilibcore.setLanguage",
+        "onCommand:wpilibcore.setAutoSave",
+        "onCommand:wpilibcore.setSkipTests",
+        "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
+        "onCommand:wpilibcore.setOffline",
+        "onCommand:wpilibcore.setStopSimulationOnEntry",
+        "onCommand:wpilibcore.setUseWinDbgX",
+        "onCommand:wpilibcore.setStartRioLog",
+        "onCommand:wpilibcore.setDeployOffline",
+        "onCommand:wpilibcore.createCommand",
+        "onCommand:wpilibcore.cancelTasks",
+        "onCommand:wpilibcore.help",
+        "onCommand:wpilibcore.openCommandPalette",
+        "onCommand:wpilibcore.refreshCppProperties",
+        "onCommand:wpilibcore.selectCppToolchain",
+        "onCommand:wpilibcore.selectCppBinaryTypes",
+        "onCommand:wpilibcore.importGradle2020Project",
+        "onCommand:wpilibcore.createNewProject",
+        "onCommand:wpilibcore.manageVendorLibs",
+        "onCommand:wpilibcore.setJavaHome",
+        "onCommand:wpilibcore.checkForUpdates",
+        "onCommand:wpilibcore.installGradleTools",
+        "onCommand:wpilibcore.showLogFolder",
+        "onCommand:wpilibcore.runGradleCommand",
+        "onCommand:wpilibcore.resetAutoUpdate",
+        "onCommand:wpilibcore.changeDesktop",
+        "onCommand:wpilibcore.openApiDocumentation",
+        "onCommand:wpilibcore.getProjectInformation",
+        "onCommand:wpilibcore.runGradleClean",
+        "onCommand:wpilib.refreshVendordeps"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "wpilib-vendordeps",
+                    "title": "WPILib Vendor Dependencies",
+                    "icon": "media/wpilib.png"
+                }
+            ]
+        },
+        "untrustedWorkspaces": {
+            "supported": "limited",
+            "description": "%wpilibcore.untrustedWorkspace.title%"
+        },
+        "taskDefinitions": [
+            {
+                "type": "wpilibgradle"
             }
-          }
+        ],
+        "debuggers": [
+            {
+                "type": "wpilib",
+                "label": "WPILib Debug",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "desktop"
+                        ],
+                        "properties": {
+                            "desktop": {
+                                "type": "boolean",
+                                "description": "True for desktop, false for roboRIO"
+                            },
+                            "hwsim": {
+                                "type": "boolean",
+                                "description": "True for hw sim, false for sw sim"
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "jsonValidation": [
+            {
+                "fileMatch": "wpilib_preferences.json",
+                "url": "./resources/wpilibschema.json"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "WPILib configuration",
+            "properties": {
+                "wpilib.additionalGradleArguments": {
+                    "type": "string",
+                    "default": "",
+                    "description": "For debugging only, passes extra arguments to gradle invocations",
+                    "scope": "resource"
+                },
+                "wpilib.autoSaveOnDeploy": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically save all files on deploy",
+                    "scope": "resource"
+                },
+                "wpilib.autoStartRioLog": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically start RioLog on deploy",
+                    "scope": "resource"
+                },
+                "wpilib.alwaysAskForTeamNumber": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Always ask for a team number, even if set",
+                    "scope": "resource"
+                },
+                "wpilib.offline": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Perform gradle commands other then deploy/debug with offline flag",
+                    "scope": "resource"
+                },
+                "wpilib.deployOffline": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Perform gradle deploy command with offline flag",
+                    "scope": "resource"
+                },
+                "wpilib.skipTests": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to skip running tests on build",
+                    "scope": "resource"
+                },
+                "wpilib.skipSelectSimulateExtension": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to skip selection of simulation extensions",
+                    "scope": "resource"
+                },
+                "wpilib.selectDefaultSimulateExtension": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to select all simulation extensions by default",
+                    "scope": "resource"
+                },
+                "wpilib.stopSimulationOnEntry": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Set to make simulation code stop automatically on entry",
+                    "scope": "resource"
+                },
+                "wpilib.useWindbgX": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use WinDbg Preview (from store) as C++ debugger (Windows only)",
+                    "scope": "resource"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "calicoColors.addColor",
+                "category": "Calico Colors",
+                "title": "Add Color"
+            },
+            {
+                "command": "calicoColors.clearColors",
+                "category": "Calico Colors",
+                "title": "Clear Colors",
+                "icon": "$(clear-all)"
+            },
+            {
+                "command": "wpilibcore.startRioLog",
+                "title": "%wpilibcore.startRioLog.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setTeamNumber",
+                "title": "%wpilibcore.setTeamNumber.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.startTool",
+                "title": "%wpilibcore.startTool.title%",
+                "category": "WPILib",
+                "icon": "resources/wpilib-icon.svg",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.buildCode",
+                "title": "%wpilibcore.buildCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.testCode",
+                "title": "%wpilibcore.testCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.deployCode",
+                "title": "%wpilibcore.deployCode.title%",
+                "category": "WPILib",
+                "icon": "resources/wpilib-icon.svg",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.debugCode",
+                "title": "%wpilibcore.debugCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.simulateCode",
+                "title": "%wpilibcore.simulateCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.simulateHwCode",
+                "title": "%wpilibcore.simulateHwCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setLanguage",
+                "title": "%wpilibcore.setLanguage.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setAutoSave",
+                "title": "%wpilibcore.setAutoSave.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setSkipTests",
+                "title": "%wpilibcore.setSkipTests.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setSelectDefaultSimulateExtension",
+                "title": "%wpilibcore.setSelectDefaultSimulateExtension.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setOffline",
+                "title": "%wpilibcore.setOffline.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setStopSimulationOnEntry",
+                "title": "%wpilibcore.setStopSimulationOnEntry.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setUseWinDbgX",
+                "title": "%wpilibcore.setUseWinDbgX.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setStartRioLog",
+                "title": "%wpilibcore.setStartRioLog.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setDeployOffline",
+                "title": "%wpilibcore.setDeployOffline.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.createCommand",
+                "title": "%wpilibcore.createCommand.title%",
+                "category": "WPILib",
+                "icon": "resources/wpilib-icon.svg",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.cancelTasks",
+                "title": "%wpilibcore.cancelTasks.title%",
+                "category": "WPILib",
+                "icon": "resources/wpilib-icon.svg",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.help",
+                "title": "%wpilibcore.help.title%",
+                "category": "WPILib",
+                "icon": "resources/wpilib-icon.svg"
+            },
+            {
+                "command": "wpilibcore.openCommandPalette",
+                "title": "%wpilibcore.openCommandPalette.title%",
+                "category": "WPILib",
+                "icon": "resources/wpilib-icon.svg"
+            },
+            {
+                "command": "wpilibcore.refreshCppProperties",
+                "title": "%wpilibcore.refreshCppProperties.title%",
+                "category": "WPILib C++",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.selectCppToolchain",
+                "title": "%wpilibcore.selectCppToolchain.title%",
+                "category": "WPILib C++",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.selectCppBinaryTypes",
+                "title": "%wpilibcore.selectCppBinaryTypes.title%",
+                "category": "WPILib C++",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.importGradle2020Project",
+                "title": "%wpilibcore.importGradle2020Project.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.createNewProject",
+                "title": "%wpilibcore.createNewProject.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.manageVendorLibs",
+                "title": "%wpilibcore.manageVendorLibs.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setJavaHome",
+                "title": "%wpilibcore.setJavaHome.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.checkForUpdates",
+                "title": "%wpilibcore.checkForUpdates.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.installGradleTools",
+                "title": "%wpilibcore.installGradleTools.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.showLogFolder",
+                "title": "%wpilibcore.showLogFolder.title%",
+                "category": "WPILib"
+            },
+            {
+                "command": "wpilibcore.runGradleCommand",
+                "title": "%wpilibcore.runGradleCommand.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.resetAutoUpdate",
+                "title": "%wpilibcore.resetAutoUpdate.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.changeDesktop",
+                "title": "%wpilibcore.changeDesktop.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.openApiDocumentation",
+                "title": "%wpilibcore.openApiDocumentation.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.getProjectInformation",
+                "title": "%wpilibcore.getProjectInformation.title%",
+                "category": "WPILib",
+                "enablement": "isWPILibProject && isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.runGradleClean",
+                "title": "%wpilibcore.runGradleClean.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilib.refreshVendordeps",
+                "title": "Refresh",
+                "icon": "$(refresh)"
+            }
+        ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "cppDependencies",
+                    "name": "C++ Dependencies",
+                    "when": "isWPILibProvidedCpp"
+                }
+            ],
+            "wpilib-vendordeps": [
+                {
+                    "type": "webview",
+                    "id": "wpilib.dependencyView",
+                    "name": "WPILib Vendor Dependencies",
+                    "icon": "media/wpilib.png"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "wpilibcore.deployCode",
+                "key": "shift+F5",
+                "when": "isWPILibProject"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "wpilibcore.createCommand",
+                    "when": "false"
+                },
+                {
+                    "command": "wpilibcore.openCommandPalette",
+                    "when": "false"
+                }
+            ],
+            "editor/title": [
+                {
+                    "command": "wpilibcore.openCommandPalette",
+                    "group": "navigation@9"
+                },
+                {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.deployCode",
+                    "group": "wpilib@1"
+                },
+                {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.buildCode",
+                    "group": "wpilib@2"
+                },
+                {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.testCode",
+                    "group": "wpilib@3"
+                },
+                {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.simulateCode",
+                    "group": "wpilib@4"
+                },
+                {
+                    "when": "isWPILibProject",
+                    "command": "wpilibcore.simulateHwCode",
+                    "group": "wpilib@5"
+                },
+                {
+                    "command": "wpilibcore.startTool",
+                    "group": "wpilib@6"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.deployCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.buildCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.testCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.manageVendorLibs",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "explorerResourceIsFolder && isWPILibProject",
+                    "command": "wpilibcore.createCommand",
+                    "group": "wpilib"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "wpilib.refreshVendordeps",
+                    "group": "navigation"
+                }
+            ]
         }
-      }
-    ],
-    "jsonValidation": [
-      {
-        "fileMatch": "wpilib_preferences.json",
-        "url": "./resources/wpilibschema.json"
-      }
-    ],
-    "configuration": {
-      "type": "object",
-      "title": "WPILib configuration",
-      "properties": {
-        "wpilib.additionalGradleArguments": {
-          "type": "string",
-          "default": "",
-          "description": "For debugging only, passes extra arguments to gradle invocations",
-          "scope": "resource"
-        },
-        "wpilib.autoSaveOnDeploy": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically save all files on deploy",
-          "scope": "resource"
-        },
-        "wpilib.autoStartRioLog": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically start RioLog on deploy",
-          "scope": "resource"
-        },
-        "wpilib.alwaysAskForTeamNumber": {
-          "type": "boolean",
-          "default": false,
-          "description": "Always ask for a team number, even if set",
-          "scope": "resource"
-        },
-        "wpilib.offline": {
-          "type": "boolean",
-          "default": false,
-          "description": "Perform gradle commands other then deploy/debug with offline flag",
-          "scope": "resource"
-        },
-        "wpilib.deployOffline": {
-          "type": "boolean",
-          "default": true,
-          "description": "Perform gradle deploy command with offline flag",
-          "scope": "resource"
-        },
-        "wpilib.skipTests": {
-          "type": "boolean",
-          "default": false,
-          "description": "Set to skip running tests on build",
-          "scope": "resource"
-        },
-        "wpilib.skipSelectSimulateExtension": {
-          "type": "boolean",
-          "default": false,
-          "description": "Set to skip selection of simulation extensions",
-          "scope": "resource"
-        },
-        "wpilib.selectDefaultSimulateExtension": {
-          "type": "boolean",
-          "default": false,
-          "description": "Set to select all simulation extensions by default",
-          "scope": "resource"
-        },
-        "wpilib.stopSimulationOnEntry": {
-          "type": "boolean",
-          "default": false,
-          "description": "Set to make simulation code stop automatically on entry",
-          "scope": "resource"
-        },
-        "wpilib.useWindbgX": {
-          "type": "boolean",
-          "default": false,
-          "description": "Use WinDbg Preview (from store) as C++ debugger (Windows only)",
-          "scope": "resource"
-        }
-      }
     },
-    "commands": [
-      {
-        "command": "calicoColors.addColor",
-        "category": "Calico Colors",
-        "title": "Add Color"
-      },
-      {
-        "command": "calicoColors.clearColors",
-        "category": "Calico Colors",
-        "title": "Clear Colors",
-        "icon": "$(clear-all)"
-      },
-      {
-        "command": "wpilibcore.startRioLog",
-        "title": "%wpilibcore.startRioLog.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setTeamNumber",
-        "title": "%wpilibcore.setTeamNumber.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.startTool",
-        "title": "%wpilibcore.startTool.title%",
-        "category": "WPILib",
-        "icon": "resources/wpilib-icon.svg",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.buildCode",
-        "title": "%wpilibcore.buildCode.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.testCode",
-        "title": "%wpilibcore.testCode.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.deployCode",
-        "title": "%wpilibcore.deployCode.title%",
-        "category": "WPILib",
-        "icon": "resources/wpilib-icon.svg",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.debugCode",
-        "title": "%wpilibcore.debugCode.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.simulateCode",
-        "title": "%wpilibcore.simulateCode.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.simulateHwCode",
-        "title": "%wpilibcore.simulateHwCode.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setLanguage",
-        "title": "%wpilibcore.setLanguage.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setAutoSave",
-        "title": "%wpilibcore.setAutoSave.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setSkipTests",
-        "title": "%wpilibcore.setSkipTests.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setSelectDefaultSimulateExtension",
-        "title": "%wpilibcore.setSelectDefaultSimulateExtension.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setOffline",
-        "title": "%wpilibcore.setOffline.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setStopSimulationOnEntry",
-        "title": "%wpilibcore.setStopSimulationOnEntry.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setUseWinDbgX",
-        "title": "%wpilibcore.setUseWinDbgX.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setStartRioLog",
-        "title": "%wpilibcore.setStartRioLog.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setDeployOffline",
-        "title": "%wpilibcore.setDeployOffline.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.createCommand",
-        "title": "%wpilibcore.createCommand.title%",
-        "category": "WPILib",
-        "icon": "resources/wpilib-icon.svg",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.cancelTasks",
-        "title": "%wpilibcore.cancelTasks.title%",
-        "category": "WPILib",
-        "icon": "resources/wpilib-icon.svg",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.help",
-        "title": "%wpilibcore.help.title%",
-        "category": "WPILib",
-        "icon": "resources/wpilib-icon.svg"
-      },
-      {
-        "command": "wpilibcore.openCommandPalette",
-        "title": "%wpilibcore.openCommandPalette.title%",
-        "category": "WPILib",
-        "icon": "resources/wpilib-icon.svg"
-      },
-      {
-        "command": "wpilibcore.refreshCppProperties",
-        "title": "%wpilibcore.refreshCppProperties.title%",
-        "category": "WPILib C++",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.selectCppToolchain",
-        "title": "%wpilibcore.selectCppToolchain.title%",
-        "category": "WPILib C++",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.selectCppBinaryTypes",
-        "title": "%wpilibcore.selectCppBinaryTypes.title%",
-        "category": "WPILib C++",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.importGradle2020Project",
-        "title": "%wpilibcore.importGradle2020Project.title%",
-        "category": "WPILib"
-      },
-      {
-        "command": "wpilibcore.createNewProject",
-        "title": "%wpilibcore.createNewProject.title%",
-        "category": "WPILib"
-      },
-      {
-        "command": "wpilibcore.manageVendorLibs",
-        "title": "%wpilibcore.manageVendorLibs.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.setJavaHome",
-        "title": "%wpilibcore.setJavaHome.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.checkForUpdates",
-        "title": "%wpilibcore.checkForUpdates.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.installGradleTools",
-        "title": "%wpilibcore.installGradleTools.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.showLogFolder",
-        "title": "%wpilibcore.showLogFolder.title%",
-        "category": "WPILib"
-      },
-      {
-        "command": "wpilibcore.runGradleCommand",
-        "title": "%wpilibcore.runGradleCommand.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.resetAutoUpdate",
-        "title": "%wpilibcore.resetAutoUpdate.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.changeDesktop",
-        "title": "%wpilibcore.changeDesktop.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.openApiDocumentation",
-        "title": "%wpilibcore.openApiDocumentation.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.getProjectInformation",
-        "title": "%wpilibcore.getProjectInformation.title%",
-        "category": "WPILib",
-        "enablement": "isWPILibProject && isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilibcore.runGradleClean",
-        "title": "%wpilibcore.runGradleClean.title%",
-        "category": "WPILib",
-        "enablement": "isWorkspaceTrusted"
-      },
-      {
-        "command": "wpilib.refreshVendordeps",
-        "title": "Refresh",
-        "icon": "$(refresh)"
-      }
-    ],
-    "views": {
-      "explorer": [
-        {
-          "id": "cppDependencies",
-          "name": "C++ Dependencies",
-          "when": "isWPILibProvidedCpp"
-        }
-      ],
-      "wpilib-vendordeps": [
-        {
-          "type": "webview",
-          "id": "wpilib.dependencyView",
-          "name": "WPILib Vendor Dependencies",
-          "icon": "media/wpilib.png"
-        }
-      ]
+    "repository": "https://github.com/wpilibsuite/vscode-wpilib",
+    "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
+    "scripts": {
+        "vscode:prepublish": "gulp build && npm run lint && webpack --mode production",
+        "clean": "rmdir-cli out",
+        "lint": "eslint .",
+        "webpack": "webpack --mode development",
+        "webpack-watch": "webpack --mode development --watch",
+        "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
+        "gulp": "gulp",
+        "test": "npm run webpack && node ./node_modules/vscode/bin/test",
+        "updateActivation": "gulp update-activation",
+        "vscePackage": "vsce package"
     },
-    "keybindings": [
-      {
-        "command": "wpilibcore.deployCode",
-        "key": "shift+F5",
-        "when": "isWPILibProject"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "wpilibcore.createCommand",
-          "when": "false"
-        },
-        {
-          "command": "wpilibcore.openCommandPalette",
-          "when": "false"
+    "devDependencies": {
+        "@types/glob": "^7.1.3",
+        "@types/micromatch": "^4.0.1",
+        "@types/mkdirp": "^1.0.1",
+        "@types/mocha": "^8.0.3",
+        "@types/ncp": "^2.0.4",
+        "@types/node": "^10.2.0",
+        "@types/node-fetch": "^2.5.7",
+        "@types/triple-beam": "^1.3.1",
+        "@types/vscode": "1.57.0",
+        "@types/xml2js": "^0.4.5",
+        "@typescript-eslint/eslint-plugin": "^6.15.0",
+        "@typescript-eslint/parser": "^6.15.0",
+        "@vscode/vsce": "^2.20.1",
+        "copy-webpack-plugin": "^6.1.1",
+        "del": "^6.0.0",
+        "eslint": "^8.56.0",
+        "event-stream": "^4.0.1",
+        "gulp": "^4.0.2",
+        "gulp-filter": "^6.0.0",
+        "gulp-json-transform": "^0.4.7",
+        "gulp-sourcemaps": "^2.6.5",
+        "gulp-typescript": "^5.0.1",
+        "gulp-yaml": "^2.0.4",
+        "mocha": "^10.2.0",
+        "rmdir-cli": "^2.0.6",
+        "run-sequence": "^2.2.1",
+        "ts-loader": "^8.4.0",
+        "ts-node": "^9.1.1",
+        "typescript": "^3.9.5",
+        "vscode-nls-dev": "^4.0.4",
+        "webpack": "4.47.0",
+        "webpack-cli": "^3.3.12"
+    },
+    "dependencies": {
+        "@vscode-elements/elements": "^1.9.0",
+        "extract-zip": "^2.0.1",
+        "glob": "^7.1.6",
+        "java-properties": "^1.0.2",
+        "jsonc-parser": "^2.3.1",
+        "logform": "^2.2.0",
+        "micromatch": "^4.0.2",
+        "mkdirp": "^1.0.4",
+        "ncp": "^2.0.0",
+        "node-fetch": "^2.6.1",
+        "raw-loader": "^4.0.2",
+        "triple-beam": "^1.3.0",
+        "vscode-cpptools": "^6.1.0",
+        "vscode-jsonrpc": "^8.1.0",
+        "vscode-nls": "^5.2.0",
+        "vscode-wpilibapi": "^2021.1.1",
+        "winston": "^3.3.3",
+        "winston-transport": "^4.4.0",
+        "wpilib-riolog": "^0.2.0",
+        "xml2js": "^0.6.2"
+    },
+    "overrides": {
+        "webpack@4.47.0": {
+            "terser-webpack-plugin": "^4.2.3"
         }
-      ],
-      "editor/title": [
-        {
-          "command": "wpilibcore.openCommandPalette",
-          "group": "navigation@9"
-        },
-        {
-          "when": "isWPILibProject",
-          "command": "wpilibcore.deployCode",
-          "group": "wpilib@1"
-        },
-        {
-          "when": "isWPILibProject",
-          "command": "wpilibcore.buildCode",
-          "group": "wpilib@2"
-        },
-        {
-          "when": "isWPILibProject",
-          "command": "wpilibcore.testCode",
-          "group": "wpilib@3"
-        },
-        {
-          "when": "isWPILibProject",
-          "command": "wpilibcore.simulateCode",
-          "group": "wpilib@4"
-        },
-        {
-          "when": "isWPILibProject",
-          "command": "wpilibcore.simulateHwCode",
-          "group": "wpilib@5"
-        },
-        {
-          "command": "wpilibcore.startTool",
-          "group": "wpilib@6"
-        }
-      ],
-      "explorer/context": [
-        {
-          "when": "resourceFilename == build.gradle",
-          "command": "wpilibcore.deployCode",
-          "group": "wpilib"
-        },
-        {
-          "when": "resourceFilename == build.gradle",
-          "command": "wpilibcore.buildCode",
-          "group": "wpilib"
-        },
-        {
-          "when": "resourceFilename == build.gradle",
-          "command": "wpilibcore.testCode",
-          "group": "wpilib"
-        },
-        {
-          "when": "resourceFilename == build.gradle",
-          "command": "wpilibcore.manageVendorLibs",
-          "group": "wpilib"
-        },
-        {
-          "when": "explorerResourceIsFolder && isWPILibProject",
-          "command": "wpilibcore.createCommand",
-          "group": "wpilib"
-        }
-      ],
-      "view/title": [
-        {
-          "command": "wpilib.refreshVendordeps",
-          "group": "navigation"
-        }
-      ]
     }
-  },
-  "repository": "https://github.com/wpilibsuite/vscode-wpilib",
-  "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
-  "scripts": {
-    "vscode:prepublish": "gulp build && npm run lint && webpack --mode production",
-    "clean": "rmdir-cli out",
-    "lint": "eslint .",
-    "webpack": "webpack --mode development",
-    "webpack-watch": "webpack --mode development --watch",
-    "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
-    "gulp": "gulp",
-    "test": "npm run webpack && node ./node_modules/vscode/bin/test",
-    "updateActivation": "gulp update-activation",
-    "vscePackage": "vsce package"
-  },
-  "devDependencies": {
-    "@types/glob": "^7.1.3",
-    "@types/micromatch": "^4.0.1",
-    "@types/mkdirp": "^1.0.1",
-    "@types/mocha": "^8.0.3",
-    "@types/ncp": "^2.0.4",
-    "@types/node": "^10.2.0",
-    "@types/node-fetch": "^2.5.7",
-    "@types/triple-beam": "^1.3.1",
-    "@types/vscode": "1.57.0",
-    "@types/xml2js": "^0.4.5",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "@vscode/vsce": "^2.20.1",
-    "copy-webpack-plugin": "^6.1.1",
-    "del": "^6.0.0",
-    "eslint": "^8.56.0",
-    "event-stream": "^4.0.1",
-    "gulp": "^4.0.2",
-    "gulp-filter": "^6.0.0",
-    "gulp-json-transform": "^0.4.7",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-typescript": "^5.0.1",
-    "gulp-yaml": "^2.0.4",
-    "mocha": "^10.2.0",
-    "rmdir-cli": "^2.0.6",
-    "run-sequence": "^2.2.1",
-    "ts-loader": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^3.9.5",
-    "vscode-nls-dev": "^4.0.4",
-    "webpack": "4.47.0",
-    "webpack-cli": "^3.3.12"
-  },
-  "dependencies": {
-    "@vscode-elements/elements": "^1.9.0",
-    "@vscode/codicons": "^0.0.36",
-    "extract-zip": "^2.0.1",
-    "glob": "^7.1.6",
-    "java-properties": "^1.0.2",
-    "jsonc-parser": "^2.3.1",
-    "logform": "^2.2.0",
-    "micromatch": "^4.0.2",
-    "mkdirp": "^1.0.4",
-    "ncp": "^2.0.0",
-    "node-fetch": "^2.6.1",
-    "triple-beam": "^1.3.0",
-    "vscode-cpptools": "^6.1.0",
-    "vscode-jsonrpc": "^8.1.0",
-    "vscode-nls": "^5.2.0",
-    "vscode-wpilibapi": "^2021.1.1",
-    "winston": "^3.3.3",
-    "winston-transport": "^4.4.0",
-    "wpilib-riolog": "^0.2.0",
-    "xml2js": "^0.6.2"
-  },
-  "overrides": {
-    "webpack@4.47.0": {
-      "terser-webpack-plugin": "^4.2.3"
-    }
-  }
 }
