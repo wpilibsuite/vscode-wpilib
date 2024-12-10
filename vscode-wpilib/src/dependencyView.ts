@@ -1,14 +1,14 @@
-import * as vscode from "vscode";
-import * as fetch from "node-fetch";
-import { ProjectInfoGatherer, IProjectInfo } from "./projectinfo";
-import { VendorLibraries } from "./vendorlibraries";
-import { IJsonDependency } from "./shared/vendorlibrariesbase";
-import { IExternalAPI } from "vscode-wpilibapi";
-import { isNewerVersion } from "./versions";
-import { logger } from "./logger";
-import { localize as i18n } from "./locale";
+import * as vscode from 'vscode';
+import * as fetch from 'node-fetch';
+import { ProjectInfoGatherer, IProjectInfo } from './projectinfo';
+import { VendorLibraries } from './vendorlibraries';
+import { IJsonDependency } from './shared/vendorlibrariesbase';
+import { IExternalAPI } from 'vscode-wpilibapi';
+import { isNewerVersion } from './versions';
+import { logger } from './logger';
+import { localize as i18n } from './locale';
 // @ts-ignore
-import elements from "!!raw-loader!@vscode-elements/elements/dist/bundled.js";
+import elements from '!!raw-loader!@vscode-elements/elements/dist/bundled.js';
 export interface IJsonList {
   path: string;
   name: string;
@@ -31,7 +31,7 @@ export interface IJSMessage {
 }
 
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = "wpilib.dependencyView";
+  public static readonly viewType = 'wpilib.dependencyView';
   private projectInfo: ProjectInfoGatherer;
   private vendorLibraries: VendorLibraries;
   private viewInfo: IProjectInfo | undefined;
@@ -73,7 +73,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
       localResourceRoots: [
         this._extensionUri,
-        vscode.Uri.joinPath(this._extensionUri, "media"),
+        vscode.Uri.joinPath(this._extensionUri, 'media'),
       ],
     };
 
@@ -81,7 +81,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       .getPreferencesAPI()
       .getFirstOrSelectedWorkspace();
     if (this.wp === undefined) {
-      logger.warn("no workspace");
+      logger.warn('no workspace');
       return;
     }
 
@@ -105,7 +105,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     });
 
     this.viewInfo?.vendorLibraries.forEach((item) =>
-      console.log(item.name.concat(" / ", item.version))
+      console.log(item.name.concat(' / ', item.version))
     );
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
@@ -113,23 +113,23 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage((data) => {
       if (this.isJSMessage(data)) {
         switch (data.type) {
-          case "install": {
+          case 'install': {
             void this.install(data.index);
             break;
           }
-          case "uninstall": {
+          case 'uninstall': {
             void this.uninstall(data.index);
             break;
           }
-          case "update": {
+          case 'update': {
             void this.update(data.version, data.index);
             break;
           }
-          case "updateall": {
+          case 'updateall': {
             void this.updateall();
             break;
           }
-          case "blur": {
+          case 'blur': {
             if (this.wp) {
               if (this.changed > this.vendorLibraries.getLastBuild()) {
                 this.externalApi
@@ -150,7 +150,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private isJSMessage(object: unknown): object is IJSMessage {
     const maybeJSMessage = object as IJSMessage;
-    return maybeJSMessage && typeof maybeJSMessage.type === "string";
+    return maybeJSMessage && typeof maybeJSMessage.type === 'string';
   }
 
   private async update(version: string, indexString: string) {
@@ -271,7 +271,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           }
         } else {
           vscode.window.showErrorMessage(
-            i18n("message", "{0}", conflictdep.errorMessage),
+            i18n('message', '{0}', conflictdep.errorMessage),
             { modal: true }
           );
         }
@@ -284,7 +284,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     if (avail && this.wp) {
       // Check to see if it is already a URL
       let url = avail.path;
-      if (url.substring(0, 4) !== "http") {
+      if (url.substring(0, 4) !== 'http') {
         url = this.ghURL + url;
       }
       try {
@@ -301,14 +301,14 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public addDependency() {
     if (this._view) {
-      this._view.webview.postMessage({ type: "addDependency" });
+      this._view.webview.postMessage({ type: 'addDependency' });
     }
   }
 
   public updateDependencies() {
     if (this._view) {
       this._view.webview.postMessage({
-        type: "updateDependencies",
+        type: 'updateDependencies',
         installed: this.installedList,
         available: this.availableDepsList,
       });
@@ -333,7 +333,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       if (this.installedDeps.length !== 0) {
         for (const id of this.installedDeps) {
           let versionList = [
-            { version: id.version, buttonText: i18n("ui", "To Latest") },
+            { version: id.version, buttonText: i18n('ui', 'To Latest') },
           ];
           for (const ad of this.availableDeps) {
             if (id.uuid === ad.uuid) {
@@ -342,12 +342,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 if (isNewerVersion(ad.version, id.version)) {
                   versionList.push({
                     version: ad.version,
-                    buttonText: i18n("ui", "Update"),
+                    buttonText: i18n('ui', 'Update'),
                   });
                 } else {
                   versionList.push({
                     version: ad.version,
-                    buttonText: i18n("ui", "Downgrade"),
+                    buttonText: i18n('ui', 'Downgrade'),
                   });
                 }
               }
@@ -460,18 +460,18 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     try {
       this.onlineDeps = await this.loadFileFromUrl(listURL);
     } catch (err) {
-      logger.log("Error fetching file", err);
+      logger.log('Error fetching file', err);
       this.onlineDeps = [];
     }
     this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
-        path: i18n("ui", homedep.jsonUrl),
-        name: i18n("ui", homedep.name),
-        version: i18n("ui", homedep.version),
-        uuid: i18n("ui", homedep.uuid),
-        description: i18n("ui", "Loaded from Local Copy"),
-        website: i18n("ui", "Loaded from Local Copy"),
+        path: i18n('ui', homedep.jsonUrl),
+        name: i18n('ui', homedep.name),
+        version: i18n('ui', homedep.version),
+        uuid: i18n('ui', homedep.uuid),
+        description: i18n('ui', 'Loaded from Local Copy'),
+        website: i18n('ui', 'Loaded from Local Copy'),
       };
       const found = this.onlineDeps.find(
         (onlinedep) =>
@@ -491,7 +491,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       timeout: 5000,
     });
     if (response === undefined) {
-      throw new Error("Failed to fetch file");
+      throw new Error('Failed to fetch file');
     }
     if (response.status >= 200 && response.status <= 300) {
       const text = await response.text();
@@ -499,10 +499,10 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       if (this.isJsonList(json)) {
         return json;
       } else {
-        throw new Error("Incorrect JSON format");
+        throw new Error('Incorrect JSON format');
       }
     } else {
-      throw new Error("Bad status " + response.status);
+      throw new Error('Bad status ' + response.status);
     }
   }
 
@@ -523,14 +523,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
     const createUri = (fp: string) => {
       return webview.asWebviewUri(
-        vscode.Uri.joinPath(this._extensionUri, ...fp.split("/"))
+        vscode.Uri.joinPath(this._extensionUri, ...fp.split('/'))
       );
     };
 
     const scriptUri = createUri(`media/main.js`);
     const styleUri = createUri(`media/main.css`);
     const codiconUri = createUri(`media/icons.css`);
-
 
     // Return the complete HTML
     return `
@@ -558,3 +557,4 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         `;
   }
 }
+

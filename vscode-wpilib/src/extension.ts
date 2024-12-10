@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // // These must be in the files to translate
 // // This cannot be placed in a library.
@@ -6,46 +6,46 @@
 // const config = JSON.parse(process.env.VSCODE_NLS_CONFIG as string);
 // const localize = nls.config(config as nls.Options)();
 
-import * as path from "path";
-import * as vscode from "vscode";
-import { IExternalAPI } from "vscode-wpilibapi";
-import { BuildTestAPI } from "./buildtestapi";
-import { BuiltinTools } from "./builtintools";
-import { CommandAPI } from "./commandapi";
-import { activateCpp } from "./cpp/cpp";
-import { ApiProvider } from "./cppprovider/apiprovider";
-import { DeployDebugAPI } from "./deploydebugapi";
-import { ExecuteAPI } from "./executor";
-import { activateJava } from "./java/java";
-import { findJdkPath } from "./jdkdetector";
-import { localize as i18n } from "./locale";
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { IExternalAPI } from 'vscode-wpilibapi';
+import { BuildTestAPI } from './buildtestapi';
+import { BuiltinTools } from './builtintools';
+import { CommandAPI } from './commandapi';
+import { activateCpp } from './cpp/cpp';
+import { ApiProvider } from './cppprovider/apiprovider';
+import { DeployDebugAPI } from './deploydebugapi';
+import { ExecuteAPI } from './executor';
+import { activateJava } from './java/java';
+import { findJdkPath } from './jdkdetector';
+import { localize as i18n } from './locale';
 import {
   closeLogger,
   getMainLogFile,
   logger,
   setLoggerDirectory,
-} from "./logger";
-import { PersistentFolderState } from "./persistentState";
-import { Preferences } from "./preferences";
-import { PreferencesAPI } from "./preferencesapi";
-import { ProjectInfoGatherer } from "./projectinfo";
-import { ExampleTemplateAPI } from "./shared/exampletemplateapi";
-import { UtilitiesAPI } from "./shared/utilitiesapi";
-import { addVendorExamples } from "./shared/vendorexamples";
-import { ToolAPI } from "./toolapi";
+} from './logger';
+import { PersistentFolderState } from './persistentState';
+import { Preferences } from './preferences';
+import { PreferencesAPI } from './preferencesapi';
+import { ProjectInfoGatherer } from './projectinfo';
+import { ExampleTemplateAPI } from './shared/exampletemplateapi';
+import { UtilitiesAPI } from './shared/utilitiesapi';
+import { addVendorExamples } from './shared/vendorexamples';
+import { ToolAPI } from './toolapi';
 import {
   existsAsync,
   mkdirpAsync,
   setExtensionContext,
   setJavaHome,
-} from "./utilities";
-import { fireVendorDepsChanged, VendorLibraries } from "./vendorlibraries";
-import { createVsCommands } from "./vscommands";
-import { Gradle2020Import } from "./webviews/gradle2020import";
-import { Help } from "./webviews/help";
-import { ProjectCreator } from "./webviews/projectcreator";
-import { WPILibUpdates } from "./wpilibupdates";
-import { DependencyViewProvider } from "./dependencyView";
+} from './utilities';
+import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
+import { createVsCommands } from './vscommands';
+import { Gradle2020Import } from './webviews/gradle2020import';
+import { Help } from './webviews/help';
+import { ProjectCreator } from './webviews/projectcreator';
+import { WPILibUpdates } from './wpilibupdates';
+import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
@@ -130,15 +130,15 @@ async function handleAfterTrusted(
   let jdkLoc = await findJdkPath(externalApi);
 
   if (jdkLoc !== undefined) {
-    if (jdkLoc.endsWith("\\") || jdkLoc.endsWith("/")) {
+    if (jdkLoc.endsWith('\\') || jdkLoc.endsWith('/')) {
       jdkLoc = jdkLoc.substring(0, jdkLoc.length - 1);
     }
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(
       i18n(
-        "message",
-        "Java 17 required, but not found. Might have compilation errors."
+        'message',
+        'Java 17 required, but not found. Might have compilation errors.'
       )
     );
   }
@@ -152,7 +152,7 @@ async function handleAfterTrusted(
     // Add built in tools
     context.subscriptions.push(await BuiltinTools.Create(externalApi));
   } catch (err) {
-    logger.error("error creating built in tool handler", err);
+    logger.error('error creating built in tool handler', err);
     creationError = true;
   }
 
@@ -168,7 +168,7 @@ async function handleAfterTrusted(
       vendorLibs
     );
   } catch (err) {
-    logger.error("error creating vendor lib utilities", err);
+    logger.error('error creating vendor lib utilities', err);
     creationError = true;
   }
 
@@ -178,7 +178,7 @@ async function handleAfterTrusted(
     wpilibUpdate = new WPILibUpdates(externalApi);
     context.subscriptions.push(wpilibUpdate);
   } catch (err) {
-    logger.error("error creating wpilib updater", err);
+    logger.error('error creating wpilib updater', err);
     creationError = true;
   }
 
@@ -194,7 +194,7 @@ async function handleAfterTrusted(
       context.subscriptions.push(projectInfo);
     }
   } catch (err) {
-    logger.error("error creating project info gatherer", err);
+    logger.error('error creating project info gatherer', err);
     creationError = true;
   }
 
@@ -218,14 +218,17 @@ async function handleAfterTrusted(
 
       if (depProvider !== undefined) {
         context.subscriptions.push(
-          vscode.commands.registerCommand("wpilib.addDependency", () => {
+          vscode.commands.registerCommand('wpilib.addDependency', () => {
             depProvider?.addDependency();
           })
         );
         context.subscriptions.push(
-          vscode.commands.registerCommand("wpilib.refreshVendordeps", async () => {
-           await depProvider?.refresh();
-          })
+          vscode.commands.registerCommand(
+            'wpilib.refreshVendordeps',
+            async () => {
+              await depProvider?.refresh();
+            }
+          )
         );
 
         /*         context.subscriptions.push(
@@ -234,7 +237,7 @@ async function handleAfterTrusted(
           })) */
 
         context.subscriptions.push(
-          vscode.commands.registerCommand("wpilib.updateDependencies", () => {
+          vscode.commands.registerCommand('wpilib.updateDependencies', () => {
             depProvider?.updateDependencies();
           })
         );
@@ -243,7 +246,7 @@ async function handleAfterTrusted(
       context.subscriptions.push(depProvider);
     }
   } catch (err) {
-    logger.error("error creating dependency view", err);
+    logger.error('error creating dependency view', err);
     creationError = true;
   }
 
@@ -258,8 +261,8 @@ async function handleAfterTrusted(
       const prefs = externalApi.getPreferencesAPI().getPreferences(w);
       if (prefs.getIsWPILibProject()) {
         const vendorDepsPattern = new vscode.RelativePattern(
-          path.join(w.uri.fsPath, "vendordeps"),
-          "**/*.json"
+          path.join(w.uri.fsPath, 'vendordeps'),
+          '**/*.json'
         );
         const vendorDepsWatcher =
           vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
@@ -276,31 +279,31 @@ async function handleAfterTrusted(
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
-        if (prefs.getProjectYear() === "intellisense") {
-          logger.log("Intellisense only build project found");
+        if (prefs.getProjectYear() === 'intellisense') {
+          logger.log('Intellisense only build project found');
           continue;
         }
 
-        if (prefs.getProjectYear() !== "2025beta") {
+        if (prefs.getProjectYear() !== '2025beta') {
           const importPersistantState = new PersistentFolderState(
-            "wpilib.2025betapersist",
+            'wpilib.2025betapersist',
             false,
             w.uri.fsPath
           );
           if (importPersistantState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
-                "message",
-                "This project is not compatible with this version of the extension. Would you like to import this project into 2025beta?"
+                'message',
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2025beta?'
               ),
               {
                 modal: true,
               },
-              { title: "Yes" },
-              { title: "No", isCloseAffordance: true },
+              { title: 'Yes' },
+              { title: 'No', isCloseAffordance: true },
               { title: "No, Don't ask again" }
             );
-            if (upgradeResult?.title === "Yes") {
+            if (upgradeResult?.title === 'Yes') {
               if (gradle2020import) {
                 await gradle2020import.startWithProject(w.uri);
               }
@@ -312,8 +315,8 @@ async function handleAfterTrusted(
         }
 
         if (
-          prefs.getCurrentLanguage() === "cpp" ||
-          prefs.getCurrentLanguage() === "java"
+          prefs.getCurrentLanguage() === 'cpp' ||
+          prefs.getCurrentLanguage() === 'java'
         ) {
           let didUpdate: boolean = false;
           if (wpilibUpdate) {
@@ -321,23 +324,23 @@ async function handleAfterTrusted(
           }
 
           let runBuild: boolean = !(await existsAsync(
-            path.join(w.uri.fsPath, "build")
+            path.join(w.uri.fsPath, 'build')
           ));
 
           if (didUpdate) {
             const result = await vscode.window.showInformationMessage(
               i18n(
-                "message",
+                'message',
                 'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
-                  "Would you like to do this now?"
+                  'Would you like to do this now?'
               ),
               {
                 modal: true,
               },
-              { title: i18n("ui", "Yes") },
-              { title: i18n("ui", "No"), isCloseAffordance: true }
+              { title: i18n('ui', 'Yes') },
+              { title: i18n('ui', 'No'), isCloseAffordance: true }
             );
-            if (result?.title !== i18n("ui", "Yes")) {
+            if (result?.title !== i18n('ui', 'Yes')) {
               runBuild = false;
             }
           }
@@ -363,7 +366,7 @@ async function handleAfterTrusted(
         }
 
         const persistentState = new PersistentFolderState(
-          "wpilib.newProjectHelp",
+          'wpilib.newProjectHelp',
           false,
           w.uri.fsPath
         );
@@ -376,7 +379,7 @@ async function handleAfterTrusted(
         }
       } else {
         const persistentState = new PersistentFolderState(
-          "wpilib.invalidFolder",
+          'wpilib.invalidFolder',
           false,
           w.uri.fsPath
         );
@@ -385,9 +388,9 @@ async function handleAfterTrusted(
           // Only go 1 subfolder deep
           const pattern = new vscode.RelativePattern(
             w,
-            "*/" +
+            '*/' +
               Preferences.wpilibPreferencesFolder +
-              "/" +
+              '/' +
               Preferences.preferenceFileName
           );
 
@@ -397,47 +400,47 @@ async function handleAfterTrusted(
             // Only 1 subfolder found, likely it
             const openResult = await vscode.window.showInformationMessage(
               i18n(
-                "message",
-                "Incorrect folder opened for WPILib project. " +
-                  "The correct folder was found in a subfolder, " +
-                  "Would you like to open it? Selecting no will cause many tasks to not work."
+                'message',
+                'Incorrect folder opened for WPILib project. ' +
+                  'The correct folder was found in a subfolder, ' +
+                  'Would you like to open it? Selecting no will cause many tasks to not work.'
               ),
               {
                 modal: true,
               },
-              { title: i18n("ui", "Yes") },
-              { title: i18n("ui", "No"), isCloseAffordance: true },
-              { title: i18n("ui", "No, Don't ask again for this folder") }
+              { title: i18n('ui', 'Yes') },
+              { title: i18n('ui', 'No'), isCloseAffordance: true },
+              { title: i18n('ui', "No, Don't ask again for this folder") }
             );
-            if (openResult?.title === i18n("ui", "Yes")) {
+            if (openResult?.title === i18n('ui', 'Yes')) {
               const wpRoot = vscode.Uri.file(
                 path.dirname(path.dirname(wpilibFiles[0].fsPath))
               );
               await vscode.commands.executeCommand(
-                "vscode.openFolder",
+                'vscode.openFolder',
                 wpRoot,
                 false
               );
             } else if (
               openResult?.title ===
-              i18n("ui", "No, Don't ask again for this folder")
+              i18n('ui', "No, Don't ask again for this folder")
             ) {
               persistentState.Value = true;
             }
           } else if (wpilibFiles.length > 1) {
             // Multiple subfolders found
             const openResult = await vscode.window.showInformationMessage(
-              "Incorrect folder opened for WPILib project. " +
-                "Multiple possible subfolders found, " +
-                "Would you like to open one? Selecting no will cause many tasks to not work.",
+              'Incorrect folder opened for WPILib project. ' +
+                'Multiple possible subfolders found, ' +
+                'Would you like to open one? Selecting no will cause many tasks to not work.',
               {
                 modal: true,
               },
-              { title: i18n("ui", "Yes") },
-              { title: i18n("ui", "No"), isCloseAffordance: true },
-              { title: i18n("ui", "No, Don't ask again for this folder") }
+              { title: i18n('ui', 'Yes') },
+              { title: i18n('ui', 'No'), isCloseAffordance: true },
+              { title: i18n('ui', "No, Don't ask again for this folder") }
             );
-            if (openResult?.title === i18n("ui", "Yes")) {
+            if (openResult?.title === i18n('ui', 'Yes')) {
               const list = wpilibFiles.map((value) => {
                 const fullRoot = path.dirname(path.dirname(value.fsPath));
                 const baseFolder = path.basename(fullRoot);
@@ -451,14 +454,14 @@ async function handleAfterTrusted(
               });
               if (picked !== undefined) {
                 await vscode.commands.executeCommand(
-                  "vscode.openFolder",
+                  'vscode.openFolder',
                   picked.fullFolder,
                   false
                 );
               }
             } else if (
               openResult?.title ===
-              i18n("ui", "No, Don't ask again for this folder")
+              i18n('ui', "No, Don't ask again for this folder")
             ) {
               persistentState.Value = true;
             }
@@ -470,7 +473,7 @@ async function handleAfterTrusted(
 
   if (creationError) {
     vscode.window.showErrorMessage(
-      "A portion of WPILib failed to initialize. See log for details"
+      'A portion of WPILib failed to initialize. See log for details'
     );
   }
 
@@ -492,7 +495,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Resources folder is used for gradle template along with HTML files
   const extensionResourceLocation = path.join(
     context.extensionPath,
-    "resources"
+    'resources'
   );
 
   // The external API can be used by other extensions that want to use our
@@ -502,12 +505,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
 
-  const logPath = path.join(frcHomeDir, "logs");
+  const logPath = path.join(frcHomeDir, 'logs');
   try {
     await mkdirpAsync(logPath);
     setLoggerDirectory(logPath);
   } catch (err) {
-    logger.error("Error creating logger", err);
+    logger.error('Error creating logger', err);
   }
 
   let creationError: boolean = false;
@@ -519,7 +522,7 @@ export async function activate(context: vscode.ExtensionContext) {
     help = await Help.Create(extensionResourceLocation);
     context.subscriptions.push(help);
   } catch (err) {
-    logger.error("error creating help window provider", err);
+    logger.error('error creating help window provider', err);
     creationError = true;
   }
 
@@ -530,7 +533,7 @@ export async function activate(context: vscode.ExtensionContext) {
     gradle2020import = await Gradle2020Import.Create(extensionResourceLocation);
     context.subscriptions.push(gradle2020import);
   } catch (err) {
-    logger.error("error creating gradle 2020 importer", err);
+    logger.error('error creating gradle 2020 importer', err);
     creationError = true;
   }
 
@@ -542,18 +545,18 @@ export async function activate(context: vscode.ExtensionContext) {
     );
     context.subscriptions.push(projectcreator);
   } catch (err) {
-    logger.error("error creating project creator", err);
+    logger.error('error creating project creator', err);
     creationError = true;
   }
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("wpilibcore.showLogFolder", async () => {
+    vscode.commands.registerCommand('wpilibcore.showLogFolder', async () => {
       let mainLog = getMainLogFile();
       if (!(await existsAsync(mainLog))) {
         mainLog = path.dirname(mainLog);
       }
       await vscode.commands.executeCommand(
-        "revealFileInOS",
+        'revealFileInOS',
         vscode.Uri.file(mainLog)
       );
     })
@@ -561,11 +564,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "wpilibcore.openCommandPalette",
+      'wpilibcore.openCommandPalette',
       async () => {
         await vscode.commands.executeCommand(
-          "workbench.action.quickOpen",
-          ">WPILib "
+          'workbench.action.quickOpen',
+          '>WPILib '
         );
       }
     )
@@ -574,7 +577,7 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!vscode.workspace.isTrusted) {
     if (creationError) {
       vscode.window.showErrorMessage(
-        "A portion of WPILib failed to initialize. See log for details"
+        'A portion of WPILib failed to initialize. See log for details'
       );
     }
 
@@ -607,3 +610,4 @@ export async function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
   closeLogger();
 }
+
