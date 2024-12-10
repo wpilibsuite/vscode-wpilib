@@ -1,12 +1,6 @@
-body {
-  scrollbar-gutter: stable;
-}
 .installed-dependency,
 .available-dependency {
   margin-bottom: 10px;
-  &:last-of-type {
-    margin-bottom: 10px;
-  }
   &:first-of-type {
     margin-top: 10px;
   }
@@ -16,9 +10,16 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  &:has(#updateall-action) {
+      margin-top: 4px;
+  }
+}
+
+#updateall-action {
+  width: 100%;
 }
 .name {
-  font-weight: bold;
+  font-weight: 600;
 }
 .downloads {
   display: flex;
@@ -29,6 +30,7 @@ body {
 }
 .details {
   margin-top: 5px;
+  color: var(--vscode-descriptionForeground);
 }
 .update {
   display: flex;
@@ -44,4 +46,8 @@ body {
 
 vscode-collapsible::part(body) {
   overflow: visible;
+}
+
+vscode-single-select {
+  flex-shrink: 2;
 }

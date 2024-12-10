@@ -26,6 +26,7 @@
       topLine.appendChild(
         Object.assign(document.createElement('span'), {
           textContent: dep.name,
+          className: 'name',
         })
       );
       topLine.appendChild(
@@ -136,6 +137,7 @@
       topLine.appendChild(
         Object.assign(document.createElement('span'), {
           textContent: dep.name,
+          className: 'name',
         })
       );
 
@@ -208,4 +210,5 @@
 
   addEventListeners();
 })();
+
 
