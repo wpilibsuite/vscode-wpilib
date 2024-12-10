@@ -542,6 +542,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 <script type="module">
                   ${elements}
                 </script>
+                
+                <link rel="preload" href="${styleUri}" as="style">
+                <link rel="preload" href="${codiconUri}" as="style">
+                <link rel="preload" href="${scriptUri}" as="script">
+                
                 <link rel="stylesheet" href="${styleUri}">
                 <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
             </head>
