@@ -34,7 +34,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private installedList: IDepInstalled[] = []; // To display deps in the installed list
   private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
   private externalApi: IExternalAPI;
-  private vendordepMarketplaceURL = `https://wpilib.jfrog.io/artifactory/vendordeps/vendordep-marketplace/`;
+  private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
   private wp: vscode.WorkspaceFolder | undefined;
   private changed = 0;
 
