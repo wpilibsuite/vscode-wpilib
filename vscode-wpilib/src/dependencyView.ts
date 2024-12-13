@@ -15,6 +15,7 @@ export interface IJsonList {
   uuid: string;
   description: string;
   website: string;
+  instructions: string;
 }
 
 export interface IDepInstalled { name: string; currentVersion: string; versionInfo: { version: string, buttonText: string }[]; }
@@ -226,7 +227,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           const success = await this.vendorLibraries.installDependency(dep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
 
           if (success) {
-            await vscode.commands.executeCommand('extension.showWebsite', avail.website, dep.name);
+            if (avail.instructions) {
+              await vscode.commands.executeCommand('extension.showWebsite', avail.instructions, dep.name);
+            }
             this.changed = Date.now();
 
             if (dep.requires) {
@@ -236,11 +239,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 reqDep = this.availableDepsList.find(requiredDep => requiredDep.uuid === required.uuid);
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  const reqsuccess = await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
-
-                  if (reqsuccess) {
-                    await vscode.commands.executeCommand('extension.showWebsite', avail.website, dep.name);
-                  }
+                  await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                  // Do not show install instructions for required deps only selected.
                 }
               }
             }
@@ -411,7 +411,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           version: i18n('ui', homedep.version),
           uuid: i18n('ui', homedep.uuid),
           description: i18n('ui', 'Loaded from Local Copy'),
-          website: i18n('ui', 'Loaded from Local Copy')
+          website: i18n('ui', 'Loaded from Local Copy'),
+          instructions: i18n('ui', 'Loaded from Local Copy')
       };
       const found = this.onlineDeps.find(onlinedep => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version);
       if (!found) {
