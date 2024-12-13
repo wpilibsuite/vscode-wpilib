@@ -222,6 +222,11 @@ async function handleAfterTrusted(externalApi: ExternalAPI, context: vscode.Exte
           continue;
         }
 
+        if ((prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java')) {
+          logger.log('Project with Unknown Language: ' + prefs.getCurrentLanguage());
+          continue;
+        }
+
         if (prefs.getProjectYear() !== '2025beta') {
           const importPersistantState = new PersistentFolderState('wpilib.2025betapersist', false, w.uri.fsPath);
           if (importPersistantState.Value === false) {
