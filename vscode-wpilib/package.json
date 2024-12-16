@@ -54,7 +54,7 @@
         "onCommand:wpilibcore.openApiDocumentation",
         "onCommand:wpilibcore.getProjectInformation",
         "onCommand:wpilibcore.runGradleClean",
-        "onCommand:wpilib.refreshVendordeps"
+        "onCommand:wpilib.refreshVendordeps",
         "onCommand:extension.showWebsite"
     ],
     "main": "./out/extension",
