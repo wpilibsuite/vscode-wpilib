@@ -55,6 +55,7 @@
         "onCommand:wpilibcore.getProjectInformation",
         "onCommand:wpilibcore.runGradleClean",
         "onCommand:wpilib.refreshVendordeps"
+        "onCommand:extension.showWebsite"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -411,7 +412,12 @@
                 "command": "wpilib.refreshVendordeps",
                 "title": "Refresh",
                 "icon": "$(refresh)"
+            },
+            {                
+                "command": "extension.showWebsite",
+                "title": "Show Website"
             }
+
         ],
         "views": {
             "explorer": [

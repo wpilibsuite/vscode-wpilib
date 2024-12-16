@@ -16,6 +16,7 @@ export interface IJsonList {
   uuid: string;
   description: string;
   website: string;
+  instructions: string;
 }
 
 export interface IDepInstalled {
@@ -43,7 +44,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private installedList: IDepInstalled[] = []; // To display deps in the installed list
   private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
   private externalApi: IExternalAPI;
-  private ghURL = `https://raw.githubusercontent.com/wpilibsuite/vendor-json-repo/master/`;
+  private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
   private wp: vscode.WorkspaceFolder | undefined;
   private changed = 0;
 
@@ -249,6 +250,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           );
 
           if (success) {
+            if (avail.instructions) {
+              await vscode.commands.executeCommand('extension.showWebsite', avail.instructions, dep.name);
+            }
             this.changed = Date.now();
 
             if (dep.requires) {
@@ -260,11 +264,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 );
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  await this.vendorLibraries.installDependency(
-                    newDep,
-                    this.vendorLibraries.getWpVendorFolder(this.wp),
-                    true
-                  );
+                  await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                  // Do not show install instructions for required deps only selected.
                 }
               }
             }
@@ -285,7 +286,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       // Check to see if it is already a URL
       let url = avail.path;
       if (url.substring(0, 4) !== 'http') {
-        url = this.ghURL + url;
+        url = this.vendordepMarketplaceURL + url;
       }
       try {
         dependency = await this.vendorLibraries.getJsonDepURL(url);
@@ -455,8 +456,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
     this.homeDeps = [];
-    const listURL =
-      this.ghURL + `${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`;
+    const listURL = this.vendordepMarketplaceURL + `${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`;
     try {
       this.onlineDeps = await this.loadFileFromUrl(listURL);
     } catch (err) {
@@ -466,12 +466,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
-        path: i18n('ui', homedep.jsonUrl),
-        name: i18n('ui', homedep.name),
-        version: i18n('ui', homedep.version),
-        uuid: i18n('ui', homedep.uuid),
-        description: i18n('ui', 'Loaded from Local Copy'),
-        website: i18n('ui', 'Loaded from Local Copy'),
+          path: i18n('ui', homedep.jsonUrl),
+          name: i18n('ui', homedep.name),
+          version: i18n('ui', homedep.version),
+          uuid: i18n('ui', homedep.uuid),
+          description: i18n('ui', 'Loaded from Local Copy'),
+          website: i18n('ui', 'Loaded from Local Copy'),
+          instructions: i18n('ui', 'Loaded from Local Copy')
       };
       const found = this.onlineDeps.find(
         (onlinedep) =>
