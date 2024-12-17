@@ -456,12 +456,17 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
     this.homeDeps = [];
-    const listURL = this.vendordepMarketplaceURL + `${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`;
-    try {
-      this.onlineDeps = await this.loadFileFromUrl(listURL);
-    } catch (err) {
-      logger.log('Error fetching file', err);
+    if(this.wp === undefined) {
       this.onlineDeps = [];
+    } else {
+      const projectYear = this.externalApi.getPreferencesAPI().getPreferences(this.wp).getProjectYear();
+      const manifestURL = this.vendordepMarketplaceURL + `${projectYear}.json`;
+      try {
+        this.onlineDeps = await this.loadFileFromUrl(manifestURL);
+      } catch (err) {
+        logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
+        this.onlineDeps = [];
+      }
     }
     this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
