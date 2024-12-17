@@ -456,7 +456,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
     this.homeDeps = [];
-    const listURL = this.vendordepMarketplaceURL + `${this.externalApi.getUtilitiesAPI().getFrcYear()}.json`;
+    const listURL = this.vendordepMarketplaceURL + `2025beta.json`;
     try {
       this.onlineDeps = await this.loadFileFromUrl(listURL);
     } catch (err) {
