@@ -1,40 +1,53 @@
-body {
-	background-color: transparent;
+.installed-dependency,
+.available-dependency {
+  margin-bottom: 10px;
+  &:first-of-type {
+    margin-top: 10px;
+  }
+}
+.top-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  &:has(#updateall-action) {
+      margin-top: 4px;
+  }
 }
 
-.color-list {
-	list-style: none;
-	padding: 0;
+#updateall-action {
+  width: 100%;
+}
+.name {
+  font-weight: 600;
+}
+.downloads {
+  display: flex;
+  align-items: center;
+}
+.icon {
+  margin-left: 5px;
+}
+.details {
+  margin-top: 5px;
+  color: var(--vscode-descriptionForeground);
+}
+.update {
+  display: flex;
+  gap: 4px;
+}
+.uninstall-button {
+  padding: 4px;
+  & > vscode-icon {
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+  }
 }
 
-.color-entry {
-	width: 100%;
-	display: flex;
-	margin-bottom: 0.4em;
-	border: 1px solid var(--vscode-input-border);
+vscode-collapsible::part(body) {
+  overflow: visible;
 }
 
-.color-preview {
-	width: 2em;
-	height: 2em;
-}
-
-.color-preview:hover {
-	outline: inset white;
-}
-
-.color-input {
-	display: block;
-	flex: 1;
-	width: 100%;
-	color: var(--vscode-input-foreground);
-	background-color: var(--vscode-input-background);
-	border: none;
-	padding: 0 0.6em;
-}
-
-.add-color-button {
-	display: block;
-	border: none;
-	margin: 0 auto;
+vscode-single-select {
+  flex-shrink: 2;
 }
