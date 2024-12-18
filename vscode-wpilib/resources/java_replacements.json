@@ -147,13 +147,13 @@
       { "from": "MutableMeasure<Velocity<Distance>>", "to": "MutLinearVelocity" },
       { "from": "MutableMeasure<Velocity<Angle>>", "to": "MutAngularVelocity" },
       { "from": "MutableMeasure<Velocity<Velocity<Distance>>>", "to": "MutLinearAcceleration" },
-      { "from": "MutableMeasure<Velocity<Velocity<Angle>>>", "to": "MutAngularAcceleration" }
+      { "from": "MutableMeasure<Velocity<Velocity<Angle>>>", "to": "MutAngularAcceleration" },
       { "from": "Measure<(\\w*)>", "to": "$1" },
       { "from": "Measure<Velocity<Distance>>", "to": "LinearVelocity" },
       { "from": "Measure<Velocity<Angle>>", "to": "AngularVelocity" },
       { "from": "Measure<Velocity<Velocity<Distance>>>", "to": "LinearAcceleration" },
       { "from": "Measure<Velocity<Velocity<Angle>>>", "to": "AngularAcceleration" },
-      { "from": "MutableMeasure.zero\\((\\w*)\\)", "to": "$1.mutable(0)" },
+      { "from": "MutableMeasure.zero\\((\\w*)\\)", "to": "$1.mutable(0)" }
     ]
   }
 ]
