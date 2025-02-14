@@ -29,6 +29,7 @@
         "onCommand:wpilibcore.setAutoSave",
         "onCommand:wpilibcore.setSkipTests",
         "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
+        "onCommand:wpilibcore.setSkipSelectSimulateExtension",
         "onCommand:wpilibcore.setOffline",
         "onCommand:wpilibcore.setStopSimulationOnEntry",
         "onCommand:wpilibcore.setUseWinDbgX",
@@ -256,6 +257,12 @@
             {
                 "command": "wpilibcore.setSelectDefaultSimulateExtension",
                 "title": "%wpilibcore.setSelectDefaultSimulateExtension.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.setSkipSelectSimulateExtension",
+                "title": "%wpilibcore.setSkipSelectSimulateExtension.title%",
                 "category": "WPILib",
                 "enablement": "isWorkspaceTrusted"
             },
