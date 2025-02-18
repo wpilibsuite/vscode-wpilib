@@ -30,6 +30,12 @@ deploy {
                     deleteOldFiles = false // Change to true to delete files on roboRIO that no
                                            // longer exist in deploy directory of this project
                 }
+
+                // deploy and debug info artifact
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('build/debug/')
+                    directory = '/home/lvuser/debug'
+                }
             }
         }
     }
