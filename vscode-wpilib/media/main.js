@@ -10,12 +10,12 @@
   // Function to generate HTML for installed dependencies
   function populateInstalledList(installed, container) {
     // Create HTML for installed dependencies
-    const badge = Object.assign(document.createElement('vscode-badge'), {
-      variant: 'counter',
-      slot: 'decorations',
+    const badge = Object.assign(document.createElement('span'), {
+      className: 'vscode-badge counter',
       textContent: installed.length,
     });
-    container.replaceChildren(badge);
+    document.querySelector('#installed-actions')?.replaceChildren(badge);
+    container.replaceChildren();
     installed.forEach((dep, index) => {
       const installedDep = Object.assign(document.createElement('div'), {
         className: 'installed-dependency',
@@ -38,18 +38,29 @@
       const update = Object.assign(document.createElement('div'), {
         className: 'update',
       });
-      const versionSelect = update.appendChild(
-        Object.assign(document.createElement('vscode-single-select'), {
+      const selectContainer = update.appendChild(
+        Object.assign(document.createElement('div'), {
+          className: 'vscode-select',
+        })
+      );
+      selectContainer.appendChild(
+        Object.assign(document.createElement('i'), {
+          className: 'codicon codicon-chevron-right chevron-icon',
+        })
+      );
+      const versionSelect = selectContainer.appendChild(
+        Object.assign(document.createElement('select'), {
           id: `version-select-${index}`,
         })
       );
       const versionAction = update.appendChild(
-        Object.assign(document.createElement('vscode-button'), {
+        Object.assign(document.createElement('button'), {
+          className: 'vscode-button',
           id: `version-action-${index}`,
         })
       );
       dep.versionInfo.forEach((versionTuple, i) => {
-        const option = document.createElement('vscode-option');
+        const option = document.createElement('option');
         option.value = versionTuple.version;
         option.textContent = versionTuple.version;
         if (dep.currentVersion === versionTuple.version) {
@@ -98,15 +109,15 @@
       });
 
       const uninstallAction = update.appendChild(
-        Object.assign(document.createElement('vscode-button'), {
+        Object.assign(document.createElement('button'), {
           id: `uninstall-action-${index}`,
-          className: 'uninstall-button',
+          className: 'uninstall-button vscode-button',
         })
       );
       uninstallAction.setAttribute('data-dependency', dep.name);
       uninstallAction.appendChild(
-        Object.assign(document.createElement('vscode-icon'), {
-          name: 'trash',
+        Object.assign(document.createElement('i'), {
+          className: 'codicon codicon-trash',
         })
       );
 
@@ -121,12 +132,12 @@
 
   // Function to generate HTML for available dependencies
   function populateAvailableList(available, container) {
-    const badge = Object.assign(document.createElement('vscode-badge'), {
-      variant: 'counter',
-      slot: 'decorations',
+    const badge = Object.assign(document.createElement('span'), {
+      className: 'vscode-badge counter',
       textContent: available.length,
     });
-    container.replaceChildren(badge);
+    document.querySelector('#available-actions')?.replaceChildren(badge);
+    container.replaceChildren();
     available.forEach((dep, index) => {
       const availableDep = Object.assign(document.createElement('div'), {
         className: 'available-dependency',
@@ -142,8 +153,9 @@
       );
 
       const installAction = topLine.appendChild(
-        Object.assign(document.createElement('vscode-button'), {
+        Object.assign(document.createElement('button'), {
           id: `install-action-${index}`,
+          className: 'vscode-button',
           textContent: 'Install',
         })
       );
@@ -210,5 +222,4 @@
 
   addEventListeners();
 })();
-
 

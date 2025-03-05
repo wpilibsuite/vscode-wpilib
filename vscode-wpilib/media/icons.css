@@ -11,7 +11,7 @@
 @font-face {
   font-family: "codicon";
   font-display: block;
-  src: url("./codicon.ttf?fb200efcd350cfb53f94163fb5066b25") format("truetype");
+  src: url("./codicon.ttf?ed24506d9e88cf1f96cdc07c81de74e0") format("truetype");
 }
 
 .codicon[class*="codicon-"] {
@@ -62,6 +62,5 @@
  *  Icons
  *-------------------*/
 
-.codicon-trash:before {
-  content: "\ea81";
-}
+.codicon-trash:before { content: "\ea81" }
+.codicon-chevron-right:before { content: "\eab6" }

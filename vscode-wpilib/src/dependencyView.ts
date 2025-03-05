@@ -8,7 +8,6 @@ import { isNewerVersion } from './versions';
 import { logger } from './logger';
 import { localize as i18n } from './locale';
 // @ts-ignore
-import elements from '!!raw-loader!@vscode-elements/elements/dist/bundled.js';
 export interface IJsonList {
   path: string;
   name: string;
@@ -251,7 +250,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
           if (success) {
             if (avail.instructions) {
-              await vscode.commands.executeCommand('extension.showWebsite', avail.instructions, dep.name);
+              await vscode.commands.executeCommand(
+                'extension.showWebsite',
+                avail.instructions,
+                dep.name
+              );
             }
             this.changed = Date.now();
 
@@ -264,7 +267,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 );
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  await this.vendorLibraries.installDependency(newDep, this.vendorLibraries.getWpVendorFolder(this.wp), true);
+                  await this.vendorLibraries.installDependency(
+                    newDep,
+                    this.vendorLibraries.getWpVendorFolder(this.wp),
+                    true
+                  );
                   // Do not show install instructions for required deps only selected.
                 }
               }
@@ -456,28 +463,35 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
     this.homeDeps = [];
-    if(this.wp === undefined) {
+    if (this.wp === undefined) {
       this.onlineDeps = [];
     } else {
-      const projectYear = this.externalApi.getPreferencesAPI().getPreferences(this.wp).getProjectYear();
+      const projectYear = this.externalApi
+        .getPreferencesAPI()
+        .getPreferences(this.wp)
+        .getProjectYear();
       const manifestURL = this.vendordepMarketplaceURL + `${projectYear}.json`;
       try {
         this.onlineDeps = await this.loadFileFromUrl(manifestURL);
       } catch (err) {
-        logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
+        logger.log(
+          'Error fetching vendordep marketplace manifest',
+          manifestURL,
+          err
+        );
         this.onlineDeps = [];
       }
     }
     this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
-          path: i18n('ui', homedep.jsonUrl),
-          name: i18n('ui', homedep.name),
-          version: i18n('ui', homedep.version),
-          uuid: i18n('ui', homedep.uuid),
-          description: i18n('ui', 'Loaded from Local Copy'),
-          website: i18n('ui', 'Loaded from Local Copy'),
-          instructions: i18n('ui', 'Loaded from Local Copy')
+        path: i18n('ui', homedep.jsonUrl),
+        name: i18n('ui', homedep.name),
+        version: i18n('ui', homedep.version),
+        uuid: i18n('ui', homedep.uuid),
+        description: i18n('ui', 'Loaded from Local Copy'),
+        website: i18n('ui', 'Loaded from Local Copy'),
+        instructions: i18n('ui', 'Loaded from Local Copy'),
       };
       const found = this.onlineDeps.find(
         (onlinedep) =>
@@ -544,11 +558,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                     <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Vendor Dependencies</title>
-                <script type="module">
-                  ${elements}
-                </script>
-                
+                <title>Vendor Dependencies</title>                
                 <link rel="preload" href="${styleUri}" as="style">
                 <link rel="preload" href="${codiconUri}" as="style">
                 <link rel="preload" href="${scriptUri}" as="script">
@@ -558,14 +568,36 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             </head>
             <body>
                 <div class="top-line">
-                    <vscode-button id="updateall-action">Update All</vscode-button>
+                    <button id="updateall-action" class="vscode-button block">Update All</button>
                 </div>
-                <vscode-collapsible title="Installed Dependencies" id="installed-dependencies" open></vscode-collapsible>
-                <vscode-collapsible title="Available Dependencies" id="available-dependencies" open></vscode-collapsible>
+                <details class="vscode-collapsible" open>
+                  <summary>
+                    <i class="codicon codicon-chevron-right icon-arrow"></i>
+                    <h2 class="title">
+                      Installed Dependencies
+                    </h2>
+                    <div class="actions" id="installed-actions"></div>
+                  </summary>
+                  <div id="installed-dependencies"></div>
+                </details>
+                <details class="vscode-collapsible"  open>
+                  <summary>
+                    <i class="codicon codicon-chevron-right icon-arrow"></i>
+                    <h2 class="title">
+                      Available Dependencies
+                    </h2>
+                    <div class="actions" id="available-actions"></div>
+                  </summary>
+                  <div id="available-dependencies"></div>
+                </details>
                 <script src="${scriptUri}"></script>
             </body>
             </html>
         `;
   }
 }
+
+
+
+
 
