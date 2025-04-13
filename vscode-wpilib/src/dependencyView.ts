@@ -536,6 +536,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     const scriptUri = createUri(`media/main.js`);
     const styleUri = createUri(`media/main.css`);
     const codiconUri = createUri(`media/icons.css`);
+    const projectYear = this.wp ? this.externalApi.getPreferencesAPI().getPreferences(this.wp).getProjectYear() : 'Unknown';
 
     // Return the complete HTML
     return `
@@ -560,8 +561,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 <div class="top-line">
                     <vscode-button id="updateall-action">Update All</vscode-button>
                 </div>
-                <vscode-collapsible title="Installed Dependencies" id="installed-dependencies" open></vscode-collapsible>
-                <vscode-collapsible title="Available Dependencies" id="available-dependencies" open></vscode-collapsible>
+                <vscode-collapsible title="Installed Dependencies: ${projectYear}" id="installed-dependencies" open></vscode-collapsible>
+                <vscode-collapsible title="Available Dependencies: ${projectYear}" id="available-dependencies" open></vscode-collapsible>
                 <script src="${scriptUri}"></script>
             </body>
             </html>
