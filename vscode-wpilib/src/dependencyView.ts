@@ -596,8 +596,3 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         `;
   }
 }
-
-
-
-
-
