@@ -420,11 +420,10 @@
                 "title": "Refresh",
                 "icon": "$(refresh)"
             },
-            {                
+            {
                 "command": "extension.showWebsite",
                 "title": "Show Website"
             }
-
         ],
         "views": {
             "explorer": [
@@ -580,7 +579,6 @@
         "webpack-cli": "^3.3.12"
     },
     "dependencies": {
-        "@vscode-elements/elements": "^1.9.0",
         "extract-zip": "^2.0.1",
         "glob": "^7.1.6",
         "java-properties": "^1.0.2",
