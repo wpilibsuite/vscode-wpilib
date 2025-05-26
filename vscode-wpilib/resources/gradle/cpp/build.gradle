@@ -1,14 +1,14 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO" version "###GRADLERIOREPLACE###"
+    id "edu.wpi.first.GradleRIO2027" version "###GRADLERIOREPLACE###"
 }
 
-// Define my targets (RoboRIO) and artifacts (deployable files)
+// Define my targets (SystemCore) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
     targets {
-        roborio(getTargetTypeClass('RoboRIO')) {
+        systemcore(getTargetTypeClass('SystemCore')) {
             // Team number is loaded either from the .wpilib/wpilib_preferences.json
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
@@ -26,8 +26,8 @@ deploy {
                 // Static files artifact
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
-                    directory = '/home/lvuser/deploy'
-                    deleteOldFiles = false // Change to true to delete files on roboRIO that no
+                    directory = '/home/systemcore/deploy'
+                    deleteOldFiles = false // Change to true to delete files on SystemCore that no
                                            // longer exist in deploy directory of this project
                 }
             }
@@ -35,7 +35,7 @@ deploy {
     }
 }
 
-def deployArtifact = deploy.targets.roborio.artifacts.frcCpp
+def deployArtifact = deploy.targets.systemcore.artifacts.frcCpp
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
@@ -51,7 +51,7 @@ wpi.sim.addDriverstation()
 model {
     components {
         frcUserProgram(NativeExecutableSpec) {
-            targetPlatform wpi.platforms.roborio
+            targetPlatform wpi.platforms.systemcore
             if (includeDesktopSupport) {
                 targetPlatform wpi.platforms.desktop
             }
