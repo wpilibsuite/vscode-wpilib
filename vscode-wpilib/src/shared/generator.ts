@@ -87,7 +87,7 @@ export async function generateCopyCpp(resourcesFolder: string, fromTemplateFolde
       await mkdirpAsync(deployDir);
 
       await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', ['generateCppDeployHint',
-        `Files placed in this directory will be deployed to the RoboRIO into the
+        `Files placed in this directory will be deployed to SystemCore into the
   'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
   function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
   directory.` ]));
@@ -287,7 +287,7 @@ export async function generateCopyJava(resourcesFolder: string, fromTemplateFold
       await mkdirpAsync(deployDir);
 
       await writeFileAsync(path.join(deployDir, 'example.txt'), i18n('generator', ['generateJavaDeployHint',
-        `Files placed in this directory will be deployed to the RoboRIO into the
+        `Files placed in this directory will be deployed to SystemCore into the
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.` ]));
     }
