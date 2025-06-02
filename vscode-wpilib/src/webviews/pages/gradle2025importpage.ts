@@ -1,19 +1,19 @@
 'use strict';
 
-import { IGradle2020IPCReceive, IGradle2020IPCSend } from './gradle2020importpagetypes';
+import { IGradle2025IPCReceive, IGradle2025IPCSend } from './gradle2025importpagetypes';
 import { validateProject, validateTeamNumber, validateProjectFolder, validateXrpRomi } from './sharedpages';
 
 interface IVsCodeApi {
-  postMessage(message: IGradle2020IPCReceive): void;
+  postMessage(message: IGradle2025IPCReceive): void;
 }
 
 declare function acquireVsCodeApi(): IVsCodeApi;
 
 const vscode = acquireVsCodeApi();
 
-function gradle2020SelectButtonClick() {
+function gradle2025SelectButtonClick() {
   (document.activeElement as HTMLElement).blur();
-  vscode.postMessage({ type: 'gradle2020' });
+  vscode.postMessage({ type: 'gradle2025' });
 }
 
 function projectSelectButtonClick() {
@@ -36,7 +36,7 @@ function importProjectButtonClick() {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
       romi: (document.getElementById('romiCB') as HTMLInputElement).checked,
       xrp: (document.getElementById('xrpCB') as HTMLInputElement).checked,
-      fromProps: (document.getElementById('gradle2020Input') as HTMLInputElement).value,
+      fromProps: (document.getElementById('gradle2025Input') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
       teamNumber: (document.getElementById('teamNumber') as HTMLInputElement).value,
@@ -47,10 +47,10 @@ function importProjectButtonClick() {
 }
 
 window.addEventListener('message', (event) => {
-  const data = event.data as IGradle2020IPCSend;
+  const data = event.data as IGradle2025IPCSend;
   switch (data.type) {
-    case 'gradle2020':
-      (document.getElementById('gradle2020Input') as HTMLInputElement).value = data.data;
+    case 'gradle2025':
+      (document.getElementById('gradle2025Input') as HTMLInputElement).value = data.data;
       break;
     case 'projectname':
       const doc = document.getElementById('projectName') as HTMLInputElement;
@@ -74,7 +74,7 @@ window.addEventListener('message', (event) => {
 });
 
 window.addEventListener('load', (_: Event) => {
-  document.getElementById('gradle2020SelectButton')!.onclick = gradle2020SelectButtonClick;
+  document.getElementById('gradle2025SelectButton')!.onclick = gradle2025SelectButtonClick;
   document.getElementById('projectSelectButton')!.onclick = projectSelectButtonClick;
   document.getElementById('projectName')!.oninput = validateProject;
   document.getElementById('teamNumber')!.oninput = validateTeamNumber;

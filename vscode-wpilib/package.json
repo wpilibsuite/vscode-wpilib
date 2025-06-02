@@ -42,7 +42,7 @@
         "onCommand:wpilibcore.refreshCppProperties",
         "onCommand:wpilibcore.selectCppToolchain",
         "onCommand:wpilibcore.selectCppBinaryTypes",
-        "onCommand:wpilibcore.importGradle2020Project",
+        "onCommand:wpilibcore.importGradle2025Project",
         "onCommand:wpilibcore.createNewProject",
         "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
@@ -341,8 +341,8 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
-                "command": "wpilibcore.importGradle2020Project",
-                "title": "%wpilibcore.importGradle2020Project.title%",
+                "command": "wpilibcore.importGradle2025Project",
+                "title": "%wpilibcore.importGradle2025Project.title%",
                 "category": "WPILib"
             },
             {
