@@ -1,6 +1,6 @@
 'use strict';
 
-export interface IGradle2020IPCData {
+export interface IGradle2025IPCData {
   desktop: boolean;
   romi: boolean;
   xrp: boolean;
@@ -11,12 +11,12 @@ export interface IGradle2020IPCData {
   teamNumber: string;
 }
 
-export interface IGradle2020IPCReceive {
+export interface IGradle2025IPCReceive {
   type: string;
-  data?: IGradle2020IPCData;
+  data?: IGradle2025IPCData;
 }
 
-export interface IGradle2020IPCSend {
+export interface IGradle2025IPCSend {
   type: string;
   data: string;
 }

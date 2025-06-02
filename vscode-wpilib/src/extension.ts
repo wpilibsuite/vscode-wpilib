@@ -41,7 +41,7 @@ import {
 } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
-import { Gradle2020Import } from './webviews/gradle2020import';
+import { Gradle2025Import } from './webviews/gradle2025import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
@@ -122,7 +122,7 @@ async function handleAfterTrusted(
   context: vscode.ExtensionContext,
   creationError: boolean,
   extensionResourceLocation: string,
-  gradle2020import: Gradle2020Import | undefined,
+  gradle2025import: Gradle2025Import | undefined,
   help: Help | undefined
 ) {
   // Only trusted workspace code can occur below here
@@ -309,8 +309,8 @@ async function handleAfterTrusted(
               { title: "No, Don't ask again" }
             );
             if (upgradeResult?.title === 'Yes') {
-              if (gradle2020import) {
-                await gradle2020import.startWithProject(w.uri);
+              if (gradle2025import) {
+                await gradle2025import.startWithProject(w.uri);
               }
             } else if (upgradeResult?.title === "No, Don't ask again") {
               importPersistantState.Value = true;
@@ -531,14 +531,14 @@ export async function activate(context: vscode.ExtensionContext) {
     creationError = true;
   }
 
-  let gradle2020import: Gradle2020Import | undefined;
+  let gradle2025import: Gradle2025Import | undefined;
 
   try {
-    // Create the gradle 2020 import provider
-    gradle2020import = await Gradle2020Import.Create(extensionResourceLocation);
-    context.subscriptions.push(gradle2020import);
+    // Create the gradle 2025 import provider
+    gradle2025import = await Gradle2025Import.Create(extensionResourceLocation);
+    context.subscriptions.push(gradle2025import);
   } catch (err) {
-    logger.error('error creating gradle 2020 importer', err);
+    logger.error('error creating gradle 2025 importer', err);
     creationError = true;
   }
 
@@ -592,7 +592,7 @@ export async function activate(context: vscode.ExtensionContext) {
         context,
         creationError,
         extensionResourceLocation,
-        gradle2020import,
+        gradle2025import,
         help
       );
     });
@@ -604,7 +604,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context,
     creationError,
     extensionResourceLocation,
-    gradle2020import,
+    gradle2025import,
     help
   );
 
