@@ -1,14 +1,15 @@
 'use strict';
 
+import { readFile } from 'fs/promises';
 import * as json from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
+import { findJdkPath, getJavaVersion } from './jdkdetector';
 import { logger } from './logger';
-import { extensionContext, readFileAsync } from './utilities';
+import { extensionContext } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
 import { WPILibUpdates } from './wpilibupdates';
-import { findJdkPath, getJavaVersion } from './jdkdetector';
 
 export interface IVendorLibraryPair {
   name: string;
@@ -152,7 +153,7 @@ Vendor Libraries:
     const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
-    const packageJson = await readFileAsync(extensionPackageJson, 'utf8');
+    const packageJson = await readFile(extensionPackageJson, 'utf8');
     const currentVsCodeVersion: string = json.parse(packageJson).version;
     const currentProjectYear: string = prefs.getProjectYear();
     const currentLanguage: string = prefs.getCurrentLanguage();

@@ -1,5 +1,6 @@
 'use strict';
 
+import { access, readdir, readFile, writeFile } from 'fs/promises';
 import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -8,7 +9,6 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
-import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './utilities';
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
@@ -163,7 +163,7 @@ export class WPILibUpdates {
 
   public async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
     try {
-      const gradleBuildFile = await readFileAsync(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
+      const gradleBuildFile = await readFile(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
 
       const matchRes = getGradleRioRegex().exec(gradleBuildFile);
 
@@ -189,11 +189,11 @@ export class WPILibUpdates {
   public async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
     try {
       const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
-      const gradleBuildFile = await readFileAsync(buildFile, 'utf8');
+      const gradleBuildFile = await readFile(buildFile, 'utf8');
 
       const newgFile = gradleBuildFile.replace(getGradleRioRegex(), `$1${version}$3`);
 
-      await writeFileAsync(buildFile, newgFile);
+      await writeFile(buildFile, newgFile);
     } catch (err) {
       logger.error('error setting wpilib (gradlerio) version', err);
       return;
@@ -275,13 +275,14 @@ export class WPILibUpdates {
     const frcHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
     const gradleRioPath = path.join(frcHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
     try {
-      const files = await readdirAsync(gradleRioPath);
+      const files = await readdir(gradleRioPath);
       const versions = [];
       for (const file of files) {
-        const pth = path.join(gradleRioPath, file, `GradleRIO-${file}.pom`);
-        const isGR = await existsAsync(pth);
-        if (isGR) {
+        try {
+          await access(path.join(gradleRioPath, file, `GradleRIO-${file}.pom`));
           versions.push(file);
+        } catch {
+          // Ignore
         }
       }
       if (versions.length === 0) {

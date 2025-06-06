@@ -1,17 +1,10 @@
 'use strict';
 
+import { access, mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises';
 import * as fetch from 'node-fetch';
 import * as path from 'path';
 import { IUtilitiesAPI } from '../api';
 import { logger } from '../logger';
-import {
-  deleteFileAsync,
-  existsAsync,
-  mkdirpAsync,
-  readdirAsync,
-  readFileAsync,
-  writeFileAsync,
-} from '../utilities';
 
 export interface IJsonDependency {
   name: string;
@@ -68,16 +61,15 @@ export class VendorLibrariesBase {
     override: boolean
   ): Promise<boolean> {
     try {
-      const dirExists = await existsAsync(url);
-
-      if (!dirExists) {
-        await mkdirpAsync(url);
-        // Directly write file
-        await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+      try {
+        await access(url);
+      } catch {
+        // File doesn't exist, directly write file
+        await mkdir(url, { recursive: true });
+        await writeFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
         return true;
       }
-
-      const files = await readdirAsync(url);
+      const files = await readdir(url);
 
       for (const file of files) {
         const fullPath = path.join(url, file);
@@ -85,7 +77,7 @@ export class VendorLibrariesBase {
         if (result !== undefined) {
           if (result.uuid === dep.uuid) {
             if (override) {
-              await deleteFileAsync(fullPath);
+              await unlink(fullPath);
               break;
             } else {
               return false;
@@ -94,7 +86,7 @@ export class VendorLibrariesBase {
         }
       }
 
-      await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+      await writeFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
       return true;
     } catch (error) {
       logger.error(`Failed to install dependency ${dep.name}:`, error);
@@ -108,7 +100,7 @@ export class VendorLibrariesBase {
 
   protected async readFile(file: string): Promise<IJsonDependency | undefined> {
     try {
-      const jsonContents = await readFileAsync(file, 'utf8');
+      const jsonContents = await readFile(file, 'utf8');
       const dep = JSON.parse(jsonContents);
 
       if (isJsonDependency(dep)) {
@@ -124,7 +116,7 @@ export class VendorLibrariesBase {
 
   protected async getDependencies(dir: string): Promise<IJsonDependency[]> {
     try {
-      const files = await readdirAsync(dir);
+      const files = await readdir(dir);
 
       const promises: Promise<IJsonDependency | undefined>[] = [];
 

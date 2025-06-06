@@ -1,11 +1,11 @@
 'use strict';
+import { access, mkdir, readFile, writeFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IPreferences } from './api';
 import { localize as i18n } from './locale';
 import { IPreferencesJson } from './shared/preferencesjson';
-import { existsAsync, mkdirAsync, readFileAsync, writeFileAsync } from './utilities';
 
 const defaultPreferences: IPreferencesJson = {
   currentLanguage: 'none',
@@ -205,13 +205,14 @@ export class Preferences implements IPreferences {
   private async asyncInitialize() {
     const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
 
-    if (await existsAsync(configFilePath)) {
+    try {
+      await access(configFilePath);
       vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
       this.isWPILibProject = true;
       this.preferencesFile = vscode.Uri.file(configFilePath);
       this.preferencesJson = defaultPreferences;
       await this.updatePreferences();
-    } else {
+    } catch {
       // Set up defaults, and create
       this.preferencesJson = defaultPreferences;
     }
@@ -227,7 +228,7 @@ export class Preferences implements IPreferences {
       return;
     }
 
-    const results = await readFileAsync(this.preferencesFile.fsPath, 'utf8');
+    const results = await readFile(this.preferencesFile.fsPath, 'utf8');
     this.preferencesJson = jsonc.parse(results) as IPreferencesJson;
   }
 
@@ -235,12 +236,9 @@ export class Preferences implements IPreferences {
     if (this.preferencesFile === undefined) {
       const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
       this.preferencesFile = vscode.Uri.file(configFilePath);
-      await mkdirAsync(path.dirname(this.preferencesFile.fsPath));
+      await mkdir(path.dirname(this.preferencesFile.fsPath));
     }
-    await writeFileAsync(
-      this.preferencesFile.fsPath,
-      JSON.stringify(this.preferencesJson, null, 4)
-    );
+    await writeFile(this.preferencesFile.fsPath, JSON.stringify(this.preferencesJson, null, 4));
   }
 
   private async noTeamNumberLogic(): Promise<number> {

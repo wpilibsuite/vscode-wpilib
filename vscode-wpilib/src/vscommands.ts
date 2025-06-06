@@ -1,5 +1,6 @@
 'use strict';
 
+import { access } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
@@ -9,7 +10,7 @@ import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
-import { existsAsync, getDesktopEnabled, gradleRun, javaHome } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
 
 // Most of our commands are created here.
@@ -309,7 +310,9 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
       const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
 
-      if (!(await existsAsync(buildgradle))) {
+      try {
+        await access(buildgradle);
+      } catch {
         logger.log('build.gradle not found at: ', buildgradle);
         return;
       }
@@ -348,10 +351,11 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const homeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
       if (pick === 'Java') {
         const indexFile = path.join(homeDir, 'documentation', 'java', 'index.html');
-        if (await existsAsync(indexFile)) {
+        try {
+          await access(indexFile);
           await vscode.env.openExternal(vscode.Uri.file(indexFile));
           return;
-        } else {
+        } catch {
           try {
             const downloadDir = await downloadDocs(
               'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/documentation/',
@@ -369,10 +373,11 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         }
       } else if (pick === 'C++') {
         const indexFile = path.join(homeDir, 'documentation', 'cpp', 'index.html');
-        if (await existsAsync(indexFile)) {
+        try {
+          await access(indexFile);
           await vscode.env.openExternal(vscode.Uri.file(indexFile));
           return;
-        } else {
+        } catch {
           try {
             const downloadDir = await downloadDocs(
               'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibc/documentation/',
