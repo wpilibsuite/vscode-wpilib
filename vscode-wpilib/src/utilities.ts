@@ -1,9 +1,6 @@
 'use strict';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
-import * as ncp from 'ncp';
 import * as path from 'path';
-import * as util from 'util';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from './api';
 import { localize as i18n } from './locale';
@@ -52,38 +49,6 @@ export async function getPackageName(): Promise<string | undefined> {
   });
   return packageName;
 }
-
-export const statAsync = util.promisify(fs.stat);
-
-export const readFileAsync = util.promisify(fs.readFile);
-
-export const writeFileAsync = util.promisify(fs.writeFile);
-
-export const copyFileAsync = util.promisify(fs.copyFile);
-
-export const mkdirAsync = util.promisify(fs.mkdir);
-
-export const existsAsync = util.promisify(fs.exists);
-
-export const deleteFileAsync = util.promisify(fs.unlink);
-
-export const mkdirpAsync = mkdirp;
-
-export function ncpAsync(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
-  return mkdirpAsync(dest).then(() => {
-    return new Promise<void>((resolve, reject) => {
-      ncp.ncp(source, dest, options, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  });
-}
-
-export const readdirAsync = util.promisify(fs.readdir);
 
 export let javaHome: string | undefined;
 export function setJavaHome(jhome: string): void {

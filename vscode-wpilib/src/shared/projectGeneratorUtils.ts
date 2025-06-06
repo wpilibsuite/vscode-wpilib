@@ -1,10 +1,10 @@
 'use strict';
 
+import { cp, mkdir, readFile, writeFile } from 'fs/promises';
 import * as glob from 'glob';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { mkdirpAsync, ncpAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
@@ -77,13 +77,15 @@ export async function setupProjectStructure(
 ): Promise<boolean> {
   try {
     // Copy gradle files
-    await ncpAsync(fromGradleFolder, toFolder, {
+    await cp(fromGradleFolder, toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
+      recursive: true,
     });
 
     // Copy shared gradle files
-    await ncpAsync(path.join(grRoot, 'shared'), toFolder, {
+    await cp(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
+      recursive: true,
     });
 
     // Set execute permissions on gradlew
@@ -128,7 +130,7 @@ export async function setupDeployDirectory(
     }
 
     const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
-    await mkdirpAsync(deployDir);
+    await mkdir(deployDir, { recursive: true });
 
     const hintKey = isJava ? 'generateJavaDeployHint' : 'generateCppDeployHint';
     const hintText = isJava
@@ -140,10 +142,7 @@ to get a proper path relative to the deploy directory.`
 function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
 directory.`;
 
-    await writeFileAsync(
-      path.join(deployDir, 'example.txt'),
-      i18n('generator', [hintKey, hintText])
-    );
+    await writeFile(path.join(deployDir, 'example.txt'), i18n('generator', [hintKey, hintText]));
 
     return true;
   } catch (error) {
@@ -162,7 +161,7 @@ export async function setupVendorDeps(
 ): Promise<boolean> {
   try {
     const vendorDir = path.join(toFolder, 'vendordeps');
-    await mkdirpAsync(vendorDir);
+    await mkdir(vendorDir, { recursive: true });
 
     // Add Commands V2
     await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDS, vendorDir);
@@ -188,5 +187,5 @@ export async function setupVendorDeps(
  */
 export async function getGradleRioVersion(grRoot: string): Promise<string> {
   const grVersionFile = path.join(grRoot, 'version.txt');
-  return (await readFileAsync(grVersionFile, 'utf8')).trim();
+  return (await readFile(grVersionFile, 'utf8')).trim();
 }

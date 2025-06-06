@@ -1,9 +1,10 @@
 'use strict';
 
 import * as cp from 'child_process';
+import { access, readFile } from 'fs/promises';
 import * as path from 'path';
 import { IExternalAPI, IPreferencesAPI, IToolRunner, IUtilitiesAPI } from './api';
-import { existsAsync, getIsWindows, readFileAsync } from './utilities';
+import { getIsWindows } from './utilities';
 
 interface ITool {
   name: string;
@@ -60,18 +61,13 @@ export class BuiltinTools {
     const homeTools = await bt.enumerateHomeTools();
     const isWindows = getIsWindows();
     for (const ht of homeTools.tools) {
-      if (isWindows) {
-        const toolPath = path.join(homeTools.dir, ht.name + '.exe');
-        if (await existsAsync(toolPath)) {
-          // Tool exists, add it
-          toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
-        }
-      } else {
-        const toolPath = path.join(homeTools.dir, ht.name);
-        if (await existsAsync(toolPath)) {
-          // Tool exists, add it
-          toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
-        }
+      const toolPath = path.join(homeTools.dir, ht.name + (isWindows ? '.exe' : ''));
+      try {
+        await access(toolPath);
+        // Tool exists, add it
+        toolApi.addTool(new VbsToolRunner(toolPath, ht.name, api.getPreferencesAPI()));
+      } catch {
+        // Ignore
       }
     }
     return bt;
@@ -94,7 +90,7 @@ export class BuiltinTools {
     const toolsJson = path.join(toolsDir, 'tools.json');
 
     try {
-      const jsonFileContents = await readFileAsync(toolsJson, 'utf8');
+      const jsonFileContents = await readFile(toolsJson, 'utf8');
       const jsonResult = JSON.parse(jsonFileContents) as ITool[];
       return {
         dir: toolsDir,

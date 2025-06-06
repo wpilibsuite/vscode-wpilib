@@ -1,9 +1,9 @@
 'use strict';
 
 import * as fs from 'fs';
+import { mkdir } from 'fs/promises';
 import * as fetch from 'node-fetch';
 import * as path from 'path';
-import { mkdirpAsync } from './utilities';
 
 const FILE_DOWNLOAD_TIMEOUT = 30000; // 30 seconds
 
@@ -32,7 +32,7 @@ export async function downloadFileToStream(url: string, destPath: string): Promi
     });
   }
 
-  await mkdirpAsync(path.dirname(destPath));
+  await mkdir(path.dirname(destPath), { recursive: true });
 
   const stream = fs.createWriteStream(destPath);
   let timer: NodeJS.Timeout;
