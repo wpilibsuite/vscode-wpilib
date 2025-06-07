@@ -21,6 +21,7 @@ export function setImplFunctions(
   setLivePage();
 }
 
+const maxLogEntries = 2000;
 let paused = false;
 let discard = false;
 let showWarnings = true;
@@ -29,7 +30,6 @@ let autoReconnect = true;
 let showTimestamps = false;
 let autoScroll = true;
 let filterText = '';
-let maxLogEntries = 2000;
 
 let UI_COLORS = {
   success: '#4caf50',
@@ -618,7 +618,9 @@ export function addError(message: IErrorMessage) {
     if (isExpanded) {
       // Collapse
       this.setAttribute('data-expanded', 'false');
-      if (toggleBtn) toggleBtn.className = 'toggle-button collapsed';
+      if (toggleBtn) {
+        toggleBtn.className = 'toggle-button collapsed';
+      }
       if (contentCtr) {
         contentCtr.className = 'error-content collapsed';
         createCollapsedErrorContent(message, contentCtr as HTMLElement, textColor);
@@ -626,7 +628,9 @@ export function addError(message: IErrorMessage) {
     } else {
       // Expand
       this.setAttribute('data-expanded', 'true');
-      if (toggleBtn) toggleBtn.className = 'toggle-button expanded';
+      if (toggleBtn) {
+        toggleBtn.className = 'toggle-button expanded';
+      }
       if (contentCtr) {
         contentCtr.className = 'error-content expanded';
         createErrorContent(message, contentCtr as HTMLElement, textColor);
