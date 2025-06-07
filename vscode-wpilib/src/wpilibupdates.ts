@@ -231,7 +231,7 @@ export class WPILibUpdates {
         logger.warn('failed to fetch URL: ' + metaDataUrl);
         return undefined;
       }
-      if (response.status >= 200 && response.status <= 300) {
+      if (response.ok) {
         const text = await response.text();
         const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
           .version;

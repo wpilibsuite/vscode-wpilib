@@ -141,10 +141,8 @@ export class VendorLibrariesBase {
         throw new Error('Failed to fetch file');
       }
 
-      if (response.status >= 200 && response.status <= 300) {
-        const text = await response.text();
-        const json = JSON.parse(text);
-
+      if (response.ok) {
+        const json = await response.json();
         if (isJsonDependency(json)) {
           return json;
         } else {
