@@ -1,7 +1,6 @@
 'use strict';
 
 import { access, mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises';
-import * as fetch from 'node-fetch';
 import * as path from 'path';
 import { IUtilitiesAPI } from '../api';
 import { logger } from '../logger';
@@ -134,8 +133,8 @@ export class VendorLibrariesBase {
 
   protected async loadFileFromUrl(url: string): Promise<IJsonDependency> {
     try {
-      const response = await fetch.default(url, {
-        timeout: 5000,
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(5000),
       });
 
       if (response === undefined) {

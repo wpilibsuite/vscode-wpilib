@@ -1,4 +1,3 @@
-import * as fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
@@ -646,8 +645,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {
-    const response = await fetch.default(url, {
-      timeout: 5000,
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(5000),
     });
     if (response === undefined) {
       throw new Error('Failed to fetch file');

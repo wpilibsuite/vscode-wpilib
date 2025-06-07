@@ -1,7 +1,6 @@
 'use strict';
 
 import { access, readdir, readFile, writeFile } from 'fs/promises';
-import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as xml2js from 'xml2js';
@@ -225,8 +224,8 @@ export class WPILibUpdates {
   private async checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
     const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
     try {
-      const response = await fetch.default(metaDataUrl, {
-        timeout: 5000,
+      const response = await fetch(metaDataUrl, {
+        signal: AbortSignal.timeout(5000),
       });
       if (response === undefined) {
         logger.warn('failed to fetch URL: ' + metaDataUrl);
