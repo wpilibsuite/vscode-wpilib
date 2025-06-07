@@ -27,7 +27,7 @@ export async function downloadFileToStream(url: string, destPath: string): Promi
     signal: AbortSignal.timeout(FILE_DOWNLOAD_TIMEOUT),
   });
   if (!res.ok) {
-    // @ts-ignore
+    // @ts-expect-error Error constructor should work
     throw new Error('Initial error downloading file ' + url, {
       cause: new Error(res.statusText),
     });
@@ -37,7 +37,7 @@ export async function downloadFileToStream(url: string, destPath: string): Promi
 
   const stream = fs.createWriteStream(destPath);
   stream.on('error', (error: unknown) => {
-    // @ts-ignore
+    // @ts-expect-error Error constructor should work
     throw new Error('Unable to download file ' + url, { cause: error });
   });
   if (res.body) {
