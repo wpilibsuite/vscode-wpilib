@@ -651,9 +651,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     if (response === undefined) {
       throw new Error('Failed to fetch file');
     }
-    if (response.status >= 200 && response.status <= 300) {
-      const text = await response.text();
-      const json = JSON.parse(text) as IJsonList[];
+    if (response.ok) {
+      const json = (await response.json()) as IJsonList[];
       if (this.isJsonList(json)) {
         return json;
       } else {
