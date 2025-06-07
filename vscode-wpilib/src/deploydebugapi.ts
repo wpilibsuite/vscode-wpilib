@@ -40,9 +40,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     if ('hwsim' in config) {
       hwsim = config.hwsim as boolean;
     }
-
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise<undefined>(async (resolve) => {
+    return (async () => {
       if (desktop) {
         if (hwsim) {
           await this.deployDebugAPI.simulateCode(workspace, undefined, '-PhwSim');
@@ -52,8 +50,8 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       } else {
         await this.deployDebugAPI.debugCode(workspace, undefined);
       }
-      resolve(undefined);
-    });
+      return undefined;
+    })();
   }
 
   public provideDebugConfigurations(

@@ -234,15 +234,8 @@ export class WPILibUpdates {
       }
       if (response.status >= 200 && response.status <= 300) {
         const text = await response.text();
-        const versions = await new Promise<string[]>((resolve, reject) => {
-          xml2js.parseString(text, (err, result) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result.metadata.versioning[0].versions[0].version);
-            }
-          });
-        });
+        const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
+          .version;
         if (versions === undefined) {
           logger.warn('parse failure');
           return undefined;
