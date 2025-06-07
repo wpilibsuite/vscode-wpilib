@@ -1,21 +1,19 @@
 'use strict';
-import * as fs from 'fs';
+import { readFile } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from './api';
 import { localize as i18n } from './locale';
 import { setExecutePermissions } from './shared/permissions';
 
-// General utilites usable by multiple classes
+// General utilities usable by multiple classes
 
 export function getIsWindows(): boolean {
-  const nodePlatform: NodeJS.Platform = process.platform;
-  return nodePlatform === 'win32';
+  return process.platform === 'win32';
 }
 
 export function getIsMac(): boolean {
-  const nodePlatform: NodeJS.Platform = process.platform;
-  return nodePlatform === 'darwin';
+  return process.platform === 'darwin';
 }
 
 export async function getClassName(): Promise<string | undefined> {
@@ -86,21 +84,17 @@ export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;
 }
 
-export function getDesktopEnabled(buildgradle: string): Promise<boolean | undefined> {
-  return new Promise<boolean | undefined>((resolve) => {
-    fs.readFile(buildgradle, 'utf8', (err, dataIn) => {
-      if (err) {
-        resolve(undefined);
-      } else {
-        const dataOut = dataIn.match(/def\s+includeDesktopSupport\s*=\s*(true|false)/m);
-        if (dataOut === null) {
-          resolve(undefined);
-        } else {
-          resolve(dataOut[1] === 'true');
-        }
-      }
-    });
-  });
+export async function getDesktopEnabled(buildgradle: string): Promise<boolean | undefined> {
+  try {
+    const dataIn = await readFile(buildgradle, 'utf8');
+    const dataOut = dataIn.match(/def\s+includeDesktopSupport\s*=\s*(true|false)/m);
+    if (dataOut !== null) {
+      return dataOut[1] === 'true';
+    }
+  } catch {
+    // See return
+  }
+  return undefined;
 }
 
 export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
