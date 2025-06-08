@@ -1,7 +1,7 @@
 'use strict';
 
 import { cp, mkdir, readFile, writeFile } from 'fs/promises';
-import * as glob from 'glob';
+import { glob } from 'glob';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
@@ -45,22 +45,9 @@ export async function findMatchingFiles(
   baseDir: string,
   pattern: string = '**/*{.java,.gradle}'
 ): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
-    glob(
-      pattern,
-      {
-        cwd: baseDir,
-        nodir: true,
-        nomount: true,
-      },
-      (err: Error | null, matches: string[]) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(matches);
-        }
-      }
-    );
+  return await glob(pattern, {
+    cwd: baseDir,
+    nodir: true,
   });
 }
 
