@@ -1,6 +1,5 @@
 'use strict';
 
-/* tslint:disable:prefer-conditional-expression */
 import { IErrorMessage, IPrintMessage, MessageType } from './message';
 import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
 import { AnsiSegment, applyAnsiStyling, parseAnsiString } from '../ansi/ansiparser';
