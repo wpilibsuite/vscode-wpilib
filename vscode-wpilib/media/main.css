@@ -1,15 +1,18 @@
 .installed-dependency,
 .available-dependency {
   margin-bottom: 10px;
+
   &:first-of-type {
     margin-top: 10px;
   }
 }
+
 .top-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+
   &:has(#updateall-action) {
     margin-top: 4px;
   }
@@ -18,36 +21,44 @@
 #updateall-action {
   width: 100%;
 }
+
 .name {
   font-weight: 600;
 }
+
 .downloads {
   display: flex;
   align-items: center;
 }
+
 .icon {
   margin-left: 5px;
 }
+
 .details {
   margin-top: 5px;
   color: var(--vscode-descriptionForeground);
 }
+
 .update {
   display: flex;
   gap: 4px;
 }
+
 .uninstall-button {
-  padding: 4px;
-  & > vscode-icon {
+  padding: 4px !important;
+
+  &>i {
     margin-right: 4px !important;
     margin-left: 4px !important;
   }
 }
 
-vscode-collapsible::part(body) {
+.vscode-collapsible div {
   overflow: visible;
 }
 
-vscode-single-select {
+.vscode-select select,
+.vscode-select {
   flex-shrink: 2;
 }

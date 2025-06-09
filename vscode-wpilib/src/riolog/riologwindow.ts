@@ -10,7 +10,7 @@ import {
   ReceiveTypes,
   SendTypes,
 } from './shared/interfaces';
-import { IErrorMessage, IPrintMessage } from './shared/message';
+import { IErrorMessage, IPrintMessage, MessageType } from './shared/message';
 
 export class RioLogWindow {
   private webview: IWindowView | undefined = undefined;
@@ -79,10 +79,21 @@ export class RioLogWindow {
 
   private createWebView() {
     this.webview = this.windowProvider.createWindowView();
+    
+    // Track if welcome message has been sent
+    let welcomeMessageSent = false;
+    
     this.webview.on('windowActive', async () => {
       if (this.webview === undefined) {
         return;
       }
+      
+      // Send welcome message first time window is active
+      if (!welcomeMessageSent) {
+        await this.sendWelcomeMessage();
+        welcomeMessageSent = true;
+      }
+      
       // Window goes active.
       await this.webview.postMessage({
         message: this.hiddenArray,
@@ -102,6 +113,30 @@ export class RioLogWindow {
         }
       }
     });
+  }
+
+  private async sendWelcomeMessage(): Promise<void> {
+    if (this.webview === undefined) {
+      return;
+    }
+
+    const welcomeMessage: IPrintMessage = {
+      line: '\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m\n' +
+        '\u001b[32mWaiting for robot connection...\u001b[0m\n' +
+        '\u001b[33mTIPS:\u001b[0m\n' +
+        '• \u001b[0mUse \u001b[1mSet\u001b[0m button to change team number\n' +
+        '• \u001b[0mClick on errors/warnings to expand details\n' +
+        '• \u001b[0mUse search box to filter messages\n' +
+        '• \u001b[0mToggle auto-scrolling for viewing older logs\n' +
+        '• \u001b[0mSave logs to file for later analysis',
+      messageType: MessageType.Print,
+      seqNumber: 0,
+      timestamp: Date.now() / 1000
+    };
+
+    // Use the same message sending path as normal console messages
+    await this.onNewMessageToSend(welcomeMessage);
+    console.log('Welcome message sent through RioLogWindow');
   }
 
   private createRioConsole() {
