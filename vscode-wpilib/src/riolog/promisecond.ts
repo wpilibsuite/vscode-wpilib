@@ -9,7 +9,7 @@ export class PromiseCondition {
       this.condSet = () => {
         resolve();
       };
-      if (this.hasBeenSet === true) {
+      if (this.hasBeenSet) {
         resolve();
       }
     });
@@ -17,7 +17,7 @@ export class PromiseCondition {
 
   public set() {
     this.hasBeenSet = true;
-    if (this.condSet !== undefined) {
+    if (this.condSet) {
       this.condSet();
     }
   }
