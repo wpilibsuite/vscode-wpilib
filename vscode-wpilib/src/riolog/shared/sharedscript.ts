@@ -18,6 +18,7 @@ export function setImplFunctions(
   checkResize = checkResizeImpl;
   scrollImpl = scrollImplFunc;
   sendMessage = sendMessageFunc;
+  setLivePage();
 }
 
 let paused = false;
@@ -813,13 +814,32 @@ export function setLivePage() {
   // Clear the container
   mainDiv.innerHTML = '';
 
+  const toolbar = createToolbar();
+  toolbar.id = 'toolbar';
+  mainDiv.appendChild(toolbar);
+
   // Create log container
   const logContainer = document.createElement('div');
   logContainer.id = 'log-container';
   mainDiv.appendChild(logContainer);
 
-  // Create toolbar
-  mainDiv.appendChild(createToolbar());
+  if (!window.__riologHasLoaded) {
+    const welcomeMessage: IPrintMessage = {
+      messageType: MessageType.Print,
+      line: '\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m\n' +
+        '\u001b[32mWaiting for robot connection...\u001b[0m\n' +
+        '\u001b[33mTIPS:\u001b[0m\n' +
+        '• \u001b[0mUse \u001b[1mSet\u001b[0m button to change team number\n' +
+        '• \u001b[0mClick on errors/warnings to expand details\n' +
+        '• \u001b[0mUse search box to filter messages\n' +
+        '• \u001b[0mToggle auto-scrolling for viewing older logs\n' +
+        '• \u001b[0mSave logs to file for later analysis',
+      timestamp: Date.now() / 1000,
+      seqNumber: 0
+    };
+    addMessage(welcomeMessage);
+    window.__riologHasLoaded = true;
+  }
 
   // Ensure timestamps button starts in correct state
   const timestampsButton = document.getElementById('timestamps-button');
@@ -916,7 +936,8 @@ function handleFileSelect(evt: Event) {
   reader.readAsText(firstFile);
 }
 
-// Initialize the page when loaded
-window.addEventListener('load', () => {
-  setLivePage();
-});
+declare global {
+  interface Window {
+    __riologHasLoaded?: boolean;
+  }
+}

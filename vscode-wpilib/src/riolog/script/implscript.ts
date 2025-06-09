@@ -34,6 +34,7 @@ export function sendMessage(message: IIPCReceiveMessage) {
 }
 
 // Register the implementation functions with the shared module
+console.log('Setting impl functions')
 setImplFunctions(checkResize, scrollImpl, sendMessage);
 
 window.addEventListener('message', (event) => {
