@@ -1,10 +1,10 @@
 'use scrict';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
-import { RioLogWindow } from 'wpilib-riolog';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';
+import { RioLogWindow } from './riolog/riologwindow';
 import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
 
 interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
