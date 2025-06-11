@@ -40,7 +40,10 @@ export class CommandAPI implements ICommandAPI {
       label: provider.getDisplayName(),
     });
   }
-  public async createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean> {
+  public async createCommand(
+    workspace: vscode.WorkspaceFolder,
+    folder: vscode.Uri
+  ): Promise<boolean> {
     if (this.creators.length === 0) {
       vscode.window.showInformationMessage(i18n('message', 'No command providers found'));
       return false;
@@ -49,7 +52,7 @@ export class CommandAPI implements ICommandAPI {
     const validLanguages: ILanguageQuickPick[] = [];
     for (const c of this.creators) {
       for (const d of c.creators) {
-        if (!await d.creator.getIsCurrentlyValid(workspace)) {
+        if (!(await d.creator.getIsCurrentlyValid(workspace))) {
           continue;
         }
         const language = d.creator.getLanguage();
@@ -82,7 +85,9 @@ export class CommandAPI implements ICommandAPI {
     } else if (validLanguages.length === 1) {
       langSelection = validLanguages[0];
     } else {
-      const lSelect = await vscode.window.showQuickPick(validLanguages, { placeHolder: i18n('ui', 'Pick a language') });
+      const lSelect = await vscode.window.showQuickPick(validLanguages, {
+        placeHolder: i18n('ui', 'Pick a language'),
+      });
       if (lSelect === undefined) {
         vscode.window.showInformationMessage(i18n('message', 'Selection exited. Cancelling'));
         return false;
@@ -90,7 +95,9 @@ export class CommandAPI implements ICommandAPI {
       langSelection = lSelect;
     }
 
-    const selection = await vscode.window.showQuickPick(langSelection.creators, { placeHolder: i18n('ui', 'Pick a command') });
+    const selection = await vscode.window.showQuickPick(langSelection.creators, {
+      placeHolder: i18n('ui', 'Pick a command'),
+    });
     if (selection === undefined) {
       vscode.window.showInformationMessage(i18n('message', 'Invalid selection'));
       return false;

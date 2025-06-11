@@ -4,7 +4,13 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { existsAsync, extensionContext, statAsync, readdirAsync, readFileAsync } from '../utilities';
+import {
+  existsAsync,
+  extensionContext,
+  statAsync,
+  readdirAsync,
+  readFileAsync,
+} from '../utilities';
 import * as vscode from '../vscodeshim';
 import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../wpilibapishim';
 import { generateCopyCpp, generateCopyJava } from './generator';
@@ -15,7 +21,7 @@ interface IJsonExample {
   description: string;
   tags: string[];
   gradlebase: string;
-  language: "java" | "cpp";
+  language: 'java' | 'cpp';
   commandversion: number;
   mainclass?: string | undefined;
   packagetoreplace?: string | undefined;
@@ -27,13 +33,22 @@ interface IJsonExample {
 function isJsonExample(arg: unknown): arg is IJsonExample {
   const jsonDep = arg as IJsonExample;
 
-  return jsonDep.name !== undefined && jsonDep.description !== undefined
-    && jsonDep.gradlebase !== undefined && jsonDep.dependencies !== undefined
-    && jsonDep.foldername !== undefined && jsonDep.language !== undefined;
+  return (
+    jsonDep.name !== undefined &&
+    jsonDep.description !== undefined &&
+    jsonDep.gradlebase !== undefined &&
+    jsonDep.dependencies !== undefined &&
+    jsonDep.foldername !== undefined &&
+    jsonDep.language !== undefined
+  );
 }
 
-export async function addVendorExamples(resourceRoot: string, core: IExampleTemplateAPI, utilities: IUtilitiesAPI,
-                                        vendorlibs: VendorLibrariesBase): Promise<void> {
+export async function addVendorExamples(
+  resourceRoot: string,
+  core: IExampleTemplateAPI,
+  utilities: IUtilitiesAPI,
+  vendorlibs: VendorLibrariesBase
+): Promise<void> {
   const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
   const storagePath = extensionContext.storagePath;
   if (storagePath === undefined) {
@@ -57,7 +72,8 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               // Only handle java and cpp
               continue;
             }
-            const extraVendordeps: string[] = (ex.extravendordeps !== undefined) ? ex.extravendordeps : [];
+            const extraVendordeps: string[] =
+              ex.extravendordeps !== undefined ? ex.extravendordeps : [];
             const provider: IExampleTemplateCreator = {
               getLanguage(): string {
                 return ex.language;
@@ -71,22 +87,50 @@ export async function addVendorExamples(resourceRoot: string, core: IExampleTemp
               async generate(folderInto: vscode.Uri): Promise<boolean> {
                 try {
                   if (ex.language === 'java') {
-                    if (!await generateCopyJava(shimmedResourceRoot, path.join(exampleDir, ex.foldername), undefined,
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, 'frc.robot.' + ex.mainclass,
-                      path.join('frc', 'robot'), false, extraVendordeps, ex.packagetoreplace)) {
-                      vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
+                    if (
+                      !(await generateCopyJava(
+                        shimmedResourceRoot,
+                        path.join(exampleDir, ex.foldername),
+                        undefined,
+                        path.join(gradleBasePath, ex.gradlebase),
+                        folderInto.fsPath,
+                        'frc.robot.' + ex.mainclass,
+                        path.join('frc', 'robot'),
+                        false,
+                        extraVendordeps,
+                        ex.packagetoreplace
+                      ))
+                    ) {
+                      vscode.window.showErrorMessage(
+                        i18n('message', 'Cannot create into non empty folder')
+                      );
                       return false;
                     }
                   } else {
-                    if (!await generateCopyCpp(shimmedResourceRoot, path.join(exampleDir, ex.foldername), undefined,
-                      path.join(gradleBasePath, ex.gradlebase), folderInto.fsPath, false, extraVendordeps)) {
-                      vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
+                    if (
+                      !(await generateCopyCpp(
+                        shimmedResourceRoot,
+                        path.join(exampleDir, ex.foldername),
+                        undefined,
+                        path.join(gradleBasePath, ex.gradlebase),
+                        folderInto.fsPath,
+                        false,
+                        extraVendordeps
+                      ))
+                    ) {
+                      vscode.window.showErrorMessage(
+                        i18n('message', 'Cannot create into non empty folder')
+                      );
                       return false;
                     }
                   }
                   const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
                   for (const vendorFile of vendorFiles) {
-                    await vendorlibs.installDependency(vendorFile, vendorlibs.getVendorFolder(folderInto.fsPath), true);
+                    await vendorlibs.installDependency(
+                      vendorFile,
+                      vendorlibs.getVendorFolder(folderInto.fsPath),
+                      true
+                    );
                   }
                 } catch (err) {
                   logger.error('Example generation error: ', err);

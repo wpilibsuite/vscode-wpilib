@@ -11,34 +11,36 @@ import { createCommands } from './vscommands';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activateCppProvider(context: vscode.ExtensionContext, coreExports: IExternalAPI): Promise<void> {
+export async function activateCppProvider(
+  context: vscode.ExtensionContext,
+  coreExports: IExternalAPI
+): Promise<void> {
+  const resourceRoot = path.join(context.extensionPath, 'resources');
 
-    const resourceRoot = path.join(context.extensionPath, 'resources');
+  const workspaces = vscode.workspace.workspaceFolders;
 
-    const workspaces = vscode.workspace.workspaceFolders;
+  const cppToolsApi = await getCppToolsApi(Version.v5);
 
-    const cppToolsApi = await getCppToolsApi(Version.v5);
+  if (cppToolsApi) {
+    context.subscriptions.push(cppToolsApi);
 
-    if (cppToolsApi) {
-        context.subscriptions.push(cppToolsApi);
+    const configLoaders: ApiProvider[] = [];
 
-        const configLoaders: ApiProvider[] = [];
+    const headerExplorer = new HeaderExplorer(resourceRoot);
 
-        const headerExplorer = new HeaderExplorer(resourceRoot);
+    context.subscriptions.push(headerExplorer);
 
-        context.subscriptions.push(headerExplorer);
-
-        if (workspaces !== undefined) {
-            for (const wp of workspaces) {
-                const prefs = coreExports.getPreferencesAPI().getPreferences(wp);
-                if (prefs.getIsWPILibProject() && prefs.getEnableCppIntellisense()) {
-                    const configLoader = new ApiProvider(wp, cppToolsApi, coreExports, headerExplorer);
-                    context.subscriptions.push(configLoader);
-                    configLoaders.push(configLoader);
-                }
-            }
+    if (workspaces !== undefined) {
+      for (const wp of workspaces) {
+        const prefs = coreExports.getPreferencesAPI().getPreferences(wp);
+        if (prefs.getIsWPILibProject() && prefs.getEnableCppIntellisense()) {
+          const configLoader = new ApiProvider(wp, cppToolsApi, coreExports, headerExplorer);
+          context.subscriptions.push(configLoader);
+          configLoaders.push(configLoader);
         }
-
-        createCommands(context, configLoaders);
+      }
     }
+
+    createCommands(context, configLoaders);
+  }
 }

@@ -3,9 +3,17 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IErrorMessage, IIPCReceiveMessage, IIPCSendMessage, IPrintMessage, IRioConsole, IRioConsoleProvider,
-         IWindowProvider, IWindowView, RioConsole } from 'wpilib-riolog';
 import { readFileAsync } from '../utilities';
+import {
+  IIPCReceiveMessage,
+  IIPCSendMessage,
+  IRioConsole,
+  IRioConsoleProvider,
+  IWindowProvider,
+  IWindowView,
+} from './shared/interfaces';
+import { RioConsole } from './rioconsole';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;
@@ -17,28 +25,39 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 
   constructor(resourceName: string, windowName: string, viewColumn: vscode.ViewColumn) {
     super();
-    this.webview = vscode.window.createWebviewPanel(resourceName,
-      windowName, viewColumn, {
-        enableCommandUris: true,
-        enableScripts: true,
-        retainContextWhenHidden: true,
-      });
+    this.webview = vscode.window.createWebviewPanel(resourceName, windowName, viewColumn, {
+      enableCommandUris: true,
+      enableScripts: true,
+      retainContextWhenHidden: true,
+    });
 
     this.disposables.push(this.webview);
 
-    this.webview.onDidChangeViewState((s) => {
-      if (s.webviewPanel.visible === true) {
-        this.emit('windowActive');
-      }
-    }, null, this.disposables);
+    this.webview.onDidChangeViewState(
+      (s) => {
+        if (s.webviewPanel.visible === true) {
+          this.emit('windowActive');
+        }
+      },
+      null,
+      this.disposables
+    );
 
-    this.webview.webview.onDidReceiveMessage((data: IIPCReceiveMessage) => {
-      this.emit('didReceiveMessage', data);
-    }, null, this.disposables);
+    this.webview.webview.onDidReceiveMessage(
+      (data: IIPCReceiveMessage) => {
+        this.emit('didReceiveMessage', data);
+      },
+      null,
+      this.disposables
+    );
 
-    this.webview.onDidDispose(() => {
-      this.emit('didDispose');
-    }, null, this.disposables);
+    this.webview.onDidDispose(
+      () => {
+        this.emit('didDispose');
+      },
+      null,
+      this.disposables
+    );
   }
 
   public getWebview(): vscode.Webview {
@@ -46,7 +65,6 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
   }
 
   public setHTML(html: string): void {
-
     this.webview.webview.html = html;
   }
   public async postMessage(message: IIPCSendMessage): Promise<boolean> {
@@ -108,8 +126,7 @@ export class RioLogWebviewProvider implements IWindowProvider {
 
   private htmlProvider: RioLogHTMLProvider | undefined;
 
-  private constructor() {
-  }
+  private constructor() {}
 
   public createWindowView(): IWindowView {
     const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);

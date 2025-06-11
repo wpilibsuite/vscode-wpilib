@@ -11,14 +11,28 @@ interface IToolQuickPick extends vscode.QuickPickItem {
 
 // The tools API provider. Lists tools added to it in a quick pick to select.
 export class ToolAPI implements IToolAPI {
-  public static async InstallToolsFromGradle(workspace: vscode.WorkspaceFolder, externalApi: IExternalAPI): Promise<void> {
-    const grResult = await gradleRun('InstallAllTools', workspace.uri.fsPath, workspace, 'ToolInstall', externalApi.getExecuteAPI(),
-                                     externalApi.getPreferencesAPI().getPreferences(workspace));
+  public static async InstallToolsFromGradle(
+    workspace: vscode.WorkspaceFolder,
+    externalApi: IExternalAPI
+  ): Promise<void> {
+    const grResult = await gradleRun(
+      'InstallAllTools',
+      workspace.uri.fsPath,
+      workspace,
+      'ToolInstall',
+      externalApi.getExecuteAPI(),
+      externalApi.getPreferencesAPI().getPreferences(workspace)
+    );
 
     if (grResult === 0) {
-      const result = await vscode.window.showInformationMessage(i18n('message', 'Restart required for new tools. Restart now?'), {
-        modal: true,
-      }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+      const result = await vscode.window.showInformationMessage(
+        i18n('message', 'Restart required for new tools. Restart now?'),
+        {
+          modal: true,
+        },
+        i18n('ui', 'Yes'),
+        i18n('ui', 'No')
+      );
       if (result !== undefined && result === i18n('ui', 'Yes')) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
@@ -39,13 +53,19 @@ export class ToolAPI implements IToolAPI {
 
   public async startTool(): Promise<boolean> {
     if (this.tools.length <= 0) {
-      const grResult = await vscode.window.showInformationMessage(i18n('message', 'No tools found. Would you like to use Gradle to grab some?'),
-        {modal: true}, i18n('ui', 'Yes'), i18n('ui', 'No'));
+      const grResult = await vscode.window.showInformationMessage(
+        i18n('message', 'No tools found. Would you like to use Gradle to grab some?'),
+        { modal: true },
+        i18n('ui', 'Yes'),
+        i18n('ui', 'No')
+      );
       if (grResult !== undefined && grResult === i18n('ui', 'Yes')) {
         const preferencesApi = this.externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (workspace === undefined) {
-          vscode.window.showInformationMessage(i18n('message', 'Cannot install gradle tools with an empty workspace'));
+          vscode.window.showInformationMessage(
+            i18n('message', 'Cannot install gradle tools with an empty workspace')
+          );
           return false;
         }
         await ToolAPI.InstallToolsFromGradle(workspace, this.externalApi);
@@ -53,16 +73,20 @@ export class ToolAPI implements IToolAPI {
       return false;
     }
 
-    const result = await vscode.window.showQuickPick(this.tools, { placeHolder: i18n('ui', 'Pick a tool') });
+    const result = await vscode.window.showQuickPick(this.tools, {
+      placeHolder: i18n('ui', 'Pick a tool'),
+    });
 
     if (result === undefined) {
       vscode.window.showInformationMessage(i18n('message', 'Tool run canceled'));
       return false;
     }
 
-    const ret =  await result.runner.runTool();
+    const ret = await result.runner.runTool();
     if (!ret) {
-      vscode.window.showInformationMessage(`${i18n('message', 'Failed to start tool')}: ${result.runner.getDisplayName()}`);
+      vscode.window.showInformationMessage(
+        `${i18n('message', 'Failed to start tool')}: ${result.runner.getDisplayName()}`
+      );
     }
     return ret;
   }

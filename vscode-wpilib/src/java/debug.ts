@@ -10,7 +10,6 @@ export interface IDebugCommands {
 }
 
 export async function startDebugging(commands: IDebugCommands): Promise<void> {
-
   const config: vscode.DebugConfiguration = {
     hostName: commands.serverAddress,
     name: 'WPILib Java Debug',

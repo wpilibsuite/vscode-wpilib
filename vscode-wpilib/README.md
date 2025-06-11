@@ -17,5 +17,5 @@ TODO
 ## Release Notes
 
 ## Third Party Licenses
-"vscode-codicons" by Microsoft is licensed under [Creative Commons Attribution 4.0 International](https://github.com/microsoft/vscode-codicons/blob/main/LICENSE)
 
+"vscode-codicons" by Microsoft is licensed under [Creative Commons Attribution 4.0 International](https://github.com/microsoft/vscode-codicons/blob/main/LICENSE)

@@ -309,14 +309,22 @@ export class Preferences implements IPreferences {
       this.preferencesFile = vscode.Uri.file(configFilePath);
       await mkdirAsync(path.dirname(this.preferencesFile.fsPath));
     }
-    await writeFileAsync(this.preferencesFile.fsPath, JSON.stringify(this.preferencesJson, null, 4));
+    await writeFileAsync(
+      this.preferencesFile.fsPath,
+      JSON.stringify(this.preferencesJson, null, 4)
+    );
   }
 
   private async noTeamNumberLogic(): Promise<number> {
     // Ask if user wants to set team number.
-    const teamRequest = await vscode.window.showInformationMessage(i18n('message', 'No team number, would you like to save one?'), {
-      modal: true,
-    }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+    const teamRequest = await vscode.window.showInformationMessage(
+      i18n('message', 'No team number, would you like to save one?'),
+      {
+        modal: true,
+      },
+      i18n('ui', 'Yes'),
+      i18n('ui', 'No')
+    );
     if (teamRequest === undefined) {
       return -1;
     }

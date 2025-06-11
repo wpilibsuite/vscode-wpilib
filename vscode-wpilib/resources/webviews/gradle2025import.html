@@ -1,78 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <title>WPILib 2025 Project Import</title>
+    <style>
+      .error {
+        color: red;
+        border-color: red;
+        border-width: 2px;
+      }
+    </style>
+  </head>
 
-<head>
-  <title>WPILib 2025 Project Import</title>
-  <style>
-    .error {
-      color: red;
-      border-color: red;
-      border-width: 2px;
-    }
+  <body>
+    <img src="replaceresource/resources/wpilib-generic.svg" height="75" />
 
-    ;
-  </style>
-</head>
+    <h1>Welcome to WPILib 2025 Project Importer</h1>
 
-<body>
-  <img src="replaceresource/resources/wpilib-generic.svg" height="75" />
-
-  <h1>Welcome to WPILib 2025 Project Importer</h1>
-
-  The import process copies your project source files from the current directory to a new directory and completely regenerates the gradle files. If you made non-standard updates to the build.gradle, you will need to make those changes again. For this reason, in place upgrades are not supported. It is also necessary to import vendor libraries again, since last year's vendor libraries must be updated to be compatible with this year's projects. See <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-overview/importing-gradle-project.html">Importing a Gradle Project</a> on frc-docs for more details.
-  <br/>
-  <br/>
-  <b>Gradle Project.</b> Select the build.gradle file of the gradle project to import.
-  <br/>
-  <input id="gradle2025Input" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
-  <button id="gradle2025SelectButton">Select a gradle project.</button>
-  <br/>
-  <br/> <div id="projectfolderdiv" data-i18n-trans="ui" class="error" STYLE="font-weight:bold">Base Folder:</div> Select a base folder to place the new project into. The imported project must be placed into a new folder. Importing in place is not supported.
-  <br/>
-  <input id="projectFolder" type="text" class="error" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
-  <br/>
-  <button id="projectSelectButton">Select a new project folder</button>
-  <br/>
-  <br/>
-  <div id="projectnamediv" class="error"><b>Project Name</b></div>
-    <input id="projectName" type="text" class="error" style="width: 100%; margin-top: 10px; margin-bottom: 10px" disabled/>
-    When you select a gradle project above, it will insert the project name, however, it may be customized.
-  <br/>
-  <br/> <b>Create a new folder?</b>
-  <input id="newFolderCB" type="checkbox" checked/>
-  <br/>
-  This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be checked. Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project Name
-  <br/>
-  <br/>
-  <div id="teamnumberdiv" class="error"><b>Team Number</b></div>
-  <input id="teamNumber" class="error" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
-  />
-  <br/>
-  <div id="desktopdiv">
-    <b>Enable Desktop Support</b>
-    <input id="desktopCB" type="checkbox" />
-    <br/>
-    This is needed for simulation and unit testing support, however there are some cases where this will do
-    some unexpected things during build. In addition, not all vendor libraries support desktop.
-    This option can be set with the command "WPILib: Set Desktop Support" at any time.
-  </div>
-  <br/>
-  <div id="romidiv">
-    <b>Import Romi Project</b>
-    <input id="romiCB" type="checkbox" />
-    <br/>
-    Check this if the project being imported is a romi project. This is not autodetected, and must be selected manually.
-  </div>
-  <br/>
-  <div id="xrpdiv">
-    <b>Import XRP Project</b>
-    <input id="xrpCB" type="checkbox" />
-    <br/>
-    Check this if the project being imported is an XRP project. This is not autodetected, and must be selected manually.
-  </div>
-  <br/>
-  <button id="importProject">Import Project</button>
-
-</body>
-
+    The import process copies your project source files from the current directory to a new
+    directory and completely regenerates the gradle files. If you made non-standard updates to the
+    build.gradle, you will need to make those changes again. For this reason, in place upgrades are
+    not supported. It is also necessary to import vendor libraries again, since last year's vendor
+    libraries must be updated to be compatible with this year's projects. See
+    <a
+      href="https://docs.wpilib.org/en/stable/docs/software/wpilib-overview/importing-gradle-project.html"
+      >Importing a Gradle Project</a
+    >
+    on frc-docs for more details.
+    <br />
+    <br />
+    <b>Gradle Project.</b> Select the build.gradle file of the gradle project to import.
+    <br />
+    <input
+      id="gradle2025Input"
+      type="text"
+      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+    />
+    <button id="gradle2025SelectButton">Select a gradle project.</button>
+    <br />
+    <br />
+    <div id="projectfolderdiv" data-i18n-trans="ui" class="error" style="font-weight: bold">
+      Base Folder:
+    </div>
+    Select a base folder to place the new project into. The imported project must be placed into a
+    new folder. Importing in place is not supported.
+    <br />
+    <input
+      id="projectFolder"
+      type="text"
+      class="error"
+      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+    />
+    <br />
+    <button id="projectSelectButton">Select a new project folder</button>
+    <br />
+    <br />
+    <div id="projectnamediv" class="error"><b>Project Name</b></div>
+    <input
+      id="projectName"
+      type="text"
+      class="error"
+      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+      disabled
+    />
+    When you select a gradle project above, it will insert the project name, however, it may be
+    customized.
+    <br />
+    <br />
+    <b>Create a new folder?</b>
+    <input id="newFolderCB" type="checkbox" checked />
+    <br />
+    This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be checked.
+    Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project Name
+    <br />
+    <br />
+    <div id="teamnumberdiv" class="error"><b>Team Number</b></div>
+    <input
+      id="teamNumber"
+      class="error"
+      type="text"
+      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+    />
+    <br />
+    <div id="desktopdiv">
+      <b>Enable Desktop Support</b>
+      <input id="desktopCB" type="checkbox" />
+      <br />
+      This is needed for simulation and unit testing support, however there are some cases where
+      this will do some unexpected things during build. In addition, not all vendor libraries
+      support desktop. This option can be set with the command "WPILib: Set Desktop Support" at any
+      time.
+    </div>
+    <br />
+    <div id="romidiv">
+      <b>Import Romi Project</b>
+      <input id="romiCB" type="checkbox" />
+      <br />
+      Check this if the project being imported is a romi project. This is not autodetected, and must
+      be selected manually.
+    </div>
+    <br />
+    <div id="xrpdiv">
+      <b>Import XRP Project</b>
+      <input id="xrpCB" type="checkbox" />
+      <br />
+      Check this if the project being imported is an XRP project. This is not autodetected, and must
+      be selected manually.
+    </div>
+    <br />
+    <button id="importProject">Import Project</button>
+  </body>
 </html>

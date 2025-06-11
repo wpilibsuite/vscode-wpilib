@@ -10,7 +10,6 @@ interface IVersion {
 
 /** Converts a version string to its corresponding Version object. */
 function parseVersion(version: string): IVersion {
-
   const dashIndex = version.indexOf('-');
   const dashParts: string[] = [];
   if (dashIndex >= 0) {

@@ -23,6 +23,8 @@ export interface IProjectInfo {
   javaDependenciesExtensionVersion: string;
   cppExtensionVersion: string;
   vendorLibraries: IVendorLibraryPair[];
+  wpilibProjectYear: string;
+  wpilibLanguage: string;
 }
 
 async function extensionVersion(extension: vscode.Extension<unknown> | undefined): Promise<string> {
@@ -39,7 +41,11 @@ export class ProjectInfoGatherer {
   private disposables: vscode.Disposable[] = [];
   private statusBar: vscode.StatusBarItem;
 
-  public constructor(vendorLibraries: VendorLibraries, wpilibUpdates: WPILibUpdates, externalApi: IExternalAPI) {
+  public constructor(
+    vendorLibraries: VendorLibraries,
+    wpilibUpdates: WPILibUpdates,
+    externalApi: IExternalAPI
+  ) {
     this.vendorLibraries = vendorLibraries;
     this.wpilibUpdates = wpilibUpdates;
     this.externalApi = externalApi;
@@ -61,9 +67,11 @@ export class ProjectInfoGatherer {
       }
     }
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.getProjectInformation', async () => {
-      await this.displayProjectInfo();
-    }));
+    this.disposables.push(
+      vscode.commands.registerCommand('wpilibcore.getProjectInformation', async () => {
+        await this.displayProjectInfo();
+      })
+    );
   }
 
   public dispose() {
@@ -80,11 +88,13 @@ export class ProjectInfoGatherer {
     }
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
-    const jdkVer = (jdkLoc === undefined) ? 'unknown' : await getJavaVersion(jdkLoc);
+    const jdkVer = jdkLoc === undefined ? 'unknown' : await getJavaVersion(jdkLoc);
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 VS Code Version: ${vscode.version}
 WPILib Extension Version: ${projectInfo.wpilibExtensionVersion}
+Project Year: ${projectInfo.wpilibProjectYear}
+Language: ${projectInfo.wpilibLanguage}
 C++ Extension Version: ${projectInfo.cppExtensionVersion}
 Java Extension Version: ${projectInfo.javaExtensionVersion}
 Java Debug Extension Version: ${projectInfo.javaDebugExtensionVersion}
@@ -99,13 +109,19 @@ Vendor Libraries:
 `;
     }
 
-    vscode.window.showInformationMessage(infoString, {
-      modal: true,
-    }, 'Copy').then(action => {
-      if (action === 'Copy') {
-        vscode.env.clipboard.writeText(infoString);
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        infoString,
+        {
+          modal: true,
+        },
+        'Copy'
+      )
+      .then((action) => {
+        if (action === 'Copy') {
+          vscode.env.clipboard.writeText(infoString);
+        }
+      });
   }
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
@@ -118,6 +134,7 @@ Vendor Libraries:
 
   private async getProjectInfo(workspace: vscode.WorkspaceFolder): Promise<IProjectInfo> {
     const vendorLibs = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
+    const prefs = this.externalApi.getPreferencesAPI().getPreferences(workspace);
 
     let currentGradleVersion = await this.wpilibUpdates.getGradleRIOVersion(workspace);
 
@@ -125,14 +142,20 @@ Vendor Libraries:
       currentGradleVersion = 'unknown';
     }
 
-    const debugExt =  await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-debug'));
-    const depViewer = await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-dependency'));
+    const debugExt = await extensionVersion(
+      vscode.extensions.getExtension('vscjava.vscode-java-debug')
+    );
+    const depViewer = await extensionVersion(
+      vscode.extensions.getExtension('vscjava.vscode-java-dependency')
+    );
     const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
     const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFileAsync(extensionPackageJson, 'utf8');
     const currentVsCodeVersion: string = json.parse(packageJson).version;
+    const currentProjectYear: string = prefs.getProjectYear();
+    const currentLanguage: string = prefs.getCurrentLanguage();
 
     const projectInfo: IProjectInfo = {
       cppExtensionVersion: cpp,
@@ -142,6 +165,8 @@ Vendor Libraries:
       vendorLibraries: [],
       wpilibExtensionVersion: currentVsCodeVersion,
       wpilibProjectVersion: currentGradleVersion,
+      wpilibProjectYear: currentProjectYear,
+      wpilibLanguage: currentLanguage,
     };
 
     for (const lib of vendorLibs) {

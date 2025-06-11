@@ -3,7 +3,9 @@
 // import { logger } from '../../logger';
 
 declare global {
-    interface Window { i18nTrans: (domain: string, message: string, ...args: unknown[]) => string; }
+  interface Window {
+    i18nTrans: (domain: string, message: string, ...args: unknown[]) => string;
+  }
 }
 
 export function validateProject(): boolean {
@@ -32,7 +34,10 @@ export function validateProjectFolder(): boolean {
   const oneDrive = s.includes('OneDrive');
   const pdiv = document.getElementById('projectfolderdiv') as HTMLDivElement;
   if (oneDrive === true || s.length === 0) {
-    pdiv.innerText = oneDrive === true ? window.i18nTrans('ui', 'Invalid Base Folder - Folder can\'t be in OneDrive') : window.i18nTrans('ui', 'Invalid Base Folder');
+    pdiv.innerText =
+      oneDrive === true
+        ? window.i18nTrans('ui', "Invalid Base Folder - Folder can't be in OneDrive")
+        : window.i18nTrans('ui', 'Invalid Base Folder');
     pdiv.classList.add('error');
     elem.classList.add('error');
     return false;
@@ -68,7 +73,7 @@ export function validateTeamNumber(): boolean {
   const s = elem.value;
   const match = s.match(/^\d{1,5}$/gm);
   const pdiv = document.getElementById('teamnumberdiv') as HTMLDivElement;
-  if ((match === null || match.length === 0)) {
+  if (match === null || match.length === 0) {
     pdiv.innerText = window.i18nTrans('ui', 'Invalid team number');
     pdiv.classList.add('error');
     elem.classList.add('error');

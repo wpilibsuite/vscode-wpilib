@@ -20,7 +20,11 @@ export abstract class WebViewBase {
     this.resourceRoot = resourceRoot;
   }
 
-  public async loadWebpage(htmlPath: string, scriptPath?: string, localeDomains?: string[]): Promise<void> {
+  public async loadWebpage(
+    htmlPath: string,
+    scriptPath?: string,
+    localeDomains?: string[]
+  ): Promise<void> {
     this.html = await readFileAsync(htmlPath, 'utf8');
 
     if (scriptPath) {
@@ -46,16 +50,27 @@ export abstract class WebViewBase {
     if (this.scriptPath) {
       this.html += this.getScriptTag(this.scriptPath, webview);
     }
-    this.html += this.getScriptTag(path.join(extensionContext.extensionPath, 'resources', 'dist', 'localeloader.js'), webview);
+    this.html += this.getScriptTag(
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'localeloader.js'),
+      webview
+    );
     const onDiskPath = vscode.Uri.file(extensionContext.extensionPath);
     const replacePath = webview.asWebviewUri(onDiskPath);
     this.html = this.html.replace(/replaceresource/g, replacePath.toString());
   }
 
-  public displayWebView(showOptions: vscode.ViewColumn | { preserveFocus: boolean, viewColumn: vscode.ViewColumn },
-                        reveal?: boolean, options?: vscode.WebviewPanelOptions & vscode.WebviewOptions) {
+  public displayWebView(
+    showOptions: vscode.ViewColumn | { preserveFocus: boolean; viewColumn: vscode.ViewColumn },
+    reveal?: boolean,
+    options?: vscode.WebviewPanelOptions & vscode.WebviewOptions
+  ) {
     if (this.webview === undefined) {
-      this.webview = vscode.window.createWebviewPanel(this.veiwType, this.title, showOptions, options);
+      this.webview = vscode.window.createWebviewPanel(
+        this.veiwType,
+        this.title,
+        showOptions,
+        options
+      );
       this.webview.iconPath = vscode.Uri.file(path.join(this.resourceRoot, 'wpilib-icon-128.png'));
       this.replaceResources(this.webview.webview);
       this.webview.webview.html = this.html;

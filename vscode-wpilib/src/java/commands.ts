@@ -15,8 +15,13 @@ export interface IJavaJsonLayout {
   replacename: string;
 }
 
-async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder: vscode.Uri, replaceName: string,
-                           javaPackage: string): Promise<boolean> {
+async function performCopy(
+  commandRoot: string,
+  command: IJavaJsonLayout,
+  folder: vscode.Uri,
+  replaceName: string,
+  javaPackage: string
+): Promise<boolean> {
   const commandFolder = path.join(commandRoot, command.foldername);
   const copiedFiles: string[] = [];
   await ncpAsync(commandFolder, folder.fsPath, {
@@ -35,23 +40,26 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
 
   for (const f of copiedFiles) {
     const file = path.join(folder.fsPath, f);
-    promiseArray.push(new Promise<void>((resolve, reject) => {
-      fs.readFile(file, 'utf8', (err, dataIn) => {
-        if (err) {
-          reject(err);
-        } else {
-          const dataOut = dataIn.replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo)
-            .replace(new RegExp(command.replacename, 'g'), replaceName);
-          fs.writeFile(file, dataOut, 'utf8', (err1) => {
-            if (err1) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        }
-      });
-    }));
+    promiseArray.push(
+      new Promise<void>((resolve, reject) => {
+        fs.readFile(file, 'utf8', (err, dataIn) => {
+          if (err) {
+            reject(err);
+          } else {
+            const dataOut = dataIn
+              .replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo)
+              .replace(new RegExp(command.replacename, 'g'), replaceName);
+            fs.writeFile(file, dataOut, 'utf8', (err1) => {
+              if (err1) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
+          }
+        });
+      })
+    );
   }
 
   await Promise.all(promiseArray);
@@ -62,16 +70,21 @@ async function performCopy(commandRoot: string, command: IJavaJsonLayout, folder
     const bname = path.basename(file);
     const dirname = path.dirname(file);
     if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(dirname, bname.replace(new RegExp(command.replacename, 'g'), replaceName));
-      movePromiseArray.push(new Promise<string>((resolve, reject) => {
-        fs.rename(file, newname, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(newname);
-          }
-        });
-      }));
+      const newname = path.join(
+        dirname,
+        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
+      );
+      movePromiseArray.push(
+        new Promise<string>((resolve, reject) => {
+          fs.rename(file, newname, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(newname);
+            }
+          });
+        })
+      );
     }
   }
 
