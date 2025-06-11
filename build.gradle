@@ -44,7 +44,6 @@ dependencies {
     javaSource 'edu.wpi.first.wpilibj:commands:+:@zip'
 }
 
-
 task extractCppDependencies(type: Copy) {
     dependsOn configurations.cppSource
 
@@ -86,44 +85,13 @@ def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
   overwrite true
 }
 
-task copyFromVsCodeToStandaloneResources(type: Copy) {
-    dependsOn extractCppDependencies
-    dependsOn extractJavaDependencies
-    dependsOn downloadNewCommands
-    dependsOn downloadRomiVendordep
-    dependsOn downloadXRPVendordep
-    from ('vscode-wpilib/resources/java') {
-        into 'java'
-    }
-    from ('vscode-wpilib/resources/cpp') {
-        into 'cpp'
-    }
-    from ('vscode-wpilib/resources/gradle') {
-        into 'gradle'
-    }
-    from ('vscode-wpilib/resources/vendordeps') {
-        into 'vendordeps'
-    }
-    into 'wpilib-utility-standalone/resources'
-}
-
-task copyFromVsCodeToStandaloneSrc(type: Copy) {
-    from ('vscode-wpilib/src/riolog/shared') {
-        into 'riolog/shared'
-    }
-    from ('vscode-wpilib/src/shared') {
-        into 'shared'
-    }
-    into 'wpilib-utility-standalone/src'
-}
+build.dependsOn extractCppDependencies
+build.dependsOn extractJavaDependencies
+build.dependsOn downloadNewCommands
+build.dependsOn downloadRomiVendordep
+build.dependsOn downloadXRPVendordep
 
 apply from: 'templatebuilder.gradle'
-
-
-task updateAllDependencies() {
-    dependsOn copyFromVsCodeToStandaloneResources
-    dependsOn copyFromVsCodeToStandaloneSrc
-}
 
 if (project.hasProperty("publishVersion")) {
     wpilibVersioning.version.set(project.publishVersion)
@@ -132,7 +100,6 @@ if (project.hasProperty("publishVersion")) {
 wpilibVersioning.version.finalizeValue()
 
 ext.pubVersion = wpilibVersioning.version.get()
-
 
 if (pubVersion == '') {
     pubVersion = '0.0.1-unknown'

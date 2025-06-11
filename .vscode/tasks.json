@@ -17,21 +17,6 @@
         "isDefault": true
       },
       "problemMatcher": []
-    },
-    {
-      "type": "npm",
-      "identifier": "standalone-watch",
-      "script": "watch",
-      "problemMatcher": "$tsc-watch",
-      "path": "wpilib-utility-standalone/",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "never"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
     }
   ]
 }

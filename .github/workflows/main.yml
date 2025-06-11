@@ -3,70 +3,8 @@ name: CI
 on: [pull_request, push]
 
 jobs:
-  build-mac:
-    name: Build - macOS
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: "temurin"
-      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
-        name: Build with Gradle
-      - run: |
-          npm install
-          npm run compile
-          npm run lint
-          npm run packageMac
-        name: Build Standalone Utility
-        working-directory: wpilib-utility-standalone
-      - name: Import Developer ID Certificate
-        uses: wpilibsuite/import-signing-certificate@v2
-        with:
-          certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
-          certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
-        if: |
-          (github.repository_owner == 'wpilibsuite') &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-      - name: Sign Standalone Utility
-        run: npm run signMac
-        working-directory: wpilib-utility-standalone
-        if: |
-          (github.repository_owner == 'wpilibsuite') &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-      - name: Notarize Standalone Utility
-        uses: wpilibsuite/xcode-notarize@v3
-        with:
-          product-path: "wpilib-utility-standalone/build/wpilibutility-darwin-universal/wpilibutility.app"
-          appstore-connect-username: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
-          appstore-connect-teamid: ${{ secrets.APPLE_NOTARIZATION_TEAMID }}
-          appstore-connect-password: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
-        if: |
-          (github.repository_owner == 'wpilibsuite') &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-      - name: Staple Notarization Ticket
-        run: xcrun stapler staple -v wpilibutility.app
-        working-directory: wpilib-utility-standalone/build/wpilibutility-darwin-universal
-        if: |
-          (github.repository_owner == 'wpilibsuite') &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-      - run: tar -C build/wpilibutility-darwin-universal -pcvzf wpilibutility-mac.tar.gz .
-        working-directory: wpilib-utility-standalone
-        name: Create Archive
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Mac
-          path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-mac.tar.gz
-
-  build-linux:
-    name: Build - Linux
+  build-vsix:
+    name: Build - VSIX
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -79,69 +17,7 @@ jobs:
         with:
           java-version: 17
           distribution: "temurin"
-      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
-        name: Build with Gradle
-      - run: |
-          npm install
-          npm run compile
-          npm run lint
-          npm run packageLinux
-        name: Build Standalone Utility
-        working-directory: wpilib-utility-standalone
-      - run: tar -C build/wpilibutility-linux-x64 -pcvzf wpilibutility-linux.tar.gz .
-        working-directory: wpilib-utility-standalone
-        name: Archive Utility
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Linux
-          path: ${{ github.workspace }}/wpilib-utility-standalone/wpilibutility-linux.tar.gz
-
-  build-windows:
-    name: Build - Windows Standalone
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: "temurin"
-      - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
-        name: Build with Gradle
-      - run: |
-          npm install
-          npm run compile
-          npm run lint
-          npm run packageWindows
-        name: Build Standalone Utility
-        working-directory: wpilib-utility-standalone
-      - run: Compress-Archive -Path wpilibutility-win32-x64\* -DestinationPath wpilibutility-windows.zip
-        working-directory: wpilib-utility-standalone/build
-        shell: powershell
-      - uses: actions/upload-artifact@v4
-        with:
-          name: WindowsStandalone
-          path: ${{ github.workspace }}/wpilib-utility-standalone/build/wpilibutility-windows.zip
-
-  build-windows-vsix:
-    name: Build - Windows VSIX
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: "temurin"
-      - run: ./gradlew build updateVersions updateAllDependencies generateTemplateZip generateExamplesZip -PbuildServer
+      - run: ./gradlew build updateVersions -PbuildServer
         name: Build with Gradle
       - run: |
           npm install
@@ -154,7 +30,7 @@ jobs:
         name: Build VSIX
       - uses: actions/upload-artifact@v4
         with:
-          name: WindowsVSIX
+          name: VSIX
           path: ${{ github.workspace }}/**/*.vsix
       - uses: actions/upload-artifact@v4
         with:
@@ -195,7 +71,7 @@ jobs:
   release:
     name: "Release"
     runs-on: ubuntu-latest
-    needs: [build-mac, build-linux, build-windows, build-windows-vsix]
+    needs: [build-vsix]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4

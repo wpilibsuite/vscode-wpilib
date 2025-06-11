@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/wpilibsuite/vscode-wpilib/actions/workflows/main.yml/badge.svg)](https://github.com/wpilibsuite/vscode-wpilib/actions/workflows/main.yml)
 
-This repository contains the WPILib VS Code extension, along with the standalone electron project that contains some of the functionality of the extension.
+This repository contains the WPILib VS Code extension.
 
 ## Build Dependencies
 
@@ -18,9 +18,8 @@ This repository contains the WPILib VS Code extension, along with the standalone
 In order to properly build, there is some setup that needs to occur.
 
 1. Go into `vscode-wpilib` and run `npm install`
-2. Go into into `wpilib-utility-standalone` and run `npm install`
-3. From the root, run `./gradlew updateAllDependencies`. This will grab the templates and examples from WPILib, and move the shared dependencies from the vscode extension to the standalone utility. This command will need to be reran any time you update the shared dependencies in the vscode project.
-4. Open the root folder in VS Code.
+2. From the root, run `./gradlew build`. This will grab the templates and examples from WPILib, copy them into the vscode extension. This command will need to be reran any time you update the shared dependencies in the vscode project.
+3. Open the root folder in VS Code.
 
 ## Building and Debugging
 
@@ -28,9 +27,6 @@ Once you have the project open in VS Code, there are 5 debugging targets set up.
 
 - `Extension` Will launch the extension to debug
 - `Extension Tests` Will launch the extension tests
-- `Standalone: Main` Will launch the standalone project. The debugger will be attached to the host process
-- `Standalone: Renderer` Will attach to the standalone projects renderer process
-- `Standalone: All` Will launch the standalone project, and attach to the renderer. This will attach 2 separate debuggers.
 
 In addition, each project has a `compile` and a `lint` npm command. These will compile and lint their respective projects. Please run these before submitting any PR, as CI will check these. In addition, VS Code's lint does not detect the same lint errors as running lint manually would.
 
