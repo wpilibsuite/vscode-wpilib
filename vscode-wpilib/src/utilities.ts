@@ -90,8 +90,14 @@ export function setJavaHome(jhome: string): void {
   javaHome = jhome;
 }
 
-export async function gradleRun(args: string, rootDir: string, workspace: vscode.WorkspaceFolder,
-                                name: string, executeApi: IExecuteAPI, preferences: IPreferences): Promise<number> {
+export async function gradleRun(
+  args: string,
+  rootDir: string,
+  workspace: vscode.WorkspaceFolder,
+  name: string,
+  executeApi: IExecuteAPI,
+  preferences: IPreferences
+): Promise<number> {
   let command = './gradlew ' + args + ' ' + preferences.getAdditionalGradleArguments();
   if (preferences.getOffline()) {
     command += ' --offline';
@@ -133,10 +139,15 @@ export function getDesktopEnabled(buildgradle: string): Promise<boolean | undefi
 }
 
 export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolean> {
-  const openSelection = await vscode.window.showInformationMessage(i18n('message',
-      'Project successfully created. Would you like to open the folder?'), {
-    modal: true,
-  }, {title: i18n('ui', 'Yes (Current Window)')}, {title: i18n('ui', 'Yes (New Window)')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+  const openSelection = await vscode.window.showInformationMessage(
+    i18n('message', 'Project successfully created. Would you like to open the folder?'),
+    {
+      modal: true,
+    },
+    { title: i18n('ui', 'Yes (Current Window)') },
+    { title: i18n('ui', 'Yes (New Window)') },
+    { title: i18n('ui', 'No'), isCloseAffordance: true }
+  );
   if (openSelection === undefined) {
     return true;
   } else if (openSelection.title === i18n('ui', 'Yes (Current Window)')) {

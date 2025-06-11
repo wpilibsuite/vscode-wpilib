@@ -16,7 +16,6 @@ import { DeployDebug } from './deploydebug';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activateJava(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
-
   const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'java');
 
   const preferences = coreExports.getPreferencesAPI();
@@ -63,11 +62,18 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
           const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
           if (await existsAsync(buildGradle)) {
             const buildGradleUri = vscode.Uri.file(buildGradle);
-            onVendorDepsChanged(async (workspace) => {
-              if (workspace.index === localW.index) {
-                await vscode.commands.executeCommand('java.projectConfiguration.update', buildGradleUri);
-              }
-            }, null, context.subscriptions);
+            onVendorDepsChanged(
+              async (workspace) => {
+                if (workspace.index === localW.index) {
+                  await vscode.commands.executeCommand(
+                    'java.projectConfiguration.update',
+                    buildGradleUri
+                  );
+                }
+              },
+              null,
+              context.subscriptions
+            );
           }
         }
       }

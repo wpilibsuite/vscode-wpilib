@@ -64,8 +64,12 @@ class DebugCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
-                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runDeployer(
+    teamNumber: number,
+    workspace: vscode.WorkspaceFolder,
+    _: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     let command = 'deploy ' + args.join(' ') + ' -PdebugMode -PteamNumber=' + teamNumber;
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
       command += ' -xcheck';
@@ -76,17 +80,30 @@ class DebugCodeDeployer implements ICodeDeployer {
     if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Debug', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'Java Debug',
+      this.executeApi,
+      prefs
+    );
     if (result !== 0) {
       return false;
     }
 
-    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'), 'utf8');
+    const debugInfo = await readFileAsync(
+      path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'),
+      'utf8'
+    );
     const parsedDebugInfo: IJavaDebugInfo[] = jsonc.parse(debugInfo) as IJavaDebugInfo[];
     if (parsedDebugInfo.length === 0) {
-      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
-        modal: true,
-      });
+      await vscode.window.showInformationMessage(
+        'No debug configurations found. Is this a robot project?',
+        {
+          modal: true,
+        }
+      );
       return false;
     }
     let targetDebugInfo = parsedDebugInfo[0];
@@ -111,9 +128,12 @@ class DebugCodeDeployer implements ICodeDeployer {
     const targetInfoArray = jsonc.parse(targetReadInfo) as ITargetInfo[];
 
     if (targetInfoArray.length === 0) {
-      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
-        modal: true,
-      });
+      await vscode.window.showInformationMessage(
+        'No debug configurations found. Is this a robot project?',
+        {
+          modal: true,
+        }
+      );
       return false;
     }
 
@@ -166,8 +186,12 @@ class DeployCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
-                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runDeployer(
+    teamNumber: number,
+    workspace: vscode.WorkspaceFolder,
+    _: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     let command = 'deploy ' + args.join(' ') + ' -PteamNumber=' + teamNumber;
     if (this.preferences.getPreferences(workspace).getSkipTests()) {
       command += ' -xcheck';
@@ -178,7 +202,14 @@ class DeployCodeDeployer implements ICodeDeployer {
     if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Deploy', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'Java Deploy',
+      this.executeApi,
+      prefs
+    );
     if (result !== 0) {
       return false;
     }
@@ -206,22 +237,41 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
-  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
-                           __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runDeployer(
+    _: number,
+    workspace: vscode.WorkspaceFolder,
+    __: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     // TODO Support debug JNI mode simulation
     const command = 'simulateExternalJavaRelease ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Simulate', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'Java Simulate',
+      this.executeApi,
+      prefs
+    );
     if (result !== 0) {
       return false;
     }
 
-    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'sim', 'release_java.json'), 'utf8');
-    const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(simulateInfo) as IJavaSimulateInfo[];
+    const simulateInfo = await readFileAsync(
+      path.join(workspace.uri.fsPath, 'build', 'sim', 'release_java.json'),
+      'utf8'
+    );
+    const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(
+      simulateInfo
+    ) as IJavaSimulateInfo[];
     if (parsedSimulateInfo.length === 0) {
-      await vscode.window.showInformationMessage('No debug configurations found. Do you have desktop builds enabled?', {
-        modal: true,
-      });
+      await vscode.window.showInformationMessage(
+        'No debug configurations found. Do you have desktop builds enabled?',
+        {
+          modal: true,
+        }
+      );
       return false;
     }
     let targetSimulateInfo = parsedSimulateInfo[0];

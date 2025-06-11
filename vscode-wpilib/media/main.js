@@ -66,8 +66,7 @@
       versionAction.addEventListener('click', () => {
         const action = versionAction.getAttribute('id');
         if (versionSelect) {
-          var selectedText =
-            versionSelect.options[versionSelect.selectedIndex].label;
+          var selectedText = versionSelect.options[versionSelect.selectedIndex].label;
           // Handle update logic here
           vscode.postMessage({
             type: 'update',
@@ -78,11 +77,8 @@
       });
       versionSelect.addEventListener('change', () => {
         const versions = dep.versionInfo;
-        var selectedText =
-          versionSelect.options[versionSelect.selectedIndex].label;
-        const version = versions.find(
-          (versionTuple) => versionTuple.version === selectedText
-        );
+        var selectedText = versionSelect.options[versionSelect.selectedIndex].label;
+        const version = versions.find((versionTuple) => versionTuple.version === selectedText);
         // Change button text based on selected dropdown value
         versionAction.textContent = version.buttonText;
 
@@ -168,27 +164,19 @@
       message = event.data; // The json data that the extension sent
       switch (message.type) {
         case 'updateDependencies': {
-          const installedContainer = document.getElementById(
-            'installed-dependencies'
-          );
-          const availableContainer = document.getElementById(
-            'available-dependencies'
-          );
+          const installedContainer = document.getElementById('installed-dependencies');
+          const availableContainer = document.getElementById('available-dependencies');
 
           if (installedContainer) {
             populateInstalledList(message.installed, installedContainer);
           } else {
-            console.error(
-              'Element with ID "installed-dependencies" not found.'
-            );
+            console.error('Element with ID "installed-dependencies" not found.');
           }
 
           if (availableContainer) {
             populateAvailableList(message.available, availableContainer);
           } else {
-            console.error(
-              'Element with ID "available-dependencies" not found.'
-            );
+            console.error('Element with ID "available-dependencies" not found.');
           }
 
           break;
@@ -196,11 +184,9 @@
       }
     });
 
-    document
-      .getElementById('updateall-action')
-      ?.addEventListener('click', () => {
-        vscode.postMessage({ type: 'updateall' });
-      });
+    document.getElementById('updateall-action')?.addEventListener('click', () => {
+      vscode.postMessage({ type: 'updateall' });
+    });
 
     // Listen for focus events
     window.addEventListener('blur', () => {
@@ -210,5 +196,3 @@
 
   addEventListeners();
 })();
-
-

@@ -20,10 +20,21 @@ class CodeBuilder implements ICodeBuilder {
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
 
-  public async runBuilder(workspace: vscode.WorkspaceFolder, _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runBuilder(
+    workspace: vscode.WorkspaceFolder,
+    _: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     const command = 'build ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Build', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'Java Build',
+      this.executeApi,
+      prefs
+    );
     logger.log(result.toString());
     return true;
   }
@@ -52,10 +63,21 @@ class CodeTester implements ICodeBuilder {
     return currentLanguage === 'none' || currentLanguage === 'java';
   }
 
-  public async runBuilder(workspace: vscode.WorkspaceFolder, _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runBuilder(
+    workspace: vscode.WorkspaceFolder,
+    _: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     const command = 'test ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'Java Test', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'Java Test',
+      this.executeApi,
+      prefs
+    );
 
     logger.log(result.toString());
     return true;

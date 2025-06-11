@@ -1,7 +1,12 @@
 'use strict';
 
 import { IGradle2020IPCReceive, IGradle2020IPCSend } from './gradle2020importpagetypes';
-import { validateProject, validateTeamNumber, validateProjectFolder, validateXrpRomi } from './sharedpages';
+import {
+  validateProject,
+  validateTeamNumber,
+  validateProjectFolder,
+  validateXrpRomi,
+} from './sharedpages';
 
 interface IVsCodeApi {
   postMessage(message: IGradle2020IPCReceive): void;

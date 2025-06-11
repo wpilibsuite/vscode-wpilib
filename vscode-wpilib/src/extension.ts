@@ -19,12 +19,7 @@ import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
 import { localize as i18n } from './locale';
-import {
-  closeLogger,
-  getMainLogFile,
-  logger,
-  setLoggerDirectory,
-} from './logger';
+import { closeLogger, getMainLogFile, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
@@ -33,12 +28,7 @@ import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
-import {
-  existsAsync,
-  mkdirpAsync,
-  setExtensionContext,
-  setJavaHome,
-} from './utilities';
+import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
 import { Gradle2020Import } from './webviews/gradle2020import';
@@ -52,16 +42,9 @@ class ExternalAPI implements IExternalAPI {
   // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
-    const deployDebugApi = await DeployDebugAPI.Create(
-      resourceFolder,
-      preferencesApi
-    );
+    const deployDebugApi = await DeployDebugAPI.Create(resourceFolder, preferencesApi);
     const buildTestApi = new BuildTestAPI(preferencesApi);
-    const externalApi = new ExternalAPI(
-      preferencesApi,
-      deployDebugApi,
-      buildTestApi
-    );
+    const externalApi = new ExternalAPI(preferencesApi, deployDebugApi, buildTestApi);
     return externalApi;
   }
 
@@ -136,10 +119,7 @@ async function handleAfterTrusted(
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(
-      i18n(
-        'message',
-        'Java 17 required, but not found. Might have compilation errors.'
-      )
+      i18n('message', 'Java 17 required, but not found. Might have compilation errors.')
     );
   }
 
@@ -186,11 +166,7 @@ async function handleAfterTrusted(
 
   try {
     if (wpilibUpdate !== undefined && vendorLibs !== undefined) {
-      projectInfo = new ProjectInfoGatherer(
-        vendorLibs,
-        wpilibUpdate,
-        externalApi
-      );
+      projectInfo = new ProjectInfoGatherer(vendorLibs, wpilibUpdate, externalApi);
       context.subscriptions.push(projectInfo);
     }
   } catch (err) {
@@ -210,10 +186,7 @@ async function handleAfterTrusted(
       );
 
       context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(
-          DependencyViewProvider.viewType,
-          depProvider
-        )
+        vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider)
       );
 
       if (depProvider !== undefined) {
@@ -223,12 +196,9 @@ async function handleAfterTrusted(
           })
         );
         context.subscriptions.push(
-          vscode.commands.registerCommand(
-            'wpilib.refreshVendordeps',
-            async () => {
-              await depProvider?.refresh();
-            }
-          )
+          vscode.commands.registerCommand('wpilib.refreshVendordeps', async () => {
+            await depProvider?.refresh();
+          })
         );
 
         /*         context.subscriptions.push(
@@ -264,8 +234,7 @@ async function handleAfterTrusted(
           path.join(w.uri.fsPath, 'vendordeps'),
           '**/*.json'
         );
-        const vendorDepsWatcher =
-          vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
+        const vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
         context.subscriptions.push(vendorDepsWatcher);
         const localW = w;
 
@@ -284,7 +253,7 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if ((prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java')) {
+        if (prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java') {
           logger.log('Project with Unknown Language: ' + prefs.getCurrentLanguage());
           continue;
         }
@@ -319,18 +288,13 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (
-          prefs.getCurrentLanguage() === 'cpp' ||
-          prefs.getCurrentLanguage() === 'java'
-        ) {
+        if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
           let didUpdate: boolean = false;
           if (wpilibUpdate) {
             didUpdate = await wpilibUpdate.checkForInitialUpdate(w);
           }
 
-          let runBuild: boolean = !(await existsAsync(
-            path.join(w.uri.fsPath, 'build')
-          ));
+          let runBuild: boolean = !(await existsAsync(path.join(w.uri.fsPath, 'build')));
 
           if (didUpdate) {
             const result = await vscode.window.showInformationMessage(
@@ -393,10 +357,7 @@ async function handleAfterTrusted(
           // Only go 1 subfolder deep
           const pattern = new vscode.RelativePattern(
             w,
-            '*/' +
-              Preferences.wpilibPreferencesFolder +
-              '/' +
-              Preferences.preferenceFileName
+            '*/' + Preferences.wpilibPreferencesFolder + '/' + Preferences.preferenceFileName
           );
 
           const wpilibFiles = await vscode.workspace.findFiles(pattern);
@@ -418,18 +379,9 @@ async function handleAfterTrusted(
               { title: i18n('ui', "No, Don't ask again for this folder") }
             );
             if (openResult?.title === i18n('ui', 'Yes')) {
-              const wpRoot = vscode.Uri.file(
-                path.dirname(path.dirname(wpilibFiles[0].fsPath))
-              );
-              await vscode.commands.executeCommand(
-                'vscode.openFolder',
-                wpRoot,
-                false
-              );
-            } else if (
-              openResult?.title ===
-              i18n('ui', "No, Don't ask again for this folder")
-            ) {
+              const wpRoot = vscode.Uri.file(path.dirname(path.dirname(wpilibFiles[0].fsPath)));
+              await vscode.commands.executeCommand('vscode.openFolder', wpRoot, false);
+            } else if (openResult?.title === i18n('ui', "No, Don't ask again for this folder")) {
               persistentState.Value = true;
             }
           } else if (wpilibFiles.length > 1) {
@@ -458,16 +410,9 @@ async function handleAfterTrusted(
                 canPickMany: false,
               });
               if (picked !== undefined) {
-                await vscode.commands.executeCommand(
-                  'vscode.openFolder',
-                  picked.fullFolder,
-                  false
-                );
+                await vscode.commands.executeCommand('vscode.openFolder', picked.fullFolder, false);
               }
-            } else if (
-              openResult?.title ===
-              i18n('ui', "No, Don't ask again for this folder")
-            ) {
+            } else if (openResult?.title === i18n('ui', "No, Don't ask again for this folder")) {
               persistentState.Value = true;
             }
           }
@@ -477,9 +422,7 @@ async function handleAfterTrusted(
   }
 
   if (creationError) {
-    vscode.window.showErrorMessage(
-      'A portion of WPILib failed to initialize. See log for details'
-    );
+    vscode.window.showErrorMessage('A portion of WPILib failed to initialize. See log for details');
   }
 
   // Log our extension is active
@@ -498,10 +441,7 @@ export async function activate(context: vscode.ExtensionContext) {
   setExtensionContext(context);
 
   // Resources folder is used for gradle template along with HTML files
-  const extensionResourceLocation = path.join(
-    context.extensionPath,
-    'resources'
-  );
+  const extensionResourceLocation = path.join(context.extensionPath, 'resources');
 
   // The external API can be used by other extensions that want to use our
   // functionality. Its definition is provided in shared/externalapi.ts.
@@ -560,23 +500,14 @@ export async function activate(context: vscode.ExtensionContext) {
       if (!(await existsAsync(mainLog))) {
         mainLog = path.dirname(mainLog);
       }
-      await vscode.commands.executeCommand(
-        'revealFileInOS',
-        vscode.Uri.file(mainLog)
-      );
+      await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.openCommandPalette',
-      async () => {
-        await vscode.commands.executeCommand(
-          'workbench.action.quickOpen',
-          '>WPILib '
-        );
-      }
-    )
+    vscode.commands.registerCommand('wpilibcore.openCommandPalette', async () => {
+      await vscode.commands.executeCommand('workbench.action.quickOpen', '>WPILib ');
+    })
   );
 
   if (!vscode.workspace.isTrusted) {
@@ -610,7 +541,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Register the command with arguments
   let disposable = vscode.commands.registerCommand(
-    'extension.showWebsite', 
+    'extension.showWebsite',
     (url: string, tabTitle: string) => {
       // If no arguments were passed, you can prompt the user (optional):
       if (!url) {
@@ -618,17 +549,17 @@ export async function activate(context: vscode.ExtensionContext) {
         return;
       }
       if (!tabTitle) {
-        tabTitle = "My Website"; // fallback title if not provided
+        tabTitle = 'My Website'; // fallback title if not provided
       }
 
       // Create and show a new webview panel
       const panel = vscode.window.createWebviewPanel(
-        'myWebview',      // internal identifier
-        tabTitle,         // use the dynamic title
+        'myWebview', // internal identifier
+        tabTitle, // use the dynamic title
         vscode.ViewColumn.One,
         {
           enableScripts: true,
-          retainContextWhenHidden: true
+          retainContextWhenHidden: true,
         }
       );
 
@@ -638,7 +569,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(disposable);
-  
+
   return externalApi;
 }
 

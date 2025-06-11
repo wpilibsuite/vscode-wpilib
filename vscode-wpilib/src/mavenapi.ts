@@ -13,8 +13,8 @@ export interface IVersioning {
 }
 
 export interface IMetaData {
- versioning: IVersioning[];
- artifactId: string;
+  versioning: IVersioning[];
+  artifactId: string;
 }
 
 export interface IMavenMetaData {
@@ -22,7 +22,10 @@ export interface IMavenMetaData {
 }
 
 export function getMavenMetadataContents(repoRoot: string): Promise<string> {
-  const xmlFile = repoRoot[repoRoot.length - 1] === '/' ? repoRoot + 'maven-metadata.xml' : repoRoot + '/maven-metadata.xml';
+  const xmlFile =
+    repoRoot[repoRoot.length - 1] === '/'
+      ? repoRoot + 'maven-metadata.xml'
+      : repoRoot + '/maven-metadata.xml';
   return downloadTextFile(xmlFile);
 }
 
@@ -55,7 +58,12 @@ export function getNewestMavenVersion(versions: string[]): string | undefined {
   return newestVersion;
 }
 
-export function constructDownloadUrl(metadata: IMavenMetaData, repoRoot: string, version: string, ext: string) {
+export function constructDownloadUrl(
+  metadata: IMavenMetaData,
+  repoRoot: string,
+  version: string,
+  ext: string
+) {
   const rootDir = repoRoot[repoRoot.length - 1] === '/' ? repoRoot : repoRoot + '/';
   const versionDir = rootDir + version + '/';
   const fileDir = versionDir + metadata.metadata.artifactId + '-' + version + ext;

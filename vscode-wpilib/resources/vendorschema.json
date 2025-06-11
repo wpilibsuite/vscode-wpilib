@@ -38,11 +38,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "groupId",
-            "artifactId",
-            "version"
-          ]
+          "required": ["groupId", "artifactId", "version"]
         }
       ]
     },

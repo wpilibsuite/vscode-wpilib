@@ -11,7 +11,7 @@ export function setExecutePermissions(file: string): Promise<void> {
       if (err) {
         reject(err);
       } else {
-        let mode = stat.mode & 0xFFFF;
+        let mode = stat.mode & 0xffff;
         mode |= fs.constants.S_IXUSR | fs.constants.S_IXGRP | fs.constants.S_IXOTH;
         fs.chmod(file, mode, (err2) => {
           if (err2) {

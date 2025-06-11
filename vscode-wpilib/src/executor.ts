@@ -39,8 +39,13 @@ export class ExecuteAPI implements IExecuteAPI {
     });
   }
 
-  public async executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder,
-                              env?: { [key: string]: string }): Promise<number> {
+  public async executeCommand(
+    command: string,
+    name: string,
+    rootDir: string,
+    workspace: vscode.WorkspaceFolder,
+    env?: { [key: string]: string }
+  ): Promise<number> {
     const shell = new vscode.ShellExecution(command, {
       cwd: rootDir,
       env,
@@ -67,7 +72,6 @@ export class ExecuteAPI implements IExecuteAPI {
       cancelled: false,
       condition: new PromiseCondition(-1),
       execution,
-
     };
     this.runners.push(runner);
     return runner.condition.wait();

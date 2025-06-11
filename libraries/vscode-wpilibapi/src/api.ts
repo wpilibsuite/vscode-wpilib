@@ -1,5 +1,5 @@
-'use strict';
-import * as vscode from 'vscode';
+"use strict";
+import * as vscode from "vscode";
 
 export interface IPreferencesChangedPair {
   workspace: vscode.WorkspaceFolder;
@@ -16,8 +16,13 @@ export interface IToolAPI {
 }
 
 export interface IExecuteAPI {
-  executeCommand(command: string, name: string, rootDir: string, workspace: vscode.WorkspaceFolder,
-                 env?: { [key: string]: string }): Promise<number>;
+  executeCommand(
+    command: string,
+    name: string,
+    rootDir: string,
+    workspace: vscode.WorkspaceFolder,
+    env?: { [key: string]: string },
+  ): Promise<number>;
   cancelCommands(): Promise<number>;
 }
 
@@ -26,31 +31,61 @@ export interface IExampleTemplateAPI {
   addExampleProvider(provider: IExampleTemplateCreator): void;
   getLanguages(template: boolean): string[];
   getBases(template: boolean, language: string): ICreatorQuickPick[];
-  createProject(template: boolean, language: string, base: string, toFolder: string,
-                newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean>;
+  createProject(
+    template: boolean,
+    language: string,
+    base: string,
+    toFolder: string,
+    newFolder: boolean,
+    projectName: string,
+    teamNumber: number,
+  ): Promise<boolean>;
 }
 
 export interface ICommandAPI {
   addCommandProvider(provider: ICommandCreator): void;
-  createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean>;
+  createCommand(
+    workspace: vscode.WorkspaceFolder,
+    folder: vscode.Uri,
+  ): Promise<boolean>;
 }
 
 export interface IDeployDebugAPI {
   startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
-  deployCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  deployCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
   registerCodeDeploy(deployer: ICodeDeployer): void;
-  debugCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  debugCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
   registerCodeDebug(deployer: ICodeDeployer): void;
-  simulateCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  simulateCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
   registerCodeSimulate(deployer: ICodeDeployer): void;
   addLanguageChoice(language: string): void;
   getLanguageChoices(): string[];
 }
 
 export interface IBuildTestAPI {
-  buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  buildCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
   registerCodeBuild(builder: ICodeBuilder): void;
-  testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  testCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
   registerCodeTest(builder: ICodeBuilder): void;
   addLanguageChoice(language: string): void;
 }
@@ -96,14 +131,20 @@ export interface IPreferences {
   getStopSimulationOnEntry(): boolean;
   getAdditionalGradleArguments(): string;
   setSkipTests(value: boolean, global: boolean): Promise<void>;
-  setSelectDefaultSimulateExtension(value: boolean, global: boolean): Promise<void>;
+  setSelectDefaultSimulateExtension(
+    value: boolean,
+    global: boolean,
+  ): Promise<void>;
   setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
   getOffline(): boolean;
   setOffline(value: boolean, global: boolean): Promise<void>;
   getDeployOffline(): boolean;
   setDeployOffline(value: boolean, global: boolean): Promise<void>;
   getSkipSelectSimulateExtension(): boolean;
-  setSkipSelectSimulateExtension(value: boolean, global: boolean): Promise<void>;
+  setSkipSelectSimulateExtension(
+    value: boolean,
+    global: boolean,
+  ): Promise<void>;
 }
 
 export interface IExampleTemplateCreator {
@@ -118,7 +159,10 @@ export interface ICommandCreator {
   getDisplayName(): string;
   getDescription(): string;
   getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  generate(folder: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<boolean>;
+  generate(
+    folder: vscode.Uri,
+    workspace: vscode.WorkspaceFolder,
+  ): Promise<boolean>;
 }
 
 export interface IToolRunner {
@@ -142,7 +186,12 @@ export interface ICodeDeployer {
    *
    * @param teamNumber The team number to deploy to
    */
-  runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  runDeployer(
+    teamNumber: number,
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection
@@ -164,7 +213,11 @@ export interface ICodeBuilder {
   /**
    * Run the command with the specified team number
    */
-  runBuilder(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean>;
+  runBuilder(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
 
   /**
    * Get the display name to be used for selection
@@ -174,7 +227,8 @@ export interface ICodeBuilder {
 }
 
 export async function getWPILibApi(): Promise<IExternalAPI | undefined> {
-  const wpilib: vscode.Extension<IExternalAPI> | undefined = vscode.extensions.getExtension('wpilibsuite.vscode-wpilib');
+  const wpilib: vscode.Extension<IExternalAPI> | undefined =
+    vscode.extensions.getExtension("wpilibsuite.vscode-wpilib");
   let extension: IExternalAPI | undefined;
 
   if (wpilib) {

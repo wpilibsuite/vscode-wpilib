@@ -5,7 +5,7 @@ import { mkdirpAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as vscode from '../vscodeshim';
 import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
 import { IPreferencesJson } from './preferencesjson';
-import  { localize as i18n } from '../locale';
+import { localize as i18n } from '../locale';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
   private templates: ICreatorQuickPick[] = [];
@@ -64,8 +64,15 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
     //
   }
 
-  public async createProject(template: boolean, language: string, base: string, toFolder: string,
-                             newFolder: boolean, projectName: string, teamNumber: number): Promise<boolean> {
+  public async createProject(
+    template: boolean,
+    language: string,
+    base: string,
+    toFolder: string,
+    newFolder: boolean,
+    projectName: string,
+    teamNumber: number
+  ): Promise<boolean> {
     if (template) {
       for (const t of this.templates) {
         if (t.creator.getLanguage() === language && t.label === base) {
@@ -79,12 +86,19 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
         }
       }
     }
-    vscode.window.showErrorMessage(i18n('message', 'Please select project type, language, and base.'));
+    vscode.window.showErrorMessage(
+      i18n('message', 'Please select project type, language, and base.')
+    );
     return false;
   }
 
-  private async handleGenerate(creator: IExampleTemplateCreator, toFolderOrig: string, newFolder: boolean,
-                               projectName: string, teamNumber: number): Promise<boolean> {
+  private async handleGenerate(
+    creator: IExampleTemplateCreator,
+    toFolderOrig: string,
+    newFolder: boolean,
+    projectName: string,
+    teamNumber: number
+  ): Promise<boolean> {
     let toFolder = toFolderOrig;
 
     if (newFolder) {

@@ -83,7 +83,7 @@ export class BuiltinTools {
     this.utilities = utilities;
   }
 
-  public dispose()  {
+  public dispose() {
     //
   }
 

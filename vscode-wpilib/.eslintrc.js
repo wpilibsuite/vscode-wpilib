@@ -5,8 +5,8 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   root: true,
   rules: {
-    "@typescript-eslint/no-namespace": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "no-case-declarations": "off"
-  }
+    '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'no-case-declarations': 'off',
+  },
 };

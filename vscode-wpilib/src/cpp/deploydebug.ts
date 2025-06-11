@@ -75,8 +75,12 @@ class DebugCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
-                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runDeployer(
+    teamNumber: number,
+    workspace: vscode.WorkspaceFolder,
+    _: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     let command = 'deploy ' + args.join(' ') + ' -PdebugMode -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
     // If deploy offline, and builds online, set flags
@@ -84,17 +88,30 @@ class DebugCodeDeployer implements ICodeDeployer {
     if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Debug', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'C++ Debug',
+      this.executeApi,
+      prefs
+    );
     if (result !== 0) {
       return false;
     }
 
-    const debugInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'), 'utf8');
+    const debugInfo = await readFileAsync(
+      path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'),
+      'utf8'
+    );
     const parsedDebugInfo: ICppDebugInfo[] = jsonc.parse(debugInfo) as ICppDebugInfo[];
     if (parsedDebugInfo.length === 0) {
-      await vscode.window.showInformationMessage('No target configurations found. Is this a robot project?', {
-        modal: true,
-      });
+      await vscode.window.showInformationMessage(
+        'No target configurations found. Is this a robot project?',
+        {
+          modal: true,
+        }
+      );
       return false;
     }
     let targetDebugInfo = parsedDebugInfo[0];
@@ -119,9 +136,12 @@ class DebugCodeDeployer implements ICodeDeployer {
     const targetInfoArray: ICppDebugCommand[] = jsonc.parse(targetReadInfo) as ICppDebugCommand[];
 
     if (targetInfoArray.length === 0) {
-      await vscode.window.showInformationMessage('No debug configurations found. Is this a robot project?', {
-        modal: true,
-      });
+      await vscode.window.showInformationMessage(
+        'No debug configurations found. Is this a robot project?',
+        {
+          modal: true,
+        }
+      );
       return false;
     }
 
@@ -198,8 +218,12 @@ class DeployCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
-  public async runDeployer(teamNumber: number, workspace: vscode.WorkspaceFolder,
-                           _: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runDeployer(
+    teamNumber: number,
+    workspace: vscode.WorkspaceFolder,
+    _: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     let command = 'deploy ' + args.join(' ') + ' -PteamNumber=' + teamNumber;
     const prefs = this.preferences.getPreferences(workspace);
     // If deploy offline, and builds online, set flags
@@ -207,7 +231,14 @@ class DeployCodeDeployer implements ICodeDeployer {
     if (prefs.getDeployOffline() && !prefs.getOffline()) {
       command += ' --offline';
     }
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Deploy', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'C++ Deploy',
+      this.executeApi,
+      prefs
+    );
     if (result !== 0) {
       return false;
     }
@@ -235,22 +266,39 @@ class SimulateCodeDeployer implements ICodeDeployer {
     const currentLanguage = prefs.getCurrentLanguage();
     return currentLanguage === 'none' || currentLanguage === 'cpp';
   }
-  public async runDeployer(_: number, workspace: vscode.WorkspaceFolder,
-                           __: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public async runDeployer(
+    _: number,
+    workspace: vscode.WorkspaceFolder,
+    __: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     // Support release
     const command = 'simulateExternalNativeDebug ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
-    const result = await gradleRun(command, workspace.uri.fsPath, workspace, 'C++ Simulate', this.executeApi, prefs);
+    const result = await gradleRun(
+      command,
+      workspace.uri.fsPath,
+      workspace,
+      'C++ Simulate',
+      this.executeApi,
+      prefs
+    );
     if (result !== 0) {
       return false;
     }
 
-    const simulateInfo = await readFileAsync(path.join(workspace.uri.fsPath, 'build', 'sim', 'debug_native.json'), 'utf8');
+    const simulateInfo = await readFileAsync(
+      path.join(workspace.uri.fsPath, 'build', 'sim', 'debug_native.json'),
+      'utf8'
+    );
     const parsedSimulateInfo: ICppSimulateInfo[] = jsonc.parse(simulateInfo) as ICppSimulateInfo[];
     if (parsedSimulateInfo.length === 0) {
-      await vscode.window.showInformationMessage('No debug configurations found. Do you have desktop builds enabled?', {
-        modal: true,
-      });
+      await vscode.window.showInformationMessage(
+        'No debug configurations found. Do you have desktop builds enabled?',
+        {
+          modal: true,
+        }
+      );
       return false;
     }
     let targetSimulateInfo = parsedSimulateInfo[0];
@@ -316,7 +364,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
         environment: targetSimulateInfo.environment,
         executablePath: targetSimulateInfo.launchfile,
         extensions,
-        ldPath: path.dirname(targetSimulateInfo.launchfile),    // gradle puts all the libs in the same dir as the executable
+        ldPath: path.dirname(targetSimulateInfo.launchfile), // gradle puts all the libs in the same dir as the executable
         soLibPath: soPath,
         srcPaths: new Set<string>(targetSimulateInfo.srcpaths),
         stopAtEntry: this.preferences.getPreferences(workspace).getStopSimulationOnEntry(),
