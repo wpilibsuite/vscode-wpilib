@@ -2,8 +2,8 @@
 
 import { EventEmitter } from 'events';
 import * as net from 'net';
-import { IRioConsole } from './interfaces';
-import { ErrorMessage, PrintMessage } from './message';
+import { IRioConsole } from './shared/interfaces';
+import { ErrorMessage, PrintMessage } from './shared/message';
 import { PromiseCondition } from './promisecond';
 import { connectToRobot } from './rioconnector';
 import { logger } from '../logger';

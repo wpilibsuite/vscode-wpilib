@@ -1,7 +1,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import { IErrorMessage, MessageType } from '../riolog/message';
+import { IErrorMessage, MessageType } from '../riolog/shared/message';
 import { RioConsole } from '../riolog/rioconsole';
 
 function checkErrorEqual(a: IErrorMessage, b: IErrorMessage): void {

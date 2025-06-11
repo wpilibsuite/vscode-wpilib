@@ -11,9 +11,9 @@ import {
   IRioConsoleProvider,
   IWindowProvider,
   IWindowView,
-} from './interfaces';
+} from './shared/interfaces';
 import { RioConsole } from './rioconsole';
-import { IErrorMessage, IPrintMessage } from './message';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;

@@ -9,8 +9,8 @@ import {
   IWindowView,
   ReceiveTypes,
   SendTypes,
-} from './interfaces';
-import { IErrorMessage, IPrintMessage } from './message';
+} from './shared/interfaces';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 
 export class RioLogWindow {
   private webview: IWindowView | undefined = undefined;

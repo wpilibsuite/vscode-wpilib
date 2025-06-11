@@ -1,7 +1,7 @@
 'use strict';
 
-import { IIPCSendMessage, ReceiveTypes, SendTypes } from '../interfaces';
-import { IErrorMessage, IPrintMessage, MessageType } from '../message';
+import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
+import { IErrorMessage, IPrintMessage, MessageType } from './message';
 import { checkResize, scrollImpl, sendMessage } from '../script/implscript';
 
 let paused = false;
