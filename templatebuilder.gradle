@@ -108,8 +108,6 @@ ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
 }
 
 task generateTemplatesFolder {
-    dependsOn copyFromVsCodeToStandaloneResources
-
     def outputDir = new File(project.buildDir, "templates")
 
     outputs.dir outputDir
@@ -136,11 +134,10 @@ task generateTemplatesZip(type: Zip) {
     dependsOn generateTemplatesFolder
     from new File(project.buildDir, "templates")
     archiveFileName = 'templates.zip'
+    build.dependsOn it
 }
 
 task generateExamplesFolder {
-    dependsOn copyFromVsCodeToStandaloneResources
-
     def outputDir = new File(project.buildDir, "examples")
 
     outputs.dir outputDir
@@ -167,5 +164,6 @@ task generateExamplesZip(type: Zip) {
     dependsOn generateExamplesFolder
     from new File(project.buildDir, "examples")
     archiveFileName = 'examples.zip'
+    build.dependsOn it
 }
 
