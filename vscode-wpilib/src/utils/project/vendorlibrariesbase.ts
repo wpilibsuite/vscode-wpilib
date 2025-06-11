@@ -1,8 +1,7 @@
 'use strict';
 
 import * as fetch from 'node-fetch';
-import * as path from 'path';
-import { logger } from '../logger';
+import { logger } from '../../logger';
 import {
   deleteFileAsync,
   existsAsync,
@@ -10,8 +9,9 @@ import {
   readdirAsync,
   readFileAsync,
   writeFileAsync,
-} from '../utilities';
-import { IUtilitiesAPI } from '../wpilibapishim';
+} from '../../utilities';
+import { IUtilitiesAPI } from '../../wpilibapishim';
+import * as pathUtils from './pathUtils';
 
 export interface IJsonDependency {
   name: string;
@@ -63,7 +63,7 @@ export class VendorLibrariesBase {
   }
 
   public getVendorFolder(root: string): string {
-    return path.join(root, 'vendordeps');
+    return pathUtils.getVendorDepsPath(root);
   }
 
   public async installDependency(
@@ -71,38 +71,45 @@ export class VendorLibrariesBase {
     url: string,
     override: boolean
   ): Promise<boolean> {
-    const dirExists = await existsAsync(url);
+    try {
+      const dirExists = await existsAsync(url);
 
-    if (!dirExists) {
-      await mkdirpAsync(url);
-      // Directly write file
-      await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-      return true;
-    }
+      if (!dirExists) {
+        await mkdirpAsync(url);
+        // Directly write file
+        await writeFileAsync(pathUtils.joinPath(url, dep.fileName), JSON.stringify(dep, null, 4));
+        return true;
+      }
 
-    const files = await readdirAsync(url);
+      const files = await readdirAsync(url);
 
-    for (const file of files) {
-      const fullPath = path.join(url, file);
-      const result = await this.readFile(fullPath);
-      if (result !== undefined) {
-        if (result.uuid === dep.uuid) {
-          if (override) {
-            await deleteFileAsync(fullPath);
-            break;
-          } else {
-            return false;
+      for (const file of files) {
+        const fullPath = pathUtils.joinPath(url, file);
+        const result = await this.readFile(fullPath);
+        if (result !== undefined) {
+          if (result.uuid === dep.uuid) {
+            if (override) {
+              await deleteFileAsync(fullPath);
+              break;
+            } else {
+              return false;
+            }
           }
         }
       }
-    }
 
-    await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-    return true;
+      await writeFileAsync(pathUtils.joinPath(url, dep.fileName), JSON.stringify(dep, null, 4));
+      return true;
+    } catch (error) {
+      logger.error(`Failed to install dependency ${dep.name}:`, error);
+      return false;
+    }
   }
 
   public getHomeDirDeps(): Promise<IJsonDependency[]> {
-    return this.getDependencies(path.join(this.utilities.getWPILibHomeDir(), 'vendordeps'));
+    return this.getDependencies(
+      pathUtils.joinPath(this.utilities.getWPILibHomeDir(), 'vendordeps')
+    );
   }
 
   protected async readFile(file: string): Promise<IJsonDependency | undefined> {
@@ -128,7 +135,7 @@ export class VendorLibrariesBase {
       const promises: Promise<IJsonDependency | undefined>[] = [];
 
       for (const file of files) {
-        promises.push(this.readFile(path.join(dir, file)));
+        promises.push(this.readFile(pathUtils.joinPath(dir, file)));
       }
 
       const results = await Promise.all(promises);
@@ -140,22 +147,30 @@ export class VendorLibrariesBase {
   }
 
   protected async loadFileFromUrl(url: string): Promise<IJsonDependency> {
-    const response = await fetch.default(url, {
-      timeout: 5000,
-    });
-    if (response === undefined) {
-      throw new Error('Failed to fetch file');
-    }
-    if (response.status >= 200 && response.status <= 300) {
-      const text = await response.text();
-      const json = JSON.parse(text);
-      if (isJsonDependency(json)) {
-        return json;
-      } else {
-        throw new Error('Incorrect JSON format');
+    try {
+      const response = await fetch.default(url, {
+        timeout: 5000,
+      });
+
+      if (response === undefined) {
+        throw new Error('Failed to fetch file');
       }
-    } else {
-      throw new Error('Bad status ' + response.status);
+
+      if (response.status >= 200 && response.status <= 300) {
+        const text = await response.text();
+        const json = JSON.parse(text);
+
+        if (isJsonDependency(json)) {
+          return json;
+        } else {
+          throw new Error('Incorrect JSON format');
+        }
+      } else {
+        throw new Error(`Bad status ${response.status}`);
+      }
+    } catch (error) {
+      logger.error(`Failed to load file from URL: ${url}`, error);
+      throw error;
     }
   }
 }

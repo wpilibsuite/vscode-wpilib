@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
 import * as xml2js from 'xml2js';
-import { localize as i18n } from './locale';
+import { localize as i18n } from './utils/i18n/locale';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './utilities';

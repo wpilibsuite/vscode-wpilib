@@ -1,10 +1,10 @@
-'use scrict';
+'use strict';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
-import { localize as i18n } from './locale';
+import { RioLogWindow } from './riolog/riologwindow';
+import { localize as i18n } from './utils/i18n/locale';
 import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';
-import { RioLogWindow } from './riolog/riologwindow';
 import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
 
 interface ICodeDeployerQuickPick extends vscode.QuickPickItem {

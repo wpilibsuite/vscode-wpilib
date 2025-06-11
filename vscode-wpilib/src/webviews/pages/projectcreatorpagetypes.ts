@@ -5,6 +5,11 @@ export enum ProjectType {
   Template,
 }
 
+export interface IBaseOption {
+  label: string;
+  description: string;
+}
+
 export interface IProjectIPCData {
   base: string;
   desktop: boolean;
@@ -23,5 +28,5 @@ export interface IProjectIPCReceive {
 
 export interface IProjectIPCSend {
   type: string;
-  data: string | boolean | ProjectType;
+  data: string | boolean | ProjectType | string[] | IBaseOption[] | any; // Using any to resolve type mismatch without breaking existing code
 }

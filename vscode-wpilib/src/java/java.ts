@@ -4,9 +4,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from 'vscode-wpilibapi';
-import { logger } from '../logger';
-import { Examples } from '../shared/examples';
-import { Templates } from '../shared/templates';
+import { Examples } from '../utils/project/examples';
+import { Templates } from '../utils/project/templates';
 import { existsAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
@@ -26,8 +25,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   const javaDebugExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
   if (javaDebugExtension === undefined) {
-    // TODO: Make this a visible warning message when project detected is java
-    logger.log('Could not find java extension. Debugging is disabled.');
+    vscode.window.showWarningMessage('Could not find java extension. Debugging is disabled.');
+
     allowDebug = false;
   }
 

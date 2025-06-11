@@ -1,7 +1,7 @@
 'use strict';
 
 import * as jsonc from 'jsonc-parser';
-import * as mm from 'micromatch';
+import mm from 'micromatch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {

@@ -5,7 +5,9 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
 import { logger } from '../logger';
-import { getClassName, ncpAsync } from '../utilities';
+import { getClassName } from '../utilities';
+import * as pathUtils from '../utils/project/pathUtils';
+import * as fileUtils from '../utils/project/fileUtils';
 
 export interface ICppJsonLayout {
   name: string;
@@ -25,172 +27,80 @@ async function performCopy(
   includeRoot: vscode.Uri,
   replaceName: string
 ): Promise<boolean> {
-  const commandFolder = path.join(commandRoot, command.foldername);
-  const copiedSrcFiles: string[] = [];
-  const copiedHeaderFiles: string[] = [];
-  await ncpAsync(commandFolder, folderSrc.fsPath, {
-    filter: (cf: string): boolean => {
-      if (!fs.lstatSync(cf).isFile()) {
-        return true;
-      }
-      const bn = path.basename(cf);
-      if (command.source.indexOf(bn) > -1) {
-        copiedSrcFiles.push(path.relative(commandFolder, cf));
-        return true;
-      } else {
-        return false;
-      }
-    },
-  });
+  try {
+    const commandFolder = pathUtils.joinPath(commandRoot, command.foldername);
 
-  await ncpAsync(commandFolder, folderHeader.fsPath, {
-    filter: (cf: string): boolean => {
-      if (!fs.lstatSync(cf).isFile()) {
-        return true;
-      }
-      const bn = path.basename(cf);
-      if (command.headers.indexOf(bn) > -1) {
-        copiedHeaderFiles.push(path.relative(commandFolder, cf));
-        return true;
-      } else {
-        return false;
-      }
-    },
-  });
+    // Create filters for source and header files
+    const sourceFilter = fileUtils.createFileNameFilter(command.source);
+    const headerFilter = fileUtils.createFileNameFilter(command.headers);
 
-  let promiseArray: Promise<void>[] = [];
-
-  for (const f of copiedHeaderFiles) {
-    const file = path.join(folderHeader.fsPath, f);
-    promiseArray.push(
-      new Promise<void>((resolve, reject) => {
-        fs.readFile(file, 'utf8', (err, dataIn) => {
-          if (err) {
-            reject(err);
-          } else {
-            const dataOut = dataIn.replace(new RegExp(command.replacename, 'g'), replaceName);
-            fs.writeFile(file, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      })
+    // Copy source and header files
+    const copiedSrcFiles = await fileUtils.copyFiles(
+      commandFolder,
+      folderSrc.fsPath,
+      sourceFilter,
+      true
     );
-  }
 
-  await Promise.all(promiseArray);
-
-  promiseArray = [];
-
-  for (const f of copiedSrcFiles) {
-    const file = path.join(folderSrc.fsPath, f);
-    promiseArray.push(
-      new Promise<void>((resolve, reject) => {
-        fs.readFile(file, 'utf8', (err, dataIn) => {
-          if (err) {
-            reject(err);
-          } else {
-            const joinedName = path
-              .join(path.relative(includeRoot.path, folderHeader.path), replaceName)
-              .replace(/\\/g, '/');
-
-            const dataOut = dataIn
-              .replace(
-                new RegExp(`#include "${command.replacename}.h"`, 'g'),
-                `#include "${joinedName}.h"`
-              )
-              .replace(new RegExp(command.replacename, 'g'), replaceName);
-
-            fs.writeFile(file, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      })
+    const copiedHeaderFiles = await fileUtils.copyFiles(
+      commandFolder,
+      folderHeader.fsPath,
+      headerFilter,
+      true
     );
+
+    // Process header files
+    const headerReplacements = new Map<string | RegExp, string>();
+    headerReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
+
+    await fileUtils.processFiles(copiedHeaderFiles, folderHeader.fsPath, headerReplacements);
+
+    // Process source files with more complex replacements
+    const sourceReplacements = new Map<string | RegExp, string>();
+    const joinedName = path
+      .join(path.relative(includeRoot.path, folderHeader.path), replaceName)
+      .replace(/\\/g, '/');
+
+    sourceReplacements.set(
+      new RegExp(`#include "${command.replacename}.h"`, 'g'),
+      `#include "${joinedName}.h"`
+    );
+    sourceReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
+
+    await fileUtils.processFiles(copiedSrcFiles, folderSrc.fsPath, sourceReplacements);
+
+    // Rename files
+    await fileUtils.renameFiles(copiedSrcFiles, folderSrc.fsPath, command.replacename, replaceName);
+
+    await fileUtils.renameFiles(
+      copiedHeaderFiles,
+      folderHeader.fsPath,
+      command.replacename,
+      replaceName
+    );
+
+    return true;
+  } catch (error) {
+    logger.error('Error performing copy operation:', error);
+    return false;
   }
-
-  await Promise.all(promiseArray);
-
-  let movePromiseArray: Promise<void>[] = [];
-  for (const f of copiedSrcFiles) {
-    const file = path.join(folderSrc.fsPath, f);
-    const bname = path.basename(file);
-    const dirname = path.dirname(file);
-    if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(
-        dirname,
-        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
-      );
-      movePromiseArray.push(
-        new Promise<void>((resolve, reject) => {
-          fs.rename(file, newname, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        })
-      );
-    }
-  }
-
-  if (movePromiseArray.length > 0) {
-    await Promise.all(movePromiseArray);
-  }
-
-  movePromiseArray = [];
-  for (const f of copiedHeaderFiles) {
-    const file = path.join(folderHeader.fsPath, f);
-    const bname = path.basename(file);
-    const dirname = path.dirname(file);
-    if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(
-        dirname,
-        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
-      );
-      movePromiseArray.push(
-        new Promise<void>((resolve, reject) => {
-          fs.rename(file, newname, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        })
-      );
-    }
-  }
-
-  if (movePromiseArray.length > 0) {
-    await Promise.all(movePromiseArray);
-  }
-
-  return true;
 }
 
 export class Commands {
   private readonly commandResourceName = 'commands.json';
 
   constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
-    const commandFolder = path.join(resourceRoot, 'src', 'commands');
-    const resourceFile = path.join(commandFolder, this.commandResourceName);
+    const commandFolder = pathUtils.joinPath(resourceRoot, 'src', 'commands');
+    const resourceFile = pathUtils.joinPath(commandFolder, this.commandResourceName);
+
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         logger.log('Command error: ', err);
         return;
       }
+
       const commands: ICppJsonLayout[] = jsonc.parse(data) as ICppJsonLayout[];
+
       for (const c of commands) {
         const provider: ICommandCreator = {
           getLanguage(): string {
@@ -215,7 +125,7 @@ export class Commands {
             }
 
             const workspaceRooted = path.relative(
-              path.join(workspace.uri.path, 'src', 'main'),
+              pathUtils.joinPath(workspace.uri.path, 'src', 'main'),
               folder.path
             );
 
@@ -239,31 +149,33 @@ export class Commands {
             } else if (rootSrc === 0) {
               const filePath = path.relative('cpp', workspaceRooted);
               srcFolder = vscode.Uri.file(
-                path.join(workspace.uri.path, 'src', 'main', 'cpp', filePath)
+                pathUtils.joinPath(workspace.uri.path, 'src', 'main', 'cpp', filePath)
               );
               headerFolder = vscode.Uri.file(
-                path.join(workspace.uri.path, 'src', 'main', 'include', filePath)
+                pathUtils.joinPath(workspace.uri.path, 'src', 'main', 'include', filePath)
               );
               includeRoot = vscode.Uri.file(
-                path.join(workspace.uri.path, 'src', 'main', 'include')
+                pathUtils.joinPath(workspace.uri.path, 'src', 'main', 'include')
               );
               // Current folder is src
             } else {
               const filePath = path.relative('include', workspaceRooted);
               srcFolder = vscode.Uri.file(
-                path.join(workspace.uri.path, 'src', 'main', 'cpp', filePath)
+                pathUtils.joinPath(workspace.uri.path, 'src', 'main', 'cpp', filePath)
               );
               headerFolder = vscode.Uri.file(
-                path.join(workspace.uri.path, 'src', 'main', 'include', filePath)
+                pathUtils.joinPath(workspace.uri.path, 'src', 'main', 'include', filePath)
               );
               includeRoot = vscode.Uri.file(
-                path.join(workspace.uri.path, 'src', 'main', 'include')
+                pathUtils.joinPath(workspace.uri.path, 'src', 'main', 'include')
               );
               // current folder is include
             }
+
             return performCopy(commandFolder, c, srcFolder, headerFolder, includeRoot, className);
           },
         };
+
         core.addCommandProvider(provider);
       }
     });

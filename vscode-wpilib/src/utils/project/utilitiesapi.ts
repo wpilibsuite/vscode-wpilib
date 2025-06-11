@@ -2,14 +2,14 @@
 
 import * as os from 'os';
 import * as path from 'path';
-import { getIsWindows } from '../utilities';
-import { IUtilitiesAPI } from '../wpilibapishim';
+import { getIsWindows } from '../../utilities';
+import { IUtilitiesAPI } from '../../wpilibapishim';
 
 export class UtilitiesAPI implements IUtilitiesAPI {
   private wpilibHome: string | undefined;
 
   public getFrcYear(): string {
-    return '2027_alpha1';
+    return '2025';
   }
   public getWPILibHomeDir(): string {
     if (this.wpilibHome) {
