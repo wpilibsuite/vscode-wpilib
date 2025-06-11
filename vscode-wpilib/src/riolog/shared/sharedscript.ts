@@ -1,7 +1,14 @@
 'use strict';
 
 /* tslint:disable:prefer-conditional-expression */
-import { IErrorMessage, IIPCSendMessage, IPrintMessage, MessageType, ReceiveTypes, SendTypes } from 'wpilib-riolog';
+import {
+  IErrorMessage,
+  IIPCSendMessage,
+  IPrintMessage,
+  MessageType,
+  ReceiveTypes,
+  SendTypes,
+} from 'wpilib-riolog';
 import { checkResize, scrollImpl, sendMessage } from '../script/implscript';
 
 let paused = false;
@@ -69,7 +76,7 @@ export function onShowWarnings() {
     warningsButton.innerHTML = 'Show Warnings';
   } else {
     showWarnings = true;
-    warningsButton.innerHTML = 'Don\'t Show Warnings';
+    warningsButton.innerHTML = "Don't Show Warnings";
   }
   const ul = document.getElementById('list');
   if (ul === null) {
@@ -99,7 +106,7 @@ export function onShowPrints() {
     printButton.innerHTML = 'Show Prints';
   } else {
     showPrints = true;
-    printButton.innerHTML = 'Don\'t Show Prints';
+    printButton.innerHTML = "Don't Show Prints";
   }
   const ul = document.getElementById('list');
   if (ul === null) {
@@ -143,7 +150,6 @@ export function onAutoReconnect() {
   } else {
     arButton.innerHTML = 'Disconnect';
   }
-
 }
 
 let showTimestamps = false;
@@ -157,7 +163,7 @@ export function onShowTimestamps() {
     tsButton.innerHTML = 'Show Timestamps';
   } else {
     showTimestamps = true;
-    tsButton.innerHTML = 'Don\'t Show Timestamps';
+    tsButton.innerHTML = "Don't Show Timestamps";
   }
   const ul = document.getElementById('list');
   if (ul === null) {
@@ -529,14 +535,16 @@ function setLivePage() {
   leftList.appendChild(createButton('pause', 'Pause', onPause));
   leftList.appendChild(createButton('discard', 'Discard', onDiscard));
   leftList.appendChild(createButton('clear', 'Clear', onClear));
-  leftList.appendChild(createButton('showprints', 'Don\'t Show Prints', onShowPrints));
-  leftList.appendChild(createButton('switchPage', 'Switch to Viewer', () => {
-    setViewerPage();
-  }));
+  leftList.appendChild(createButton('showprints', "Don't Show Prints", onShowPrints));
+  leftList.appendChild(
+    createButton('switchPage', 'Switch to Viewer', () => {
+      setViewerPage();
+    })
+  );
   mainDiv.appendChild(leftList);
 
   const rightList = createSplitUl(false);
-  rightList.appendChild(createButton('showwarnings', 'Don\'t Show Warnings', onShowWarnings));
+  rightList.appendChild(createButton('showwarnings', "Don't Show Warnings", onShowWarnings));
   rightList.appendChild(createButton('autoreconnect', 'Disconnect', onAutoReconnect));
   rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
   rightList.appendChild(createButton('savelot', 'Save Log', onSaveLog));
@@ -589,14 +597,16 @@ export function setViewerPage() {
   fileInput.style.width = '100%';
   fileInput.addEventListener('change', handleFileSelect, false);
   leftList.appendChild(fileInput);
-  leftList.appendChild(createButton('showprints', 'Don\'t Show Prints', onShowPrints));
-  leftList.appendChild(createButton('switchPage', 'Switch to Live', () => {
-    setLivePage();
-  }));
+  leftList.appendChild(createButton('showprints', "Don't Show Prints", onShowPrints));
+  leftList.appendChild(
+    createButton('switchPage', 'Switch to Live', () => {
+      setLivePage();
+    })
+  );
   mainDiv.appendChild(leftList);
 
   const rightList = createSplitUl(false);
-  rightList.appendChild(createButton('showwarnings', 'Don\'t Show Warnings', onShowWarnings));
+  rightList.appendChild(createButton('showwarnings', "Don't Show Warnings", onShowWarnings));
   rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
 
   mainDiv.appendChild(rightList);

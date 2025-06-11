@@ -1,7 +1,8 @@
 'use strict';
 
 export enum ProjectType {
-  Example, Template,
+  Example,
+  Template,
 }
 
 export interface IProjectIPCData {

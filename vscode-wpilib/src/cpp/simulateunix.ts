@@ -19,13 +19,20 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
     MIMode: commands.clang ? 'lldb' : 'gdb',
     additionalSOLibSearchPath: commands.soLibPath,
     cwd: commands.workspace.uri.fsPath,
-    environment: [{
-      name: 'HALSIM_EXTENSIONS', value: commands.extensions,
-    }, {
-      name: 'LD_LIBRARY_PATH', value: commands.ldPath,
-    }, {
-      name: 'DYLD_FALLBACK_LIBRARY_PATH', value: commands.ldPath,
-    }],
+    environment: [
+      {
+        name: 'HALSIM_EXTENSIONS',
+        value: commands.extensions,
+      },
+      {
+        name: 'LD_LIBRARY_PATH',
+        value: commands.ldPath,
+      },
+      {
+        name: 'DYLD_FALLBACK_LIBRARY_PATH',
+        value: commands.ldPath,
+      },
+    ],
     console: 'integratedTerminal',
     name: 'WPILib C++ Simulate',
     program: commands.executablePath,

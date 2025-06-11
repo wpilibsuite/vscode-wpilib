@@ -34,7 +34,7 @@ export class Templates {
       }
       const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
       for (const e of templates) {
-        const extraVendordeps: string[] = (e.extravendordeps !== undefined) ? e.extravendordeps : [];
+        const extraVendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {
             return java ? 'java' : 'cpp';
@@ -52,16 +52,39 @@ export class Templates {
                 testFolder = path.join(templatesTestFolder, e.foldername);
               }
               if (java) {
-                if (!await generateCopyJava(resourceRoot, path.join(templatesFolder, e.foldername), testFolder,
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, 'frc.robot.Main', path.join('frc', 'robot'),
-                  false, extraVendordeps)) {
-                  vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
+                if (
+                  !(await generateCopyJava(
+                    resourceRoot,
+                    path.join(templatesFolder, e.foldername),
+                    testFolder,
+                    path.join(gradleBasePath, e.gradlebase),
+                    folderInto.fsPath,
+                    'frc.robot.Main',
+                    path.join('frc', 'robot'),
+                    false,
+                    extraVendordeps
+                  ))
+                ) {
+                  vscode.window.showErrorMessage(
+                    i18n('message', 'Cannot create into non empty folder')
+                  );
                   return false;
                 }
               } else {
-                if (!await generateCopyCpp(resourceRoot, path.join(templatesFolder, e.foldername), testFolder,
-                  path.join(gradleBasePath, e.gradlebase), folderInto.fsPath, false, extraVendordeps)) {
-                  vscode.window.showErrorMessage(i18n('message', 'Cannot create into non empty folder'));
+                if (
+                  !(await generateCopyCpp(
+                    resourceRoot,
+                    path.join(templatesFolder, e.foldername),
+                    testFolder,
+                    path.join(gradleBasePath, e.gradlebase),
+                    folderInto.fsPath,
+                    false,
+                    extraVendordeps
+                  ))
+                ) {
+                  vscode.window.showErrorMessage(
+                    i18n('message', 'Cannot create into non empty folder')
+                  );
                   return false;
                 }
               }
@@ -77,7 +100,5 @@ export class Templates {
     });
   }
 
-  public dispose() {
-
-  }
+  public dispose() {}
 }

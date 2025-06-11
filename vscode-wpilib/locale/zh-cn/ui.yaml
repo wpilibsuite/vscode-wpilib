@@ -1,5 +1,5 @@
-"Yes": 是
-"No": 否
+'Yes': 是
+'No': 否
 Yes (Build Only): 仅执行构建
 Yes (Project): 是 (项目)
 Yes (Global): 是 (全局)
@@ -18,7 +18,7 @@ Pick a language: 选择语言
 Pick a language (Currently {0}): 选择语言 (当前为 {0})
 Online: 在线
 Offline: 离线
-"Old Version: {0}": "旧版本: {0}"
+'Old Version: {0}': '旧版本: {0}'
 Enter a team number: 输入队伍编号
 Invalid team number: 队伍编号不合法
 Enter a project name: 输入项目名称

@@ -12,11 +12,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: "temurin"
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -74,11 +74,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: "temurin"
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -105,11 +105,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: "temurin"
       - run: ./gradlew build updateVersions updateAllDependencies -PbuildServer
         name: Build with Gradle
       - run: |
@@ -136,11 +136,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'temurin'
+          distribution: "temurin"
       - run: ./gradlew build updateVersions updateAllDependencies generateTemplateZip generateExamplesZip -PbuildServer
         name: Build with Gradle
       - run: |
@@ -160,6 +160,37 @@ jobs:
         with:
           name: Distributions
           path: ${{ github.workspace }}/build/distributions/*
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - name: Run Prettier
+        run: npx prettier -w .
+        working-directory: vscode-wpilib
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD
+      - name: Generate diff
+        run: git diff HEAD > format-fixes.patch
+        if: ${{ failure() }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: format fixes
+          path: format-fixes.patch
+        if: ${{ failure() }}
+      - name: Write to job summary
+        run: |
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          cat format-fixes.patch >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        if: ${{ failure() }}
 
   release:
     name: "Release"

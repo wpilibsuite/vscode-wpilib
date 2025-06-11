@@ -10,7 +10,12 @@ export default function format(message: string, args: unknown[]): string {
       let replacement = match;
       if (typeof arg === 'string') {
         replacement = arg;
-      } else if (typeof arg === 'number' || typeof arg === 'boolean' || arg === void 0 || arg === null) {
+      } else if (
+        typeof arg === 'number' ||
+        typeof arg === 'boolean' ||
+        arg === void 0 ||
+        arg === null
+      ) {
         replacement = String(arg);
       }
       return replacement;

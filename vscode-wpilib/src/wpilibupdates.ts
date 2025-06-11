@@ -21,7 +21,9 @@ interface IOnlineTuple {
 }
 
 export class WPILibUpdates {
-  public static getUpdatePersistentState(workspace: vscode.WorkspaceFolder): PersistentFolderState<boolean> {
+  public static getUpdatePersistentState(
+    workspace: vscode.WorkspaceFolder
+  ): PersistentFolderState<boolean> {
     return new PersistentFolderState('wpilib.projectUpdate', false, workspace.uri.fsPath);
   }
 
@@ -31,11 +33,17 @@ export class WPILibUpdates {
   constructor(externalApi: IExternalAPI) {
     this.externalApi = externalApi;
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.checkForUpdates', async () => {
-      if (!await this.checkForUpdates()) {
-        logger.log('no update installed');
-      }
-    }, this));
+    this.disposables.push(
+      vscode.commands.registerCommand(
+        'wpilibcore.checkForUpdates',
+        async () => {
+          if (!(await this.checkForUpdates())) {
+            logger.log('no update installed');
+          }
+        },
+        this
+      )
+    );
   }
 
   public async checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<boolean> {
@@ -46,15 +54,25 @@ export class WPILibUpdates {
     const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
     const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
     if (newVersion !== undefined && persistentState.Value === false) {
-      const result = await vscode.window.showInformationMessage(i18n('message',
+      const result = await vscode.window.showInformationMessage(
+        i18n(
+          'message',
           `This project is currently using WPILib version ({1}). Would you like to update the project ` +
-          `to WPILib version {0}?`, newVersion, grVersion), {
-            modal: true,
-          }, i18n('ui', 'Yes'), i18n('ui', 'No'), i18n('ui', 'No, Don\'t ask again'));
+            `to WPILib version {0}?`,
+          newVersion,
+          grVersion
+        ),
+        {
+          modal: true,
+        },
+        i18n('ui', 'Yes'),
+        i18n('ui', 'No'),
+        i18n('ui', "No, Don't ask again")
+      );
       if (result !== undefined && result === i18n('ui', 'Yes')) {
         await this.setGradleRIOVersion(newVersion, wp);
         return true;
-      } else if (result !== undefined && result === i18n('ui', 'No, Don\'t ask again')) {
+      } else if (result !== undefined && result === i18n('ui', "No, Don't ask again")) {
         persistentState.Value = true;
       }
     }
@@ -77,18 +95,36 @@ export class WPILibUpdates {
       vscode.window.showInformationMessage(i18n('message', 'No WPILib Update Found'));
       return false;
     } else {
-      const result = await vscode.window.showInformationMessage(i18n('message', 
-        `This project is currently using WPILib version ({1}). Would you like to update the project ` +
-        `to WPILib version {0}?`, newVersion.newVersion, grVersion), {
-            modal: true,
-          }, i18n('ui', 'Yes'), i18n('ui', 'No'));
+      const result = await vscode.window.showInformationMessage(
+        i18n(
+          'message',
+          `This project is currently using WPILib version ({1}). Would you like to update the project ` +
+            `to WPILib version {0}?`,
+          newVersion.newVersion,
+          grVersion
+        ),
+        {
+          modal: true,
+        },
+        i18n('ui', 'Yes'),
+        i18n('ui', 'No')
+      );
       if (result !== undefined && result === i18n('ui', 'Yes')) {
         await this.setGradleRIOVersion(newVersion.newVersion, wp);
         if (newVersion.online) {
-          const buildRes = await vscode.window.showInformationMessage(i18n('message', 'It is recommended to run a "Build" and update tools after a ' +
-            'WPILib update to ensure dependencies are installed correctly. Would you like to do this now?'), {
+          const buildRes = await vscode.window.showInformationMessage(
+            i18n(
+              'message',
+              'It is recommended to run a "Build" and update tools after a ' +
+                'WPILib update to ensure dependencies are installed correctly. Would you like to do this now?'
+            ),
+            {
               modal: true,
-            }, i18n('ui', 'Yes'), i18n('ui', 'Yes (Build Only)'), i18n('ui', 'No'));
+            },
+            i18n('ui', 'Yes'),
+            i18n('ui', 'Yes (Build Only)'),
+            i18n('ui', 'No')
+          );
           if (buildRes !== undefined) {
             if (buildRes === i18n('ui', 'Yes')) {
               await this.externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
@@ -97,11 +133,18 @@ export class WPILibUpdates {
             }
           }
         } else {
-          const buildRes = await vscode.window.showInformationMessage(i18n('message',
-            'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
-            'Would you like to do this now?'), {
+          const buildRes = await vscode.window.showInformationMessage(
+            i18n(
+              'message',
+              'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
+                'Would you like to do this now?'
+            ),
+            {
               modal: true,
-            }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+            },
+            { title: i18n('ui', 'Yes') },
+            { title: i18n('ui', 'No'), isCloseAffordance: true }
+          );
           if (buildRes?.title !== i18n('ui', 'Yes')) {
             await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
           }
@@ -119,7 +162,6 @@ export class WPILibUpdates {
   }
 
   public async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
-
     try {
       const gradleBuildFile = await readFileAsync(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
 
@@ -162,7 +204,9 @@ export class WPILibUpdates {
     const qResult = await vscode.window.showInformationMessage(
       i18n('message', 'Check offline or online?'),
       { modal: true },
-      i18n('ui', 'Online'), i18n('ui', 'Offline'));
+      i18n('ui', 'Online'),
+      i18n('ui', 'Offline')
+    );
     if (qResult === undefined) {
       return undefined;
     } else if (qResult === i18n('ui', 'Online')) {
@@ -195,7 +239,6 @@ export class WPILibUpdates {
             if (err) {
               reject(err);
             } else {
-              
               resolve(result.metadata.versioning[0].versions[0].version);
             }
           });

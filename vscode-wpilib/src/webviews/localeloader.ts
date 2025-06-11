@@ -11,7 +11,7 @@ let defaultDomain: string;
 
 function localize(domain: string, message: string | string[], ...args: unknown[]) {
   let key: string;
-  if (typeof message == "string") {
+  if (typeof message == 'string') {
     key = message;
   } else if (message.length === 2) {
     key = message[0];

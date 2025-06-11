@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 export enum MessageType {
   Error,
@@ -38,7 +38,7 @@ export class PrintMessage implements IPrintMessage {
     this.seqNumber = data.readInt16BE(count);
     count += 2;
     const slice = data.slice(count);
-    this.line = slice.toString('utf8');
+    this.line = slice.toString("utf8");
   }
 }
 
@@ -79,7 +79,8 @@ export class ErrorMessage implements IMessage {
     tmp = this.getSizedString(data, count);
     this.callStack = tmp.data;
     count += tmp.byteLength;
-    this.messageType = (this.flags & 1) !== 0 ? MessageType.Error : MessageType.Warning;
+    this.messageType =
+      (this.flags & 1) !== 0 ? MessageType.Error : MessageType.Warning;
   }
 
   private getSizedString(data: Buffer, start: number): IStringNumberPair {
@@ -88,7 +89,7 @@ export class ErrorMessage implements IMessage {
     const count = size + 2;
     return {
       byteLength: count,
-      data: data.toString('utf8', start, start + count - 2),
+      data: data.toString("utf8", start, start + count - 2),
     };
   }
 }

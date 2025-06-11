@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-import * as assert from 'assert';
-import * as riolog from '../index';
-import { IErrorMessage, MessageType } from '../message';
+import * as assert from "assert";
+import * as riolog from "../index";
+import { IErrorMessage, MessageType } from "../message";
 
 function checkErrorEqual(a: IErrorMessage, b: IErrorMessage): void {
   assert.strictEqual(a.callStack, b.callStack);
@@ -38,37 +38,37 @@ function getBufferFromError(message: IErrorMessage): Buffer {
 
   buffer.writeUInt16BE(message.details.length, count);
   count += 2;
-  count += buffer.write(message.details, count, undefined, 'utf8');
+  count += buffer.write(message.details, count, undefined, "utf8");
 
   buffer.writeUInt16BE(message.location.length, count);
   count += 2;
-  count += buffer.write(message.location, count, undefined, 'utf8');
+  count += buffer.write(message.location, count, undefined, "utf8");
 
   buffer.writeUInt16BE(message.callStack.length, count);
   count += 2;
-  count += buffer.write(message.callStack, count, undefined, 'utf8');
+  count += buffer.write(message.callStack, count, undefined, "utf8");
 
   buffer.writeUInt16BE(count - 2, 0);
 
   return buffer.slice(0, count);
 }
 
-suite('Input Error Buffer Tests', () => {
+suite("Input Error Buffer Tests", () => {
   [true, false].forEach((x) => {
-    test(`Single Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Single Buffer Full ${x ? "Error" : "Warning"}`, () => {
       const rioconsole = new riolog.RioConsole();
       const message: IErrorMessage = {
-        callStack: 'Test',
-        details: 'Hello',
+        callStack: "Test",
+        details: "Hello",
         errorCode: 2345,
         flags: x ? 1 : 0,
-        location: 'World',
+        location: "World",
         messageType: x ? MessageType.Error : MessageType.Warning,
         numOccur: 2,
         seqNumber: 3,
         timestamp: 42.5,
       };
-      rioconsole.on('message', (m: riolog.IErrorMessage) => {
+      rioconsole.on("message", (m: riolog.IErrorMessage) => {
         checkErrorEqual(message, m);
       });
       const buf = getBufferFromError(message);
@@ -77,20 +77,20 @@ suite('Input Error Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Split Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Split Buffer Full ${x ? "Error" : "Warning"}`, () => {
       const rioconsole = new riolog.RioConsole();
       const message: IErrorMessage = {
-        callStack: 'Test',
-        details: 'Hello',
+        callStack: "Test",
+        details: "Hello",
         errorCode: 2345,
         flags: x ? 1 : 0,
-        location: 'World',
+        location: "World",
         messageType: x ? MessageType.Error : MessageType.Warning,
         numOccur: 2,
         seqNumber: 3,
         timestamp: 42.5,
       };
-      rioconsole.on('message', (m: riolog.IErrorMessage) => {
+      rioconsole.on("message", (m: riolog.IErrorMessage) => {
         checkErrorEqual(message, m);
       });
       const buf = getBufferFromError(message);
@@ -102,20 +102,20 @@ suite('Input Error Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Split Length Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Split Length Buffer Full ${x ? "Error" : "Warning"}`, () => {
       const rioconsole = new riolog.RioConsole();
       const message: IErrorMessage = {
-        callStack: 'Test',
-        details: 'Hello',
+        callStack: "Test",
+        details: "Hello",
         errorCode: 2345,
         flags: x ? 1 : 0,
-        location: 'World',
+        location: "World",
         messageType: x ? MessageType.Error : MessageType.Warning,
         numOccur: 2,
         seqNumber: 3,
         timestamp: 42.5,
       };
-      rioconsole.on('message', (m: riolog.IErrorMessage) => {
+      rioconsole.on("message", (m: riolog.IErrorMessage) => {
         checkErrorEqual(message, m);
       });
       const buf = getBufferFromError(message);
@@ -127,20 +127,20 @@ suite('Input Error Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Split Length 2 Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Split Length 2 Buffer Full ${x ? "Error" : "Warning"}`, () => {
       const rioconsole = new riolog.RioConsole();
       const message: IErrorMessage = {
-        callStack: 'Test',
-        details: 'Hello',
+        callStack: "Test",
+        details: "Hello",
         errorCode: 2345,
         flags: x ? 1 : 0,
-        location: 'World',
+        location: "World",
         messageType: x ? MessageType.Error : MessageType.Warning,
         numOccur: 2,
         seqNumber: 3,
         timestamp: 42.5,
       };
-      rioconsole.on('message', (m: riolog.IErrorMessage) => {
+      rioconsole.on("message", (m: riolog.IErrorMessage) => {
         checkErrorEqual(message, m);
       });
       const buf = getBufferFromError(message);
@@ -154,21 +154,21 @@ suite('Input Error Buffer Tests', () => {
   });
 
   [true, false].forEach((x) => {
-    test(`Double Split Buffer Full ${x ? 'Error' : 'Warning'}`, () => {
+    test(`Double Split Buffer Full ${x ? "Error" : "Warning"}`, () => {
       const rioconsole = new riolog.RioConsole();
       const message: IErrorMessage = {
-        callStack: 'Test',
-        details: 'Hello',
+        callStack: "Test",
+        details: "Hello",
         errorCode: 2345,
         flags: x ? 1 : 0,
-        location: 'World',
+        location: "World",
         messageType: x ? MessageType.Error : MessageType.Warning,
         numOccur: 2,
         seqNumber: 3,
         timestamp: 42.5,
       };
       let count = 0;
-      rioconsole.on('message', (m: riolog.IErrorMessage) => {
+      rioconsole.on("message", (m: riolog.IErrorMessage) => {
         checkErrorEqual(message, m);
         count++;
       });
@@ -187,4 +187,3 @@ suite('Input Error Buffer Tests', () => {
     });
   });
 });
-

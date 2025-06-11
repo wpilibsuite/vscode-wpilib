@@ -20,11 +20,19 @@ export class BuildTestAPI implements IBuildTestAPI {
     this.preferences = preferences;
   }
 
-  public buildCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public buildCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     return this.buildTestCommon(workspace, this.builders, source, args);
   }
 
-  public testCode(workspace: vscode.WorkspaceFolder, source: vscode.Uri | undefined, ...args: string[]): Promise<boolean> {
+  public testCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
     return this.buildTestCommon(workspace, this.testers, source, args);
   }
 
@@ -59,8 +67,12 @@ export class BuildTestAPI implements IBuildTestAPI {
     }
   }
 
-  private async buildTestCommon(workspace: vscode.WorkspaceFolder, builder: ICodeBuilderQuickPick[],
-                                source: vscode.Uri | undefined, args: string[]): Promise<boolean> {
+  private async buildTestCommon(
+    workspace: vscode.WorkspaceFolder,
+    builder: ICodeBuilderQuickPick[],
+    source: vscode.Uri | undefined,
+    args: string[]
+  ): Promise<boolean> {
     if (builder.length <= 0) {
       vscode.window.showInformationMessage(i18n('message', 'No registered deployers'));
       return false;
@@ -83,7 +95,9 @@ export class BuildTestAPI implements IBuildTestAPI {
     } else if (validBuilders.length === 1) {
       langSelection = validBuilders[0];
     } else {
-      const selection = await vscode.window.showQuickPick(validBuilders, { placeHolder: i18n('ui', 'Pick a language') });
+      const selection = await vscode.window.showQuickPick(validBuilders, {
+        placeHolder: i18n('ui', 'Pick a language'),
+      });
       if (selection === undefined) {
         vscode.window.showInformationMessage(i18n('message', 'Selection exited. Cancelling'));
         return false;

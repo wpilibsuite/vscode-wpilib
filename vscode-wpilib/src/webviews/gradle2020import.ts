@@ -8,8 +8,19 @@ import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
-import { existsAsync, extensionContext, mkdirpAsync, promptForProjectOpen, readFileAsync, writeFileAsync } from '../utilities';
-import { IGradle2020IPCData, IGradle2020IPCReceive, IGradle2020IPCSend } from './pages/gradle2020importpagetypes';
+import {
+  existsAsync,
+  extensionContext,
+  mkdirpAsync,
+  promptForProjectOpen,
+  readFileAsync,
+  writeFileAsync,
+} from '../utilities';
+import {
+  IGradle2020IPCData,
+  IGradle2020IPCReceive,
+  IGradle2020IPCSend,
+} from './pages/gradle2020importpagetypes';
 import { WebViewBase } from './webviewbase';
 
 export class Gradle2020Import extends WebViewBase {
@@ -24,9 +35,11 @@ export class Gradle2020Import extends WebViewBase {
   private constructor(resourceRoot: string) {
     super('wpilibgradle2020import', 'WPILib Gradle 2020-2024 Import', resourceRoot);
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.importGradle2020Project', () => {
-      return this.startWebpage();
-    }));
+    this.disposables.push(
+      vscode.commands.registerCommand('wpilibcore.importGradle2020Project', () => {
+        return this.startWebpage();
+      })
+    );
   }
 
   public async startWithProject(projectRoot: vscode.Uri) {
@@ -41,30 +54,34 @@ export class Gradle2020Import extends WebViewBase {
       retainContextWhenHidden: true,
     });
     if (this.webview) {
-      this.webview.webview.onDidReceiveMessage(async (data: IGradle2020IPCReceive) => {
-        switch (data.type) {
-          case 'loaded':
-            const copy = this.onLoad;
-            this.onLoad = undefined;
-            if (copy) {
-              await copy();
-            }
-            break;
-          case 'gradle2020':
-            await this.handleGradle2020Button();
-            break;
-          case 'newproject':
-            await this.handleNewProjectLoc();
-            break;
-          case 'importproject':
-            if (data.data) {
-              await this.handleImport(data.data);
-            }
-            break;
-          default:
-            break;
-        }
-      }, undefined, this.disposables);
+      this.webview.webview.onDidReceiveMessage(
+        async (data: IGradle2020IPCReceive) => {
+          switch (data.type) {
+            case 'loaded':
+              const copy = this.onLoad;
+              this.onLoad = undefined;
+              if (copy) {
+                await copy();
+              }
+              break;
+            case 'gradle2020':
+              await this.handleGradle2020Button();
+              break;
+            case 'newproject':
+              await this.handleNewProjectLoc();
+              break;
+            case 'importproject':
+              if (data.data) {
+                await this.handleImport(data.data);
+              }
+              break;
+            default:
+              break;
+          }
+        },
+        undefined,
+        this.disposables
+      );
     }
   }
 
@@ -179,16 +196,28 @@ export class Gradle2020Import extends WebViewBase {
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
         cpp = false;
       } else {
-        await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
-          modal: true,
-        });
+        await vscode.window.showErrorMessage(
+          i18n(
+            'message',
+            'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+          ),
+          {
+            modal: true,
+          }
+        );
         return;
       }
     } else {
       // Error
-      await vscode.window.showErrorMessage(i18n('message', 'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'), {
-        modal: true,
-      });
+      await vscode.window.showErrorMessage(
+        i18n(
+          'message',
+          'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+        ),
+        {
+          modal: true,
+        }
+      );
       return;
     }
 
@@ -196,25 +225,35 @@ export class Gradle2020Import extends WebViewBase {
 
     let javaRobotPackage: string = '';
 
-    if (await existsAsync(gradleFile) && !cpp) {
+    if ((await existsAsync(gradleFile)) && !cpp) {
       const gradleContents = await readFileAsync(gradleFile, 'utf8');
       const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
       const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
       if (regexRes !== null && regexRes.length === 2) {
         javaRobotPackage = regexRes[1];
       } else {
-        const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
-          modal: true,
-        }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true});
+        const res = await vscode.window.showInformationMessage(
+          i18n('message', 'Failed to determine robot class. Enter it manually?'),
+          {
+            modal: true,
+          },
+          { title: 'Yes' },
+          { title: 'No', isCloseAffordance: true }
+        );
         if (res?.title !== 'Yes') {
           await vscode.window.showErrorMessage('Project Import Failed');
           return;
         }
       }
     } else if (!cpp) {
-      const res = await vscode.window.showInformationMessage(i18n('message', 'Failed to determine robot class. Enter it manually?'), {
-        modal: true,
-      }, {title: 'Yes'}, {title: 'No', isCloseAffordance: true});
+      const res = await vscode.window.showInformationMessage(
+        i18n('message', 'Failed to determine robot class. Enter it manually?'),
+        {
+          modal: true,
+        },
+        { title: 'Yes' },
+        { title: 'No', isCloseAffordance: true }
+      );
       if (res?.title !== 'Yes') {
         await vscode.window.showErrorMessage('Project Import Failed');
         return;
@@ -238,28 +277,62 @@ export class Gradle2020Import extends WebViewBase {
     const commandsJsonPath = path.join(oldProjectPath, 'vendordeps', 'WPILibOldCommands.json');
 
     if (fs.existsSync(commandsJsonPath)) {
-      await vscode.window.showErrorMessage(i18n('message', 'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'), {
-        modal: true,
-      });
+      await vscode.window.showErrorMessage(
+        i18n(
+          'message',
+          'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'
+        ),
+        {
+          modal: true,
+        }
+      );
     }
 
-    const extraVendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp']: [];
+    const extraVendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
 
     let success = false;
     if (cpp) {
-      const gradlePath = path.join(gradleBasePath, data.romi ? 'cppromi' : data.xrp ? 'cppxrp': 'cpp');
-      success = await generateCopyCpp(path.join(resourceRoot, 'cpp'), path.join(oldProjectPath, 'src'), undefined, gradlePath, toFolder,
-                                       true, extraVendordeps);
+      const gradlePath = path.join(
+        gradleBasePath,
+        data.romi ? 'cppromi' : data.xrp ? 'cppxrp' : 'cpp'
+      );
+      success = await generateCopyCpp(
+        path.join(resourceRoot, 'cpp'),
+        path.join(oldProjectPath, 'src'),
+        undefined,
+        gradlePath,
+        toFolder,
+        true,
+        extraVendordeps
+      );
     } else {
-      const gradlePath = path.join(gradleBasePath, data.romi ? 'javaromi' : data.xrp ? 'javaxrp' : 'java');
-      success = await generateCopyJava(path.join(resourceRoot, 'java'), path.join(oldProjectPath, 'src'), undefined, gradlePath, toFolder,
-                                       javaRobotPackage, '', true, extraVendordeps);
+      const gradlePath = path.join(
+        gradleBasePath,
+        data.romi ? 'javaromi' : data.xrp ? 'javaxrp' : 'java'
+      );
+      success = await generateCopyJava(
+        path.join(resourceRoot, 'java'),
+        path.join(oldProjectPath, 'src'),
+        undefined,
+        gradlePath,
+        toFolder,
+        javaRobotPackage,
+        '',
+        true,
+        extraVendordeps
+      );
     }
 
     if (!success) {
-      vscode.window.showErrorMessage(i18n('message', 'Failed to update. Did you attempt to extract to the existing project folder?'), {
-        modal: true,
-      });
+      vscode.window.showErrorMessage(
+        i18n(
+          'message',
+          'Failed to update. Did you attempt to extract to the existing project folder?'
+        ),
+        {
+          modal: true,
+        }
+      );
       return;
     }
 
@@ -285,7 +358,9 @@ export class Gradle2020Import extends WebViewBase {
   }
 
   private async asyncInitialize() {
-    await this.loadWebpage(path.join(extensionContext.extensionPath, 'resources', 'webviews', 'gradle2020import.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'dist', 'gradle2020importpage.js'));
+    await this.loadWebpage(
+      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'gradle2020import.html'),
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'gradle2020importpage.js')
+    );
   }
 }

@@ -5,18 +5,31 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { downloadFileToStream } from './fetchhelpers';
 import { localize as i18n } from './locale';
-import {constructDownloadUrl, getMavenMetadata, getMavenMetadataContents, getMavenVersions, getNewestMavenVersion} from './mavenapi';
+import {
+  constructDownloadUrl,
+  getMavenMetadata,
+  getMavenMetadataContents,
+  getMavenVersions,
+  getNewestMavenVersion,
+} from './mavenapi';
 import { deleteFileAsync, existsAsync, mkdirpAsync } from './utilities';
 
-export async function downloadDocs(repoRoot: string, ext: string,  rootFolder: string, innerFolder: string): Promise<string | undefined> {
+export async function downloadDocs(
+  repoRoot: string,
+  ext: string,
+  rootFolder: string,
+  innerFolder: string
+): Promise<string | undefined> {
   let disposable: vscode.Disposable | undefined;
   try {
     const answer = await vscode.window.showInformationMessage(
       i18n('message', 'Documentation not installed locally. Would you like to download it?'),
-      { modal: true }, {title: i18n('ui', 'Yes')}, {title: i18n('ui', 'No'), isCloseAffordance: true});
+      { modal: true },
+      { title: i18n('ui', 'Yes') },
+      { title: i18n('ui', 'No'), isCloseAffordance: true }
+    );
 
     if (answer?.title === i18n('ui', 'Yes')) {
-
       disposable = vscode.window.setStatusBarMessage(i18n('message', 'Downloading Maven MetaData'));
 
       const metaDataFile = await getMavenMetadataContents(repoRoot);
@@ -45,7 +58,7 @@ export async function downloadDocs(repoRoot: string, ext: string,  rootFolder: s
       disposable.dispose();
       disposable = vscode.window.setStatusBarMessage(i18n('message', 'Downloading API Docs'));
 
-      await  downloadFileToStream(downloadUrl, outputFile);
+      await downloadFileToStream(downloadUrl, outputFile);
 
       const outputDir = path.join(rootFolder, innerFolder);
 

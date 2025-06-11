@@ -1,425 +1,425 @@
 [
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 1,
-        "timestamp": 0
-    },
-    {
-        "line": "0",
-        "messageType": 2,
-        "seqNumber": 1,
-        "timestamp": 0
-    },
-    {
-        "line": "1",
-        "messageType": 2,
-        "seqNumber": 1,
-        "timestamp": 0
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 1,
-        "timestamp": 0
-    },
-    {
-        "line": "2",
-        "messageType": 2,
-        "seqNumber": 1,
-        "timestamp": 0
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 2,
-        "timestamp": 0.3506155014038086
-    },
-    {
-        "line": "3",
-        "messageType": 2,
-        "seqNumber": 2,
-        "timestamp": 0.3506155014038086
-    },
-    {
-        "line": "4",
-        "messageType": 2,
-        "seqNumber": 2,
-        "timestamp": 0.3506155014038086
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 2,
-        "timestamp": 0.3506155014038086
-    },
-    {
-        "line": "5",
-        "messageType": 2,
-        "seqNumber": 2,
-        "timestamp": 0.3506155014038086
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 3,
-        "timestamp": 0.7045447826385498
-    },
-    {
-        "line": "6",
-        "messageType": 2,
-        "seqNumber": 3,
-        "timestamp": 0.7045447826385498
-    },
-    {
-        "line": "7",
-        "messageType": 2,
-        "seqNumber": 3,
-        "timestamp": 0.7045447826385498
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 3,
-        "timestamp": 0.7045447826385498
-    },
-    {
-        "line": "8",
-        "messageType": 2,
-        "seqNumber": 3,
-        "timestamp": 0.7045447826385498
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 4,
-        "timestamp": 1.0553627014160156
-    },
-    {
-        "line": "9",
-        "messageType": 2,
-        "seqNumber": 4,
-        "timestamp": 1.0553627014160156
-    },
-    {
-        "line": "10",
-        "messageType": 2,
-        "seqNumber": 4,
-        "timestamp": 1.0553627014160156
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 4,
-        "timestamp": 1.0553627014160156
-    },
-    {
-        "line": "11",
-        "messageType": 2,
-        "seqNumber": 4,
-        "timestamp": 1.0553627014160156
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 5,
-        "timestamp": 1.4066150188446045
-    },
-    {
-        "line": "12",
-        "messageType": 2,
-        "seqNumber": 5,
-        "timestamp": 1.4066150188446045
-    },
-    {
-        "line": "13",
-        "messageType": 2,
-        "seqNumber": 5,
-        "timestamp": 1.4066150188446045
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 5,
-        "timestamp": 1.4066150188446045
-    },
-    {
-        "line": "14",
-        "messageType": 2,
-        "seqNumber": 5,
-        "timestamp": 1.4066150188446045
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 6,
-        "timestamp": 1.758495569229126
-    },
-    {
-        "line": "15",
-        "messageType": 2,
-        "seqNumber": 6,
-        "timestamp": 1.758495569229126
-    },
-    {
-        "line": "16",
-        "messageType": 2,
-        "seqNumber": 6,
-        "timestamp": 1.758495569229126
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 6,
-        "timestamp": 1.758495569229126
-    },
-    {
-        "line": "17",
-        "messageType": 2,
-        "seqNumber": 6,
-        "timestamp": 1.758495569229126
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 7,
-        "timestamp": 2.109886407852173
-    },
-    {
-        "line": "18",
-        "messageType": 2,
-        "seqNumber": 7,
-        "timestamp": 2.109886407852173
-    },
-    {
-        "line": "19",
-        "messageType": 2,
-        "seqNumber": 7,
-        "timestamp": 2.109886407852173
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 7,
-        "timestamp": 2.109886407852173
-    },
-    {
-        "line": "20",
-        "messageType": 2,
-        "seqNumber": 7,
-        "timestamp": 2.109886407852173
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 8,
-        "timestamp": 2.4614994525909424
-    },
-    {
-        "line": "21",
-        "messageType": 2,
-        "seqNumber": 8,
-        "timestamp": 2.4614994525909424
-    },
-    {
-        "line": "22",
-        "messageType": 2,
-        "seqNumber": 8,
-        "timestamp": 2.4614994525909424
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 8,
-        "timestamp": 2.4614994525909424
-    },
-    {
-        "line": "23",
-        "messageType": 2,
-        "seqNumber": 8,
-        "timestamp": 2.4614994525909424
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 9,
-        "timestamp": 2.8129451274871826
-    },
-    {
-        "line": "24",
-        "messageType": 2,
-        "seqNumber": 9,
-        "timestamp": 2.8129451274871826
-    },
-    {
-        "line": "25",
-        "messageType": 2,
-        "seqNumber": 9,
-        "timestamp": 2.8129451274871826
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 9,
-        "timestamp": 2.8129451274871826
-    },
-    {
-        "line": "26",
-        "messageType": 2,
-        "seqNumber": 9,
-        "timestamp": 2.8129451274871826
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 10,
-        "timestamp": 3.1642138957977295
-    },
-    {
-        "line": "27",
-        "messageType": 2,
-        "seqNumber": 10,
-        "timestamp": 3.1642138957977295
-    },
-    {
-        "line": "28",
-        "messageType": 2,
-        "seqNumber": 10,
-        "timestamp": 3.1642138957977295
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is a warning",
-        "errorCode": 1118481,
-        "flags": 0,
-        "location": "foo.c:1111",
-        "messageType": 1,
-        "numOccur": 1,
-        "seqNumber": 10,
-        "timestamp": 3.1642138957977295
-    },
-    {
-        "line": "29",
-        "messageType": 2,
-        "seqNumber": 10,
-        "timestamp": 3.1642138957977295
-    },
-    {
-        "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
-        "details": "this is an </br>errorwitha\r\nong text",
-        "errorCode": 1118481,
-        "flags": 1,
-        "location": "foo.c:1111",
-        "messageType": 0,
-        "numOccur": 1,
-        "seqNumber": 11,
-        "timestamp": 3.5155158042907715
-    },
-    {
-        "line": "30",
-        "messageType": 2,
-        "seqNumber": 11,
-        "timestamp": 3.5155158042907715
-    },
-    {
-        "line": "31",
-        "messageType": 2,
-        "seqNumber": 11,
-        "timestamp": 3.5155158042907715
-    }
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 1,
+    "timestamp": 0
+  },
+  {
+    "line": "0",
+    "messageType": 2,
+    "seqNumber": 1,
+    "timestamp": 0
+  },
+  {
+    "line": "1",
+    "messageType": 2,
+    "seqNumber": 1,
+    "timestamp": 0
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 1,
+    "timestamp": 0
+  },
+  {
+    "line": "2",
+    "messageType": 2,
+    "seqNumber": 1,
+    "timestamp": 0
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 2,
+    "timestamp": 0.3506155014038086
+  },
+  {
+    "line": "3",
+    "messageType": 2,
+    "seqNumber": 2,
+    "timestamp": 0.3506155014038086
+  },
+  {
+    "line": "4",
+    "messageType": 2,
+    "seqNumber": 2,
+    "timestamp": 0.3506155014038086
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 2,
+    "timestamp": 0.3506155014038086
+  },
+  {
+    "line": "5",
+    "messageType": 2,
+    "seqNumber": 2,
+    "timestamp": 0.3506155014038086
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 3,
+    "timestamp": 0.7045447826385498
+  },
+  {
+    "line": "6",
+    "messageType": 2,
+    "seqNumber": 3,
+    "timestamp": 0.7045447826385498
+  },
+  {
+    "line": "7",
+    "messageType": 2,
+    "seqNumber": 3,
+    "timestamp": 0.7045447826385498
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 3,
+    "timestamp": 0.7045447826385498
+  },
+  {
+    "line": "8",
+    "messageType": 2,
+    "seqNumber": 3,
+    "timestamp": 0.7045447826385498
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 4,
+    "timestamp": 1.0553627014160156
+  },
+  {
+    "line": "9",
+    "messageType": 2,
+    "seqNumber": 4,
+    "timestamp": 1.0553627014160156
+  },
+  {
+    "line": "10",
+    "messageType": 2,
+    "seqNumber": 4,
+    "timestamp": 1.0553627014160156
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 4,
+    "timestamp": 1.0553627014160156
+  },
+  {
+    "line": "11",
+    "messageType": 2,
+    "seqNumber": 4,
+    "timestamp": 1.0553627014160156
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 5,
+    "timestamp": 1.4066150188446045
+  },
+  {
+    "line": "12",
+    "messageType": 2,
+    "seqNumber": 5,
+    "timestamp": 1.4066150188446045
+  },
+  {
+    "line": "13",
+    "messageType": 2,
+    "seqNumber": 5,
+    "timestamp": 1.4066150188446045
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 5,
+    "timestamp": 1.4066150188446045
+  },
+  {
+    "line": "14",
+    "messageType": 2,
+    "seqNumber": 5,
+    "timestamp": 1.4066150188446045
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 6,
+    "timestamp": 1.758495569229126
+  },
+  {
+    "line": "15",
+    "messageType": 2,
+    "seqNumber": 6,
+    "timestamp": 1.758495569229126
+  },
+  {
+    "line": "16",
+    "messageType": 2,
+    "seqNumber": 6,
+    "timestamp": 1.758495569229126
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 6,
+    "timestamp": 1.758495569229126
+  },
+  {
+    "line": "17",
+    "messageType": 2,
+    "seqNumber": 6,
+    "timestamp": 1.758495569229126
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 7,
+    "timestamp": 2.109886407852173
+  },
+  {
+    "line": "18",
+    "messageType": 2,
+    "seqNumber": 7,
+    "timestamp": 2.109886407852173
+  },
+  {
+    "line": "19",
+    "messageType": 2,
+    "seqNumber": 7,
+    "timestamp": 2.109886407852173
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 7,
+    "timestamp": 2.109886407852173
+  },
+  {
+    "line": "20",
+    "messageType": 2,
+    "seqNumber": 7,
+    "timestamp": 2.109886407852173
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 8,
+    "timestamp": 2.4614994525909424
+  },
+  {
+    "line": "21",
+    "messageType": 2,
+    "seqNumber": 8,
+    "timestamp": 2.4614994525909424
+  },
+  {
+    "line": "22",
+    "messageType": 2,
+    "seqNumber": 8,
+    "timestamp": 2.4614994525909424
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 8,
+    "timestamp": 2.4614994525909424
+  },
+  {
+    "line": "23",
+    "messageType": 2,
+    "seqNumber": 8,
+    "timestamp": 2.4614994525909424
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 9,
+    "timestamp": 2.8129451274871826
+  },
+  {
+    "line": "24",
+    "messageType": 2,
+    "seqNumber": 9,
+    "timestamp": 2.8129451274871826
+  },
+  {
+    "line": "25",
+    "messageType": 2,
+    "seqNumber": 9,
+    "timestamp": 2.8129451274871826
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 9,
+    "timestamp": 2.8129451274871826
+  },
+  {
+    "line": "26",
+    "messageType": 2,
+    "seqNumber": 9,
+    "timestamp": 2.8129451274871826
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 10,
+    "timestamp": 3.1642138957977295
+  },
+  {
+    "line": "27",
+    "messageType": 2,
+    "seqNumber": 10,
+    "timestamp": 3.1642138957977295
+  },
+  {
+    "line": "28",
+    "messageType": 2,
+    "seqNumber": 10,
+    "timestamp": 3.1642138957977295
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is a warning",
+    "errorCode": 1118481,
+    "flags": 0,
+    "location": "foo.c:1111",
+    "messageType": 1,
+    "numOccur": 1,
+    "seqNumber": 10,
+    "timestamp": 3.1642138957977295
+  },
+  {
+    "line": "29",
+    "messageType": 2,
+    "seqNumber": 10,
+    "timestamp": 3.1642138957977295
+  },
+  {
+    "callStack": "traceback 1\ntraceback 2\ntraceback 3\n",
+    "details": "this is an </br>errorwitha\r\nong text",
+    "errorCode": 1118481,
+    "flags": 1,
+    "location": "foo.c:1111",
+    "messageType": 0,
+    "numOccur": 1,
+    "seqNumber": 11,
+    "timestamp": 3.5155158042907715
+  },
+  {
+    "line": "30",
+    "messageType": 2,
+    "seqNumber": 11,
+    "timestamp": 3.5155158042907715
+  },
+  {
+    "line": "31",
+    "messageType": 2,
+    "seqNumber": 11,
+    "timestamp": 3.5155158042907715
+  }
 ]

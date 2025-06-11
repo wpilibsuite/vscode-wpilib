@@ -14,52 +14,56 @@ const del = require('del');
 const nls = require('vscode-nls-dev');
 
 // If all VS Code langaues are support you can use nls.coreLanguages
-const languages = [{
-	id: 'zh-CN'
-}];
+const languages = [
+  {
+    id: 'zh-CN',
+  },
+];
 
 const defaultActivationEvents = [
-	"workspaceContains:.wpilib/wpilib_preferences.json",
-	"workspaceContains:build/vscodeconfig.json"
-]
+  'workspaceContains:.wpilib/wpilib_preferences.json',
+  'workspaceContains:build/vscodeconfig.json',
+];
 
 //---- internal
 
 function updateActivationCommands() {
-	return gulp.src(['./package.json'])
-		.pipe(jsontransform((data) => {
-			const activationEvents = [];
-			for (const evnt of defaultActivationEvents) {
-				activationEvents.push(evnt);
-			}
-			for (const cmd of data.contributes.commands) {
-				activationEvents.push(`onCommand:${cmd.command}`);
-			}
-			data.activationEvents = activationEvents;
-			return data;
-		}, 4))
-		.pipe(gulp.dest('./'));
+  return gulp
+    .src(['./package.json'])
+    .pipe(
+      jsontransform((data) => {
+        const activationEvents = [];
+        for (const evnt of defaultActivationEvents) {
+          activationEvents.push(evnt);
+        }
+        for (const cmd of data.contributes.commands) {
+          activationEvents.push(`onCommand:${cmd.command}`);
+        }
+        data.activationEvents = activationEvents;
+        return data;
+      }, 4)
+    )
+    .pipe(gulp.dest('./'));
 }
 
 gulp.task('update-activation', () => {
-	return updateActivationCommands();
+  return updateActivationCommands();
 });
 
-gulp.task('i18n-compile', function (){
-	return gulp.src('./locale/**/*.yaml')
-		.pipe(yaml())
-		.pipe(gulp.dest('./i18n/'))
+gulp.task('i18n-compile', function () {
+  return gulp.src('./locale/**/*.yaml').pipe(yaml()).pipe(gulp.dest('./i18n/'));
 });
 
-gulp.task('i18n-additional', function() {
-	return gulp.src(['package.nls.json'])
-		.pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
-		.pipe(gulp.dest('.'));
+gulp.task('i18n-additional', function () {
+  return gulp
+    .src(['package.nls.json'])
+    .pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
+    .pipe(gulp.dest('.'));
 });
 
-gulp.task('clean', function() {
-	return del(['package.nls.*.json', 'vscode-wpilib*.vsix']);
-})
+gulp.task('clean', function () {
+  return del(['package.nls.*.json', 'vscode-wpilib*.vsix']);
+});
 
 gulp.task('build', gulp.series('clean', 'i18n-compile', 'i18n-additional', 'update-activation'));
 

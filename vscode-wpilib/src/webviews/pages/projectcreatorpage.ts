@@ -67,7 +67,7 @@ function selectProjectFolder() {
       projectType,
       teamNumber: '',
       toFolder: (document.getElementById('projectFolder') as HTMLInputElement).value,
-    }
+    },
   });
 }
 

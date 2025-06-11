@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-import { EventEmitter } from 'events';
-import * as net from 'net';
-import { IRioConsole } from './interfaces';
-import { ErrorMessage, PrintMessage } from './message';
-import { PromiseCondition } from './promisecond';
-import { connectToRobot } from './rioconnector';
+import { EventEmitter } from "events";
+import * as net from "net";
+import { IRioConsole } from "./interfaces";
+import { ErrorMessage, PrintMessage } from "./message";
+import { PromiseCondition } from "./promisecond";
+import { connectToRobot } from "./rioconnector";
 
 const maxFrameSize = 100000;
 
@@ -55,7 +55,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
         }
         await this.runFunction(this.teamNumber);
       }
-      console.log('finished loop');
+      console.log("finished loop");
     };
     this.promise = asyncFunction();
   }
@@ -102,7 +102,8 @@ export class RioConsole extends EventEmitter implements IRioConsole {
             return;
           }
         }
-        this.dataStore.frameSize = (this.dataStore.buf[0] << 8) | this.dataStore.buf[1];
+        this.dataStore.frameSize =
+          (this.dataStore.buf[0] << 8) | this.dataStore.buf[1];
       }
       {
         let need = this.dataStore.frameSize - (this.dataStore.count - 2);
@@ -140,23 +141,23 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     if (tag === 11) {
       // error or warning.
       const m = new ErrorMessage(outputBuffer);
-      this.emit('message', m);
+      this.emit("message", m);
     } else if (tag === 12) {
       const m = new PrintMessage(outputBuffer);
-      this.emit('message', m);
+      this.emit("message", m);
     }
   }
 
   private async runFunction(teamNumber: number): Promise<void> {
     const socket = await this.connect(teamNumber);
     if (socket === undefined) {
-      console.log('bad socket');
+      console.log("bad socket");
       return;
     }
     this.connected = true;
-    this.emit('connectionChanged', true);
-    console.log('succesfully connected');
-    socket.on('data', (data) => {
+    this.emit("connectionChanged", true);
+    console.log("succesfully connected");
+    socket.on("data", (data) => {
       this.handleBuffer(data);
     });
     if (this.cleanup) {
@@ -171,20 +172,20 @@ export class RioConsole extends EventEmitter implements IRioConsole {
         socket.destroy();
         socket.removeAllListeners();
         resolve();
-        console.log('closed locally');
+        console.log("closed locally");
       };
-      socket.on('close', () => {
+      socket.on("close", () => {
         socket.removeAllListeners();
         resolve();
-        console.log('closed remotely (close)');
+        console.log("closed remotely (close)");
       });
-      socket.on('end', () => {
+      socket.on("end", () => {
         socket.removeAllListeners();
         resolve();
-        console.log('closed remotely (end)');
+        console.log("closed remotely (end)");
       });
     });
     this.connected = false;
-    this.emit('connectionChanged', false);
+    this.emit("connectionChanged", false);
   }
 }

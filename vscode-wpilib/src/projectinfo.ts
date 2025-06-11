@@ -41,7 +41,11 @@ export class ProjectInfoGatherer {
   private disposables: vscode.Disposable[] = [];
   private statusBar: vscode.StatusBarItem;
 
-  public constructor(vendorLibraries: VendorLibraries, wpilibUpdates: WPILibUpdates, externalApi: IExternalAPI) {
+  public constructor(
+    vendorLibraries: VendorLibraries,
+    wpilibUpdates: WPILibUpdates,
+    externalApi: IExternalAPI
+  ) {
     this.vendorLibraries = vendorLibraries;
     this.wpilibUpdates = wpilibUpdates;
     this.externalApi = externalApi;
@@ -63,9 +67,11 @@ export class ProjectInfoGatherer {
       }
     }
 
-    this.disposables.push(vscode.commands.registerCommand('wpilibcore.getProjectInformation', async () => {
-      await this.displayProjectInfo();
-    }));
+    this.disposables.push(
+      vscode.commands.registerCommand('wpilibcore.getProjectInformation', async () => {
+        await this.displayProjectInfo();
+      })
+    );
   }
 
   public dispose() {
@@ -82,7 +88,7 @@ export class ProjectInfoGatherer {
     }
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
-    const jdkVer = (jdkLoc === undefined) ? 'unknown' : await getJavaVersion(jdkLoc);
+    const jdkVer = jdkLoc === undefined ? 'unknown' : await getJavaVersion(jdkLoc);
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 VS Code Version: ${vscode.version}
@@ -103,13 +109,19 @@ Vendor Libraries:
 `;
     }
 
-    vscode.window.showInformationMessage(infoString, {
-      modal: true,
-    }, 'Copy').then(action => {
-      if (action === 'Copy') {
-        vscode.env.clipboard.writeText(infoString);
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        infoString,
+        {
+          modal: true,
+        },
+        'Copy'
+      )
+      .then((action) => {
+        if (action === 'Copy') {
+          vscode.env.clipboard.writeText(infoString);
+        }
+      });
   }
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
@@ -130,8 +142,12 @@ Vendor Libraries:
       currentGradleVersion = 'unknown';
     }
 
-    const debugExt =  await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-debug'));
-    const depViewer = await extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-dependency'));
+    const debugExt = await extensionVersion(
+      vscode.extensions.getExtension('vscjava.vscode-java-debug')
+    );
+    const depViewer = await extensionVersion(
+      vscode.extensions.getExtension('vscjava.vscode-java-dependency')
+    );
     const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
     const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
 

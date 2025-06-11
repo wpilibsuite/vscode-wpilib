@@ -3,18 +3,18 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
- /* This file contains cherrypicked icons from codicons for size */
- /* Currently built with everything but the below removed from mappings
+/* This file contains cherrypicked icons from codicons for size */
+/* Currently built with everything but the below removed from mappings
     - trash
 */
 
 @font-face {
-  font-family: "codicon";
+  font-family: 'codicon';
   font-display: block;
-  src: url("./codicon.ttf?fb200efcd350cfb53f94163fb5066b25") format("truetype");
+  src: url('./codicon.ttf?fb200efcd350cfb53f94163fb5066b25') format('truetype');
 }
 
-.codicon[class*="codicon-"] {
+.codicon[class*='codicon-'] {
   font: normal normal normal 16px/1 codicon;
   display: inline-block;
   text-decoration: none;
@@ -63,5 +63,5 @@
  *-------------------*/
 
 .codicon-trash:before {
-  content: "\ea81";
+  content: '\ea81';
 }

@@ -10,12 +10,12 @@ function parseMajorVersion(content: string): number {
   let regexp = /version "(.*)"/g;
   let match = regexp.exec(content);
   if (!match) {
-      return 0;
+    return 0;
   }
   let version = match[1];
   // Ignore '1.' prefix for legacy Java versions
   if (version.startsWith('1.')) {
-      version = version.substring(2);
+    version = version.substring(2);
   }
 
   // look into the interesting bits now
@@ -23,7 +23,7 @@ function parseMajorVersion(content: string): number {
   match = regexp.exec(version);
   let javaVersion = 0;
   if (match) {
-      javaVersion = parseInt(match[0], 10);
+    javaVersion = parseInt(match[0], 10);
   }
   return javaVersion;
 }
@@ -47,7 +47,9 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
         logger.log(`Found jdt.ls.java.home Version: ${javaVersion} at ${vscodeJavaHome}`);
         return vscodeJavaHome;
       } else {
-        logger.info(`Bad Java version ${javaVersion} at ${vscodeJavaHome} from jdt.ls.java.home Version`);
+        logger.info(
+          `Bad Java version ${javaVersion} at ${vscodeJavaHome} from jdt.ls.java.home Version`
+        );
       }
     } catch (err) {
       logger.log('Error loading java from jdt.ls.java.home, skipping', err);
