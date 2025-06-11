@@ -2,7 +2,6 @@
   {
     "fileMatcher": "**/*.java",
     "flags": "g",
-    "replacements": [
-    ]
+    "replacements": []
   }
 ]
