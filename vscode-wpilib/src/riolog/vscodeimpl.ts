@@ -3,18 +3,17 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { readFileAsync } from '../utilities';
 import {
-  IErrorMessage,
   IIPCReceiveMessage,
   IIPCSendMessage,
-  IPrintMessage,
   IRioConsole,
   IRioConsoleProvider,
   IWindowProvider,
   IWindowView,
-  RioConsole,
-} from 'wpilib-riolog';
-import { readFileAsync } from '../utilities';
+} from './shared/interfaces';
+import { RioConsole } from './rioconsole';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;

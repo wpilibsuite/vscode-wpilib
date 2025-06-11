@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 import {
   IDisposable,
@@ -9,8 +9,8 @@ import {
   IWindowView,
   ReceiveTypes,
   SendTypes,
-} from "./interfaces";
-import { IErrorMessage, IPrintMessage } from "./message";
+} from './shared/interfaces';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 
 export class RioLogWindow {
   private webview: IWindowView | undefined = undefined;
@@ -23,10 +23,7 @@ export class RioLogWindow {
   private windowProvider: IWindowProvider;
   private rioConsoleProvider: IRioConsoleProvider;
 
-  constructor(
-    windowProv: IWindowProvider,
-    rioConProivder: IRioConsoleProvider,
-  ) {
+  constructor(windowProv: IWindowProvider, rioConProivder: IRioConsoleProvider) {
     this.windowProvider = windowProv;
     this.rioConsoleProvider = rioConProivder;
   }
@@ -41,7 +38,7 @@ export class RioLogWindow {
     if (this.webview === undefined || this.rioConsole === undefined) {
       return;
     }
-    this.webview.on("didDispose", () => {
+    this.webview.on('didDispose', () => {
       if (this.rioConsole !== undefined) {
         this.rioConsole.stop();
         this.rioConsole.removeAllListeners();
@@ -51,20 +48,17 @@ export class RioLogWindow {
       this.running = false;
     });
 
-    this.webview.on("didReceiveMessage", async (data: IIPCReceiveMessage) => {
+    this.webview.on('didReceiveMessage', async (data: IIPCReceiveMessage) => {
       await this.onMessageReceived(data);
     });
 
-    this.rioConsole.on("connectionChanged", async (c: boolean) => {
+    this.rioConsole.on('connectionChanged', async (c: boolean) => {
       await this.onConnectionChanged(c);
     });
 
-    this.rioConsole.on(
-      "message",
-      async (message: IPrintMessage | IErrorMessage) => {
-        await this.onNewMessageToSend(message);
-      },
-    );
+    this.rioConsole.on('message', async (message: IPrintMessage | IErrorMessage) => {
+      await this.onNewMessageToSend(message);
+    });
 
     this.rioConsole.setTeamNumber(teamNumber);
     this.rioConsole.startListening();
@@ -85,7 +79,7 @@ export class RioLogWindow {
 
   private createWebView() {
     this.webview = this.windowProvider.createWindowView();
-    this.webview.on("windowActive", async () => {
+    this.webview.on('windowActive', async () => {
       if (this.webview === undefined) {
         return;
       }
@@ -196,7 +190,7 @@ export class RioLogWindow {
       }
     } else if (data.type === ReceiveTypes.ChangeNumber) {
       const number = data.message as number;
-      console.log("setting team number");
+      console.log('setting team number');
       this.rioConsole.setTeamNumber(number);
     }
   }
