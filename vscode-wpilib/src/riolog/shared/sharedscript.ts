@@ -29,7 +29,7 @@ let autoReconnect = true;
 let showTimestamps = false;
 let autoScroll = true;
 let filterText = '';
-let maxLogEntries = 2000;
+const maxLogEntries = 2000;
 
 let UI_COLORS = {
   success: '#4caf50',
@@ -327,7 +327,7 @@ export function onConnect() {
     line: '\u001b[32mRobot connection established\u001b[0m',
     messageType: MessageType.Print,
     seqNumber: 0,
-    timestamp: Date.now() / 1000
+    timestamp: Date.now() / 1000,
   };
   addMessage(connectedMessage);
 }
@@ -344,7 +344,7 @@ export function onDisconnect() {
     line: '\u001b[31mRobot connection lost\u001b[0m',
     messageType: MessageType.Print,
     seqNumber: 0,
-    timestamp: Date.now() / 1000
+    timestamp: Date.now() / 1000,
   };
   addMessage(disconnectedMessage);
 }
@@ -359,9 +359,7 @@ export function onChangeTeamNumber() {
   if (isNaN(teamNumber) || teamNumber < 0 || teamNumber > 99999) {
     // Visual indication of invalid input
     input.classList.add('error');
-    setTimeout(() => {
-      input.classList.remove('error');
-    }, 1000);
+    setTimeout(() => input.classList.remove('error'), 1000);
     return;
   }
 
@@ -422,7 +420,7 @@ function insertMessage(ts: number, line: string, li: HTMLElement, color?: string
       continue;
     }
 
-    if (first === false) {
+    if (!first) {
       contentSpan.appendChild(document.createElement('br'));
     }
     first = false;
@@ -454,7 +452,7 @@ function insertStackTrace(st: string, container: HTMLElement, color?: string) {
     if (item.trim() === '') {
       continue;
     }
-    if (first === false) {
+    if (!first) {
       div.appendChild(document.createElement('br'));
     }
     first = false;
@@ -477,7 +475,7 @@ function insertLocation(loc: string, container: HTMLElement, color?: string) {
     if (item.trim() === '') {
       continue;
     }
-    if (first === false) {
+    if (!first) {
       div.appendChild(document.createElement('br'));
     }
     first = false;
@@ -557,10 +555,14 @@ export function createErrorContent(message: IErrorMessage, container: HTMLElemen
 }
 
 // Create HTML for a collapsed error view
-export function createCollapsedErrorContent(message: IErrorMessage, container: HTMLElement, color?: string) {
+export function createCollapsedErrorContent(
+  message: IErrorMessage,
+  container: HTMLElement,
+  color?: string
+) {
   // Clear existing content
   container.innerHTML = '';
-  
+
   // Just show the error message
   insertMessage(message.timestamp, message.details, container, color);
 }
@@ -573,11 +575,13 @@ export function addError(message: IErrorMessage) {
   }
 
   const entry = document.createElement('div');
-  entry.className = message.messageType === MessageType.Warning
-    ? 'log-entry warning-log'
-    : 'log-entry error-log';
+  entry.className =
+    message.messageType === MessageType.Warning ? 'log-entry warning-log' : 'log-entry error-log';
   entry.setAttribute('data-expanded', 'false');
-  entry.setAttribute('data-type', message.messageType === MessageType.Warning ? 'warning' : 'error');
+  entry.setAttribute(
+    'data-type',
+    message.messageType === MessageType.Warning ? 'warning' : 'error'
+  );
   entry.setAttribute('data-message', JSON.stringify(message));
 
   // Hide warnings if they're filtered out
@@ -596,22 +600,25 @@ export function addError(message: IErrorMessage) {
   entry.appendChild(contentContainer);
 
   // Add the initial collapsed view content
-  const textColor = message.messageType === MessageType.Warning
-    ? 'var(--vscode-warningForeground, ' + UI_COLORS.warning + ')'
-    : 'var(--vscode-testing-iconFailed, ' + UI_COLORS.error + ')';
-    
+  const textColor =
+    message.messageType === MessageType.Warning
+      ? 'var(--vscode-warningForeground, ' + UI_COLORS.warning + ')'
+      : 'var(--vscode-testing-iconFailed, ' + UI_COLORS.error + ')';
+
   createCollapsedErrorContent(message, contentContainer, textColor);
 
   // Add click handler to toggle expansion
-  entry.addEventListener('click', function() {
+  entry.addEventListener('click', function () {
     const isExpanded = this.getAttribute('data-expanded') === 'true';
     const toggleBtn = this.querySelector('.toggle-button');
     const contentCtr = this.querySelector('.error-content');
-    
+
     if (isExpanded) {
       // Collapse
       this.setAttribute('data-expanded', 'false');
-      if (toggleBtn) toggleBtn.className = 'toggle-button collapsed';
+      if (toggleBtn) {
+        toggleBtn.className = 'toggle-button collapsed';
+      }
       if (contentCtr) {
         contentCtr.className = 'error-content collapsed';
         createCollapsedErrorContent(message, contentCtr as HTMLElement, textColor);
@@ -619,13 +626,15 @@ export function addError(message: IErrorMessage) {
     } else {
       // Expand
       this.setAttribute('data-expanded', 'true');
-      if (toggleBtn) toggleBtn.className = 'toggle-button expanded';
+      if (toggleBtn) {
+        toggleBtn.className = 'toggle-button expanded';
+      }
       if (contentCtr) {
         contentCtr.className = 'error-content expanded';
         createErrorContent(message, contentCtr as HTMLElement, textColor);
       }
     }
-    
+
     checkResize();
   });
 
@@ -653,6 +662,7 @@ export function checkResizeImpl() {
 }
 
 export function handleMessage(data: IIPCSendMessage | any): void {
+  console.log(data);
   // Handle theme color update message
   if (data.type === 'themeColors') {
     updateThemeColors(data.message);
@@ -753,12 +763,22 @@ export function createToolbar(): HTMLElement {
 
   const buttons = [
     { id: 'pause-button', text: 'Pause', handler: onPause, tooltip: 'Pause log updates' },
-    { id: 'discard-button', text: 'Discard', handler: onDiscard, tooltip: 'Discard incoming messages' },
+    {
+      id: 'discard-button',
+      text: 'Discard',
+      handler: onDiscard,
+      tooltip: 'Discard incoming messages',
+    },
     { id: 'clear-button', text: 'Clear', handler: onClear, tooltip: 'Clear all log entries' },
-    { id: 'autoscroll-button', text: 'Auto-Scroll: On', handler: onAutoScrollToggle, tooltip: 'Toggle automatic scrolling' },
+    {
+      id: 'autoscroll-button',
+      text: 'Auto-Scroll: On',
+      handler: onAutoScrollToggle,
+      tooltip: 'Toggle automatic scrolling',
+    },
   ];
 
-  buttons.forEach(btn => {
+  buttons.forEach((btn) => {
     const button = document.createElement('button');
     button.id = btn.id;
     button.className = 'toolbar-button';
@@ -773,14 +793,35 @@ export function createToolbar(): HTMLElement {
   filterButtons.className = 'button-group';
 
   const filterBtns = [
-    { id: 'prints-button', text: 'Hide Prints', handler: onShowPrints, tooltip: 'Toggle print messages' },
-    { id: 'warnings-button', text: 'Hide Warnings', handler: onShowWarnings, tooltip: 'Toggle warning messages' },
-    { id: 'timestamps-button', text: 'Show Timestamps', handler: onShowTimestamps, tooltip: 'Toggle timestamps', active: true },
-    { id: 'reconnect-button', text: 'Auto-Reconnect: On', handler: onAutoReconnect, tooltip: 'Toggle auto reconnection' },
+    {
+      id: 'prints-button',
+      text: 'Hide Prints',
+      handler: onShowPrints,
+      tooltip: 'Toggle print messages',
+    },
+    {
+      id: 'warnings-button',
+      text: 'Hide Warnings',
+      handler: onShowWarnings,
+      tooltip: 'Toggle warning messages',
+    },
+    {
+      id: 'timestamps-button',
+      text: 'Show Timestamps',
+      handler: onShowTimestamps,
+      tooltip: 'Toggle timestamps',
+      active: true,
+    },
+    {
+      id: 'reconnect-button',
+      text: 'Auto-Reconnect: On',
+      handler: onAutoReconnect,
+      tooltip: 'Toggle auto reconnection',
+    },
     { id: 'save-button', text: 'Save Log', handler: onSaveLog, tooltip: 'Save log to file' },
   ];
 
-  filterBtns.forEach(btn => {
+  filterBtns.forEach((btn) => {
     const button = document.createElement('button');
     button.id = btn.id;
     button.className = 'toolbar-button';
@@ -826,7 +867,8 @@ export function setLivePage() {
   if (!window.__riologHasLoaded) {
     const welcomeMessage: IPrintMessage = {
       messageType: MessageType.Print,
-      line: '\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m\n' +
+      line:
+        '\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m\n' +
         '\u001b[32mWaiting for robot connection...\u001b[0m\n' +
         '\u001b[33mTIPS:\u001b[0m\n' +
         '• \u001b[0mUse \u001b[1mSet\u001b[0m button to change team number\n' +
@@ -835,7 +877,7 @@ export function setLivePage() {
         '• \u001b[0mToggle auto-scrolling for viewing older logs\n' +
         '• \u001b[0mSave logs to file for later analysis',
       timestamp: Date.now() / 1000,
-      seqNumber: 0
+      seqNumber: 0,
     };
     addMessage(welcomeMessage);
     window.__riologHasLoaded = true;
@@ -928,7 +970,7 @@ function handleFileSelect(evt: Event) {
         messageType: MessageType.Error,
         numOccur: 1,
         seqNumber: 0,
-        timestamp: Date.now() / 1000
+        timestamp: Date.now() / 1000,
       };
       addMessage(errorMessage);
     }

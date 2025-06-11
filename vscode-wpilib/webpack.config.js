@@ -26,9 +26,6 @@ module.exports = [
     resolve: {
       extensions: ['.ts', '.js'],
     },
-    node: {
-      net: 'empty',
-    },
     output: {
       path: path.resolve(__dirname, 'resources', 'dist'),
       filename: '[name].js',

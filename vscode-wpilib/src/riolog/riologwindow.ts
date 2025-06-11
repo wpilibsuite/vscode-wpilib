@@ -10,7 +10,7 @@ import {
   ReceiveTypes,
   SendTypes,
 } from './shared/interfaces';
-import { IErrorMessage, IPrintMessage, MessageType } from './shared/message';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 
 export class RioLogWindow {
   private webview: IWindowView | undefined = undefined;
@@ -79,12 +79,12 @@ export class RioLogWindow {
 
   private createWebView() {
     this.webview = this.windowProvider.createWindowView();
-    
+
     this.webview.on('windowActive', async () => {
       if (this.webview === undefined) {
         return;
       }
-      
+
       // Window goes active.
       await this.webview.postMessage({
         message: this.hiddenArray,

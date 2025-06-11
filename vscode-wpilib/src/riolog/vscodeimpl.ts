@@ -3,7 +3,6 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { readFileAsync } from '../utilities';
 import {
   IIPCReceiveMessage,
   IIPCSendMessage,
@@ -14,6 +13,7 @@ import {
 } from './shared/interfaces';
 import { RioConsole } from './rioconsole';
 import { IErrorMessage, IPrintMessage } from './shared/message';
+import { readFileAsync } from '../utilities';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;
@@ -35,7 +35,7 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 
     this.webview.onDidChangeViewState(
       (s) => {
-        if (s.webviewPanel.visible === true) {
+        if (s.webviewPanel.visible) {
           this.emit('windowActive');
         }
       },
@@ -44,28 +44,18 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     );
 
     this.webview.webview.onDidReceiveMessage(
-      (data: IIPCReceiveMessage) => {
-        this.emit('didReceiveMessage', data);
-      },
+      (data: IIPCReceiveMessage) => this.emit('didReceiveMessage', data),
       null,
       this.disposables
     );
 
-    this.webview.onDidDispose(
-      () => {
-        this.emit('didDispose');
-      },
-      null,
-      this.disposables
-    );
+    this.webview.onDidDispose(() => this.emit('didDispose'), null, this.disposables);
 
     // Send theme colors when created
     this.sendThemeColors();
 
     // Listen for theme changes and update colors
-    vscode.window.onDidChangeActiveColorTheme(() => {
-      this.sendThemeColors();
-    }, null, this.disposables);
+    vscode.window.onDidChangeActiveColorTheme(() => this.sendThemeColors(), null, this.disposables);
   }
 
   private sendThemeColors() {
@@ -78,9 +68,9 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
       info: '#2196f3',
     };
 
-    this.webview.webview.postMessage({ 
-      type: 'themeColors', 
-      message: colors 
+    this.webview.webview.postMessage({
+      type: 'themeColors',
+      message: colors,
     });
   }
 
@@ -112,13 +102,10 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
     if (!uri) {
       return false;
     }
-    
+
     try {
-      await vscode.workspace.fs.writeFile(
-        uri,
-        Buffer.from(JSON.stringify(saveData, null, 2))
-      );
-      
+      await vscode.workspace.fs.writeFile(uri, Buffer.from(JSON.stringify(saveData, null, 2)));
+
       vscode.window.showInformationMessage(`RioLog saved to ${uri.fsPath}`);
       return true;
     } catch (err) {
@@ -145,28 +132,31 @@ export class RioLogHTMLProvider implements IHTMLProvider {
 
   public getHTML(webview: vscode.Webview): string {
     // Get paths to script and CSS
-    const scriptPath = vscode.Uri.file(path.join(this.resourceRoot, '..', 'resources', 'dist', 'riologpage.js'));
-    const cssPath = vscode.Uri.file(path.join(this.resourceRoot, '..',  'media', 'main.css'));
+    const scriptPath = vscode.Uri.file(
+      path.join(this.resourceRoot, '..', 'resources', 'dist', 'riologpage.js')
+    );
+    const cssPath = vscode.Uri.file(path.join(this.resourceRoot, '..', 'media', 'main.css'));
 
     // Convert to webview URIs
     const scriptUri = webview.asWebviewUri(scriptPath);
     const cssUri = webview.asWebviewUri(cssPath);
 
     let html = this.html!;
-    
+
     // Add CSS link
-    html = html.replace('</head>', 
-      `<link rel="stylesheet" href="${cssUri}" />\r\n</head>`);
-    
+    html = html.replace('</head>', `<link rel="stylesheet" href="${cssUri}" />\r\n</head>`);
+
     // Add script with error handling
-    html = html.replace('</body>', 
+    html = html.replace(
+      '</body>',
       `<script>
         window.addEventListener('error', (event) => {
           console.error('Error in RioLog script:', event.error);
         });
       </script>
       <script src="${scriptUri}"></script>
-      </body>`);
+      </body>`
+    );
 
     return html;
   }

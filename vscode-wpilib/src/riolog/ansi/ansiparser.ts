@@ -12,34 +12,34 @@ export interface AnsiState {
 }
 
 // Color mapping for standard ANSI colors
-const foregroundColors: {[key: number]: string} = {
-  30: '#000000',  // black
-  31: '#f44336',  // red
-  32: '#4caf50',  // green
-  33: '#ffeb3b',  // yellow
-  34: '#2196f3',  // blue
-  35: '#e91e63',  // magenta
-  36: '#00bcd4',  // cyan
-  37: '#ffffff',  // white
-  90: '#9e9e9e',  // gray
-  91: '#ff5252',  // lightred
-  92: '#8bc34a',  // lightgreen
-  93: '#ffc107',  // lightyellow
-  94: '#03a9f4',  // lightblue
-  95: '#ec407a',  // lightmagenta
-  96: '#26c6da',  // lightcyan
-  97: '#fafafa',  // white
+const foregroundColors: { [key: number]: string } = {
+  30: '#000000', // black
+  31: '#f44336', // red
+  32: '#4caf50', // green
+  33: '#ffeb3b', // yellow
+  34: '#2196f3', // blue
+  35: '#e91e63', // magenta
+  36: '#00bcd4', // cyan
+  37: '#ffffff', // white
+  90: '#9e9e9e', // gray
+  91: '#ff5252', // lightred
+  92: '#8bc34a', // lightgreen
+  93: '#ffc107', // lightyellow
+  94: '#03a9f4', // lightblue
+  95: '#ec407a', // lightmagenta
+  96: '#26c6da', // lightcyan
+  97: '#fafafa', // white
 };
 
-const backgroundColors: {[key: number]: string} = {
-  40: '#000000',  // black
-  41: '#f44336',  // red
-  42: '#4caf50',  // green
-  43: '#ffeb3b',  // yellow
-  44: '#2196f3',  // blue
-  45: '#e91e63',  // magenta
-  46: '#00bcd4',  // cyan
-  47: '#ffffff',  // white
+const backgroundColors: { [key: number]: string } = {
+  40: '#000000', // black
+  41: '#f44336', // red
+  42: '#4caf50', // green
+  43: '#ffeb3b', // yellow
+  44: '#2196f3', // blue
+  45: '#e91e63', // magenta
+  46: '#00bcd4', // cyan
+  47: '#ffffff', // white
   100: '#9e9e9e', // gray
   101: '#ff5252', // lightred
   102: '#8bc34a', // lightgreen
@@ -59,28 +59,28 @@ export interface AnsiSegment {
 export function parseAnsiString(text: string): AnsiSegment[] {
   const result: AnsiSegment[] = [];
   const regex = /\u001b\[((?:\d+;)*\d*)m/g;
-  
+
   let lastIndex = 0;
   let match: RegExpExecArray | null;
   let currentState: AnsiState = {};
-  
+
   while ((match = regex.exec(text)) !== null) {
     // Add text before the escape sequence with current state
     const segment = text.substring(lastIndex, match.index);
     if (segment) {
       result.push({
         text: segment,
-        state: { ...currentState }
+        state: { ...currentState },
       });
     }
-    
+
     // Update state based on escape sequence
-    const codes = match[1].split(';').map(num => parseInt(num || '0', 10));
-    
+    const codes = match[1].split(';').map((num) => parseInt(num || '0', 10));
+
     // Process codes
     for (let i = 0; i < codes.length; i++) {
       const code = codes[i];
-      
+
       // Process reset and text styles
       if (code === 0) {
         // Reset all attributes
@@ -108,7 +108,7 @@ export function parseAnsiString(text: string): AnsiSegment[] {
         delete currentState.foreground;
       } else if (code === 49) {
         delete currentState.background;
-      } 
+      }
       // Standard colors
       else if ((code >= 30 && code <= 37) || (code >= 90 && code <= 97)) {
         currentState.foreground = foregroundColors[code];
@@ -116,8 +116,8 @@ export function parseAnsiString(text: string): AnsiSegment[] {
         currentState.background = backgroundColors[code];
       }
       // 8-bit color support (256 colors)
-      else if (code === 38 && i + 2 < codes.length && codes[i+1] === 5) {
-        const colorCode = codes[i+2];
+      else if (code === 38 && i + 2 < codes.length && codes[i + 1] === 5) {
+        const colorCode = codes[i + 2];
         // Generate 8-bit color
         if (colorCode < 8) {
           // Standard colors (0-7)
@@ -137,9 +137,8 @@ export function parseAnsiString(text: string): AnsiSegment[] {
           currentState.foreground = `rgb(${gray}, ${gray}, ${gray})`;
         }
         i += 2; // Skip the next two parameters
-      }
-      else if (code === 48 && i + 2 < codes.length && codes[i+1] === 5) {
-        const colorCode = codes[i+2];
+      } else if (code === 48 && i + 2 < codes.length && codes[i + 1] === 5) {
+        const colorCode = codes[i + 2];
         // Same logic for background colors
         if (colorCode < 8) {
           currentState.background = backgroundColors[colorCode + 40];
@@ -157,34 +156,33 @@ export function parseAnsiString(text: string): AnsiSegment[] {
         i += 2; // Skip the next two parameters
       }
       // 24-bit color support (RGB)
-      else if (code === 38 && i + 4 < codes.length && codes[i+1] === 2) {
-        const r = codes[i+2];
-        const g = codes[i+3];
-        const b = codes[i+4];
+      else if (code === 38 && i + 4 < codes.length && codes[i + 1] === 2) {
+        const r = codes[i + 2];
+        const g = codes[i + 3];
+        const b = codes[i + 4];
         currentState.foreground = `rgb(${r}, ${g}, ${b})`;
         i += 4; // Skip the next four parameters
-      }
-      else if (code === 48 && i + 4 < codes.length && codes[i+1] === 2) {
-        const r = codes[i+2];
-        const g = codes[i+3];
-        const b = codes[i+4];
+      } else if (code === 48 && i + 4 < codes.length && codes[i + 1] === 2) {
+        const r = codes[i + 2];
+        const g = codes[i + 3];
+        const b = codes[i + 4];
         currentState.background = `rgb(${r}, ${g}, ${b})`;
         i += 4; // Skip the next four parameters
       }
     }
-    
+
     lastIndex = match.index + match[0].length;
   }
-  
+
   // Add the remaining text with current state
   const remainingText = text.substring(lastIndex);
   if (remainingText) {
     result.push({
       text: remainingText,
-      state: { ...currentState }
+      state: { ...currentState },
     });
   }
-  
+
   return result;
 }
 

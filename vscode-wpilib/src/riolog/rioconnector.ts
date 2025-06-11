@@ -58,9 +58,7 @@ function timerPromise(ms: number): ICancellableTimer {
   let timer: NodeJS.Timeout | undefined;
   return {
     promise: new Promise((resolve, _) => {
-      timer = setTimeout(() => {
-        resolve(undefined);
-      }, ms);
+      timer = setTimeout(() => resolve(undefined), ms);
     }),
     cancel() {
       if (timer === undefined) {

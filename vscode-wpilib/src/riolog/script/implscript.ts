@@ -1,7 +1,7 @@
 'use strict';
 
 import { IIPCReceiveMessage, IIPCSendMessage } from '../shared/interfaces';
-import { checkResizeImpl, handleMessage } from '../shared/sharedscript';
+import { setImplFunctions, handleMessage } from '../shared/sharedscript';
 
 interface IVsCodeApi {
   postMessage(message: IIPCReceiveMessage, to: string): void;
@@ -15,7 +15,7 @@ export function checkResize(): void {
   // Get required elements
   const toolbar = document.getElementById('toolbar');
   const logContainer = document.getElementById('log-container');
-  
+
   // Apply dynamic max-height calculation if both elements exist
   if (toolbar && logContainer) {
     logContainer.style.maxHeight = `calc(100vh - ${toolbar.offsetHeight}px)`;
@@ -34,7 +34,7 @@ export function sendMessage(message: IIPCReceiveMessage) {
 }
 
 // Register the implementation functions with the shared module
-console.log('Setting impl functions')
+console.log('Setting impl functions');
 setImplFunctions(checkResize, scrollImpl, sendMessage);
 
 window.addEventListener('message', (event) => {
@@ -47,6 +47,4 @@ window.addEventListener('message', (event) => {
 window.addEventListener('resize', checkResize);
 
 // Initialize everything once loaded
-window.addEventListener('load', () => {
-  setTimeout(checkResize, 100);
-});
+window.addEventListener('load', () => setTimeout(checkResize, 100));
