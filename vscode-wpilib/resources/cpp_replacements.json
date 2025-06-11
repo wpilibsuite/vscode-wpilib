@@ -2,7 +2,6 @@
   {
     "fileMatcher": "**/*{.cpp,.c,.cc,.h,.hh,.hpp}",
     "flags": "gi",
-    "replacements": [
-    ]
+    "replacements": []
   }
 ]
