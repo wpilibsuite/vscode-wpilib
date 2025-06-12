@@ -1,6 +1,8 @@
 'use strict';
 
 import * as fetch from 'node-fetch';
+import path from 'path';
+import { IUtilitiesAPI } from '../../api';
 import { logger } from '../../logger';
 import {
   deleteFileAsync,
@@ -10,8 +12,6 @@ import {
   readFileAsync,
   writeFileAsync,
 } from '../../utilities';
-import { IUtilitiesAPI } from '../../wpilibapishim';
-import * as pathUtils from './pathUtils';
 
 export interface IJsonDependency {
   name: string;
@@ -63,7 +63,7 @@ export class VendorLibrariesBase {
   }
 
   public getVendorFolder(root: string): string {
-    return pathUtils.getVendorDepsPath(root);
+    return path.join(root, 'vendordeps');
   }
 
   public async installDependency(
@@ -77,14 +77,14 @@ export class VendorLibrariesBase {
       if (!dirExists) {
         await mkdirpAsync(url);
         // Directly write file
-        await writeFileAsync(pathUtils.joinPath(url, dep.fileName), JSON.stringify(dep, null, 4));
+        await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
         return true;
       }
 
       const files = await readdirAsync(url);
 
       for (const file of files) {
-        const fullPath = pathUtils.joinPath(url, file);
+        const fullPath = path.join(url, file);
         const result = await this.readFile(fullPath);
         if (result !== undefined) {
           if (result.uuid === dep.uuid) {
@@ -98,7 +98,7 @@ export class VendorLibrariesBase {
         }
       }
 
-      await writeFileAsync(pathUtils.joinPath(url, dep.fileName), JSON.stringify(dep, null, 4));
+      await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
       return true;
     } catch (error) {
       logger.error(`Failed to install dependency ${dep.name}:`, error);
@@ -107,9 +107,7 @@ export class VendorLibrariesBase {
   }
 
   public getHomeDirDeps(): Promise<IJsonDependency[]> {
-    return this.getDependencies(
-      pathUtils.joinPath(this.utilities.getWPILibHomeDir(), 'vendordeps')
-    );
+    return this.getDependencies(path.join(this.utilities.getWPILibHomeDir(), 'vendordeps'));
   }
 
   protected async readFile(file: string): Promise<IJsonDependency | undefined> {
@@ -135,7 +133,7 @@ export class VendorLibrariesBase {
       const promises: Promise<IJsonDependency | undefined>[] = [];
 
       for (const file of files) {
-        promises.push(this.readFile(pathUtils.joinPath(dir, file)));
+        promises.push(this.readFile(path.join(dir, file)));
       }
 
       const results = await Promise.all(promises);

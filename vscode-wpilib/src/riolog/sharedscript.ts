@@ -1,16 +1,8 @@
 'use strict';
 
 /* tslint:disable:prefer-conditional-expression */
-import {
-  IErrorMessage,
-  IPrintMessage,
-  MessageType,
-} from './shared/message';
-import {
-  IIPCSendMessage,
-  ReceiveTypes,
-  SendTypes,
-} from './shared/interfaces';
+import { IErrorMessage, IPrintMessage, MessageType } from './shared/message';
+import { IIPCSendMessage, ReceiveTypes, SendTypes } from './shared/interfaces';
 import { AnsiSegment, applyAnsiStyling, parseAnsiString } from './ansi/ansiparser';
 
 // Define these functions here, they'll be implemented in implscript.ts

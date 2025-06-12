@@ -48,7 +48,7 @@
 .uninstall-button {
   padding: 4px !important;
 
-  &>i {
+  & > i {
     margin-right: 4px !important;
     margin-left: 4px !important;
   }
@@ -63,11 +63,11 @@
   flex-shrink: 2;
 }
 
-button[id*="install-action"] {
+button[id*='install-action'] {
   flex-shrink: 0;
 }
 
-button[id*="version-action"] {
+button[id*='version-action'] {
   overflow: visible;
   padding: 1px 6px;
 }
@@ -134,7 +134,7 @@ html {
   padding: 0;
 }
 
-.vscode-select select[multiple]+.chevron-icon {
+.vscode-select select[multiple] + .chevron-icon {
   display: none;
 }
 
@@ -267,7 +267,7 @@ html {
 
 /* collapsible */
 
-.vscode-collapsible+.vscode-collapsible {
+.vscode-collapsible + .vscode-collapsible {
   border-top: 1px solid var(--vscode-sideBarSectionHeader-border);
 }
 
@@ -557,16 +557,13 @@ html {
 }
 
 .error-content {
+  margin-left: 12px;
+}
 
 /* Rules to properly handle error collapsing in RioLog */
 .error-content.collapsed .stack-trace,
 .error-content.collapsed .location-info {
   display: none;
-}
-  margin-left: 12px;
-}
-}
-  margin-left: 12px;
 }
 
 .stack-trace,
@@ -584,12 +581,12 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
 /* File input styling for the log viewer mode */
-input[type="file"] {
+input[type='file'] {
   display: none;
 }
 
@@ -700,7 +697,7 @@ label.toolbar-button {
   font-size: 16px;
   margin-bottom: 12px;
   color: var(--vscode-foreground);
-  width: 100%
+  width: 100%;
 }
 
 .project-error-text {
@@ -936,8 +933,8 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input[type="text"],
-input[type="number"] {
+input[type='text'],
+input[type='number'] {
   background-color: var(--vscode-input-background, white);
   color: var(--vscode-input-foreground, black);
   border: 1px solid var(--vscode-input-border, #ccc);

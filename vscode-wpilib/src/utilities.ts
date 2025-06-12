@@ -5,8 +5,8 @@ import * as ncp from 'ncp';
 import * as path from 'path';
 import * as util from 'util';
 import * as vscode from 'vscode';
-import { IExecuteAPI, IPreferences } from 'vscode-wpilibapi';
-import { localize as i18n } from './utils/i18n/locale';
+import { IExecuteAPI, IPreferences } from './api';
+import { localize as i18n } from './utils/l10n/locale';
 import { setExecutePermissions } from './utils/project/permissions';
 
 // General utilites usable by multiple classes

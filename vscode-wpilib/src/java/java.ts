@@ -3,10 +3,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from '../api';
+import { existsAsync } from '../utilities';
 import { Examples } from '../utils/project/examples';
 import { Templates } from '../utils/project/templates';
-import { existsAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';

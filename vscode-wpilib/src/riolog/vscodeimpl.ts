@@ -3,10 +3,7 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import {
-  IErrorMessage,
-  IPrintMessage,
-} from './shared/message';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 import {
   IIPCReceiveMessage,
   IIPCSendMessage,

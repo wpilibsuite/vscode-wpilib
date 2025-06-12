@@ -580,22 +580,17 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@vscode-elements/elements": "^1.16.1",
         "extract-zip": "^2.0.1",
         "glob": "^7.2.3",
-        "java-properties": "^1.0.2",
         "jsonc-parser": "^2.3.1",
         "logform": "^2.7.0",
         "micromatch": "^4.0.8",
         "mkdirp": "^1.0.4",
         "ncp": "^2.0.0",
         "node-fetch": "^2.7.0",
-        "raw-loader": "^4.0.2",
-        "util": "^0.12.5",
         "vscode-cpptools": "^6.3.0",
         "vscode-jsonrpc": "^8.2.1",
         "vscode-nls": "^5.2.0",
-        "vscode-wpilibapi": "^2021.1.1",
         "winston": "^3.17.0",
         "winston-transport": "^4.9.0",
         "xml2js": "^0.6.2"

@@ -1,12 +1,12 @@
-import * as vscode from 'vscode';
 import * as fetch from 'node-fetch';
-import { ProjectInfoGatherer, IProjectInfo } from '../projectinfo';
-import { VendorLibraries } from '../vendorlibraries';
-import { IJsonDependency } from '../utils/project/vendorlibrariesbase';
-import { IExternalAPI } from 'vscode-wpilibapi';
-import { isNewerVersion } from '../versions';
+import * as vscode from 'vscode';
+import { IExternalAPI } from '../api';
 import { logger } from '../logger';
-import { localize as i18n } from '../utils/i18n/locale';
+import { IProjectInfo, ProjectInfoGatherer } from '../projectinfo';
+import { localize as i18n } from '../utils/l10n/locale';
+import { IJsonDependency } from '../utils/project/vendorlibrariesbase';
+import { VendorLibraries } from '../vendorlibraries';
+import { isNewerVersion } from '../versions';
 
 export interface IJsonList {
   path: string;

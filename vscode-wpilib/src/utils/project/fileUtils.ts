@@ -5,14 +5,6 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { logger } from '../../logger';
 import { ncpAsync, readFileAsync, writeFileAsync } from '../../utilities';
-import * as pathUtils from './pathUtils';
-
-/**
- * Filter function for copying files based on file extension
- */
-export interface IFileCopyFilter {
-  (sourcePath: string): boolean;
-}
 
 /**
  * Copy files from source to destination with optional filter
@@ -20,7 +12,7 @@ export interface IFileCopyFilter {
 export async function copyFiles(
   sourceFolder: string,
   destinationFolder: string,
-  filter?: IFileCopyFilter,
+  filter?: (sourcePath: string) => boolean,
   trackCopiedFiles: boolean = false
 ): Promise<string[]> {
   const copiedFiles: string[] = [];
@@ -83,7 +75,7 @@ export async function processFiles(
 ): Promise<boolean> {
   try {
     const promises = files.map(async (file) => {
-      const fullPath = pathUtils.joinPath(basePath, file);
+      const fullPath = path.join(basePath, file);
       await processFileContent(fullPath, replacements);
     });
 
@@ -109,14 +101,14 @@ export async function renameFiles(
   const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
 
   for (const filePath of files) {
-    const fullPath = pathUtils.joinPath(basePath, filePath);
+    const fullPath = path.join(basePath, filePath);
     const filename = path.basename(fullPath);
 
     // Only rename files matching the pattern
     if (filename.match(regex)) {
       const directory = path.dirname(fullPath);
       const newName = filename.replace(regex, replacement);
-      const newPath = pathUtils.joinPath(directory, newName);
+      const newPath = path.join(directory, newName);
 
       renamePromises.push(
         new Promise<string>((resolve, reject) => {
@@ -157,7 +149,7 @@ export async function renameFiles(
 /**
  * Filter that only includes specified file extensions
  */
-export function createFileExtensionFilter(extensions: string[]): IFileCopyFilter {
+export function createFileExtensionFilter(extensions: string[]) {
   return (sourcePath: string): boolean => {
     if (!fs.lstatSync(sourcePath).isFile()) {
       return true; // Always include directories
@@ -171,7 +163,7 @@ export function createFileExtensionFilter(extensions: string[]): IFileCopyFilter
 /**
  * Filter that only includes files with specific names
  */
-export function createFileNameFilter(fileNames: string[]): IFileCopyFilter {
+export function createFileNameFilter(fileNames: string[]) {
   return (sourcePath: string): boolean => {
     if (!fs.lstatSync(sourcePath).isFile()) {
       return true; // Always include directories

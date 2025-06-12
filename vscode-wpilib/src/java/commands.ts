@@ -1,11 +1,11 @@
 'use strict';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
+import path from 'path';
 import * as vscode from 'vscode';
-import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
+import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
 import { getClassName, getPackageName } from '../utilities';
-import * as pathUtils from '../utils/project/pathUtils';
 import * as fileUtils from '../utils/project/fileUtils';
 
 export interface IJavaJsonLayout {
@@ -24,7 +24,7 @@ async function performCopy(
   javaPackage: string
 ): Promise<boolean> {
   try {
-    const commandFolder = pathUtils.joinPath(commandRoot, command.foldername);
+    const commandFolder = path.join(commandRoot, command.foldername);
 
     // Copy files and track them
     const copiedFiles = await fileUtils.copyFiles(
@@ -67,8 +67,8 @@ export class Commands {
   private readonly commandResourceName = 'commands.json';
 
   constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
-    const commandFolder = pathUtils.joinPath(resourceRoot, 'src', 'commands');
-    const resourceFile = pathUtils.joinPath(commandFolder, this.commandResourceName);
+    const commandFolder = path.join(resourceRoot, 'src', 'commands');
+    const resourceFile = path.join(commandFolder, this.commandResourceName);
 
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {

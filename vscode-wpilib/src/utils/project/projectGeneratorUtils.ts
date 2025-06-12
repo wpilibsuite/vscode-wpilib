@@ -2,13 +2,11 @@
 
 import * as path from 'path';
 const glob = require('glob');
-import { localize as i18n } from '../i18n/locale';
+import { localize as i18n } from '../l10n/locale';
 import { logger } from '../../logger';
-import { ncpAsync, readFileAsync, writeFileAsync } from '../../utilities';
+import { mkdirpAsync, ncpAsync, readFileAsync, writeFileAsync } from '../../utilities';
 import { setExecutePermissions } from './permissions';
 import * as pathUtils from './pathUtils';
-
-export type CopyCallback = (srcFolder: string, rootFolder: string) => Promise<boolean>;
 
 /**
  * Common patterns used in text replacements
@@ -53,7 +51,7 @@ export async function processTemplateFiles(
   const promiseArray: Promise<void>[] = [];
 
   for (const filePath of files) {
-    const fullPath = pathUtils.joinPath(basePath, filePath);
+    const fullPath = path.join(basePath, filePath);
     promiseArray.push(
       (async () => {
         try {
@@ -112,28 +110,6 @@ export async function findMatchingFiles(
 }
 
 /**
- * Copy source template folder to destination
- */
-export async function copyTemplateFolder(
-  sourceFolder: string | CopyCallback,
-  destinationPath: string,
-  rootFolder: string
-): Promise<boolean> {
-  try {
-    if (typeof sourceFolder === 'string') {
-      await ncpAsync(sourceFolder, destinationPath);
-    } else {
-      // Use the callback for custom copy logic
-      await sourceFolder(destinationPath, rootFolder);
-    }
-    return true;
-  } catch (error) {
-    logger.error(`Failed to copy template folder to ${destinationPath}`, error);
-    return false;
-  }
-}
-
-/**
  * Setup project structure and copy Gradle files
  */
 export async function setupProjectStructure(
@@ -148,12 +124,12 @@ export async function setupProjectStructure(
     });
 
     // Copy shared gradle files
-    await ncpAsync(pathUtils.joinPath(grRoot, 'shared'), toFolder, {
+    await ncpAsync(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
     });
 
     // Set execute permissions on gradlew
-    await setExecutePermissions(pathUtils.getGradlewPath(toFolder));
+    await setExecutePermissions(path.join(toFolder, 'gradlew'));
 
     return true;
   } catch (error) {
@@ -192,8 +168,8 @@ export async function setupDeployDirectory(
       return true;
     }
 
-    const deployDir = pathUtils.joinPath(toFolder, 'src', 'main', 'deploy');
-    await pathUtils.ensureDirectory(deployDir);
+    const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
+    await mkdirpAsync(deployDir);
 
     const hintKey = isJava ? 'generateJavaDeployHint' : 'generateCppDeployHint';
     const hintText = isJava
@@ -206,7 +182,7 @@ function from the 'frc/Filesystem.h' header to get a proper path relative to the
 directory.`;
 
     await writeFileAsync(
-      pathUtils.joinPath(deployDir, 'example.txt'),
+      path.join(deployDir, 'example.txt'),
       i18n('generator', [hintKey, hintText])
     );
 
@@ -226,8 +202,8 @@ export async function setupVendorDeps(
   extraVendordeps: string[] = []
 ): Promise<boolean> {
   try {
-    const vendorDir = pathUtils.getVendorDepsPath(toFolder);
-    await pathUtils.ensureDirectory(vendorDir);
+    const vendorDir = path.join(toFolder, 'vendordeps');
+    await mkdirpAsync(vendorDir);
 
     // Add WPILib New Commands
     await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDS, vendorDir);
@@ -252,6 +228,6 @@ export async function setupVendorDeps(
  * Get the Gradle RIO version from version.txt
  */
 export async function getGradleRioVersion(grRoot: string): Promise<string> {
-  const grVersionFile = pathUtils.joinPath(grRoot, 'version.txt');
+  const grVersionFile = path.join(grRoot, 'version.txt');
   return (await readFileAsync(grVersionFile, 'utf8')).trim();
 }

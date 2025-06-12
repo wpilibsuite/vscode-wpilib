@@ -3,9 +3,9 @@
 import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import * as xml2js from 'xml2js';
-import { localize as i18n } from './utils/i18n/locale';
+import { localize as i18n } from './utils/l10n/locale';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './utilities';

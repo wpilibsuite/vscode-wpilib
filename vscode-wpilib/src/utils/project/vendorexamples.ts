@@ -1,20 +1,20 @@
 'use strict';
 
 import * as jsonc from 'jsonc-parser';
-import { localize as i18n } from '../i18n/locale';
+import path from 'path';
+import * as vscode from 'vscode';
+import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../../api';
 import { logger } from '../../logger';
 import {
   existsAsync,
   extensionContext,
-  statAsync,
   readdirAsync,
   readFileAsync,
+  statAsync,
 } from '../../utilities';
-import * as vscode from '../../vscodeshim';
-import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../../wpilibapishim';
+import { localize as i18n } from '../l10n/locale';
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
-import * as pathUtils from './pathUtils';
 
 interface IJsonExample {
   name: string;
@@ -49,19 +49,19 @@ export async function addVendorExamples(
   utilities: IUtilitiesAPI,
   vendorlibs: VendorLibrariesBase
 ): Promise<void> {
-  const shimmedResourceRoot = pathUtils.joinPath(resourceRoot, 'vendordeps');
+  const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
   const storagePath = extensionContext.storagePath;
   if (storagePath === undefined) {
     return;
   }
 
-  const exampleDir = pathUtils.joinPath(utilities.getWPILibHomeDir(), 'vendorexamples');
-  const gradleBasePath = pathUtils.joinPath(resourceRoot, 'gradle');
+  const exampleDir = path.join(utilities.getWPILibHomeDir(), 'vendorexamples');
+  const gradleBasePath = path.join(resourceRoot, 'gradle');
 
   if (await existsAsync(exampleDir)) {
     const files = await readdirAsync(exampleDir);
     for (const file of files) {
-      const filePath = pathUtils.joinPath(exampleDir, file);
+      const filePath = path.join(exampleDir, file);
       if ((await statAsync(filePath)).isDirectory()) {
         continue;
       }
@@ -92,8 +92,8 @@ export async function addVendorExamples(
                 },
                 async generate(folderInto: vscode.Uri): Promise<boolean> {
                   try {
-                    const exampleFolderPath = pathUtils.joinPath(exampleDir, ex.foldername);
-                    const gradlePath = pathUtils.joinPath(gradleBasePath, ex.gradlebase);
+                    const exampleFolderPath = path.join(exampleDir, ex.foldername);
+                    const gradlePath = path.join(gradleBasePath, ex.gradlebase);
 
                     if (ex.language === 'java') {
                       if (
@@ -104,7 +104,7 @@ export async function addVendorExamples(
                           gradlePath,
                           folderInto.fsPath,
                           'frc.robot.' + ex.mainclass,
-                          pathUtils.joinPath('frc', 'robot'),
+                          path.join('frc', 'robot'),
                           false,
                           extraVendordeps,
                           ex.packagetoreplace

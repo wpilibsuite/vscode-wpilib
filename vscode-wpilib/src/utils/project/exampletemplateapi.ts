@@ -1,15 +1,11 @@
 'use strict';
 
 import * as path from 'path';
+import * as vscode from 'vscode';
+import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../../api';
 import { mkdirpAsync, readFileAsync, writeFileAsync } from '../../utilities';
-import * as vscode from '../../vscodeshim';
-import {
-  ICreatorQuickPick,
-  IExampleTemplateAPI,
-  IExampleTemplateCreator,
-} from '../../wpilibapishim';
+import { localize as i18n } from '../l10n/locale';
 import { IPreferencesJson } from './preferencesjson';
-import { localize as i18n } from '../i18n/locale';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
   private templates: ICreatorQuickPick[] = [];

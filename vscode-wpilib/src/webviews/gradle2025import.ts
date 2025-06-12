@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { localize as i18n } from '../utils/i18n/locale';
+import { localize as i18n } from '../utils/l10n/locale';
 import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../utils/project/generator';
 import { ImportUpdate } from '../utils/project/importupdater';
 import { IPreferencesJson } from '../utils/project/preferencesjson';

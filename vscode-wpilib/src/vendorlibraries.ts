@@ -1,13 +1,13 @@
 'use strict';
 
+import path from 'path';
 import * as vscode from 'vscode';
+import { IExternalAPI } from './api';
 import { logger } from './logger';
-import { IExternalAPI } from 'vscode-wpilibapi';
-import { localize as i18n } from './utils/i18n/locale';
-import { IJsonDependency, VendorLibrariesBase } from './utils/project/vendorlibrariesbase';
 import { deleteFileAsync, readdirAsync } from './utilities';
+import { localize as i18n } from './utils/l10n/locale';
+import { IJsonDependency, VendorLibrariesBase } from './utils/project/vendorlibrariesbase';
 import { isNewerVersion } from './versions';
-import * as pathUtils from './utils/project/pathUtils';
 
 class OptionQuickPick implements vscode.QuickPickItem {
   public label: string;
@@ -231,7 +231,7 @@ export class VendorLibraries extends VendorLibrariesBase {
       const url = this.getWpVendorFolder(workspace);
       const files = await readdirAsync(url);
       for (const file of files) {
-        const fullPath = pathUtils.joinPath(url, file);
+        const fullPath = path.join(url, file);
         const result = await this.readFile(fullPath);
         if (result !== undefined) {
           for (const ti of toRemove) {

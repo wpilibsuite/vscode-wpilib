@@ -8,7 +8,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
 import { BuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
@@ -18,7 +18,7 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
-import { localize as i18n } from './utils/i18n/locale';
+import { localize as i18n } from './utils/l10n/locale';
 import { closeLogger, getMainLogFile, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
@@ -254,9 +254,9 @@ async function handleAfterTrusted(
             continue;
           }
 
-          if (prefs.getProjectYear() !== '2025') {
+          if (prefs.getProjectYear() !== '2027_alpha1') {
             const importPersistentState = new PersistentFolderState(
-              'wpilib.2025persist',
+              'wpilib.2027_alpha1persist',
               false,
               w.uri.fsPath
             );
@@ -264,7 +264,7 @@ async function handleAfterTrusted(
               const upgradeResult = await vscode.window.showInformationMessage(
                 i18n(
                   'message',
-                  'This project is not compatible with this version of the extension. Would you like to import this project into 2025?'
+                  'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha1?'
                 ),
                 {
                   modal: true,
