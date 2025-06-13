@@ -4,7 +4,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 /**@type {import('webpack').Configuration}*/
 module.exports = [
   {
-    mode: isDevelopment ? 'development' : 'production',
     entry: {
       localeloader: './src/webviews/localeloader.ts',
       gradle2025importpage: './src/webviews/pages/gradle2025importpage.ts',
@@ -38,7 +37,6 @@ module.exports = [
   },
   {
     target: 'node',
-    mode: isDevelopment ? 'development' : 'production',
     entry: './src/extension.ts',
     output: {
       path: path.resolve(__dirname, 'out'),

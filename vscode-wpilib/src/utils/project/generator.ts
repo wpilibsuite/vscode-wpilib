@@ -136,13 +136,11 @@ export async function generateCopyJava(
   }
 }
 
-export function setDesktopEnabled(buildgradle: string, setting: boolean): Promise<void> {
-  return pathUtils
-    .updateFileContents(buildgradle, (content) =>
-      content.replace(
-        /def\s+includeDesktopSupport\s*=\s*(true|false)/gm,
-        `def includeDesktopSupport = ${setting ? 'true' : 'false'}`
-      )
+export async function setDesktopEnabled(buildgradle: string, setting: boolean): Promise<void> {
+  await pathUtils.updateFileContents(buildgradle, (content) =>
+    content.replace(
+      /def\s+includeDesktopSupport\s*=\s*(true|false)/gm,
+      `def includeDesktopSupport = ${setting ? 'true' : 'false'}`
     )
-    .then(() => {});
+  );
 }

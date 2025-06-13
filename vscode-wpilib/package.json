@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "publisher": "wpilibsuite",
     "license": "BSD-3-Clause",
-    "icon": "wpilib-icon-128.png",
+    "icon": "resources/wpilib-icon-128.png",
     "engines": {
         "vscode": "^1.57.0"
     },
@@ -44,7 +44,6 @@
         "onCommand:wpilibcore.selectCppBinaryTypes",
         "onCommand:wpilibcore.importGradle2025Project",
         "onCommand:wpilibcore.createNewProject",
-        "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
         "onCommand:wpilibcore.checkForUpdates",
         "onCommand:wpilibcore.installGradleTools",
@@ -65,7 +64,7 @@
                 {
                     "id": "wpilib-vendordeps",
                     "title": "WPILib Vendor Dependencies",
-                    "icon": "resources/media/wpilib.png"
+                    "icon": "resources/wpilib-icon-128.png"
                 }
             ]
         },
@@ -351,12 +350,6 @@
                 "category": "WPILib"
             },
             {
-                "command": "wpilibcore.manageVendorLibs",
-                "title": "%wpilibcore.manageVendorLibs.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
                 "command": "wpilibcore.setJavaHome",
                 "title": "%wpilibcore.setJavaHome.title%",
                 "category": "WPILib",
@@ -438,7 +431,7 @@
                     "type": "webview",
                     "id": "wpilib.dependencyView",
                     "name": "WPILib Vendor Dependencies",
-                    "icon": "resources/media/wpilib.png"
+                    "icon": "resources/wpilib-icon-128.png"
                 }
             ]
         },
@@ -512,11 +505,6 @@
                     "group": "wpilib"
                 },
                 {
-                    "when": "resourceFilename == build.gradle",
-                    "command": "wpilibcore.manageVendorLibs",
-                    "group": "wpilib"
-                },
-                {
                     "when": "explorerResourceIsFolder && isWPILibProject",
                     "command": "wpilibcore.createCommand",
                     "group": "wpilib"
@@ -533,11 +521,11 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "gulp build && npm run lint && webpack --mode production",
+        "vscode:prepublish": "gulp build && npm run lint && webpack --config-node-env production",
         "clean": "rmdir-cli out",
         "lint": "eslint .",
-        "webpack": "webpack --mode development",
-        "webpack-watch": "webpack --mode development --watch",
+        "webpack": "webpack --config-node-env production",
+        "webpack-watch": "webpack --config-node-env development --watch",
         "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
         "gulp": "gulp",
         "test": "npm run webpack && node ./node_modules/vscode/bin/test",
