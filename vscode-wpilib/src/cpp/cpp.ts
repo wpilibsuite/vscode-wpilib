@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from '../api';
 import { activateCppProvider } from '../cppprovider/cppprovider';
+import { localize as i18n } from '../utils/l10n/locale';
 import { Examples } from '../utils/project/examples';
 import { Templates } from '../utils/project/templates';
 import { BuildTest } from './buildtest';
@@ -28,7 +29,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
   if (cppExtension === undefined) {
     vscode.window.showWarningMessage(
-      'Could not find cpptools C++ extension. Debugging is disabled.'
+      i18n('message', 'Could not find cpptools C++ extension. Debugging is disabled.')
     );
     allowDebug = false;
   }

@@ -11,6 +11,7 @@ import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
+import { localize as i18n } from '../utils/l10n/locale';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -25,7 +26,9 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   const javaDebugExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
   if (javaDebugExtension === undefined) {
-    vscode.window.showWarningMessage('Could not find java extension. Debugging is disabled.');
+    vscode.window.showWarningMessage(
+      i18n('message', 'Could not find Debugger for Java extension. Debugging is disabled.')
+    );
 
     allowDebug = false;
   }

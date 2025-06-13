@@ -219,6 +219,7 @@ async function handleAfterTrusted(
     logger.error('error creating dependency view', err);
     creationError = true;
   }
+
   // Create all of our commands that the extension runs
   createVsCommands(context, externalApi);
 

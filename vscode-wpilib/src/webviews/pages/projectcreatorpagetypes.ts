@@ -1,5 +1,7 @@
 'use strict';
 
+import { ICreatorQuickPick } from '../../api';
+
 export enum ProjectType {
   Example,
   Template,
@@ -28,5 +30,5 @@ export interface IProjectIPCReceive {
 
 export interface IProjectIPCSend {
   type: string;
-  data: string | boolean | ProjectType | string[] | IBaseOption[] | any; // Using any to resolve type mismatch without breaking existing code
+  data: string | boolean | ProjectType | string[] | IBaseOption[] | ICreatorQuickPick[];
 }

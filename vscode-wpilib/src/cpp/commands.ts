@@ -91,15 +91,12 @@ export class Commands {
   constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
     const commandFolder = path.join(resourceRoot, 'src', 'commands');
     const resourceFile = path.join(commandFolder, this.commandResourceName);
-
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         logger.log('Command error: ', err);
         return;
       }
-
       const commands: ICppJsonLayout[] = jsonc.parse(data) as ICppJsonLayout[];
-
       for (const c of commands) {
         const provider: ICommandCreator = {
           getLanguage(): string {
@@ -170,11 +167,9 @@ export class Commands {
               );
               // current folder is include
             }
-
             return performCopy(commandFolder, c, srcFolder, headerFolder, includeRoot, className);
           },
         };
-
         core.addCommandProvider(provider);
       }
     });

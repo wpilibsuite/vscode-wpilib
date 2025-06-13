@@ -69,15 +69,12 @@ export class Commands {
   constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
     const commandFolder = path.join(resourceRoot, 'src', 'commands');
     const resourceFile = path.join(commandFolder, this.commandResourceName);
-
     fs.readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         logger.error('Command file error: ', err);
         return;
       }
-
       const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];
-
       for (const c of commands) {
         const provider: ICommandCreator = {
           getLanguage(): string {
@@ -122,11 +119,9 @@ export class Commands {
             if (className === undefined || className === '') {
               return false;
             }
-
             return performCopy(commandFolder, c, folder, className, javaPackage);
           },
         };
-
         core.addCommandProvider(provider);
       }
     });
