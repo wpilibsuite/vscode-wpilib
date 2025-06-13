@@ -454,7 +454,6 @@ html {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-right: 12px;
 }
 
 .toolbar-button {

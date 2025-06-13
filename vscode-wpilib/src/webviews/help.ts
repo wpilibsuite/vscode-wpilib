@@ -35,7 +35,7 @@ export class Help extends WebViewBase {
             case 'openDocumentation':
               vscode.commands.executeCommand(
                 'vscode.open',
-                vscode.Uri.parse('https://docs.wpilib.org/en/stable')
+                vscode.Uri.parse('https://docs.wpilib.org/en/2027')
               );
               break;
           }
