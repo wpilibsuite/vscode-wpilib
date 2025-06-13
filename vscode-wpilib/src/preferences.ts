@@ -2,9 +2,9 @@
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IPreferences } from 'vscode-wpilibapi';
-import { localize as i18n } from './locale';
-import { IPreferencesJson } from './shared/preferencesjson';
+import { IPreferences } from './api';
+import { localize as i18n } from './utils/l10n/locale';
+import { IPreferencesJson } from './utils/project/preferencesjson';
 import { existsAsync, mkdirAsync, readFileAsync, writeFileAsync } from './utilities';
 
 const defaultPreferences: IPreferencesJson = {
@@ -43,7 +43,7 @@ export class Preferences implements IPreferences {
     return prefs;
   }
 
-  public static getPrefrencesFilePath(root: string): string {
+  public static getPreferencesFilePath(root: string): string {
     return path.join(root, Preferences.wpilibPreferencesFolder, Preferences.preferenceFileName);
   }
 
@@ -275,7 +275,7 @@ export class Preferences implements IPreferences {
   }
 
   private async asyncInitialize() {
-    const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+    const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
 
     if (await existsAsync(configFilePath)) {
       vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
@@ -305,7 +305,7 @@ export class Preferences implements IPreferences {
 
   private async writePreferences(): Promise<void> {
     if (this.preferencesFile === undefined) {
-      const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+      const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
       this.preferencesFile = vscode.Uri.file(configFilePath);
       await mkdirAsync(path.dirname(this.preferencesFile.fsPath));
     }

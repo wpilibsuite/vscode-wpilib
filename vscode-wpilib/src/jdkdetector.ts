@@ -3,7 +3,7 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { logger } from './logger';
 
 function parseMajorVersion(content: string): number {
