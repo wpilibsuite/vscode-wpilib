@@ -92,7 +92,7 @@ export class Commands {
           async generate(folder: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<boolean> {
             const className = await getClassName();
 
-            if (className === undefined || className === '') {
+            if (!className) {
               return false;
             }
 

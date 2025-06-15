@@ -98,7 +98,7 @@ export class Commands {
             } else {
               // Could not root path, ask for one
               const res = await getPackageName();
-              if (res === undefined) {
+              if (!res) {
                 return false;
               }
               javaPackage = res;
@@ -106,7 +106,7 @@ export class Commands {
 
             const className = await getClassName();
 
-            if (className === undefined || className === '') {
+            if (!className) {
               return false;
             }
             return performCopy(commandFolder, c, folder, className, javaPackage);

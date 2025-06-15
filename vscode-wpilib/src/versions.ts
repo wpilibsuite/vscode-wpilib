@@ -4,7 +4,7 @@ interface IVersion {
   major: number;
   minor: number;
   patch: number;
-  else: string | undefined;
+  else?: string;
   version: string;
 }
 

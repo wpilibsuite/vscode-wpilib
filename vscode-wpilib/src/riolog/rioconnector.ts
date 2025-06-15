@@ -241,7 +241,7 @@ export async function connectToRobot(
   const timer = timerPromise(timeout);
   connectors.push(timer.promise);
   const firstDone: net.Socket | undefined = await properRace(connectors);
-  if (firstDone === undefined) {
+  if (!firstDone) {
     // Kill all
     for (const p of pairs) {
       p.dispose();

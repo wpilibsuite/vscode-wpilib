@@ -6,7 +6,7 @@ export function createCommands(context: vscode.ExtensionContext, configLoaders: 
     vscode.commands.registerCommand('wpilibcore.selectCppToolchain', async () => {
       const workspaces = vscode.workspace.workspaceFolders;
 
-      if (workspaces === undefined) {
+      if (!workspaces) {
         return;
       }
 
@@ -24,7 +24,7 @@ export function createCommands(context: vscode.ExtensionContext, configLoaders: 
     vscode.commands.registerCommand('wpilibcore.selectCppBinaryTypes', async () => {
       const workspaces = vscode.workspace.workspaceFolders;
 
-      if (workspaces === undefined) {
+      if (!workspaces) {
         return;
       }
 
@@ -45,7 +45,7 @@ export function createCommands(context: vscode.ExtensionContext, configLoaders: 
     vscode.commands.registerCommand('wpilibcore.refreshCppProperties', async () => {
       const workspaces = vscode.workspace.workspaceFolders;
 
-      if (workspaces === undefined) {
+      if (!workspaces) {
         return;
       }
 
