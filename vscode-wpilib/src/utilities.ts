@@ -68,7 +68,7 @@ export async function gradleRun(
 
   let varCommands;
 
-  if (javaHome !== undefined && javaHome !== '') {
+  if (javaHome) {
     command += ` -Dorg.gradle.java.home="${javaHome}"`;
     varCommands = {
       ['JAVA_HOME']: javaHome,
@@ -107,14 +107,12 @@ export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolea
     { title: i18n('ui', 'Yes (New Window)') },
     { title: i18n('ui', 'No'), isCloseAffordance: true }
   );
-  if (openSelection === undefined) {
+  if (!openSelection) {
     return true;
   } else if (openSelection.title === i18n('ui', 'Yes (Current Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
   } else if (openSelection.title === i18n('ui', 'Yes (New Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
-  } else {
-    return true;
   }
   return true;
 }

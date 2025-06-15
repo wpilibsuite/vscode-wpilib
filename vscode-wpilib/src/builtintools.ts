@@ -32,7 +32,7 @@ class VbsToolRunner implements IToolRunner {
     return new Promise<boolean>((resolve, _reject) => {
       let cmd = `${this.toolScript}`;
 
-      if (wp !== undefined) {
+      if (wp) {
         const toolStoreFolder = path.join(wp.uri.fsPath, `.${this.name}`);
         cmd += ` "${toolStoreFolder}"`;
       }

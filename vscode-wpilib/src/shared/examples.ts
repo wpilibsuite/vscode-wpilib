@@ -56,7 +56,7 @@ export class Examples {
           async generate(folderInto: vscode.Uri): Promise<boolean> {
             try {
               let testFolder;
-              if (e.hasunittests === true) {
+              if (e.hasunittests) {
                 testFolder = path.join(examplesTestFolder, e.foldername);
               }
               if (java) {

@@ -35,11 +35,11 @@ export class RioLogWindow {
     this.running = true;
     this.createWebView();
     this.createRioConsole();
-    if (this.webview === undefined || this.rioConsole === undefined) {
+    if (!this.webview || !this.rioConsole) {
       return;
     }
     this.webview.on('didDispose', () => {
-      if (this.rioConsole !== undefined) {
+      if (this.rioConsole) {
         this.rioConsole.stop();
         this.rioConsole.removeAllListeners();
       }
@@ -65,7 +65,7 @@ export class RioLogWindow {
   }
 
   public stop() {
-    if (this.webview !== undefined) {
+    if (this.webview) {
       this.webview.dispose();
     }
   }
@@ -80,7 +80,7 @@ export class RioLogWindow {
   private createWebView() {
     this.webview = this.windowProvider.createWindowView();
     this.webview.on('windowActive', async () => {
-      if (this.webview === undefined) {
+      if (!this.webview) {
         return;
       }
       // Window goes active.
@@ -88,8 +88,8 @@ export class RioLogWindow {
         message: this.hiddenArray,
         type: SendTypes.Batch,
       });
-      if (this.rioConsole !== undefined) {
-        if (this.rioConsole.connected === true) {
+      if (this.rioConsole) {
+        if (this.rioConsole.connected) {
           await this.webview.postMessage({
             message: true,
             type: SendTypes.ConnectionChanged,
@@ -109,7 +109,7 @@ export class RioLogWindow {
   }
 
   private async sendPaused() {
-    if (this.webview === undefined) {
+    if (!this.webview) {
       return;
     }
     const success = await this.webview.postMessage({
@@ -123,7 +123,7 @@ export class RioLogWindow {
   }
 
   private async onConnectionChanged(connected: boolean) {
-    if (this.webview === undefined) {
+    if (!this.webview) {
       return;
     }
     if (connected) {
@@ -140,10 +140,10 @@ export class RioLogWindow {
   }
 
   private async onNewMessageToSend(message: IPrintMessage | IErrorMessage) {
-    if (this.webview === undefined) {
+    if (!this.webview) {
       return;
     }
-    if (this.paused === true) {
+    if (this.paused) {
       this.pausedArray.push(message);
       await this.webview.postMessage({
         message: this.pausedArray.length,
@@ -161,7 +161,7 @@ export class RioLogWindow {
   }
 
   private async onMessageReceived(data: IIPCReceiveMessage): Promise<void> {
-    if (this.rioConsole === undefined) {
+    if (!this.rioConsole) {
       return;
     }
     if (data.type === ReceiveTypes.Discard) {
@@ -169,11 +169,11 @@ export class RioLogWindow {
     } else if (data.type === ReceiveTypes.Pause) {
       const old = this.paused;
       this.paused = data.message as boolean;
-      if (old === true && this.paused === false) {
+      if (old && !this.paused) {
         await this.sendPaused();
       }
     } else if (data.type === ReceiveTypes.Save) {
-      if (this.webview === undefined) {
+      if (!this.webview) {
         return;
       }
       const deserializedLogs: (IPrintMessage | IErrorMessage)[] = [];
@@ -185,7 +185,7 @@ export class RioLogWindow {
     } else if (data.type === ReceiveTypes.Reconnect) {
       const newValue = data.message as boolean;
       this.rioConsole.setAutoReconnect(newValue);
-      if (newValue === false) {
+      if (!newValue) {
         this.rioConsole.disconnect();
       }
     } else if (data.type === ReceiveTypes.ChangeNumber) {

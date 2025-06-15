@@ -3,7 +3,7 @@
 export class PromiseCondition<T> {
   private hasBeenSet: boolean = false;
   private value: T;
-  private condSet: ((value: T) => void) | undefined = undefined;
+  private condSet?: (value: T) => void = undefined;
 
   public constructor(defaultValue: T) {
     this.value = defaultValue;
@@ -14,7 +14,7 @@ export class PromiseCondition<T> {
       this.condSet = (value) => {
         resolve(value);
       };
-      if (this.hasBeenSet === true) {
+      if (this.hasBeenSet) {
         resolve(this.value);
       }
     });
@@ -23,7 +23,7 @@ export class PromiseCondition<T> {
   public set(value: T) {
     this.value = value;
     this.hasBeenSet = true;
-    if (this.condSet !== undefined) {
+    if (this.condSet) {
       this.condSet(value);
     }
   }

@@ -138,7 +138,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   private configRelativePattern: vscode.RelativePattern;
   private configWatcher: vscode.FileSystemWatcher;
 
-  private gradleWatcher: vscode.FileSystemWatcher | undefined;
+  private gradleWatcher?: vscode.FileSystemWatcher;
 
   private executeApi: IExecuteAPI;
 
@@ -206,24 +206,22 @@ export class ApiProvider implements CustomConfigurationProvider {
   }
 
   public async canProvideBrowseConfigurationsPerFolder(
-    _?: vscode.CancellationToken | undefined
+    _?: vscode.CancellationToken
   ): Promise<boolean> {
     return false;
   }
   public async provideFolderBrowseConfiguration(
     _: vscode.Uri,
-    __?: vscode.CancellationToken | undefined
+    __?: vscode.CancellationToken
   ): Promise<WorkspaceBrowseConfiguration> {
     throw new Error('Method not supported.');
   }
 
-  public async canProvideBrowseConfiguration(
-    _?: vscode.CancellationToken | undefined
-  ): Promise<boolean> {
+  public async canProvideBrowseConfiguration(_?: vscode.CancellationToken): Promise<boolean> {
     return true;
   }
   public async provideBrowseConfiguration(
-    _?: vscode.CancellationToken | undefined
+    _?: vscode.CancellationToken
   ): Promise<WorkspaceBrowseConfiguration> {
     const browsePath: string[] = [];
     let compilerPath;
@@ -234,26 +232,18 @@ export class ApiProvider implements CustomConfigurationProvider {
         browsePath.push(...tc.allLibFiles);
       }
     }
-    if (compilerPath === undefined) {
-      const config: WorkspaceBrowseConfiguration = {
-        browsePath,
-      };
-      return config;
-    } else {
-      const config: WorkspaceBrowseConfiguration = {
-        browsePath,
-        compilerPath,
-      };
-      return config;
-    }
+    return {
+      browsePath,
+      compilerPath,
+    };
   }
 
   public async canProvideConfiguration(
     uri: vscode.Uri,
-    _: vscode.CancellationToken | undefined
+    _: vscode.CancellationToken
   ): Promise<boolean> {
     const fileWp = vscode.workspace.getWorkspaceFolder(uri);
-    if (fileWp === undefined || fileWp.index !== this.workspace.index) {
+    if (!fileWp || fileWp.index !== this.workspace.index) {
       return false;
     }
     return this.findMatchingBinary(uri);
@@ -261,7 +251,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
   public async provideConfigurations(
     uris: vscode.Uri[],
-    _: vscode.CancellationToken | undefined
+    _?: vscode.CancellationToken
   ): Promise<SourceFileConfigurationItem[]> {
     const ret: SourceFileConfigurationItem[] = [];
 
@@ -335,24 +325,24 @@ export class ApiProvider implements CustomConfigurationProvider {
     for (const tc of this.toolchains) {
       for (const arg of tc.systemCppArgs) {
         const version = getVersionFromArg(arg);
-        if (version !== undefined) {
+        if (version) {
           tc.cppLangVersion = version;
           break;
         }
       }
-      if (tc.cppLangVersion === undefined) {
+      if (tc.cppLangVersion) {
         tc.cppLangVersion = 'c++17';
       }
 
       for (const arg of tc.systemCArgs) {
         const version = getVersionFromArg(arg);
-        if (version !== undefined) {
+        if (version) {
           tc.cLangVersion = version;
           break;
         }
       }
 
-      if (tc.cLangVersion === undefined) {
+      if (tc.cLangVersion) {
         tc.cLangVersion = 'c11';
       }
     }
@@ -414,7 +404,7 @@ export class ApiProvider implements CustomConfigurationProvider {
       placeHolder: 'Enable intellisense for the following types of binaries',
     });
 
-    if (selectedItems === undefined) {
+    if (!selectedItems) {
       return;
     }
 
@@ -497,7 +487,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   }
 
   private setupWatchers() {
-    if (this.gradleWatcher === undefined) {
+    if (!this.gradleWatcher) {
       const gradlePattern = new vscode.RelativePattern(this.workspace, '**/*.gradle');
 
       this.gradleWatcher = vscode.workspace.createFileSystemWatcher(gradlePattern);
@@ -559,14 +549,12 @@ export class ApiProvider implements CustomConfigurationProvider {
     for (const tc of this.toolchains) {
       if (getToolchainName(tc) === this.selectedName.Value) {
         for (const sb of tc.sourceBinaries) {
-          if (sb.executable === true && currentBinaryTypes.executables === false) {
+          if (sb.executable && !currentBinaryTypes.executables) {
             continue;
           }
-
-          if (sb.sharedLibrary === true && currentBinaryTypes.sharedLibraries === false) {
+          if (sb.sharedLibrary && !currentBinaryTypes.sharedLibraries) {
             continue;
           }
-
           if (
             sb.executable === false &&
             sb.sharedLibrary === false &&
@@ -600,11 +588,11 @@ export class ApiProvider implements CustomConfigurationProvider {
                     sb.langVersionSet = true;
                     for (const arg of sb.args) {
                       sb.langVersion = getVersionFromArg(arg);
-                      if (sb.langVersion !== undefined) {
+                      if (sb.langVersion) {
                         break;
                       }
                     }
-                    if (sb.langVersion === undefined) {
+                    if (!sb.langVersion) {
                       sb.langVersion = tc.cppLangVersion;
                     }
                   }
@@ -638,11 +626,11 @@ export class ApiProvider implements CustomConfigurationProvider {
                     sb.langVersionSet = true;
                     for (const arg of sb.args) {
                       sb.langVersion = getVersionFromArg(arg);
-                      if (sb.langVersion !== undefined) {
+                      if (sb.langVersion) {
                         break;
                       }
                     }
-                    if (sb.langVersion === undefined) {
+                    if (!sb.langVersion) {
                       sb.langVersion = tc.cLangVersion;
                     }
                   }

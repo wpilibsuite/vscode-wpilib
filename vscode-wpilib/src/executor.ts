@@ -56,7 +56,7 @@ export class ExecuteAPI implements IExecuteAPI {
         command = command.substring(2);
       }
       shell.commandLine = command;
-      if (shell.options !== undefined) {
+      if (shell.options) {
         shell.options.executable = 'cmd.exe';
         shell.options.shellArgs = ['/d', '/c'];
       }

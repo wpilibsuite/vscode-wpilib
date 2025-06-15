@@ -39,9 +39,9 @@ interface IJavaSimulateInfo {
 
 class JavaQuickPick<T> implements vscode.QuickPickItem {
   public label: string;
-  public description?: string | undefined;
-  public detail?: string | undefined;
-  public picked?: boolean | undefined;
+  public description?: string;
+  public detail?: string;
+  public picked?: boolean;
 
   public debugInfo: T;
 
@@ -116,7 +116,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select a target',
       });
-      if (picked === undefined) {
+      if (!picked) {
         vscode.window.showInformationMessage('Target cancelled');
         return false;
       }
@@ -148,7 +148,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
       });
-      if (picked === undefined) {
+      if (!picked) {
         vscode.window.showInformationMessage('Artifact cancelled');
         return false;
       }
@@ -284,7 +284,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
       });
-      if (picked === undefined) {
+      if (!picked) {
         vscode.window.showInformationMessage('Artifact cancelled');
         return false;
       }
@@ -313,7 +313,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
           canPickMany: true,
           placeHolder: 'Pick extensions to run',
         });
-        if (quickPick === undefined) {
+        if (!quickPick) {
           vscode.window.showInformationMessage('Simulation cancelled');
           return false;
         }
