@@ -60,149 +60,128 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.deployCode',
-      async (source: vscode.Uri | undefined) => {
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot deploy code since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getDeployDebugAPI().deployCode(workspace, source);
+    vscode.commands.registerCommand('wpilibcore.deployCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot deploy code since this is not a WPILib project')
+        );
+        return;
       }
-    )
+      await externalApi.getDeployDebugAPI().deployCode(workspace, source);
+    })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.debugCode',
-      async (source: vscode.Uri | undefined) => {
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot debug code since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getDeployDebugAPI().debugCode(workspace, source);
+    vscode.commands.registerCommand('wpilibcore.debugCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot debug code since this is not a WPILib project')
+        );
+        return;
       }
-    )
+      await externalApi.getDeployDebugAPI().debugCode(workspace, source);
+    })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.simulateCode',
-      async (source: vscode.Uri | undefined) => {
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot simulate code since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getDeployDebugAPI().simulateCode(workspace, source);
+    vscode.commands.registerCommand('wpilibcore.simulateCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot simulate code since this is not a WPILib project')
+        );
+        return;
       }
-    )
+      await externalApi.getDeployDebugAPI().simulateCode(workspace, source);
+    })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.simulateHwCode',
-      async (source: vscode.Uri | undefined) => {
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot simulate code since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getDeployDebugAPI().simulateCode(workspace, source, '-PhwSim');
+    vscode.commands.registerCommand('wpilibcore.simulateHwCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot simulate code since this is not a WPILib project')
+        );
+        return;
       }
-    )
+      await externalApi.getDeployDebugAPI().simulateCode(workspace, source, '-PhwSim');
+    })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.testCode',
-      async (source: vscode.Uri | undefined) => {
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot start tests since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getBuildTestAPI().testCode(workspace, source);
+    vscode.commands.registerCommand('wpilibcore.testCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot start tests since this is not a WPILib project')
+        );
+        return;
       }
-    )
+      await externalApi.getBuildTestAPI().testCode(workspace, source);
+    })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.buildCode',
-      async (source: vscode.Uri | undefined) => {
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot build robot code since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getBuildTestAPI().buildCode(workspace, source);
+    vscode.commands.registerCommand('wpilibcore.buildCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot build robot code since this is not a WPILib project')
+        );
+        return;
       }
-    )
+      await externalApi.getBuildTestAPI().buildCode(workspace, source);
+    })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(
-      'wpilibcore.createCommand',
-      async (arg: vscode.Uri | undefined) => {
-        if (arg === undefined) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Must select a folder to create a command')
-          );
-          return;
-        }
-        const preferencesApi = externalApi.getPreferencesAPI();
-        const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
-          vscode.window.showInformationMessage(
-            i18n('message', 'Cannot create command since this is not a WPILib project')
-          );
-          return;
-        }
-        await externalApi.getCommandAPI().createCommand(workspace, arg);
+    vscode.commands.registerCommand('wpilibcore.createCommand', async (arg?: vscode.Uri) => {
+      if (arg === undefined) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Must select a folder to create a command')
+        );
+        return;
       }
-    )
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot create command since this is not a WPILib project')
+        );
+        return;
+      }
+      await externalApi.getCommandAPI().createCommand(workspace, arg);
+    })
   );
 
   context.subscriptions.push(

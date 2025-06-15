@@ -11,8 +11,8 @@ export interface IJsonDependency {
   uuid: string;
   jsonUrl: string;
   fileName: string;
-  conflictsWith: IJsonConflicts[] | undefined;
-  requires: IJsonRequires[] | undefined;
+  conflictsWith?: IJsonConflicts[];
+  requires?: IJsonRequires[];
 }
 
 export interface IJsonRequires {
@@ -73,14 +73,12 @@ export class VendorLibrariesBase {
       for (const file of files) {
         const fullPath = path.join(url, file);
         const result = await this.readFile(fullPath);
-        if (result !== undefined) {
-          if (result.uuid === dep.uuid) {
-            if (override) {
-              await unlink(fullPath);
-              break;
-            } else {
-              return false;
-            }
+        if (result && result.uuid === dep.uuid) {
+          if (override) {
+            await unlink(fullPath);
+            break;
+          } else {
+            return false;
           }
         }
       }

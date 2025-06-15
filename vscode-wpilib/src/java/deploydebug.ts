@@ -39,9 +39,9 @@ interface IJavaSimulateInfo {
 
 class JavaQuickPick<T> implements vscode.QuickPickItem {
   public label: string;
-  public description?: string | undefined;
-  public detail?: string | undefined;
-  public picked?: boolean | undefined;
+  public description?: string;
+  public detail?: string;
+  public picked?: boolean;
 
   public debugInfo: T;
 

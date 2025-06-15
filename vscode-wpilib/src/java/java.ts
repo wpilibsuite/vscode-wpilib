@@ -53,7 +53,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
   context.subscriptions.push(templates);
 
-  if (vscode.extensions.getExtension('redhat.java') !== undefined) {
+  if (vscode.extensions.getExtension('redhat.java')) {
     // Add handlers for each workspace if java is installed
     const wp = vscode.workspace.workspaceFolders;
     if (wp) {

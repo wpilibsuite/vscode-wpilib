@@ -6,7 +6,7 @@ import { IUtilitiesAPI } from '../api';
 import { getIsWindows } from '../utilities';
 
 export class UtilitiesAPI implements IUtilitiesAPI {
-  private wpilibHome: string | undefined;
+  private wpilibHome?: string;
 
   public getWPILibYear(): string {
     return '2027_alpha4';

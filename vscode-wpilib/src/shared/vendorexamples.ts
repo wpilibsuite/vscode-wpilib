@@ -18,8 +18,8 @@ interface IJsonExample {
   gradlebase: string;
   language: 'java' | 'cpp';
   commandversion: number;
-  mainclass?: string | undefined;
-  packagetoreplace?: string | undefined;
+  mainclass?: string;
+  packagetoreplace?: string;
   dependencies: string[];
   foldername: string;
   extravendordeps?: string[];

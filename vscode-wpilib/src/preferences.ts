@@ -115,7 +115,7 @@ export class Preferences implements IPreferences {
   public async getTeamNumber(): Promise<number> {
     // If always ask, get it.
     const alwaysAsk = this.getConfiguration().get<boolean>('alwaysAskForTeamNumber');
-    if (alwaysAsk !== undefined && alwaysAsk === true) {
+    if (alwaysAsk) {
       return requestTeamNumber();
     }
     if (this.preferencesJson.teamNumber < 0) {

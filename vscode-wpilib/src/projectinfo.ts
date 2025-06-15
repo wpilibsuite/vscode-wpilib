@@ -58,7 +58,7 @@ export class ProjectInfoGatherer {
     this.disposables.push(this.statusBar);
 
     const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
+    if (workspaces) {
       for (const wp of workspaces) {
         const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
         if (prefs.getIsWPILibProject()) {

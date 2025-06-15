@@ -34,7 +34,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
   private projectInfo: ProjectInfoGatherer;
   private vendorLibraries: VendorLibraries;
-  private viewInfo: IProjectInfo | undefined;
+  private viewInfo?: IProjectInfo;
   private disposables: vscode.Disposable[] = [];
   private installedDeps: IJsonDependency[] = []; // The actual dep information that is installed
   private availableDeps: IJsonList[] = []; // All available deps
@@ -44,7 +44,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
   private externalApi: IExternalAPI;
   private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
-  private wp: vscode.WorkspaceFolder | undefined;
+  private wp?: vscode.WorkspaceFolder;
   private changed = 0;
   private refreshInProgress = false;
   private showingInstructions = false;
@@ -458,13 +458,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   public updateDependencies() {
-    if (this._view) {
-      this._view.webview.postMessage({
-        type: 'updateDependencies',
-        installed: this.installedList,
-        available: this.availableDepsList,
-      });
-    }
+    this._view?.webview.postMessage({
+      type: 'updateDependencies',
+      installed: this.installedList,
+      available: this.availableDepsList,
+    });
   }
 
   public dispose() {
@@ -489,36 +487,34 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.availableDeps = await this.getAvailableDependencies();
       if (this.availableDeps.length !== 0) {
         // Check Github for the VendorDep list
-        if (this.installedDeps.length !== 0) {
-          for (const id of this.installedDeps) {
-            let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-            for (const ad of this.availableDeps) {
-              if (id.uuid === ad.uuid) {
-                // Populate version array with version and button text
-                if (id.version !== ad.version) {
-                  if (isNewerVersion(ad.version, id.version)) {
-                    versionList.push({
-                      version: ad.version,
-                      buttonText: i18n('ui', 'Update'),
-                    });
-                  } else {
-                    versionList.push({
-                      version: ad.version,
-                      buttonText: i18n('ui', 'Downgrade'),
-                    });
-                  }
+        for (const id of this.installedDeps) {
+          let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
+          for (const ad of this.availableDeps) {
+            if (id.uuid === ad.uuid) {
+              // Populate version array with version and button text
+              if (id.version !== ad.version) {
+                if (isNewerVersion(ad.version, id.version)) {
+                  versionList.push({
+                    version: ad.version,
+                    buttonText: i18n('ui', 'Update'),
+                  });
+                } else {
+                  versionList.push({
+                    version: ad.version,
+                    buttonText: i18n('ui', 'Downgrade'),
+                  });
                 }
               }
             }
-            // Now we need to sort the version list newest to oldest
-            versionList = this.sortVersions(versionList);
-
-            this.installedList.push({
-              name: id.name,
-              currentVersion: id.version,
-              versionInfo: versionList,
-            });
           }
+          // Now we need to sort the version list newest to oldest
+          versionList = this.sortVersions(versionList);
+
+          this.installedList.push({
+            name: id.name,
+            currentVersion: id.version,
+            versionInfo: versionList,
+          });
         }
 
         // We need to group the available deps and filter out the installed ones
@@ -663,16 +659,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private isJsonList(jsonDepList: IJsonList[]): jsonDepList is IJsonList[] {
-    return jsonDepList.every((jsonDep) => {
-      return (
+    return jsonDepList.every(
+      (jsonDep) =>
         jsonDep.path !== undefined &&
         jsonDep.name !== undefined &&
         jsonDep.uuid !== undefined &&
         jsonDep.version !== undefined &&
         jsonDep.description !== undefined &&
         jsonDep.website !== undefined
-      );
-    });
+    );
   }
 
   private _getHtmlForWebview(webview: vscode.Webview): string {
