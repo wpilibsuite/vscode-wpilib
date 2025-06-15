@@ -1,11 +1,12 @@
 'use strict';
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
-import * as path from 'path';
+import path from 'path';
 import * as vscode from 'vscode';
-import { ICommandAPI, ICommandCreator, IPreferencesAPI } from 'vscode-wpilibapi';
+import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
-import { getClassName, getPackageName, ncpAsync } from '../utilities';
+import { getClassName, getPackageName } from '../utilities';
+import * as fileUtils from '../utils/project/fileUtils';
 
 export interface IJavaJsonLayout {
   name: string;
@@ -22,86 +23,44 @@ async function performCopy(
   replaceName: string,
   javaPackage: string
 ): Promise<boolean> {
-  const commandFolder = path.join(commandRoot, command.foldername);
-  const copiedFiles: string[] = [];
-  await ncpAsync(commandFolder, folder.fsPath, {
-    filter: (cf: string): boolean => {
-      if (fs.lstatSync(cf).isFile()) {
-        copiedFiles.push(path.relative(commandFolder, cf));
-      }
-      return true;
-    },
-  });
+  try {
+    const commandFolder = path.join(commandRoot, command.foldername);
 
-  const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:commands)\\..+?(?=;|\\.)';
-  const replacePackageTo = javaPackage;
-
-  const promiseArray: Promise<void>[] = [];
-
-  for (const f of copiedFiles) {
-    const file = path.join(folder.fsPath, f);
-    promiseArray.push(
-      new Promise<void>((resolve, reject) => {
-        fs.readFile(file, 'utf8', (err, dataIn) => {
-          if (err) {
-            reject(err);
-          } else {
-            const dataOut = dataIn
-              .replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo)
-              .replace(new RegExp(command.replacename, 'g'), replaceName);
-            fs.writeFile(file, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      })
+    // Copy files and track them
+    const copiedFiles = await fileUtils.copyFiles(
+      commandFolder,
+      folder.fsPath,
+      undefined, // No filter needed for Java
+      true // Track copied files
     );
+
+    // Create replacements map
+    const replacements = new Map<string | RegExp, string>();
+
+    // Add package replacement
+    const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:commands)\\..+?(?=;|\\.)';
+    replacements.set(new RegExp(replacePackageFrom, 'g'), javaPackage);
+
+    // Add classname replacement
+    replacements.set(new RegExp(command.replacename, 'g'), replaceName);
+
+    // Process files with replacements
+    await fileUtils.processFiles(copiedFiles, folder.fsPath, replacements);
+
+    // Rename files
+    await fileUtils.renameFiles(
+      copiedFiles,
+      folder.fsPath,
+      command.replacename,
+      replaceName,
+      true // Open in editor
+    );
+
+    return true;
+  } catch (error) {
+    logger.error('Error performing copy operation:', error);
+    return false;
   }
-
-  await Promise.all(promiseArray);
-
-  const movePromiseArray: Promise<string>[] = [];
-  for (const f of copiedFiles) {
-    const file = path.join(folder.fsPath, f);
-    const bname = path.basename(file);
-    const dirname = path.dirname(file);
-    if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(
-        dirname,
-        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
-      );
-      movePromiseArray.push(
-        new Promise<string>((resolve, reject) => {
-          fs.rename(file, newname, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(newname);
-            }
-          });
-        })
-      );
-    }
-  }
-
-  if (movePromiseArray.length > 0) {
-    const renamedCopiedFiles = await Promise.all(movePromiseArray);
-    for (const file of renamedCopiedFiles) {
-      const uri = vscode.Uri.file(file);
-      try {
-        const td = await vscode.workspace.openTextDocument(uri);
-        await vscode.window.showTextDocument(td);
-      } catch (err) {
-        logger.warn('Failed to open copied file: ' + file, err);
-      }
-    }
-  }
-
-  return true;
 }
 
 export class Commands {
@@ -147,7 +106,7 @@ export class Commands {
               }
               logger.log(packageslash);
             } else {
-              // Coult not root path, ask for one
+              // Could not root path, ask for one
               const res = await getPackageName();
               if (res === undefined) {
                 return false;

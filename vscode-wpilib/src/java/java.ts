@@ -3,15 +3,15 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
-import { logger } from '../logger';
-import { Examples } from '../shared/examples';
-import { Templates } from '../shared/templates';
+import { IExternalAPI } from '../api';
 import { existsAsync } from '../utilities';
+import { Examples } from '../utils/project/examples';
+import { Templates } from '../utils/project/templates';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
+import { localize as i18n } from '../utils/l10n/locale';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -26,8 +26,10 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   const javaDebugExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
   if (javaDebugExtension === undefined) {
-    // TODO: Make this a visible warning message when project detected is java
-    logger.log('Could not find java extension. Debugging is disabled.');
+    vscode.window.showWarningMessage(
+      i18n('message', 'Could not find Debugger for Java extension. Debugging is disabled.')
+    );
+
     allowDebug = false;
   }
 

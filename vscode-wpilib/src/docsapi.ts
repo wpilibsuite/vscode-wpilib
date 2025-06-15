@@ -1,10 +1,10 @@
 'use strict';
 
-import * as extract from 'extract-zip';
+const extract = require('extract-zip');
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { downloadFileToStream } from './fetchhelpers';
-import { localize as i18n } from './locale';
+import { localize as i18n } from './utils/l10n/locale';
 import {
   constructDownloadUrl,
   getMavenMetadata,
@@ -38,13 +38,13 @@ export async function downloadDocs(
 
       const versions = getMavenVersions(metaData);
 
-      const newstVersion = getNewestMavenVersion(versions);
+      const newestVersion = getNewestMavenVersion(versions);
 
-      if (newstVersion === undefined) {
+      if (newestVersion === undefined) {
         throw new Error('No version found');
       }
 
-      const downloadUrl = constructDownloadUrl(metaData, repoRoot, newstVersion, ext);
+      const downloadUrl = constructDownloadUrl(metaData, repoRoot, newestVersion, ext);
       const tmpFolder = path.join(rootFolder, 'tmp');
 
       await mkdirpAsync(tmpFolder);
