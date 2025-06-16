@@ -34,26 +34,27 @@ async function performCopy(
     const headerFilter = fileUtils.createFileNameFilter(command.headers);
 
     // Copy source and header files
-    const copiedSrcFiles = await fileUtils.copyFiles(
+    const copiedSrcFiles = await fileUtils.copyAndReturnFiles(
       commandFolder,
       folderSrc.fsPath,
-      sourceFilter,
-      true
+      sourceFilter
     );
 
-    const copiedHeaderFiles = await fileUtils.copyFiles(
+    const copiedHeaderFiles = await fileUtils.copyAndReturnFiles(
       commandFolder,
       folderHeader.fsPath,
-      headerFilter,
-      true
+      headerFilter
     );
 
     // Process header files
     const headerReplacements = new Map<string | RegExp, string>();
     headerReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-    await fileUtils.processFiles(copiedHeaderFiles, folderHeader.fsPath, headerReplacements);
-
+    await Promise.all(
+      copiedHeaderFiles.map(async (file) =>
+        fileUtils.processFile(file, folderHeader.fsPath, headerReplacements)
+      )
+    );
     // Process source files with more complex replacements
     const sourceReplacements = new Map<string | RegExp, string>();
     const joinedName = path
@@ -66,8 +67,11 @@ async function performCopy(
     );
     sourceReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-    await fileUtils.processFiles(copiedSrcFiles, folderSrc.fsPath, sourceReplacements);
-
+    await Promise.all(
+      copiedSrcFiles.map(async (file) =>
+        fileUtils.processFile(file, folderSrc.fsPath, sourceReplacements)
+      )
+    );
     // Rename files
     await fileUtils.renameFiles(copiedSrcFiles, folderSrc.fsPath, command.replacename, replaceName);
 

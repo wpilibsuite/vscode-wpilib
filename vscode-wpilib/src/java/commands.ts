@@ -27,35 +27,33 @@ async function performCopy(
     const commandFolder = path.join(commandRoot, command.foldername);
 
     // Copy files and track them
-    const copiedFiles = await fileUtils.copyFiles(
-      commandFolder,
-      folder.fsPath,
-      undefined, // No filter needed for Java
-      true // Track copied files
-    );
+    const copiedFiles = await fileUtils.copyAndReturnFiles(commandFolder, folder.fsPath);
 
     // Create replacements map
     const replacements = new Map<string | RegExp, string>();
 
     // Add package replacement
-    const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:commands)\\..+?(?=;|\\.)';
-    replacements.set(new RegExp(replacePackageFrom, 'g'), javaPackage);
+    replacements.set(/edu\.wpi\.first\.wpilibj\.(?:commands)\..+?(?=;|\.)/g, javaPackage);
 
     // Add classname replacement
     replacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
     // Process files with replacements
-    await fileUtils.processFiles(copiedFiles, folder.fsPath, replacements);
-
+    await Promise.all(
+      copiedFiles.map(async (file) => fileUtils.processFile(file, folder.fsPath, replacements))
+    );
     // Rename files
-    await fileUtils.renameFiles(
+    const renamedFiles = await fileUtils.renameFiles(
       copiedFiles,
       folder.fsPath,
       command.replacename,
-      replaceName,
-      true // Open in editor
+      replaceName
     );
 
+    for (const file of renamedFiles) {
+      const document = await vscode.workspace.openTextDocument(vscode.Uri.file(file));
+      await vscode.window.showTextDocument(document);
+    }
     return true;
   } catch (error) {
     logger.error('Error performing copy operation:', error);

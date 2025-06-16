@@ -4,7 +4,7 @@ import * as jsonc from 'jsonc-parser';
 import path from 'path';
 import { logger } from '../../logger';
 import { readFileAsync } from '../../utilities';
-import * as fileUtils from './fileUtils';
+import { updateFileContents } from './pathUtils';
 const glob = require('glob');
 
 interface IReplaceGroup {
@@ -57,7 +57,14 @@ export async function ImportUpdate(srcDir: string, updateFile: string): Promise<
         toUpdateFiles.map(async (filePath) => {
           const fullPath = path.join(srcDir, filePath);
           try {
-            await fileUtils.processFileContent(fullPath, replacements);
+            await updateFileContents(fullPath, (content: string) => {
+              // Apply all replacements
+              for (const [pattern, replacement] of replacements) {
+                const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
+                content = content.replace(regex, replacement);
+              }
+              return content;
+            });
           } catch (error) {
             logger.error(`Failed to update file: ${filePath}`, error);
             throw error;

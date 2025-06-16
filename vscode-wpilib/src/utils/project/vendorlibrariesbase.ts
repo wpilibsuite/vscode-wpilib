@@ -62,10 +62,6 @@ export class VendorLibrariesBase {
     return foundDeps;
   }
 
-  public getVendorFolder(root: string): string {
-    return path.join(root, 'vendordeps');
-  }
-
   public async installDependency(
     dep: IJsonDependency,
     url: string,

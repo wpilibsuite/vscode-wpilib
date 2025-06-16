@@ -38,52 +38,6 @@ export function gradleCopyFilter(sourcePath: string, fromGradleFolder: string): 
 }
 
 /**
- * Copy and process template files with regex replacements
- * @param files List of files to process
- * @param basePath Base path where files are located
- * @param replacements Map of regex patterns and their replacements
- */
-export async function processTemplateFiles(
-  files: string[],
-  basePath: string,
-  replacements: Map<string | RegExp, string>
-): Promise<boolean> {
-  const promiseArray: Promise<void>[] = [];
-
-  for (const filePath of files) {
-    const fullPath = path.join(basePath, filePath);
-    promiseArray.push(
-      (async () => {
-        try {
-          const content = await readFileAsync(fullPath, 'utf8');
-          let processedContent = content;
-
-          // Apply all replacements
-          for (const [pattern, replacement] of replacements) {
-            processedContent = processedContent.replace(
-              pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g'),
-              replacement
-            );
-          }
-
-          await writeFileAsync(fullPath, processedContent, 'utf8');
-        } catch (error) {
-          logger.error(`Error processing template file: ${fullPath}`, error);
-          throw error;
-        }
-      })()
-    );
-  }
-
-  try {
-    await Promise.all(promiseArray);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-/**
  * Find all files matching pattern
  */
 export async function findMatchingFiles(

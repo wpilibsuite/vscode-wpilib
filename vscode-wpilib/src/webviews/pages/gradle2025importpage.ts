@@ -92,7 +92,7 @@ function updateSummary() {
     const projectFolder = document.getElementById('projectFolder') as HTMLInputElement;
     const projectName = document.getElementById('projectName') as HTMLInputElement;
     const newFolder = document.getElementById('newFolderCB') as HTMLInputElement;
-    
+
     let destination = projectFolder.value || 'Not selected';
     if (newFolder.checked && projectName.value) {
       destination += `/${projectName.value}`;

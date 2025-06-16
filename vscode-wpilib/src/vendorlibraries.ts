@@ -131,7 +131,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
-    return this.getVendorFolder(workspace.uri.fsPath);
+    return path.join(workspace.uri.fsPath, 'vendordeps');
   }
 
   private async getInstalledDependencies(

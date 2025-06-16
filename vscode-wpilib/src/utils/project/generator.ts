@@ -5,6 +5,7 @@ import { logger } from '../../logger';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
 import { ncpAsync } from '../../utilities';
+import { processFile } from './fileUtils';
 
 export async function generateCopyCpp(
   resourcesFolder: string,
@@ -105,12 +106,12 @@ export async function generateCopyJava(
     }
 
     // Process template files
-    await genUtils.processTemplateFiles(files, codePath, replacements);
+    await Promise.all(files.map((testFile) => processFile(testFile, codePath, replacements)));
 
     // Process test files if they exist
     if (fromTemplateTestFolder !== undefined) {
       const testFiles = await genUtils.findMatchingFiles(testPath);
-      await genUtils.processTemplateFiles(testFiles, testPath, replacements);
+      await Promise.all(testFiles.map((testFile) => processFile(testFile, testPath, replacements)));
     }
 
     // Setup project structure
