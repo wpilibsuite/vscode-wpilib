@@ -40,8 +40,7 @@ export async function generateCopyCpp(
     await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot);
 
     // Update gradle file with correct version
-    const buildGradlePath = path.join(toFolder, 'vendordeps');
-    await genUtils.updateGradleRioVersion(buildGradlePath, gradleRioVersion);
+    await genUtils.updateGradleRioVersion(path.join(toFolder, 'build.gradle'), gradleRioVersion);
 
     // Setup deploy directory
     await genUtils.setupDeployDirectory(toFolder, directGradleImport, false);
