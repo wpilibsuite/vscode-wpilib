@@ -1,4 +1,4 @@
-Java 17 required, but not found. Might have compilation errors.: 没有找到需要的 Java 17，可能会产生编译错误。
+Java 21 required, but not found. Might have compilation errors.: 没有找到需要的 Java 21，可能会产生编译错误。
 # This project is not compatible with this version of the extension. Please create a new project.
 # It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. Would you like to do this now?
 # It is recommended to run a "Build" and update tools after a WPILib update to ensure dependencies are installed correctly. Would you like to do this now?

@@ -43,7 +43,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   if (vscodeJavaHome) {
     try {
       const javaVersion = await getJavaVersion(vscodeJavaHome);
-      if (javaVersion >= 17) {
+      if (javaVersion >= 21) {
         logger.log(`Found jdt.ls.java.home Version: ${javaVersion} at ${vscodeJavaHome}`);
         return vscodeJavaHome;
       } else {
@@ -61,7 +61,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   if (vscodeOldJavaHome) {
     try {
       const javaVersion = await getJavaVersion(vscodeOldJavaHome);
-      if (javaVersion >= 17) {
+      if (javaVersion >= 21) {
         logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeOldJavaHome}`);
         return vscodeOldJavaHome;
       } else {
@@ -78,7 +78,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
     const frcHomeJava = path.join(frcHome, 'jdk');
     try {
       const javaVersion = await getJavaVersion(frcHomeJava);
-      if (javaVersion >= 17) {
+      if (javaVersion >= 21) {
         logger.log(`Found Java Home Version: ${javaVersion} at ${frcHomeJava}`);
         return frcHomeJava;
       } else {
@@ -94,7 +94,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   if (javaHome !== undefined) {
     try {
       const javaVersion = await getJavaVersion(javaHome);
-      if (javaVersion >= 17) {
+      if (javaVersion >= 21) {
         logger.log(`Found Java Home Version: ${javaVersion} at ${javaHome}`);
         return javaHome;
       } else {
@@ -110,7 +110,7 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   if (jdkHome !== undefined) {
     try {
       const javaVersion = await getJavaVersion(jdkHome);
-      if (javaVersion >= 17) {
+      if (javaVersion >= 21) {
         logger.log(`Found Java Home Version: ${javaVersion} at ${jdkHome}`);
         return jdkHome;
       } else {
