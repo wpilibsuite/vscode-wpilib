@@ -15,7 +15,7 @@ jobs:
           node-version: "20.x"
       - uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 21
           distribution: "temurin"
       - run: ./gradlew build updateVersions -PbuildServer
         name: Build with Gradle
