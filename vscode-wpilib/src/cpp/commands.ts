@@ -1,5 +1,6 @@
 'use strict';
 import * as fs from 'fs';
+import { cp } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -29,32 +30,17 @@ async function performCopy(
   try {
     const commandFolder = path.join(commandRoot, command.foldername);
 
-    // Create filters for source and header files
-    const sourceFilter = fileUtils.createFileNameFilter(command.source);
-    const headerFilter = fileUtils.createFileNameFilter(command.headers);
-
-    // Copy source and header files
-    const copiedSrcFiles = await fileUtils.copyAndReturnFiles(
-      commandFolder,
-      folderSrc.fsPath,
-      sourceFilter
-    );
-
-    const copiedHeaderFiles = await fileUtils.copyAndReturnFiles(
-      commandFolder,
-      folderHeader.fsPath,
-      headerFilter
-    );
+    const renamedHeader = path.join(folderHeader.fsPath, `${replaceName}.h`);
+    const renamedSource = path.join(folderSrc.fsPath, `${replaceName}.cpp`);
+    // The source and header arrays are always one item long
+    await cp(path.join(commandFolder, command.source[0]), renamedHeader);
+    await cp(path.join(commandFolder, command.headers[0]), renamedSource);
 
     // Process header files
     const headerReplacements = new Map<RegExp, string>();
     headerReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-    await Promise.all(
-      copiedHeaderFiles.map(async (file) =>
-        fileUtils.processFile(file, folderHeader.fsPath, headerReplacements)
-      )
-    );
+    await fileUtils.processFile(renamedHeader, folderHeader.fsPath, headerReplacements);
     // Process source files with more complex replacements
     const sourceReplacements = new Map<RegExp, string>();
     const joinedName = path
@@ -67,21 +53,7 @@ async function performCopy(
     );
     sourceReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-    await Promise.all(
-      copiedSrcFiles.map(async (file) =>
-        fileUtils.processFile(file, folderSrc.fsPath, sourceReplacements)
-      )
-    );
-    // Rename files
-    await fileUtils.renameFiles(copiedSrcFiles, folderSrc.fsPath, command.replacename, replaceName);
-
-    await fileUtils.renameFiles(
-      copiedHeaderFiles,
-      folderHeader.fsPath,
-      command.replacename,
-      replaceName
-    );
-
+    await fileUtils.processFile(renamedSource, folderSrc.fsPath, sourceReplacements);
     return true;
   } catch (error) {
     logger.error('Error performing copy operation:', error);
