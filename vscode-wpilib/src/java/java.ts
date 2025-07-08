@@ -5,13 +5,13 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from '../api';
 import { existsAsync } from '../utilities';
-import { Examples } from '../utils/project/examples';
-import { Templates } from '../utils/project/templates';
+import { Examples } from '../shared/examples';
+import { Templates } from '../shared/templates';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
 import { DeployDebug } from './deploydebug';
-import { localize as i18n } from '../utils/l10n/locale';
+import { localize as i18n } from '../locale';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

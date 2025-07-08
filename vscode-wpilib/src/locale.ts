@@ -2,9 +2,9 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import format from '../../formatter';
-import { logger } from '../../logger';
-import { extensionContext } from '../../utilities';
+import format from './formatter';
+import { logger } from './logger';
+import { extensionContext } from './utilities';
 
 interface IVSCodeNlsConfig {
   locale: string;

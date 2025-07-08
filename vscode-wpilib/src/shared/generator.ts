@@ -1,10 +1,10 @@
 'use strict';
 
 import * as path from 'path';
-import { logger } from '../../logger';
+import { logger } from '../logger';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
-import { ncpAsync } from '../../utilities';
+import { ncpAsync } from '../utilities';
 import { processFile } from './fileUtils';
 
 export async function generateCopyCpp(

@@ -8,7 +8,7 @@ module.exports = [
       localeloader: './src/webviews/localeloader.ts',
       gradle2025importpage: './src/webviews/pages/gradle2025importpage.ts',
       projectcreatorpage: './src/webviews/pages/projectcreatorpage.ts',
-      riologpage: ['./src/riolog/sharedscript.ts', './src/riolog/script/implscript.ts'],
+      riologpage: ['./src/riolog/shared/sharedscript.ts', './src/riolog/script/implscript.ts'],
     },
     devtool: isDevelopment ? 'inline-source-map' : 'source-map',
     module: {

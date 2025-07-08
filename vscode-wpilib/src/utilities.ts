@@ -6,8 +6,8 @@ import * as path from 'path';
 import * as util from 'util';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from './api';
-import { localize as i18n } from './utils/l10n/locale';
-import { setExecutePermissions } from './utils/project/permissions';
+import { localize as i18n } from './locale';
+import { setExecutePermissions } from './shared/permissions';
 
 // General utilites usable by multiple classes
 

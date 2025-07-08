@@ -5,8 +5,8 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { logger } from './logger';
 import { deleteFileAsync, readdirAsync } from './utilities';
-import { localize as i18n } from './utils/l10n/locale';
-import { IJsonDependency, VendorLibrariesBase } from './utils/project/vendorlibrariesbase';
+import { localize as i18n } from './locale';
+import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 
 export class VendorLibraries extends VendorLibrariesBase {
   private disposables: vscode.Disposable[] = [];

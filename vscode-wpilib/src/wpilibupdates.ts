@@ -8,7 +8,7 @@ import { IExternalAPI } from './api';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './utilities';
-import { localize as i18n } from './utils/l10n/locale';
+import { localize as i18n } from './locale';
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
 import { getClassName } from '../utilities';
-import * as fileUtils from '../utils/project/fileUtils';
+import * as fileUtils from '../shared/fileUtils';
 
 export interface ICppJsonLayout {
   name: string;

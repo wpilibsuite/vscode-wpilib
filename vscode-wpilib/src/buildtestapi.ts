@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { IBuildTestAPI, ICodeBuilder } from './api';
-import { localize as i18n } from './utils/l10n/locale';
+import { localize as i18n } from './locale';
 import { PreferencesAPI } from './preferencesapi';
 
 interface ICodeBuilderQuickPick extends vscode.QuickPickItem {

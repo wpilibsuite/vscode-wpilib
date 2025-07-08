@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator } from './api';
-import { localize as i18n } from './utils/l10n/locale';
+import { localize as i18n } from './locale';
 
 interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: ICommandCreator;

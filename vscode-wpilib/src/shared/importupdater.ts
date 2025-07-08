@@ -2,8 +2,8 @@
 
 import * as jsonc from 'jsonc-parser';
 import path from 'path';
-import { logger } from '../../logger';
-import { readFileAsync } from '../../utilities';
+import { logger } from '../logger';
+import { readFileAsync } from '../utilities';
 import { updateFileContents } from './pathUtils';
 const glob = require('glob');
 

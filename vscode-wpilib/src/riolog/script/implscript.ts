@@ -1,7 +1,7 @@
 'use strict';
 
 import { IIPCReceiveMessage, IIPCSendMessage } from '../shared/interfaces';
-import { setImplFunctions, handleMessage } from '../sharedscript';
+import { setImplFunctions, handleMessage } from '../shared/sharedscript';
 
 interface IVsCodeApi {
   postMessage(message: IIPCReceiveMessage, to: string): void;

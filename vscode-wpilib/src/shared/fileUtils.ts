@@ -3,8 +3,8 @@
 import * as fs from 'fs';
 import { rename } from 'fs/promises';
 import * as path from 'path';
-import { logger } from '../../logger';
-import { ncpAsync } from '../../utilities';
+import { logger } from '../logger';
+import { ncpAsync } from '../utilities';
 import { updateFileContents } from './pathUtils';
 
 /**

@@ -8,8 +8,8 @@ import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { ToolAPI } from './toolapi';
 import { existsAsync, getDesktopEnabled, gradleRun, javaHome } from './utilities';
-import { localize as i18n } from './utils/l10n/locale';
-import { setDesktopEnabled } from './utils/project/generator';
+import { localize as i18n } from './locale';
+import { setDesktopEnabled } from './shared/generator';
 import { WPILibUpdates } from './wpilibupdates';
 
 interface IUpdatePair {

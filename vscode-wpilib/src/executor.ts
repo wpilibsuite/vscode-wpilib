@@ -1,9 +1,9 @@
 'use strict';
 import * as vscode from 'vscode';
 import { IExecuteAPI } from './api';
-import { localize as i18n } from './utils/l10n/locale';
+import { localize as i18n } from './locale';
 import { logger } from './logger';
-import { PromiseCondition } from './utils/project/promisecondition';
+import { PromiseCondition } from './shared/promisecondition';
 import { getIsWindows } from './utilities';
 
 interface ITaskRunner {

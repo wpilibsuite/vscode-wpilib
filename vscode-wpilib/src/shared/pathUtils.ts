@@ -2,8 +2,8 @@
 
 import { readdir } from 'fs/promises';
 import * as path from 'path';
-import { logger } from '../../logger';
-import { copyFileAsync, readFileAsync, writeFileAsync } from '../../utilities';
+import { logger } from '../logger';
+import { copyFileAsync, readFileAsync, writeFileAsync } from '../utilities';
 
 /**
  * Creates source and test paths based on project type and import mode

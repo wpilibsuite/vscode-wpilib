@@ -18,15 +18,15 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
-import { localize as i18n } from './utils/l10n/locale';
+import { localize as i18n } from './locale';
 import { closeLogger, getMainLogFile, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
 import { ProjectInfoGatherer } from './projectinfo';
-import { ExampleTemplateAPI } from './utils/project/exampletemplateapi';
-import { UtilitiesAPI } from './utils/project/utilitiesapi';
-import { addVendorExamples } from './utils/project/vendorexamples';
+import { ExampleTemplateAPI } from './shared/exampletemplateapi';
+import { UtilitiesAPI } from './shared/utilitiesapi';
+import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
 import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
@@ -35,7 +35,7 @@ import { Gradle2025Import } from './webviews/gradle2025import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
-import { DependencyViewProvider } from './dependencyview/dependencyView';
+import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {

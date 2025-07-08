@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { loadLocaleFile } from '../utils/l10n/locale';
+import { loadLocaleFile } from '../locale';
 import { extensionContext, readFileAsync } from '../utilities';
 import { logger } from '../logger';
 

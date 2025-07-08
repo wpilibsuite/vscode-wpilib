@@ -2,8 +2,8 @@
 
 import * as fetch from 'node-fetch';
 import path from 'path';
-import { IUtilitiesAPI } from '../../api';
-import { logger } from '../../logger';
+import { IUtilitiesAPI } from '../api';
+import { logger } from '../logger';
 import {
   deleteFileAsync,
   existsAsync,
@@ -11,7 +11,7 @@ import {
   readdirAsync,
   readFileAsync,
   writeFileAsync,
-} from '../../utilities';
+} from '../utilities';
 
 export interface IJsonDependency {
   name: string;

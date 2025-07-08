@@ -3,16 +3,16 @@
 import * as jsonc from 'jsonc-parser';
 import path from 'path';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../../api';
-import { logger } from '../../logger';
+import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../api';
+import { logger } from '../logger';
 import {
   existsAsync,
   extensionContext,
   readdirAsync,
   readFileAsync,
   statAsync,
-} from '../../utilities';
-import { localize as i18n } from '../l10n/locale';
+} from '../utilities';
+import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
 
