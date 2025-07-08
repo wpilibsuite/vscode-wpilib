@@ -1,5 +1,6 @@
 'use strict';
 import * as fs from 'fs';
+import { cp } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -24,10 +25,12 @@ async function performCopy(
   javaPackage: string
 ): Promise<boolean> {
   try {
-    const commandFolder = path.join(commandRoot, command.foldername);
-
     // Copy files and track them
-    const copiedFiles = await fileUtils.copyAndReturnFiles(commandFolder, folder.fsPath);
+    const renamedCommand = path.join(folder.fsPath, `${replaceName}.java`);
+    await cp(
+      path.join(commandRoot, command.foldername, `${command.replacename}.java`),
+      renamedCommand
+    );
 
     // Create replacements map
     const replacements = new Map<RegExp, string>();
@@ -39,21 +42,10 @@ async function performCopy(
     replacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
     // Process files with replacements
-    await Promise.all(
-      copiedFiles.map(async (file) => fileUtils.processFile(file, folder.fsPath, replacements))
-    );
-    // Rename files
-    const renamedFiles = await fileUtils.renameFiles(
-      copiedFiles,
-      folder.fsPath,
-      command.replacename,
-      replaceName
-    );
+    await fileUtils.processFile(renamedCommand, folder.fsPath, replacements);
 
-    for (const file of renamedFiles) {
-      const document = await vscode.workspace.openTextDocument(vscode.Uri.file(file));
-      await vscode.window.showTextDocument(document);
-    }
+    const document = await vscode.workspace.openTextDocument(vscode.Uri.file(renamedCommand));
+    await vscode.window.showTextDocument(document);
     return true;
   } catch (error) {
     logger.error('Error performing copy operation:', error);
