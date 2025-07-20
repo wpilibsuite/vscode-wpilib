@@ -47,8 +47,11 @@ export async function updateFileContents(
   try {
     const fileContent = await readFileAsync(filePath, 'utf8');
     const updatedContent = replacer(fileContent);
-    await writeFileAsync(filePath, updatedContent, 'utf8');
-    return true;
+    if (fileContent !== updatedContent) {
+      await writeFileAsync(filePath, updatedContent, 'utf8');
+      return true;
+    }
+    return false;
   } catch (err) {
     logger.error('Failed to update file contents', err);
     return false;

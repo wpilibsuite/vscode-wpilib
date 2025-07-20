@@ -1,6 +1,6 @@
 'use strict';
 import * as fs from 'fs';
-const mkdirp = require('mkdirp');
+import mkdirp = require('mkdirp');
 import * as ncp from 'ncp';
 import * as path from 'path';
 import * as util from 'util';

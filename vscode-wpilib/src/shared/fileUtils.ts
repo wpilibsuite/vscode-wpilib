@@ -42,7 +42,7 @@ export async function processFile(
   return updateFileContents(path.join(basePath, file), (content) => {
     // Apply all replacements
     for (const [pattern, replacement] of replacements) {
-      const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
+      const regex = typeof pattern === 'string' ? new RegExp(pattern, 'g') : pattern;
       content = content.replace(regex, replacement);
     }
     return content;
@@ -59,7 +59,7 @@ export async function renameFiles(
   replacement: string
 ): Promise<string[]> {
   const renamePromises: Promise<string>[] = [];
-  const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
+  const regex = typeof pattern === 'string' ? new RegExp(pattern, 'g') : pattern;
 
   for (const filePath of files) {
     const fullPath = path.join(basePath, filePath);

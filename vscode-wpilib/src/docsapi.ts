@@ -1,6 +1,6 @@
 'use strict';
 
-const extract = require('extract-zip');
+import extract = require('extract-zip');
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { downloadFileToStream } from './fetchhelpers';

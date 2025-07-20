@@ -5,7 +5,7 @@ import path from 'path';
 import { logger } from '../logger';
 import { readFileAsync } from '../utilities';
 import { updateFileContents } from './pathUtils';
-const glob = require('glob');
+import glob = require('glob');
 
 interface IReplaceGroup {
   from: string;
@@ -60,7 +60,7 @@ export async function ImportUpdate(srcDir: string, updateFile: string): Promise<
             await updateFileContents(fullPath, (content: string) => {
               // Apply all replacements
               for (const [pattern, replacement] of replacements) {
-                const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern, 'g');
+                const regex = typeof pattern === 'string' ? new RegExp(pattern, 'g') : pattern;
                 content = content.replace(regex, replacement);
               }
               return content;

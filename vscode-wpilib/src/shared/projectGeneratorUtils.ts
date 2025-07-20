@@ -1,7 +1,7 @@
 'use strict';
 
 import * as path from 'path';
-const glob = require('glob');
+import glob = require('glob');
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { mkdirpAsync, ncpAsync, readFileAsync, writeFileAsync } from '../utilities';

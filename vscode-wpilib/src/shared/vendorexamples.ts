@@ -77,6 +77,7 @@ export async function addVendorExamples(
         for (const ex of parsed) {
           if (!isJsonExample(ex)) {
             logger.log('item not example', ex);
+            continue;
           }
           if (ex.language !== 'java' && ex.language !== 'cpp') {
             // Only handle java and cpp
