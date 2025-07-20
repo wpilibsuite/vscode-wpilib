@@ -726,7 +726,7 @@ export function createToolbar(): HTMLElement {
   const teamNumberInput = document.createElement('input');
   teamNumberInput.type = 'number';
   teamNumberInput.id = 'team-number';
-  teamNumberInput.className = 'team-number-input';
+  teamNumberInput.className = 'vscode-textfield';
   teamNumberInput.min = '1';
   teamNumberInput.max = '99999';
   teamNumberInput.placeholder = 'Team #';
@@ -734,7 +734,7 @@ export function createToolbar(): HTMLElement {
 
   const teamNumberButton = document.createElement('button');
   teamNumberButton.id = 'team-number-button';
-  teamNumberButton.className = 'toolbar-button';
+  teamNumberButton.className = 'vscode-button';
   teamNumberButton.textContent = 'Set';
   teamNumberButton.addEventListener('click', onChangeTeamNumber);
   teamNumberContainer.appendChild(teamNumberButton);
@@ -746,7 +746,7 @@ export function createToolbar(): HTMLElement {
   const searchInput = document.createElement('input');
   searchInput.type = 'text';
   searchInput.id = 'search-input';
-  searchInput.className = 'search-input';
+  searchInput.className = 'vscode-textfield';
   searchInput.placeholder = 'Search logs...';
   searchInput.addEventListener('input', onSearch);
   searchContainer.appendChild(searchInput);
@@ -779,7 +779,7 @@ export function createToolbar(): HTMLElement {
   buttons.forEach((btn) => {
     const button = document.createElement('button');
     button.id = btn.id;
-    button.className = 'toolbar-button';
+    button.className = 'vscode-button';
     button.textContent = btn.text;
     button.title = btn.tooltip;
     button.addEventListener('click', btn.handler);
@@ -822,7 +822,7 @@ export function createToolbar(): HTMLElement {
   filterBtns.forEach((btn) => {
     const button = document.createElement('button');
     button.id = btn.id;
-    button.className = 'toolbar-button';
+    button.className = 'vscode-button';
     if (btn.active) {
       button.classList.add('active');
     }
@@ -920,7 +920,7 @@ export function setViewerPage() {
     const fileLabel = document.createElement('label');
     fileLabel.htmlFor = 'log-file-input';
     fileLabel.textContent = 'Load Log File';
-    fileLabel.className = 'toolbar-button';
+    fileLabel.className = 'vscode-button';
 
     toolbar.insertBefore(fileLabel, toolbar.firstChild);
     toolbar.insertBefore(fileInput, toolbar.firstChild);

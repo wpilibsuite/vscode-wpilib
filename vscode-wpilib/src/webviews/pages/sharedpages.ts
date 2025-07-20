@@ -13,11 +13,11 @@ export function validateProject(): boolean {
   const error = document.getElementById('projectNameError') as HTMLElement;
 
   if (projectName.value.trim() === '') {
-    projectName.classList.add('error');
+    projectName.classList.add('invalid');
     error.style.display = 'block';
     return false;
   } else {
-    projectName.classList.remove('error');
+    projectName.classList.remove('invalid');
     error.style.display = 'none';
     return true;
   }
@@ -29,7 +29,7 @@ export function validateProjectFolder(): boolean {
   const folderPath = projectFolder.value.trim();
 
   if (folderPath === '' || folderPath.includes('OneDrive')) {
-    projectFolder.classList.add('error');
+    projectFolder.classList.add('invalid');
     if (error) {
       error.style.display = 'block';
       error.innerText = folderPath.includes('OneDrive')
@@ -38,7 +38,7 @@ export function validateProjectFolder(): boolean {
     }
     return false;
   } else {
-    projectFolder.classList.remove('error');
+    projectFolder.classList.remove('invalid');
     if (error) {
       error.style.display = 'none';
     }
@@ -53,15 +53,15 @@ export function validateXrpRomi(): boolean {
 
   // Both can't be checked at the same time
   if (romi.checked && xrp.checked) {
-    romi.classList.add('error');
-    xrp.classList.add('error');
+    romi.classList.add('invalid');
+    xrp.classList.add('invalid');
     if (error) {
       error.style.display = 'block';
     }
     return false;
   } else {
-    romi.classList.remove('error');
-    xrp.classList.remove('error');
+    romi.classList.remove('invalid');
+    xrp.classList.remove('invalid');
     if (error) {
       error.style.display = 'none';
     }
@@ -75,7 +75,7 @@ export function validateTeamNumber(): boolean {
 
   if (teamNumber.value.trim() === '') {
     // Empty is valid (optional)
-    teamNumber.classList.remove('error');
+    teamNumber.classList.remove('invalid');
     if (error) {
       error.style.display = 'none';
     }
@@ -84,13 +84,13 @@ export function validateTeamNumber(): boolean {
 
   const num = Number.parseInt(teamNumber.value, 10);
   if (Number.isNaN(num) || num < 1 || num > 9999) {
-    teamNumber.classList.add('error');
+    teamNumber.classList.add('invalid');
     if (error) {
       error.style.display = 'block';
     }
     return false;
   } else {
-    teamNumber.classList.remove('error');
+    teamNumber.classList.remove('invalid');
     if (error) {
       error.style.display = 'none';
     }

@@ -57,7 +57,7 @@
         <div class="wizard-navigation">
           <div></div>
           <!-- Empty div for alignment -->
-          <button id="next-to-step-2" class="project-button next-button" disabled>Next</button>
+          <button id="next-to-step-2" class="vscode-button next-button" disabled>Next</button>
         </div>
       </div>
 
@@ -70,8 +70,8 @@
 
         <div class="project-row">
           <div class="project-label"><b>Language</b></div>
-          <div class="select-wrapper">
-            <select id="language-select" class="project-select" disabled>
+          <div class="select-wrapper vscode-select">
+            <select id="language-select" disabled>
               <option value="" selected disabled>Select a language</option>
             </select>
           </div>
@@ -79,16 +79,16 @@
 
         <div class="project-row">
           <div class="project-label"><b>Project Base</b></div>
-          <div class="select-wrapper">
-            <select id="base-select" class="project-select" disabled>
+          <div class="select-wrapper vscode-select">
+            <select id="base-select" disabled>
               <option value="" selected disabled>Select a project base</option>
             </select>
           </div>
         </div>
 
         <div class="wizard-navigation">
-          <button id="back-to-step-1" class="project-button back-button">Back</button>
-          <button id="next-to-step-3" class="project-button next-button" disabled>Next</button>
+          <button id="back-to-step-1" class="vscode-button secondary">Back</button>
+          <button id="next-to-step-3" class="vscode-button next-button" disabled>Next</button>
         </div>
       </div>
 
@@ -102,19 +102,22 @@
         <div class="project-row">
           <div id="projectfolderdiv" class="project-label"><b>Base Folder</b></div>
           <div class="project-field-container">
-            <input id="projectFolder" type="text" class="project-input" readonly />
+            <div class="projectFolderSelector">
+              <button id="projectSelectButton" class="vscode-button">Select Folder</button>
+            <input id="projectFolder" type="text" class="vscode-textfield" readonly />
+            </div>
             <div id="projectFolderError" class="project-error-text">Base folder is required</div>
           </div>
         </div>
 
         <div class="project-row">
-          <button id="projectSelectButton" class="project-button">Select Folder</button>
+          <button id="projectSelectButton" class="vscode-button">Select Folder</button>
         </div>
 
         <div class="project-row">
           <div id="projectnamediv" class="project-label"><b>Project Name</b></div>
           <div class="project-field-container">
-            <input id="projectName" type="text" class="project-input" />
+            <input id="projectName" type="text" class="vscode-textfield" />
             <div id="projectNameError" class="project-error-text">Project name is required</div>
           </div>
         </div>
@@ -122,32 +125,42 @@
         <div class="project-row">
           <div class="project-label"><b>Team Number</b></div>
           <div class="project-field-container">
-            <input id="teamNumber" type="text" class="project-input" placeholder="Optional" />
+            <input id="teamNumber" type="text" class="vscode-textfield" placeholder="Optional" />
             <div id="teamNumberError" class="project-error-text">
               Team number must be between 1 and 9999
             </div>
           </div>
         </div>
 
-        <div class="project-row project-checkboxes">
-          <div class="project-checkbox-container">
-            <input id="newFolderCB" type="checkbox" class="project-checkbox" checked />
-            <label for="newFolderCB">Create a new folder</label>
+        <div class="project-row">
+          <div class="vscode-checkbox">
+            <input id="newFolderCB" type="checkbox" checked />
+            <label for="newFolderCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Create a new folder</span>
+            </label>
             <span class="checkbox-help">Creates a new folder at Base Folder/Project Name</span>
           </div>
         </div>
 
-        <div class="project-row project-checkboxes">
-          <div class="project-checkbox-container">
-            <input id="desktopCB" type="checkbox" class="project-checkbox" />
-            <label for="desktopCB">Enable Desktop Support</label>
+        <div class="project-row">
+          <div class="vscode-checkbox">
+            <input id="desktopCB" type="checkbox" />
+            <label for="desktopCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Enable Desktop Support</span>
+            </label>
             <span class="checkbox-help">This enables unit testing and simulation support</span>
           </div>
         </div>
 
         <div class="wizard-navigation">
-          <button id="back-to-step-2" class="project-button back-button">Back</button>
-          <button id="next-to-step-4" class="project-button next-button">Next</button>
+          <button id="back-to-step-2" class="vscode-button secondary">Back</button>
+          <button id="next-to-step-4" class="vscode-button next-button">Next</button>
         </div>
       </div>
 
@@ -179,8 +192,8 @@
         </div>
 
         <div class="wizard-navigation">
-          <button id="back-to-step-3" class="project-button back-button">Back</button>
-          <button id="generateProject" class="project-button primary-button">Create Project</button>
+          <button id="back-to-step-3" class="vscode-button secondary">Back</button>
+          <button id="generateProject" class="vscode-">Create Project</button>
         </div>
       </div>
     </div>

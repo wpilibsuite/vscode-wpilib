@@ -747,16 +747,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             min-width: 50px;
             max-width: 100%;
           }
-          #install-url-action {
-            width: 72px;
-            flex-shrink: 0;
-            height: 24px;
-            box-sizing: border-box;
-            padding: 1px 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
           .url-help-text {
             font-size: 12px;
             color: var(--vscode-descriptionForeground);
@@ -782,12 +772,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             align-items: center;
             justify-content: center;
           }
-          .update {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            height: 24px;
-          }
             background-color: var(--vscode-button-secondaryBackground, transparent);
             color: var(--vscode-button-secondaryForeground);
             border: 1px solid var(--vscode-button-border);
@@ -811,8 +795,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           </summary>
           <div class="url-install-section">
             <div class="url-input-container">
-              <input type="text" id="url-input" class="vscode-input" placeholder="Enter vendordep URL..." />
-              <button id="install-url-action" class="vscode-button">
+              <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep URL..." />
+              <button id="install-action" class="vscode-button">
                 <i class="codicon codicon-cloud-download"></i>
                 Install
               </button>

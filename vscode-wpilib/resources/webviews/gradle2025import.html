@@ -32,17 +32,17 @@
         </div>
 
         <div class="project-row">
-          <input id="gradle2025Input" type="text" class="project-input" readonly />
+          <input id="gradle2025Input" type="text" class="vscode-textfield" readonly />
         </div>
 
         <div class="project-row">
-          <button id="gradle2025SelectButton" class="project-button">Select Source Project</button>
+          <button id="gradle2025SelectButton" class="vscode-button">Select Source Project</button>
         </div>
 
         <div class="wizard-navigation">
           <div></div>
           <!-- Empty div for alignment -->
-          <button id="next-to-step-2" class="project-button next-button" disabled>Next</button>
+          <button id="next-to-step-2" class="vscode-button next-button" disabled>Next</button>
         </div>
       </div>
 
@@ -59,17 +59,17 @@
         </div>
 
         <div class="project-row">
-          <input id="projectFolder" type="text" class="project-input" readonly />
+          <input id="projectFolder" type="text" class="vscode-textfield" readonly />
         </div>
 
         <div class="project-row">
-          <button id="projectSelectButton" class="project-button">Select Destination Folder</button>
+          <button id="projectSelectButton" class="vscode-button">Select Destination Folder</button>
         </div>
 
         <div class="project-row">
           <div class="project-label"><b>Project Name</b></div>
           <div class="project-field-container">
-            <input id="projectName" type="text" class="project-input" />
+            <input id="projectName" type="text" class="vscode-textfield" />
             <div id="projectNameError" class="project-error-text">Project name is required</div>
           </div>
         </div>
@@ -77,25 +77,35 @@
         <div class="project-row">
           <div class="project-label"><b>Team Number</b></div>
           <div class="project-field-container">
-            <input id="teamNumber" type="text" class="project-input" placeholder="Optional" />
+            <input id="teamNumber" type="text" class="vscode-textfield" placeholder="Optional" />
             <div id="teamNumberError" class="project-error-text">
               Team number must be between 1 and 9999
             </div>
           </div>
         </div>
 
-        <div class="project-row project-checkboxes">
-          <div class="project-checkbox-container">
-            <input id="newFolderCB" type="checkbox" class="project-checkbox" checked />
-            <label for="newFolderCB">Create a new folder</label>
+        <div class="project-row">
+          <div class="vscode-checkbox">
+            <input id="newFolderCB" type="checkbox" checked />
+            <label for="newFolderCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Create a new folder</span>
+            </label>
             <span class="checkbox-help">Creates a new folder at Base Folder/Project Name</span>
           </div>
         </div>
 
-        <div class="project-row project-checkboxes">
-          <div class="project-checkbox-container">
-            <input id="desktopCB" type="checkbox" class="project-checkbox" />
-            <label for="desktopCB">Enable Desktop Support</label>
+        <div class="project-row">
+          <div class="vscode-checkbox">
+            <input id="desktopCB" type="checkbox" />
+            <label for="desktopCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Enable Desktop Support</span>
+            </label>
             <span class="checkbox-help">Enables desktop simulation and unit testing</span>
           </div>
         </div>
@@ -103,13 +113,23 @@
         <div class="project-row">
           <h3>Hardware Option</h3>
           <p>Select a hardware option if applicable:</p>
-          <div class="project-checkbox-container">
-            <input id="romiCB" type="checkbox" class="project-checkbox" />
-            <label for="romiCB">Romi</label>
+          <div class="vscode-checkbox">
+            <input id="romiCB" type="checkbox" />
+            <label for="romiCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Romi</span>
+            </label>
           </div>
-          <div class="project-checkbox-container">
-            <input id="xrpCB" type="checkbox" class="project-checkbox" />
-            <label for="xrpCB">XRP</label>
+          <div class="vscode-checkbox">
+            <input id="xrpCB" type="checkbox" />
+            <label for="xrpCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">XRP</span>
+            </label>
           </div>
           <div id="xrpRomiError" class="project-error-text">
             You cannot select both Romi and XRP
@@ -117,8 +137,8 @@
         </div>
 
         <div class="wizard-navigation">
-          <button id="back-to-step-1" class="project-button back-button">Back</button>
-          <button id="next-to-step-3" class="project-button next-button">Next</button>
+          <button id="back-to-step-1" class="vscode-button secondary">Back</button>
+          <button id="next-to-step-3" class="vscode-button next-button">Next</button>
         </div>
       </div>
 
@@ -163,8 +183,8 @@
         </div>
 
         <div class="wizard-navigation">
-          <button id="back-to-step-2" class="project-button back-button">Back</button>
-          <button id="importProject" class="project-button primary-button">Import Project</button>
+          <button id="back-to-step-2" class="vscode-button secondary">Back</button>
+          <button id="importProject" class="vscode-button">Import Project</button>
         </div>
       </div>
     </div>
