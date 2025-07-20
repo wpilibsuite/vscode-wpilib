@@ -83,7 +83,13 @@ export function validateTeamNumber(): boolean {
   }
 
   const num = Number.parseInt(teamNumber.value, 10);
-  if (Number.isNaN(num) || num < 1 || num > 9999) {
+  if (
+    Number.isNaN(num) ||
+    teamNumber.value.includes('.') ||
+    teamNumber.value.includes('e') ||
+    num < 1 ||
+    num > 25599
+  ) {
     teamNumber.classList.add('invalid');
     if (error) {
       error.style.display = 'block';
