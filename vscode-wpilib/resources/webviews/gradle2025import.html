@@ -111,26 +111,17 @@
         <div class="project-row">
           <h3>Hardware Option</h3>
           <p>Select a hardware option if applicable:</p>
-          <div class="vscode-checkbox">
-            <input id="romiCB" type="checkbox" />
-            <label for="romiCB">
-              <span class="icon">
-                <i class="codicon codicon-check icon-checked"></i>
-              </span>
-              <span class="text">Romi</span>
-            </label>
+          <div class="radio-option">
+            <input id="romiCB" type="radio" name="hardware" value="romi" />
+            <label for="romiCB">Romi</label>
           </div>
-          <div class="vscode-checkbox">
-            <input id="xrpCB" type="checkbox" />
-            <label for="xrpCB">
-              <span class="icon">
-                <i class="codicon codicon-check icon-checked"></i>
-              </span>
-              <span class="text">XRP</span>
-            </label>
+          <div class="radio-option">
+            <input id="xrpCB" type="radio" name="hardware" value="xrp" />
+            <label for="xrpCB">XRP</label>
           </div>
-          <div id="xrpRomiError" class="project-error-text">
-            You cannot select both Romi and XRP
+          <div class="radio-option">
+            <input id="noneCB" type="radio" name="hardware" value="none" checked />
+            <label for="noneCB">roboRIO</label>
           </div>
         </div>
 

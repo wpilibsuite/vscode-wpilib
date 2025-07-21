@@ -47,26 +47,17 @@ export function validateProjectFolder(): boolean {
 }
 
 export function validateXrpRomi(): boolean {
-  const romi = document.getElementById('romiCB') as HTMLInputElement;
-  const xrp = document.getElementById('xrpCB') as HTMLInputElement;
-  const error = document.getElementById('xrpRomiError') as HTMLElement;
-
-  // Both can't be checked at the same time
-  if (romi.checked && xrp.checked) {
-    romi.classList.add('invalid');
-    xrp.classList.add('invalid');
-    if (error) {
-      error.style.display = 'block';
-    }
-    return false;
-  } else {
-    romi.classList.remove('invalid');
-    xrp.classList.remove('invalid');
-    if (error) {
-      error.style.display = 'none';
-    }
-    return true;
+  const romiDiv = document.getElementById('romidiv') as HTMLDivElement;
+  const xrpDiv = document.getElementById('xrpdiv') as HTMLDivElement;
+  
+  if (romiDiv) {
+    romiDiv.classList.remove('error');
   }
+  if (xrpDiv) {
+    xrpDiv.classList.remove('error');
+  }
+  
+  return true;
 }
 
 export function validateTeamNumber(): boolean {

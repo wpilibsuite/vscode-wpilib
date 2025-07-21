@@ -36,11 +36,16 @@ function importProjectButtonClick() {
   }
 
   (document.activeElement as HTMLElement).blur();
+  
+  const hardwareSelection = document.querySelector('input[name="hardware"]:checked') as HTMLInputElement;
+  const romiSelected = hardwareSelection?.value === 'romi';
+  const xrpSelected = hardwareSelection?.value === 'xrp';
+  
   vscode.postMessage({
     data: {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
-      romi: (document.getElementById('romiCB') as HTMLInputElement).checked,
-      xrp: (document.getElementById('xrpCB') as HTMLInputElement).checked,
+      romi: romiSelected,
+      xrp: xrpSelected,
       fromProps: (document.getElementById('gradle2025Input') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
