@@ -1,11 +1,11 @@
 'use strict';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
+import mkdirp = require('mkdirp');
 import * as ncp from 'ncp';
 import * as path from 'path';
 import * as util from 'util';
 import * as vscode from 'vscode';
-import { IExecuteAPI, IPreferences } from 'vscode-wpilibapi';
+import { IExecuteAPI, IPreferences } from './api';
 import { localize as i18n } from './locale';
 import { setExecutePermissions } from './shared/permissions';
 
