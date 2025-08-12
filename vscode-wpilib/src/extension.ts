@@ -548,6 +548,12 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('URL not provided!');
         return;
       }
+      try {
+        new URL(url);
+      } catch (e) {
+        vscode.window.showErrorMessage(`Could not display website! Invalid URL: "${url}"`);
+        return;
+      }
       if (!tabTitle) {
         tabTitle = 'My Website'; // fallback title if not provided
       }
