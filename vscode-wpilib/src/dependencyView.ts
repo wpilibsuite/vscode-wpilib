@@ -616,7 +616,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         this.onlineDeps = [];
       }
     }
-    this.homeDeps = await this.vendorLibraries.getCachedHomeDirDeps();
+    this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
         path: i18n('ui', homedep.jsonUrl),

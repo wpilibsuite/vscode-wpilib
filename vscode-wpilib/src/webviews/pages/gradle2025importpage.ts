@@ -36,11 +36,13 @@ function importProjectButtonClick() {
   }
 
   (document.activeElement as HTMLElement).blur();
-  
-  const hardwareSelection = document.querySelector('input[name="hardware"]:checked') as HTMLInputElement;
+
+  const hardwareSelection = document.querySelector(
+    'input[name="hardware"]:checked'
+  ) as HTMLInputElement;
   const romiSelected = hardwareSelection?.value === 'romi';
   const xrpSelected = hardwareSelection?.value === 'xrp';
-  
+
   vscode.postMessage({
     data: {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,

@@ -49,14 +49,14 @@ export function validateProjectFolder(): boolean {
 export function validateXrpRomi(): boolean {
   const romiDiv = document.getElementById('romidiv') as HTMLDivElement;
   const xrpDiv = document.getElementById('xrpdiv') as HTMLDivElement;
-  
+
   if (romiDiv) {
     romiDiv.classList.remove('error');
   }
   if (xrpDiv) {
     xrpDiv.classList.remove('error');
   }
-  
+
   return true;
 }
 
