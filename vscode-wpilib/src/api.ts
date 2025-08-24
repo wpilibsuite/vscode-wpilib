@@ -115,9 +115,7 @@ export interface IPreferences {
   getCurrentLanguage(): string;
   setCurrentLanguage(language: string): Promise<void>;
   getAutoStartRioLog(): boolean;
-  setAutoStartRioLog(autoStart: boolean, global: boolean): Promise<void>;
   getAutoSaveOnDeploy(): boolean;
-  setAutoSaveOnDeploy(autoSave: boolean, global: boolean): Promise<void>;
   getIsWPILibProject(): boolean;
   getEnableCppIntellisense(): boolean;
   setEnableCppIntellisense(set: boolean): Promise<void>;
@@ -127,15 +125,9 @@ export interface IPreferences {
   getSelectDefaultSimulateExtension(): boolean;
   getStopSimulationOnEntry(): boolean;
   getAdditionalGradleArguments(): string;
-  setSkipTests(value: boolean, global: boolean): Promise<void>;
-  setSelectDefaultSimulateExtension(value: boolean, global: boolean): Promise<void>;
-  setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
   getOffline(): boolean;
-  setOffline(value: boolean, global: boolean): Promise<void>;
   getDeployOffline(): boolean;
-  setDeployOffline(value: boolean, global: boolean): Promise<void>;
   getSkipSelectSimulateExtension(): boolean;
-  setSkipSelectSimulateExtension(value: boolean, global: boolean): Promise<void>;
 }
 
 export interface IExampleTemplateCreator {

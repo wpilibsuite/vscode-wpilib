@@ -140,68 +140,12 @@ export class Preferences implements IPreferences {
     return res;
   }
 
-  public async setAutoStartRioLog(autoStart: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('autoStartRioLog', autoStart, target);
-  }
-
-  public async setOffline(value: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('offline', value, target);
-  }
-
-  public async setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('stopSimulationOnEntry', value, target);
-  }
-
-  public async setSkipTests(value: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('skipTests', value, target);
-  }
-
-  public async setSkipSelectSimulateExtension(value: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('skipSelectSimulateExtension', value, target);
-  }
-
-  public async setSelectDefaultSimulateExtension(value: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('selectDefaultSimulateExtension', value, target);
-  }
-
   public getAutoSaveOnDeploy(): boolean {
     const res = this.getConfiguration().get<boolean>('autoSaveOnDeploy');
     if (res === undefined) {
       return false;
     }
     return res;
-  }
-
-  public async setAutoSaveOnDeploy(autoSave: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('autoSaveOnDeploy', autoSave, target);
   }
 
   public getAdditionalGradleArguments(): string {
@@ -250,14 +194,6 @@ export class Preferences implements IPreferences {
       return false;
     }
     return res;
-  }
-
-  public async setDeployOffline(value: boolean, global: boolean): Promise<void> {
-    let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-    if (!global) {
-      target = vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    return this.getConfiguration().update('deployOffline', value, target);
   }
 
   public getDeployOffline(): boolean {
