@@ -735,17 +735,6 @@ input.vscode-textfield[type='file']::file-selector-button:hover,
   font-size: 12px;
 }
 
-/* Handle input styling for number inputs */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type='number'] {
-  -moz-appearance: textfield;
-}
-
 /* Project Creator and Import Styles */
 .project-container {
   display: flex;
