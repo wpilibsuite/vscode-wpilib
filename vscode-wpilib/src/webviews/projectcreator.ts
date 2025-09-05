@@ -2,10 +2,10 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI } from 'vscode-wpilibapi';
+import { extensionContext, promptForProjectOpen } from '../utilities';
 import { localize as i18n } from '../locale';
 import { setDesktopEnabled } from '../shared/generator';
-import { extensionContext, promptForProjectOpen } from '../utilities';
+import { IExampleTemplateAPI } from '../api';
 import {
   IProjectIPCData,
   IProjectIPCReceive,
@@ -13,7 +13,6 @@ import {
   ProjectType,
 } from './pages/projectcreatorpagetypes';
 import { WebViewBase } from './webviewbase';
-import { Uri } from '../vscodeshim';
 
 export class ProjectCreator extends WebViewBase {
   public static async Create(
@@ -115,48 +114,40 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async handleProjectType() {
-    const items = [];
-    items.push({ label: i18n('projectcreator', 'Template'), value: ProjectType.Template });
-    items.push({ label: i18n('projectcreator', 'Example'), value: ProjectType.Example });
-    const result = await vscode.window.showQuickPick(items, {
-      placeHolder: i18n('projectcreator', 'Select a project type'),
+    // Instead of showing a QuickPick, return the list of languages directly to the UI
+    const templateLanguages = this.exampleTemplateApi.getLanguages(true);
+
+    await this.postMessage({
+      data: templateLanguages,
+      type: 'language',
     });
-    if (result) {
-      await this.postMessage({
-        data: result.value,
-        type: 'projecttype',
-      });
-    }
   }
 
   private async handleLanguage(data: IProjectIPCData) {
-    const languages: string[] = this.exampleTemplateApi.getLanguages(
+    // Get languages for the selected project type
+    const languages = this.exampleTemplateApi.getLanguages(
       data.projectType === ProjectType.Template
     );
-    const result = await vscode.window.showQuickPick(languages, {
-      placeHolder: i18n('projectcreator', 'Select a language'),
+
+    // Return the list of languages to the UI
+    await this.postMessage({
+      data: languages,
+      type: 'language',
     });
-    if (result) {
-      await this.postMessage({
-        data: result,
-        type: 'language',
-      });
-    }
   }
 
   private async handleBase(data: IProjectIPCData) {
-    const result = await vscode.window.showQuickPick(
-      this.exampleTemplateApi.getBases(data.projectType === ProjectType.Template, data.language),
-      {
-        placeHolder: i18n('projectcreator', 'Select a project base'),
-      }
+    // Get bases for the selected language and project type
+    const bases = this.exampleTemplateApi.getBases(
+      data.projectType === ProjectType.Template,
+      data.language
     );
-    if (result) {
-      await this.postMessage({
-        data: result.label,
-        type: 'base',
-      });
-    }
+
+    // Return the complete base objects to the UI
+    await this.postMessage({
+      data: bases,
+      type: 'base',
+    });
   }
 
   private async handleNewProjectLoc(data: IProjectIPCData) {
@@ -165,7 +156,7 @@ export class ProjectCreator extends WebViewBase {
       canSelectFolders: true,
       canSelectMany: false,
       openLabel: i18n('ui', 'Select Folder'),
-      defaultUri: data.toFolder.length > 0 ? Uri.file(data.toFolder) : undefined,
+      defaultUri: data.toFolder.length > 0 ? vscode.Uri.file(data.toFolder) : undefined,
     };
     const result = await vscode.window.showOpenDialog(open);
 
@@ -182,10 +173,20 @@ export class ProjectCreator extends WebViewBase {
   }
 
   private async asyncInitialize() {
-    await this.loadWebpage(
-      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'projectcreator.html'),
-      path.join(extensionContext.extensionPath, 'resources', 'dist', 'projectcreatorpage.js'),
-      ['projectcreator']
+    const htmlPath = path.join(
+      extensionContext.extensionPath,
+      'resources',
+      'webviews',
+      'projectcreator.html'
     );
+    const scriptPath = path.join(
+      extensionContext.extensionPath,
+      'resources',
+      'dist',
+      'projectcreatorpage.js'
+    );
+
+    // Include the 'projectcreator' domain for localization
+    await this.loadWebpage(htmlPath, scriptPath, ['projectcreator']);
   }
 }

@@ -36,11 +36,18 @@ function importProjectButtonClick() {
   }
 
   (document.activeElement as HTMLElement).blur();
+
+  const hardwareSelection = document.querySelector(
+    'input[name="hardware"]:checked'
+  ) as HTMLInputElement;
+  const romiSelected = hardwareSelection?.value === 'romi';
+  const xrpSelected = hardwareSelection?.value === 'xrp';
+
   vscode.postMessage({
     data: {
       desktop: (document.getElementById('desktopCB') as HTMLInputElement).checked,
-      romi: (document.getElementById('romiCB') as HTMLInputElement).checked,
-      xrp: (document.getElementById('xrpCB') as HTMLInputElement).checked,
+      romi: romiSelected,
+      xrp: xrpSelected,
       fromProps: (document.getElementById('gradle2025Input') as HTMLInputElement).value,
       newFolder: (document.getElementById('newFolderCB') as HTMLInputElement).checked,
       projectName: (document.getElementById('projectName') as HTMLInputElement).value,
@@ -51,11 +58,70 @@ function importProjectButtonClick() {
   });
 }
 
+function navigateToStep(step: number) {
+  document.querySelectorAll('.wizard-step').forEach((el) => {
+    (el as HTMLElement).classList.remove('active');
+  });
+
+  const targetStep = document.getElementById(`step-${step}`);
+  if (targetStep) {
+    targetStep.classList.add('active');
+  }
+
+  document.querySelectorAll('.progress-step').forEach((el) => {
+    const stepNumber = parseInt((el as HTMLElement).getAttribute('data-step') || '0', 10);
+
+    (el as HTMLElement).classList.remove('active', 'completed');
+
+    if (stepNumber === step) {
+      (el as HTMLElement).classList.add('active');
+    } else if (stepNumber < step) {
+      (el as HTMLElement).classList.add('completed');
+    }
+  });
+
+  if (step === 3) {
+    updateSummary();
+  }
+}
+
+function updateSummary() {
+  const summarySource = document.getElementById('summary-source');
+  const summaryDestination = document.getElementById('summary-destination');
+  const summaryTeam = document.getElementById('summary-team');
+
+  if (summarySource) {
+    const gradle2025Input = document.getElementById('gradle2025Input') as HTMLInputElement;
+    summarySource.textContent = gradle2025Input.value || 'Not selected';
+  }
+
+  if (summaryDestination) {
+    const projectFolder = document.getElementById('projectFolder') as HTMLInputElement;
+    const projectName = document.getElementById('projectName') as HTMLInputElement;
+    const newFolder = document.getElementById('newFolderCB') as HTMLInputElement;
+
+    let destination = projectFolder.value || 'Not selected';
+    if (newFolder.checked && projectName.value) {
+      destination += `/${projectName.value}`;
+    }
+    summaryDestination.textContent = destination;
+  }
+
+  if (summaryTeam) {
+    const teamNumber = document.getElementById('teamNumber') as HTMLInputElement;
+    summaryTeam.textContent = teamNumber.value || 'Not specified';
+  }
+}
+
 window.addEventListener('message', (event) => {
   const data = event.data as IGradle2025IPCSend;
   switch (data.type) {
     case 'gradle2025':
       (document.getElementById('gradle2025Input') as HTMLInputElement).value = data.data;
+      const nextButton = document.getElementById('next-to-step-2') as HTMLButtonElement;
+      if (nextButton) {
+        nextButton.disabled = false;
+      }
       break;
     case 'projectname':
       const doc = document.getElementById('projectName') as HTMLInputElement;
@@ -87,6 +153,13 @@ window.addEventListener('load', (_: Event) => {
   document.getElementById('projectFolder')!.oninput = validateProjectFolder;
   document.getElementById('romiCB')!.onchange = validateXrpRomi;
   document.getElementById('xrpCB')!.onchange = validateXrpRomi;
+
+  document.getElementById('next-to-step-2')!.onclick = () => navigateToStep(2);
+  document.getElementById('next-to-step-3')!.onclick = () => navigateToStep(3);
+  document.getElementById('back-to-step-1')!.onclick = () => navigateToStep(1);
+  document.getElementById('back-to-step-2')!.onclick = () => navigateToStep(2);
+
+  navigateToStep(1);
 
   vscode.postMessage({ type: 'loaded' });
 });

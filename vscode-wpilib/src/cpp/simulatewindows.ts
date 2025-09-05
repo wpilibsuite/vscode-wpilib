@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExecuteAPI } from 'vscode-wpilibapi';
+import { IExecuteAPI } from '../api';
 import { logger } from '../logger';
 
 export interface IWindowsSimulateCommands {
