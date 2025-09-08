@@ -1,9 +1,8 @@
 'use strict';
 
-import { readdir } from 'fs/promises';
+import { copyFile, readdir } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
-import { copyFileAsync } from '../utilities';
 
 /**
  * Creates source and test paths based on project type and import mode
@@ -48,7 +47,7 @@ export async function copyVendorDep(
   try {
     const sourcePath = path.join(path.dirname(resourcesFolder), 'vendordeps', vendorDepName);
     const targetPath = path.join(targetDir, vendorDepName);
-    await copyFileAsync(sourcePath, targetPath);
+    await copyFile(sourcePath, targetPath);
     return true;
   } catch (err) {
     logger.error(`Failed to copy vendor dependency: ${vendorDepName}`, err);
