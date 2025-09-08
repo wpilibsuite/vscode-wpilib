@@ -9,9 +9,9 @@ import { logger } from '../logger';
 import {
   existsAsync,
   extensionContext,
-  statAsync,
   readdirAsync,
   readFileAsync,
+  statAsync,
 } from '../utilities';
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
