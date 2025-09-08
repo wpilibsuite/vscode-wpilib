@@ -3,7 +3,7 @@
 import { readdir } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
-import { copyFileAsync, readFileAsync, writeFileAsync } from '../utilities';
+import { copyFileAsync } from '../utilities';
 
 /**
  * Creates source and test paths based on project type and import mode
@@ -35,27 +35,6 @@ export function getProjectPaths(
   }
 
   return { codePath, testPath };
-}
-
-/**
- * Safely updates file contents by reading and writing atomically
- */
-export async function updateFileContents(
-  filePath: string,
-  replacer: (content: string) => string
-): Promise<boolean> {
-  try {
-    const fileContent = await readFileAsync(filePath, 'utf8');
-    const updatedContent = replacer(fileContent);
-    if (fileContent !== updatedContent) {
-      await writeFileAsync(filePath, updatedContent, 'utf8');
-      return true;
-    }
-    return false;
-  } catch (err) {
-    logger.error('Failed to update file contents', err);
-    return false;
-  }
 }
 
 /**

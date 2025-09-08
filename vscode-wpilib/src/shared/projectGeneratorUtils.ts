@@ -5,8 +5,9 @@ import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { mkdirpAsync, ncpAsync, readFileAsync, writeFileAsync } from '../utilities';
-import { setExecutePermissions } from './permissions';
+import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
+import { setExecutePermissions } from './permissions';
 
 /**
  * Common patterns used in text replacements
@@ -29,7 +30,7 @@ export const VendorDepFiles = {
 /**
  * Filter function for excluding files from gradle copy operations
  */
-export function gradleCopyFilter(sourcePath: string, fromGradleFolder: string): boolean {
+function gradleCopyFilter(sourcePath: string, fromGradleFolder: string): boolean {
   const rooted = path.relative(fromGradleFolder, sourcePath);
   if (rooted.startsWith('bin') || rooted.indexOf('.project') >= 0) {
     return false;
@@ -100,7 +101,7 @@ export async function updateGradleRioVersion(
   gradleRioVersion: string
 ): Promise<boolean> {
   try {
-    return await pathUtils.updateFileContents(buildGradlePath, (content) =>
+    return await fileUtils.updateFileContents(buildGradlePath, (content) =>
       content.replace(new RegExp(ReplacementPatterns.GRADLE_RIO_MARKER, 'g'), gradleRioVersion)
     );
   } catch (error) {
