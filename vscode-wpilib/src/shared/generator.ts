@@ -2,10 +2,10 @@
 
 import * as path from 'path';
 import { logger } from '../logger';
+import { ncpAsync } from '../utilities';
+import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
-import { ncpAsync } from '../utilities';
-import { processFile } from './fileUtils';
 
 export async function generateCopyCpp(
   resourcesFolder: string,
@@ -105,19 +105,23 @@ export async function generateCopyJava(
     }
 
     // Process template files
-    await Promise.all(files.map((testFile) => processFile(testFile, codePath, replacements)));
+    await Promise.all(
+      files.map((testFile) => fileUtils.processFile(testFile, codePath, replacements))
+    );
 
     // Process test files if they exist
     if (fromTemplateTestFolder !== undefined) {
       const testFiles = await genUtils.findMatchingFiles(testPath);
-      await Promise.all(testFiles.map((testFile) => processFile(testFile, testPath, replacements)));
+      await Promise.all(
+        testFiles.map((testFile) => fileUtils.processFile(testFile, testPath, replacements))
+      );
     }
 
     // Setup project structure
     await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot);
 
     // Update gradle file with correct version and robot class
-    await pathUtils.updateFileContents(path.join(toFolder, 'build.gradle'), (content) =>
+    await fileUtils.updateFileContents(path.join(toFolder, 'build.gradle'), (content) =>
       content
         .replace(new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'), robotClassTo)
         .replace(new RegExp(genUtils.ReplacementPatterns.GRADLE_RIO_MARKER, 'g'), gradleRioVersion)
@@ -137,7 +141,7 @@ export async function generateCopyJava(
 }
 
 export async function setDesktopEnabled(buildgradle: string, setting: boolean): Promise<void> {
-  await pathUtils.updateFileContents(buildgradle, (content) =>
+  await fileUtils.updateFileContents(buildgradle, (content) =>
     content.replace(
       /def\s+includeDesktopSupport\s*=\s*(true|false)/gm,
       `def includeDesktopSupport = ${setting ? 'true' : 'false'}`

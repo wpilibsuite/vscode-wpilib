@@ -4,7 +4,7 @@ import * as jsonc from 'jsonc-parser';
 import path from 'path';
 import { logger } from '../logger';
 import { readFileAsync } from '../utilities';
-import { updateFileContents } from './pathUtils';
+import { updateFileContents } from './fileUtils';
 import glob = require('glob');
 
 interface IReplaceGroup {
