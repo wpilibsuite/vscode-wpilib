@@ -9,7 +9,7 @@ module.exports = [
 
       gradle2025importpage: './src/webviews/pages/gradle2025importpage.ts',
       projectcreatorpage: './src/webviews/pages/projectcreatorpage.ts',
-      riologpage: './src/riolog/shared/sharedscript.ts',
+      riologpage: ['./src/riolog/shared/sharedscript.ts', './src/riolog/script/implscript.ts'],
     },
     devtool: 'inline-source-map',
     module: {

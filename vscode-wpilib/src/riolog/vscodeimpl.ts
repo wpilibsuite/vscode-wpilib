@@ -3,7 +3,7 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { readFileAsync } from '../utilities';
+import { IErrorMessage, IPrintMessage } from './shared/message';
 import {
   IIPCReceiveMessage,
   IIPCSendMessage,
@@ -13,7 +13,7 @@ import {
   IWindowView,
 } from './shared/interfaces';
 import { RioConsole } from './rioconsole';
-import { IErrorMessage, IPrintMessage } from './shared/message';
+import { readFileAsync } from '../utilities';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;
@@ -58,6 +58,34 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
       null,
       this.disposables
     );
+
+    // Send theme colors when created
+    this.sendThemeColors();
+
+    // Listen for theme changes and update colors
+    vscode.window.onDidChangeActiveColorTheme(
+      () => {
+        this.sendThemeColors();
+      },
+      null,
+      this.disposables
+    );
+  }
+
+  private sendThemeColors() {
+    // Extract key colors from the current theme
+    const colors = {
+      // These don't have direct VSCode equivalents, so we use custom colors
+      success: '#4caf50',
+      warning: '#ff9800',
+      error: '#f44336',
+      info: '#2196f3',
+    };
+
+    this.webview.webview.postMessage({
+      type: 'themeColors',
+      message: colors,
+    });
   }
 
   public getWebview(): vscode.Webview {
@@ -67,9 +95,11 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
   public setHTML(html: string): void {
     this.webview.webview.html = html;
   }
+
   public async postMessage(message: IIPCSendMessage): Promise<boolean> {
     return this.webview.webview.postMessage(message);
   }
+
   public dispose() {
     for (const d of this.disposables) {
       d.dispose();
@@ -77,12 +107,25 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
   }
 
   public async handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean> {
-    const d = await vscode.workspace.openTextDocument({
-      content: JSON.stringify(saveData, null, 4),
-      language: 'json',
+    const uri = await vscode.window.showSaveDialog({
+      defaultUri: vscode.Uri.file('riolog.json'),
+      filters: { 'JSON Files': ['json'] },
+      saveLabel: 'Save RioLog',
     });
-    await vscode.window.showTextDocument(d);
-    return true;
+
+    if (!uri) {
+      return false;
+    }
+
+    try {
+      await vscode.workspace.fs.writeFile(uri, Buffer.from(JSON.stringify(saveData, null, 2)));
+
+      vscode.window.showInformationMessage(`RioLog saved to ${uri.fsPath}`);
+      return true;
+    } catch (err) {
+      vscode.window.showErrorMessage(`Failed to save RioLog: ${err}`);
+      return false;
+    }
   }
 }
 
@@ -102,16 +145,42 @@ export class RioLogHTMLProvider implements IHTMLProvider {
   }
 
   public getHTML(webview: vscode.Webview): string {
-    const onDiskPath = vscode.Uri.file(path.join(this.resourceRoot, 'dist', 'riologpage.js'));
+    // Get paths to script and CSS
+    const scriptPath = vscode.Uri.file(
+      path.join(this.resourceRoot, '..', 'resources', 'dist', 'riologpage.js')
+    );
+    const elementsCssPath = vscode.Uri.file(
+      path.join(this.resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')
+    );
+    const rioLogCssPath = vscode.Uri.file(
+      path.join(this.resourceRoot, '..', 'resources', 'media', 'riolog.css')
+    );
 
-    // And get the special URI to use with the webview
-    const scriptResourcePath = webview.asWebviewUri(onDiskPath);
+    // Convert to webview URIs
+    const scriptUri = webview.asWebviewUri(scriptPath);
+    const elementsCssUri = webview.asWebviewUri(elementsCssPath);
+    const rioLogCssUri = webview.asWebviewUri(rioLogCssPath);
 
     let html = this.html!;
-    html += '\r\n<script src="';
-    html += scriptResourcePath.toString();
-    html += '">\r\n';
-    html += '\r\n</script>\r\n';
+
+    // Add CSS link
+    html = html.replace(
+      '</head>',
+      `<link rel="stylesheet" href="${elementsCssUri}" />
+      <link rel="stylesheet" href="${rioLogCssUri}" />\r\n</head>`
+    );
+
+    // Add script with error handling
+    html = html.replace(
+      '</body>',
+      `<script>
+        window.addEventListener('error', (event) => {
+          console.error('Error in RioLog script:', event.error);
+        });
+      </script>
+      <script src="${scriptUri}"></script>
+      </body>`
+    );
 
     return html;
   }

@@ -47,7 +47,7 @@ class ConsoleHandler(socketserver.StreamRequestHandler):
         while 1:
             timestamp = time.time() - startTime
             sequence = (sequence + 1) & 0xffff
-            split = self.makeErrorMsgSplit(timestamp, sequence, 1, 0x111111, 1, "this is an </br>errorwitha\r\nong text", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n")
+            split = self.makeErrorMsgSplit(timestamp, sequence, 1, 0x111111, 1, "this is an error with a super long text. We want to know if the riolog will correctly wrap the content to the next line once it goes wayyyyyyyyyyyyyyyyyyyyyyy over the length limit.", "foo.c:1111", "traceback 1\ntraceback 2\ntraceback 3\n")
             print(split[0])
             print (split[1])
             self.wfile.write(split[0])
