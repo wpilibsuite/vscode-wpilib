@@ -1,6 +1,6 @@
 'use strict';
 import * as fs from 'fs';
-import { cp } from 'fs/promises';
+import { copyFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -33,14 +33,14 @@ async function performCopy(
     const renamedHeader = path.join(folderHeader.fsPath, `${replaceName}.h`);
     const renamedSource = path.join(folderSrc.fsPath, `${replaceName}.cpp`);
     // The source and header arrays are always one item long
-    await cp(path.join(commandFolder, command.source[0]), renamedHeader);
-    await cp(path.join(commandFolder, command.headers[0]), renamedSource);
+    await copyFile(path.join(commandFolder, command.headers[0]), renamedHeader);
+    await copyFile(path.join(commandFolder, command.source[0]), renamedSource);
 
     // Process header files
     const headerReplacements = new Map<RegExp, string>();
     headerReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-    await fileUtils.processFile(renamedHeader, folderHeader.fsPath, headerReplacements);
+    await fileUtils.processFile(renamedHeader, headerReplacements);
     // Process source files with more complex replacements
     const sourceReplacements = new Map<RegExp, string>();
     const joinedName = path
@@ -53,7 +53,7 @@ async function performCopy(
     );
     sourceReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-    await fileUtils.processFile(renamedSource, folderSrc.fsPath, sourceReplacements);
+    await fileUtils.processFile(renamedSource, sourceReplacements);
     return true;
   } catch (error) {
     logger.error('Error performing copy operation:', error);

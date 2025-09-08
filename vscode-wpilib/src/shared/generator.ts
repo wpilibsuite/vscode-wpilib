@@ -55,6 +55,20 @@ export async function generateCopyCpp(
   }
 }
 
+/**
+ * Generates a Java project.
+ * @param resourcesFolder The folder where the extension resources for a language are.
+ * @param fromTemplateFolder The folder where the template/project source files are.
+ * @param fromTemplateTestFolder The folder where the template/project test source files are.
+ * @param fromGradleFolder The folder where build.gradle is located.
+ * @param toFolder The folder to copy everything to. This is the root of the project.
+ * @param robotClassTo The main robot class.
+ * @param copyRoot The base package in folder form to copy to.
+ * @param directGradleImport Whether or not the file in fromTemplateFolder are in the Gradle project structure already.
+ * @param extraVendordeps List of extra WPILib vendordeps to add to the project.
+ * @param packageReplaceString The base package to replace with frc.robot.
+ * @returns True if the project successfully generated, false otherwise.
+ */
 export async function generateCopyJava(
   resourcesFolder: string,
   fromTemplateFolder: string,
@@ -105,16 +119,12 @@ export async function generateCopyJava(
     }
 
     // Process template files
-    await Promise.all(
-      files.map((testFile) => fileUtils.processFile(testFile, codePath, replacements))
-    );
+    await Promise.all(files.map((file) => fileUtils.processFile(file, replacements)));
 
     // Process test files if they exist
     if (fromTemplateTestFolder !== undefined) {
       const testFiles = await genUtils.findMatchingFiles(testPath);
-      await Promise.all(
-        testFiles.map((testFile) => fileUtils.processFile(testFile, testPath, replacements))
-      );
+      await Promise.all(testFiles.map((testFile) => fileUtils.processFile(testFile, replacements)));
     }
 
     // Setup project structure

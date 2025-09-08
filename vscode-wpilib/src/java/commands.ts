@@ -1,13 +1,13 @@
 'use strict';
-import * as fs from 'fs';
-import { cp } from 'fs/promises';
+import { readFile } from 'fs';
+import { copyFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
-import { getClassName, getPackageName } from '../utilities';
 import * as fileUtils from '../shared/fileUtils';
+import { getClassName, getPackageName } from '../utilities';
 
 export interface IJavaJsonLayout {
   name: string;
@@ -27,7 +27,7 @@ async function performCopy(
   try {
     // Copy files and track them
     const renamedCommand = path.join(folder.fsPath, `${replaceName}.java`);
-    await cp(
+    await copyFile(
       path.join(commandRoot, command.foldername, `${command.replacename}.java`),
       renamedCommand
     );
@@ -42,7 +42,7 @@ async function performCopy(
     replacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
     // Process files with replacements
-    await fileUtils.processFile(renamedCommand, folder.fsPath, replacements);
+    await fileUtils.processFile(renamedCommand, replacements);
 
     const document = await vscode.workspace.openTextDocument(vscode.Uri.file(renamedCommand));
     await vscode.window.showTextDocument(document);
@@ -59,7 +59,7 @@ export class Commands {
   constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
     const commandFolder = path.join(resourceRoot, 'src', 'commands');
     const resourceFile = path.join(commandFolder, this.commandResourceName);
-    fs.readFile(resourceFile, 'utf8', (err, data) => {
+    readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         logger.error('Command file error: ', err);
         return;

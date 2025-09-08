@@ -65,7 +65,10 @@ export async function findMatchingFiles(
 }
 
 /**
- * Setup project structure and copy Gradle files
+ * Setup project structure and copy Gradle files.
+ * @param fromGradleFolder The folder where the files, like build.gradle, for a specific project type are located.
+ * @param toFolder The folder to copy files to.
+ * @param grRoot The folder where the extension's Gradle files are.
  */
 export async function setupProjectStructure(
   fromGradleFolder: string,
@@ -119,6 +122,7 @@ export async function setupDeployDirectory(
   isJava: boolean
 ): Promise<boolean> {
   try {
+    // Already done when files were copied to the code path
     if (directGradleImport) {
       return true;
     }

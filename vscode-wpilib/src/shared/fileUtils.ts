@@ -1,15 +1,15 @@
 'use strict';
 
 import { readFile, writeFile } from 'fs/promises';
-import * as path from 'path';
 import { logger } from '../logger';
 
-export async function processFile(
-  file: string,
-  basePath: string,
-  replacements: Map<RegExp, string>
-) {
-  return updateFileContents(path.join(basePath, file), (content) => {
+/**
+ * Updates a file using a set of regex replacements.
+ * @param filePath The absolute path to a file.
+ * @param replacements The regexes and what they are to be replaced with.
+ */
+export async function processFile(filePath: string, replacements: Map<RegExp, string>) {
+  return updateFileContents(filePath, (content) => {
     // Apply all replacements
     for (const [pattern, replacement] of replacements) {
       content = content.replace(pattern, replacement);
@@ -19,7 +19,8 @@ export async function processFile(
 }
 
 /**
- * Safely updates file contents by reading and writing atomically
+ * Safely updates file contents by reading and writing atomically.
+ * @param filePath The absolute path to a file.
  */
 export async function updateFileContents(
   filePath: string,
