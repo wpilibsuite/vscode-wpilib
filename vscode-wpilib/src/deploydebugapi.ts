@@ -1,4 +1,4 @@
-'use scrict';
+'use strict';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IDeployDebugAPI } from './api';
 import { localize as i18n } from './locale';
