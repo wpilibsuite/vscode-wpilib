@@ -37,89 +37,49 @@ export function getJavaVersion(javaHome: string): Promise<number> {
   });
 }
 
+async function checkJavaPath(path: string | undefined, source: string) {
+  if (path) {
+    try {
+      const javaVersion = await getJavaVersion(path);
+      if (javaVersion >= 21) {
+        logger.log(`Found ${source} Version: ${javaVersion} at ${path}`);
+        return true;
+      } else {
+        logger.info(`Bad Java version ${javaVersion} at ${path} from ${source}`);
+      }
+    } catch (err) {
+      logger.log(`Error loading java from ${source}, skipping`, err);
+    }
+  }
+  return false;
+}
+
 export async function findJdkPath(api: IExternalAPI): Promise<string | undefined> {
   // Check for java property, as thats easily user settable, and we want it to win
   const vscodeJavaHome = vscode.workspace.getConfiguration('java').get<string>('jdt.ls.java.home');
-  if (vscodeJavaHome) {
-    try {
-      const javaVersion = await getJavaVersion(vscodeJavaHome);
-      if (javaVersion >= 21) {
-        logger.log(`Found jdt.ls.java.home Version: ${javaVersion} at ${vscodeJavaHome}`);
-        return vscodeJavaHome;
-      } else {
-        logger.info(
-          `Bad Java version ${javaVersion} at ${vscodeJavaHome} from jdt.ls.java.home Version`
-        );
-      }
-    } catch (err) {
-      logger.log('Error loading java from jdt.ls.java.home, skipping', err);
-    }
+  if (await checkJavaPath(vscodeJavaHome, 'jdt.ls.java.home')) {
+    return vscodeJavaHome;
   }
-
   // Check for deprecated java property, as that was used before 2024
   const vscodeOldJavaHome = vscode.workspace.getConfiguration('java').get<string>('home');
-  if (vscodeOldJavaHome) {
-    try {
-      const javaVersion = await getJavaVersion(vscodeOldJavaHome);
-      if (javaVersion >= 21) {
-        logger.log(`Found Java Home Version: ${javaVersion} at ${vscodeOldJavaHome}`);
-        return vscodeOldJavaHome;
-      } else {
-        logger.info(`Bad Java version ${javaVersion} at ${vscodeOldJavaHome} from java.home`);
-      }
-    } catch (err) {
-      logger.log('Error loading java from java.home, skipping', err);
-    }
+  if (await checkJavaPath(vscodeOldJavaHome, 'java.home')) {
+    return vscodeOldJavaHome;
   }
-
   // Then check the FRC home directory for the FRC jdk
   const frcHome = api.getUtilitiesAPI().getWPILibHomeDir();
-  {
-    const frcHomeJava = path.join(frcHome, 'jdk');
-    try {
-      const javaVersion = await getJavaVersion(frcHomeJava);
-      if (javaVersion >= 21) {
-        logger.log(`Found Java Home Version: ${javaVersion} at ${frcHomeJava}`);
-        return frcHomeJava;
-      } else {
-        logger.info(`Bad Java version ${javaVersion} at ${frcHomeJava}`);
-      }
-    } catch (err) {
-      logger.log('Error loading java from frc home, skipping', err);
-    }
+  const frcHomeJava = path.join(frcHome, 'jdk');
+  if (await checkJavaPath(frcHomeJava, 'FRC Home JDK')) {
+    return frcHomeJava;
   }
-
   // Check for java home
   const javaHome = process.env.JAVA_HOME;
-  if (javaHome !== undefined) {
-    try {
-      const javaVersion = await getJavaVersion(javaHome);
-      if (javaVersion >= 21) {
-        logger.log(`Found Java Home Version: ${javaVersion} at ${javaHome}`);
-        return javaHome;
-      } else {
-        logger.info(`Bad Java version ${javaVersion} at ${javaHome} from JAVA_HOME`);
-      }
-    } catch (err) {
-      logger.log('Error loading java from JAVA_HOME, skipping', err);
-    }
+  if (await checkJavaPath(javaHome, 'JAVA_HOME')) {
+    return javaHome;
   }
-
   // Check for jdk home
   const jdkHome = process.env.JDK_HOME;
-  if (jdkHome !== undefined) {
-    try {
-      const javaVersion = await getJavaVersion(jdkHome);
-      if (javaVersion >= 21) {
-        logger.log(`Found Java Home Version: ${javaVersion} at ${jdkHome}`);
-        return jdkHome;
-      } else {
-        logger.info(`Bad Java version ${javaVersion} at ${jdkHome} from JDK_HOME`);
-      }
-    } catch (err) {
-      logger.log('Error loading java from JDK_HOME, skipping', err);
-    }
+  if (await checkJavaPath(jdkHome, 'JDK_HOME')) {
+    return jdkHome;
   }
-
   return undefined;
 }
