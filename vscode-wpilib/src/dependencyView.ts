@@ -234,11 +234,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
           if (success) {
             if (avail.instructions) {
-              await vscode.commands.executeCommand(
-                'extension.showWebsite',
-                avail.instructions,
-                dep.name
-              );
+              await vscode.commands.executeCommand('simpleBrowser.show', avail.instructions);
             }
             this.changed = Date.now();
 
