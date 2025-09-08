@@ -1,6 +1,6 @@
 'use scrict';
 import * as vscode from 'vscode';
-import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
+import { ICodeDeployer, IDeployDebugAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';

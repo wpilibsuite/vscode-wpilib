@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI } from 'vscode-wpilibapi';
+import { IExampleTemplateAPI } from '../api';
 import { localize as i18n } from '../locale';
 import { setDesktopEnabled } from '../shared/generator';
 import { extensionContext, promptForProjectOpen } from '../utilities';
@@ -13,7 +13,6 @@ import {
   ProjectType,
 } from './pages/projectcreatorpagetypes';
 import { WebViewBase } from './webviewbase';
-import { Uri } from '../vscodeshim';
 
 export class ProjectCreator extends WebViewBase {
   public static async Create(
@@ -165,7 +164,7 @@ export class ProjectCreator extends WebViewBase {
       canSelectFolders: true,
       canSelectMany: false,
       openLabel: i18n('ui', 'Select Folder'),
-      defaultUri: data.toFolder.length > 0 ? Uri.file(data.toFolder) : undefined,
+      defaultUri: data.toFolder.length > 0 ? vscode.Uri.file(data.toFolder) : undefined,
     };
     const result = await vscode.window.showOpenDialog(open);
 

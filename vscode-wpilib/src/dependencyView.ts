@@ -3,7 +3,7 @@ import * as fetch from 'node-fetch';
 import { ProjectInfoGatherer, IProjectInfo } from './projectinfo';
 import { VendorLibraries } from './vendorlibraries';
 import { IJsonDependency } from './shared/vendorlibrariesbase';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { isNewerVersion } from './versions';
 import { logger } from './logger';
 import { localize as i18n } from './locale';

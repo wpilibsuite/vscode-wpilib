@@ -8,7 +8,7 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
 import { BuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';

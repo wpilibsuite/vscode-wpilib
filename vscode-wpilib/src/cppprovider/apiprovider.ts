@@ -10,7 +10,7 @@ import {
   SourceFileConfigurationItem,
   WorkspaceBrowseConfiguration,
 } from 'vscode-cpptools';
-import { IExecuteAPI, IExternalAPI, IPreferences } from 'vscode-wpilibapi';
+import { IExecuteAPI, IExternalAPI, IPreferences } from '../api';
 import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
 import { gradleRun, readFileAsync } from '../utilities';
