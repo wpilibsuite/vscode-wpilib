@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { IBuildTestAPI, ICodeBuilder } from 'vscode-wpilibapi';
+import { IBuildTestAPI, ICodeBuilder } from './api';
 import { localize as i18n } from './locale';
 import { PreferencesAPI } from './preferencesapi';
 

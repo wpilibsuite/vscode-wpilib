@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from 'vscode-wpilibapi';
+import { IPreferences, IPreferencesAPI, IPreferencesChangedPair } from './api';
 import { Preferences } from './preferences';
 
 // Stores the preferences provider for WPILib

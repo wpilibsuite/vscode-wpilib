@@ -1,7 +1,7 @@
 'use strict';
 
 import * as jsonc from 'jsonc-parser';
-import * as mm from 'micromatch';
+import mm from 'micromatch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {
@@ -10,7 +10,7 @@ import {
   SourceFileConfigurationItem,
   WorkspaceBrowseConfiguration,
 } from 'vscode-cpptools';
-import { IExecuteAPI, IExternalAPI, IPreferences } from 'vscode-wpilibapi';
+import { IExecuteAPI, IExternalAPI, IPreferences } from '../api';
 import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
 import { gradleRun, readFileAsync } from '../utilities';

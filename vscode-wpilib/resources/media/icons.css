@@ -4,14 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 /* This file contains cherrypicked icons from codicons for size */
-/* Currently built with everything but the below removed from mappings
-    - trash
-*/
+/* See below for the list of icons */
 
 @font-face {
   font-family: 'codicon';
   font-display: block;
-  src: url('./codicon.ttf?fb200efcd350cfb53f94163fb5066b25') format('truetype');
+  src: url('./codicon.ttf?ed24506d9e88cf1f96cdc07c81de74e0') format('truetype');
 }
 
 .codicon[class*='codicon-'] {
@@ -62,6 +60,34 @@
  *  Icons
  *-------------------*/
 
+.codicon-add:before {
+  content: '\ea60';
+}
+
+.codicon-warning:before {
+  content: '\ea6c';
+}
+
+.codicon-sync:before {
+  content: '\ea77';
+}
+
 .codicon-trash:before {
   content: '\ea81';
+}
+
+.codicon-check:before {
+  content: '\eab2';
+}
+
+.codicon-cloud-download:before {
+  content: '\eac2';
+}
+
+.codicon-chevron-right:before {
+  content: '\eab6';
+}
+
+.codicon-chrome-minimize:before {
+  content: '\eaba';
 }

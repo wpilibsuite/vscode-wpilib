@@ -1,6 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
-import { IExecuteAPI } from 'vscode-wpilibapi';
+import { IExecuteAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PromiseCondition } from './shared/promisecondition';

@@ -2,7 +2,7 @@
 
 import * as cp from 'child_process';
 import * as path from 'path';
-import { IExternalAPI, IPreferencesAPI, IToolRunner, IUtilitiesAPI } from 'vscode-wpilibapi';
+import { IExternalAPI, IPreferencesAPI, IToolRunner, IUtilitiesAPI } from './api';
 import { existsAsync, getIsWindows, readFileAsync } from './utilities';
 
 interface ITool {
