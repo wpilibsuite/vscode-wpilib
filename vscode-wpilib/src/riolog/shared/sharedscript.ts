@@ -1,199 +1,255 @@
 'use strict';
 
-import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
+/* tslint:disable:prefer-conditional-expression */
 import { IErrorMessage, IPrintMessage, MessageType } from './message';
-import { checkResize, scrollImpl, sendMessage } from '../script/implscript';
+import { IIPCSendMessage, ReceiveTypes, SendTypes } from './interfaces';
+import { AnsiSegment, applyAnsiStyling, parseAnsiString } from '../ansi/ansiparser';
+
+// Define these functions here, they'll be implemented in implscript.ts
+let checkResize: () => void;
+let scrollImpl: () => void;
+let sendMessage: (message: any) => void;
+
+// Function to set the implementation functions from implscript
+export function setImplFunctions(
+  checkResizeImpl: () => void,
+  scrollImplFunc: () => void,
+  sendMessageFunc: (message: any) => void
+) {
+  checkResize = checkResizeImpl;
+  scrollImpl = scrollImplFunc;
+  sendMessage = sendMessageFunc;
+  setLivePage();
+}
 
 let paused = false;
+let discard = false;
+let showWarnings = true;
+let showPrints = true;
+let autoReconnect = true;
+let showTimestamps = false;
+let autoScroll = true;
+let filterText = '';
+let maxLogEntries = 2000;
+
+let UI_COLORS = {
+  success: '#4caf50',
+  warning: '#ff9800',
+  error: '#f44336',
+  info: '#2196f3',
+};
+
+function updateThemeColors(colors: Record<string, string>) {
+  UI_COLORS = { ...UI_COLORS, ...colors };
+}
+
 export function onPause() {
-  const pauseElement = document.getElementById('pause');
+  paused = !paused;
+  const pauseElement = document.getElementById('pause-button');
   if (pauseElement === null) {
     return;
   }
-  if (paused === true) {
-    paused = false;
-    pauseElement.innerHTML = 'Pause';
-    sendMessage({
-      message: false,
-      type: ReceiveTypes.Pause,
-    });
-  } else {
-    paused = true;
+
+  if (paused) {
     pauseElement.innerHTML = 'Paused: 0';
-    sendMessage({
-      message: true,
-      type: ReceiveTypes.Pause,
-    });
+    pauseElement.classList.add('active');
+  } else {
+    pauseElement.innerHTML = 'Pause';
+    pauseElement.classList.remove('active');
   }
+
+  sendMessage({
+    message: paused,
+    type: ReceiveTypes.Pause,
+  });
 }
 
-let discard = false;
 export function onDiscard() {
-  const dButton = document.getElementById('discard');
+  discard = !discard;
+  const dButton = document.getElementById('discard-button');
   if (dButton === null) {
     return;
   }
-  if (discard === true) {
-    discard = false;
-    dButton.innerHTML = 'Discard';
-    sendMessage({
-      message: false,
-      type: ReceiveTypes.Discard,
-    });
+
+  if (discard) {
+    dButton.innerHTML = 'Resume Capture';
+    dButton.classList.add('active');
   } else {
-    discard = true;
-    dButton.innerHTML = 'Resume';
-    sendMessage({
-      message: true,
-      type: ReceiveTypes.Discard,
-    });
+    dButton.innerHTML = 'Discard';
+    dButton.classList.remove('active');
   }
+
+  sendMessage({
+    message: discard,
+    type: ReceiveTypes.Discard,
+  });
 }
 
 export function onClear() {
-  const list = document.getElementById('list');
+  const list = document.getElementById('log-container');
   if (list === null) {
     return;
   }
   list.innerHTML = '';
 }
 
-let showWarnings = true;
+export function onAutoScrollToggle() {
+  autoScroll = !autoScroll;
+  const scrollButton = document.getElementById('autoscroll-button');
+  if (scrollButton === null) {
+    return;
+  }
+
+  if (autoScroll) {
+    scrollButton.innerHTML = 'Auto-Scroll: On';
+    scrollButton.classList.remove('active');
+    scrollImpl();
+  } else {
+    scrollButton.innerHTML = 'Auto-Scroll: Off';
+    scrollButton.classList.add('active');
+  }
+}
+
 export function onShowWarnings() {
-  const warningsButton = document.getElementById('showwarnings');
+  showWarnings = !showWarnings;
+  const warningsButton = document.getElementById('warnings-button');
   if (warningsButton === null) {
     return;
   }
-  if (showWarnings === true) {
-    showWarnings = false;
-    warningsButton.innerHTML = 'Show Warnings';
+
+  if (showWarnings) {
+    warningsButton.innerHTML = 'Hide Warnings';
+    warningsButton.classList.remove('active');
   } else {
-    showWarnings = true;
-    warningsButton.innerHTML = "Don't Show Warnings";
+    warningsButton.innerHTML = 'Show Warnings';
+    warningsButton.classList.add('active');
   }
-  const ul = document.getElementById('list');
-  if (ul === null) {
+
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  const items = ul.getElementsByTagName('li');
+
+  const items = container.getElementsByClassName('warning-log');
   for (let i = 0; i < items.length; ++i) {
-    if (items[i].dataset.type === 'warning') {
-      if (showWarnings === true) {
-        items[i].style.display = 'inline';
-      } else {
-        items[i].style.display = 'none';
-      }
+    if (showWarnings) {
+      (items[i] as HTMLElement).style.display = 'block';
+    } else {
+      (items[i] as HTMLElement).style.display = 'none';
     }
   }
+
+  applyLogFilter();
   checkResize();
 }
 
-let showPrints = true;
 export function onShowPrints() {
-  const printButton = document.getElementById('showprints');
+  showPrints = !showPrints;
+  const printButton = document.getElementById('prints-button');
   if (printButton === null) {
     return;
   }
-  if (showPrints === true) {
-    showPrints = false;
-    printButton.innerHTML = 'Show Prints';
+
+  if (showPrints) {
+    printButton.innerHTML = 'Hide Prints';
+    printButton.classList.remove('active');
   } else {
-    showPrints = true;
-    printButton.innerHTML = "Don't Show Prints";
+    printButton.innerHTML = 'Show Prints';
+    printButton.classList.add('active');
   }
-  const ul = document.getElementById('list');
-  if (ul === null) {
+
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  const items = ul.getElementsByTagName('li');
+
+  const items = container.getElementsByClassName('print-log');
   for (let i = 0; i < items.length; ++i) {
-    if (items[i].dataset.type === 'print') {
-      if (showPrints === true) {
-        items[i].style.display = 'inline';
-      } else {
-        items[i].style.display = 'none';
-      }
+    if (showPrints) {
+      (items[i] as HTMLElement).style.display = 'block';
+    } else {
+      (items[i] as HTMLElement).style.display = 'none';
     }
   }
+
+  applyLogFilter();
   checkResize();
 }
 
-let autoReconnect = true;
 export function onAutoReconnect() {
-  if (autoReconnect === true) {
-    autoReconnect = false;
-    // send a disconnect
+  autoReconnect = !autoReconnect;
+
+  // Send message to backend
+  sendMessage({
+    message: autoReconnect,
+    type: ReceiveTypes.Reconnect,
+  });
+
+  const arButton = document.getElementById('reconnect-button');
+  if (arButton === null) {
+    return;
+  }
+
+  if (autoReconnect) {
+    arButton.innerHTML = 'Auto-Reconnect: On';
+    arButton.classList.remove('active');
+  } else {
+    arButton.innerHTML = 'Auto-Reconnect: Off';
+    arButton.classList.add('active');
+
+    // Force disconnect when auto-reconnect is disabled
     sendMessage({
       message: false,
       type: ReceiveTypes.Reconnect,
     });
-  } else {
-    autoReconnect = true;
-    sendMessage({
-      message: true,
-      type: ReceiveTypes.Reconnect,
-    });
-  }
-  const arButton = document.getElementById('autoreconnect');
-  if (arButton === null) {
-    return;
-  }
-  if (autoReconnect === true) {
-    arButton.innerHTML = 'Reconnect';
-  } else {
-    arButton.innerHTML = 'Disconnect';
   }
 }
 
-let showTimestamps = false;
 export function onShowTimestamps() {
-  const tsButton = document.getElementById('timestamps');
+  showTimestamps = !showTimestamps;
+  const tsButton = document.getElementById('timestamps-button');
   if (tsButton === null) {
     return;
   }
-  if (showTimestamps === true) {
-    showTimestamps = false;
-    tsButton.innerHTML = 'Show Timestamps';
+
+  if (showTimestamps) {
+    tsButton.innerHTML = 'Hide Timestamps';
+    tsButton.classList.remove('active');
   } else {
-    showTimestamps = true;
-    tsButton.innerHTML = "Don't Show Timestamps";
+    tsButton.innerHTML = 'Show Timestamps';
+    tsButton.classList.add('active');
   }
-  const ul = document.getElementById('list');
-  if (ul === null) {
+
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  const items = ul.getElementsByTagName('li');
-  for (let i = 0; i < items.length; ++i) {
-    const spans = items[i].getElementsByTagName('span');
-    if (spans === undefined) {
-      continue;
-    }
-    for (let j = 0; j < spans.length; j++) {
-      const span = spans[j];
-      if (span.hasAttribute('data-timestamp')) {
-        if (showTimestamps === true) {
-          span.style.display = 'inline';
-        } else {
-          span.style.display = 'none';
-        }
-      }
+
+  const timestamps = container.getElementsByClassName('timestamp');
+  for (let i = 0; i < timestamps.length; ++i) {
+    if (showTimestamps) {
+      (timestamps[i] as HTMLElement).style.display = 'inline';
+    } else {
+      (timestamps[i] as HTMLElement).style.display = 'none';
     }
   }
+
   checkResize();
 }
 
 export function onSaveLog() {
-  const ul = document.getElementById('list');
-  if (ul === null) {
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  const items = ul.getElementsByTagName('li');
+
+  const items = container.getElementsByClassName('log-entry');
   const logs: string[] = [];
 
   for (let i = 0; i < items.length; ++i) {
-    const m = items[i].dataset.message;
-    if (m === undefined) {
-      return;
+    const m = items[i].getAttribute('data-message');
+    if (m === null) {
+      continue;
     }
     logs.push(m);
   }
@@ -204,56 +260,195 @@ export function onSaveLog() {
   });
 }
 
-export function onConnect() {
-  const button = document.getElementById('autoreconnect');
-  if (button === null) {
+export function onSearch(event: Event) {
+  const input = event.target as HTMLInputElement;
+  filterText = input.value.toLowerCase();
+  applyLogFilter();
+}
+
+function applyLogFilter() {
+  if (filterText === '') {
+    // Show all entries that should be visible based on their type
+    const container = document.getElementById('log-container');
+    if (container === null) {
+      return;
+    }
+
+    const items = container.getElementsByClassName('log-entry');
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i] as HTMLElement;
+      const type = item.getAttribute('data-type');
+
+      if (type === 'warning' && !showWarnings) {
+        item.style.display = 'none';
+      } else if (type === 'print' && !showPrints) {
+        item.style.display = 'none';
+      } else {
+        item.style.display = 'block';
+      }
+    }
     return;
   }
-  button.style.backgroundColor = 'Green';
+
+  // Filter based on text content
+  const container = document.getElementById('log-container');
+  if (container === null) {
+    return;
+  }
+
+  const items = container.getElementsByClassName('log-entry');
+  for (let i = 0; i < items.length; ++i) {
+    const item = items[i] as HTMLElement;
+    const type = item.getAttribute('data-type');
+
+    // Skip if it's already hidden by type filters
+    if ((type === 'warning' && !showWarnings) || (type === 'print' && !showPrints)) {
+      item.style.display = 'none';
+      continue;
+    }
+
+    const content = item.textContent?.toLowerCase() || '';
+    if (content.includes(filterText)) {
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
+  }
+}
+
+export function onConnect() {
+  const statusIndicator = document.getElementById('connection-status');
+  if (statusIndicator) {
+    statusIndicator.className = 'connection-status connected';
+    statusIndicator.setAttribute('title', 'Connected to Robot');
+  }
+
+  // Add connection message
+  const connectedMessage: IPrintMessage = {
+    line: '\u001b[32mRobot connection established\u001b[0m',
+    messageType: MessageType.Print,
+    seqNumber: 0,
+    timestamp: Date.now() / 1000,
+  };
+  addMessage(connectedMessage);
 }
 
 export function onDisconnect() {
-  const button = document.getElementById('autoreconnect');
-  if (button === null) {
-    return;
+  const statusIndicator = document.getElementById('connection-status');
+  if (statusIndicator) {
+    statusIndicator.className = 'connection-status disconnected';
+    statusIndicator.setAttribute('title', 'Disconnected from Robot');
   }
-  button.style.backgroundColor = 'Red';
+
+  // Add disconnection message
+  const disconnectedMessage: IPrintMessage = {
+    line: '\u001b[31mRobot connection lost\u001b[0m',
+    messageType: MessageType.Print,
+    seqNumber: 0,
+    timestamp: Date.now() / 1000,
+  };
+  addMessage(disconnectedMessage);
 }
 
-function insertMessage(ts: number, line: string, li: HTMLLIElement, color?: string) {
-  const div = document.createElement('div');
+export function onChangeTeamNumber() {
+  const input = document.getElementById('team-number') as HTMLInputElement;
+  if (!input) {
+    return;
+  }
+
+  const teamNumber = parseInt(input.value, 10);
+  if (isNaN(teamNumber) || teamNumber < 0 || teamNumber > 99999) {
+    // Visual indication of invalid input
+    input.classList.add('error');
+    setTimeout(() => {
+      input.classList.remove('error');
+    }, 1000);
+    return;
+  }
+
+  sendMessage({
+    message: teamNumber,
+    type: ReceiveTypes.ChangeNumber,
+  });
+
+  // Visual confirmation
+  const button = document.getElementById('team-number-button');
+  if (button) {
+    const originalText = button.textContent || '';
+    button.textContent = '✓ Applied';
+    button.classList.add('success');
+
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.classList.remove('success');
+    }, 1000);
+  }
+}
+
+// Create a styled segment from ANSI parsed content
+function createStyledElement(segment: AnsiSegment): HTMLSpanElement {
+  const span = document.createElement('span');
+  const tNode = document.createTextNode(segment.text);
+  span.appendChild(tNode);
+  applyAnsiStyling(span, segment.state);
+  return span;
+}
+
+function insertMessage(ts: number, line: string, li: HTMLElement, color?: string) {
+  const messageContent = document.createElement('div');
+  messageContent.className = 'log-message';
+
+  // Create timestamp element
   const tsSpan = document.createElement('span');
-  tsSpan.appendChild(document.createTextNode(ts.toFixed(3) + ': '));
-  tsSpan.dataset.timestamp = 'true';
-  if (showTimestamps === true) {
-    tsSpan.style.display = 'inline';
-  } else {
+  tsSpan.className = 'timestamp';
+  tsSpan.textContent = new Date(ts * 1000).toISOString().slice(11, -1) + ': ';
+  if (!showTimestamps) {
     tsSpan.style.display = 'none';
   }
-  div.appendChild(tsSpan);
-  const span = document.createElement('span');
-  const split = line.split('\n');
+  messageContent.appendChild(tsSpan);
+
+  // Create the content container
+  const contentSpan = document.createElement('span');
+  contentSpan.className = 'message-content';
+  if (color !== undefined) {
+    contentSpan.style.color = color;
+  }
+
+  // Process each line
+  const lines = line.split('\n');
   let first = true;
-  for (const item of split) {
+
+  for (const item of lines) {
     if (item.trim() === '') {
       continue;
     }
+
     if (first === false) {
-      span.appendChild(document.createElement('br'));
+      contentSpan.appendChild(document.createElement('br'));
     }
     first = false;
-    const tNode = document.createTextNode(item);
-    span.appendChild(tNode);
+
+    // Check if the line contains ANSI codes
+    if (item.includes('\u001b[')) {
+      const segments = parseAnsiString(item);
+      for (const segment of segments) {
+        contentSpan.appendChild(createStyledElement(segment));
+      }
+    } else {
+      // No ANSI codes, just append text
+      const tNode = document.createTextNode(item);
+      contentSpan.appendChild(tNode);
+    }
   }
-  if (color !== undefined) {
-    span.style.color = color;
-  }
-  div.appendChild(span);
-  li.appendChild(div);
+
+  messageContent.appendChild(contentSpan);
+  li.appendChild(messageContent);
 }
 
-function insertStackTrace(st: string, li: HTMLLIElement, color?: string) {
+function insertStackTrace(st: string, container: HTMLElement, color?: string) {
   const div = document.createElement('div');
+  div.className = 'stack-trace';
+
   const split = st.split('\n');
   let first = true;
   for (const item of split) {
@@ -270,11 +465,13 @@ function insertStackTrace(st: string, li: HTMLLIElement, color?: string) {
   if (color !== undefined) {
     div.style.color = color;
   }
-  li.appendChild(div);
+  container.appendChild(div);
 }
 
-function insertLocation(loc: string, li: HTMLLIElement, color?: string) {
+function insertLocation(loc: string, container: HTMLElement, color?: string) {
   const div = document.createElement('div');
+  div.className = 'location-info';
+
   const split = loc.split('\n');
   let first = true;
   for (const item of split) {
@@ -282,16 +479,16 @@ function insertLocation(loc: string, li: HTMLLIElement, color?: string) {
       continue;
     }
     if (first === false) {
-      li.appendChild(document.createElement('br'));
+      div.appendChild(document.createElement('br'));
     }
     first = false;
     const tNode = document.createTextNode('\u00a0\u00a0 from: ' + item);
-    li.appendChild(tNode);
+    div.appendChild(tNode);
   }
   if (color !== undefined) {
     div.style.color = color;
   }
-  li.appendChild(div);
+  container.appendChild(div);
 }
 
 export function addMessage(message: IPrintMessage | IErrorMessage) {
@@ -303,104 +500,444 @@ export function addMessage(message: IPrintMessage | IErrorMessage) {
 }
 
 function limitList() {
-  const ul = document.getElementById('list') as HTMLUListElement;
-  if (ul === null) {
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  if (ul.childElementCount > 1000 && ul.firstChild !== null) {
-    ul.removeChild(ul.firstChild);
+
+  while (container.childElementCount > maxLogEntries && container.firstChild !== null) {
+    container.removeChild(container.firstChild);
   }
 }
 
 export function addPrint(message: IPrintMessage) {
   limitList();
-  const ul = document.getElementById('list') as HTMLUListElement;
-  if (ul === null) {
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  const li = document.createElement('li');
-  li.style.fontFamily = 'Consolas, "Courier New", monospace';
-  insertMessage(message.timestamp, message.line, li);
-  const str = JSON.stringify(message);
-  li.dataset.message = str;
-  li.dataset.type = 'print';
-  if (showPrints === true) {
-    li.style.display = 'inline';
-  } else {
-    li.style.display = 'none';
+
+  const entry = document.createElement('div');
+  entry.className = 'log-entry print-log';
+  entry.setAttribute('data-type', 'print');
+  entry.setAttribute('data-message', JSON.stringify(message));
+
+  if (!showPrints) {
+    entry.style.display = 'none';
   }
-  ul.appendChild(li);
+
+  insertMessage(message.timestamp, message.line, entry);
+  container.appendChild(entry);
+
+  // Apply search filter if needed
+  if (filterText !== '') {
+    const content = entry.textContent?.toLowerCase() || '';
+    if (!content.includes(filterText)) {
+      entry.style.display = 'none';
+    }
+  }
+
+  if (autoScroll) {
+    scrollImpl();
+  }
 }
 
-export function expandError(message: IErrorMessage, li: HTMLLIElement, color?: string) {
+// Creates HTML for an expanded error view
+export function createErrorContent(message: IErrorMessage, container: HTMLElement, color?: string) {
+  // Clear existing content first
+  container.innerHTML = '';
+
   // First append the message
-  insertMessage(message.timestamp, message.details, li, color);
+  insertMessage(message.timestamp, message.details, container, color);
+
   // Then append location, tabbed in once
-  insertLocation(message.location, li);
+  insertLocation(message.location, container, color);
+
   // Then append stack trace, tabbed in twice
-  insertStackTrace(message.callStack, li);
-  li.appendChild(document.createElement('br'));
+  insertStackTrace(message.callStack, container, color);
+}
+
+// Create HTML for a collapsed error view
+export function createCollapsedErrorContent(
+  message: IErrorMessage,
+  container: HTMLElement,
+  color?: string
+) {
+  // Clear existing content
+  container.innerHTML = '';
+
+  // Just show the error message
+  insertMessage(message.timestamp, message.details, container, color);
 }
 
 export function addError(message: IErrorMessage) {
   limitList();
-  const ul = document.getElementById('list');
-  if (ul === null) {
+  const container = document.getElementById('log-container');
+  if (container === null) {
     return;
   }
-  const li = document.createElement('li');
-  li.style.fontFamily = 'Consolas, "Courier New", monospace';
-  const str = JSON.stringify(message);
-  li.dataset.expanded = 'false';
-  li.dataset.message = str;
-  if (message.messageType === MessageType.Warning) {
-    li.dataset.type = 'warning';
-    insertMessage(message.timestamp, message.details, li, 'Yellow');
-    if (showWarnings === true) {
-      li.style.display = 'inline';
-    } else {
-      li.style.display = 'none';
-    }
-  } else {
-    li.dataset.type = 'error';
-    insertMessage(message.timestamp, message.details, li, 'Red');
+
+  const entry = document.createElement('div');
+  entry.className =
+    message.messageType === MessageType.Warning ? 'log-entry warning-log' : 'log-entry error-log';
+  entry.setAttribute('data-expanded', 'false');
+  entry.setAttribute(
+    'data-type',
+    message.messageType === MessageType.Warning ? 'warning' : 'error'
+  );
+  entry.setAttribute('data-message', JSON.stringify(message));
+
+  // Hide warnings if they're filtered out
+  if (message.messageType === MessageType.Warning && !showWarnings) {
+    entry.style.display = 'none';
   }
-  li.onclick = () => {
-    if (li.dataset.expanded === 'true') {
-      // shrink
-      li.dataset.expanded = 'false';
-      if (li.dataset.message === undefined) {
-        return;
-      }
-      const parsed = JSON.parse(li.dataset.message) as IPrintMessage | IErrorMessage;
-      li.innerHTML = '';
-      if (li.dataset.type === 'warning') {
-        insertMessage(parsed.timestamp, (parsed as IErrorMessage).details, li, 'Yellow');
-      } else {
-        insertMessage(parsed.timestamp, (parsed as IErrorMessage).details, li, 'Red');
+
+  // Create the toggle button
+  const toggleButton = document.createElement('div');
+  toggleButton.className = 'toggle-button collapsed';
+  entry.appendChild(toggleButton);
+
+  // Create the content container
+  const contentContainer = document.createElement('div');
+  contentContainer.className = 'error-content collapsed';
+  entry.appendChild(contentContainer);
+
+  // Add the initial collapsed view content
+  const textColor =
+    message.messageType === MessageType.Warning
+      ? 'var(--vscode-warningForeground, ' + UI_COLORS.warning + ')'
+      : 'var(--vscode-testing-iconFailed, ' + UI_COLORS.error + ')';
+
+  createCollapsedErrorContent(message, contentContainer, textColor);
+
+  // Add click handler to toggle expansion
+  entry.addEventListener('click', function () {
+    const isExpanded = this.getAttribute('data-expanded') === 'true';
+    const toggleBtn = this.querySelector('.toggle-button');
+    const contentCtr = this.querySelector('.error-content');
+
+    if (isExpanded) {
+      // Collapse
+      this.setAttribute('data-expanded', 'false');
+      if (toggleBtn) toggleBtn.className = 'toggle-button collapsed';
+      if (contentCtr) {
+        contentCtr.className = 'error-content collapsed';
+        createCollapsedErrorContent(message, contentCtr as HTMLElement, textColor);
       }
     } else {
-      // expand
-      li.dataset.expanded = 'true';
-      if (li.dataset.message === undefined) {
-        return;
-      }
-      const parsed = JSON.parse(li.dataset.message);
-      li.innerHTML = '';
-      if (li.dataset.type === 'warning') {
-        expandError(parsed as IErrorMessage, li, 'Yellow');
-      } else {
-        expandError(parsed as IErrorMessage, li, 'Red');
+      // Expand
+      this.setAttribute('data-expanded', 'true');
+      if (toggleBtn) toggleBtn.className = 'toggle-button expanded';
+      if (contentCtr) {
+        contentCtr.className = 'error-content expanded';
+        createErrorContent(message, contentCtr as HTMLElement, textColor);
       }
     }
+
     checkResize();
-  };
-  ul.appendChild(li);
+  });
+
+  container.appendChild(entry);
+
+  // Apply search filter if needed
+  if (filterText !== '') {
+    const content = entry.textContent?.toLowerCase() || '';
+    if (!content.includes(filterText)) {
+      entry.style.display = 'none';
+    }
+  }
+
+  if (autoScroll) {
+    scrollImpl();
+  }
 }
 
-window.addEventListener('resize', () => {
-  checkResize();
-});
+export function checkResizeImpl() {
+  const container = document.getElementById('log-container');
+  if (container === null) {
+    return;
+  }
+  // Container height is managed through CSS
+}
+
+export function handleMessage(data: IIPCSendMessage | any): void {
+  // Handle theme color update message
+  if (data.type === 'themeColors') {
+    updateThemeColors(data.message);
+    return;
+  }
+
+  switch (data.type) {
+    case SendTypes.New:
+      addMessage(data.message as IPrintMessage | IErrorMessage);
+      break;
+
+    case SendTypes.Batch:
+      for (const message of data.message as (IPrintMessage | IErrorMessage)[]) {
+        addMessage(message);
+      }
+      break;
+
+    case SendTypes.PauseUpdate:
+      const pauseButton = document.getElementById('pause-button');
+      if (pauseButton !== null) {
+        pauseButton.innerHTML = `Paused: ${data.message}`;
+      }
+      break;
+
+    case SendTypes.ConnectionChanged:
+      const connected: boolean = data.message as boolean;
+      if (connected) {
+        onConnect();
+      } else {
+        onDisconnect();
+      }
+      break;
+
+    default:
+      break;
+  }
+}
+
+export function createToolbar(): HTMLElement {
+  const toolbar = document.createElement('div');
+  toolbar.id = 'toolbar';
+  toolbar.className = 'toolbar';
+
+  // Create the connection status indicator
+  const statusContainer = document.createElement('div');
+  statusContainer.className = 'status-container';
+
+  const connectionStatus = document.createElement('div');
+  connectionStatus.id = 'connection-status';
+  connectionStatus.className = 'connection-status disconnected';
+  connectionStatus.setAttribute('title', 'Disconnected from Robot');
+  statusContainer.appendChild(connectionStatus);
+
+  // Create the team number input group
+  const teamNumberContainer = document.createElement('div');
+  teamNumberContainer.className = 'team-number-container';
+
+  const teamNumberLabel = document.createElement('label');
+  teamNumberLabel.htmlFor = 'team-number';
+  teamNumberLabel.textContent = 'Team:';
+  teamNumberContainer.appendChild(teamNumberLabel);
+
+  const teamNumberInput = document.createElement('input');
+  teamNumberInput.type = 'number';
+  teamNumberInput.id = 'team-number';
+  teamNumberInput.className = 'vscode-textfield';
+  teamNumberInput.min = '1';
+  teamNumberInput.max = '99999';
+  teamNumberInput.placeholder = 'Team #';
+  teamNumberContainer.appendChild(teamNumberInput);
+
+  const teamNumberButton = document.createElement('button');
+  teamNumberButton.id = 'team-number-button';
+  teamNumberButton.className = 'vscode-button';
+  teamNumberButton.textContent = 'Set';
+  teamNumberButton.addEventListener('click', onChangeTeamNumber);
+  teamNumberContainer.appendChild(teamNumberButton);
+
+  // Search filter
+  const searchContainer = document.createElement('div');
+  searchContainer.className = 'search-container';
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.id = 'search-input';
+  searchInput.className = 'vscode-textfield';
+  searchInput.placeholder = 'Search logs...';
+  searchInput.addEventListener('input', onSearch);
+  searchContainer.appendChild(searchInput);
+
+  // Button groups
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'buttons-container';
+
+  // Control buttons
+  const controlButtons = document.createElement('div');
+  controlButtons.className = 'button-group';
+
+  const buttons = [
+    { id: 'pause-button', text: 'Pause', handler: onPause, tooltip: 'Pause log updates' },
+    {
+      id: 'discard-button',
+      text: 'Discard',
+      handler: onDiscard,
+      tooltip: 'Discard incoming messages',
+    },
+    { id: 'clear-button', text: 'Clear', handler: onClear, tooltip: 'Clear all log entries' },
+    {
+      id: 'autoscroll-button',
+      text: 'Auto-Scroll: On',
+      handler: onAutoScrollToggle,
+      tooltip: 'Toggle automatic scrolling',
+    },
+  ];
+
+  buttons.forEach((btn) => {
+    const button = document.createElement('button');
+    button.id = btn.id;
+    button.className = 'vscode-button';
+    button.textContent = btn.text;
+    button.title = btn.tooltip;
+    button.addEventListener('click', btn.handler);
+    controlButtons.appendChild(button);
+  });
+
+  // Filter buttons
+  const filterButtons = document.createElement('div');
+  filterButtons.className = 'button-group';
+
+  const filterBtns = [
+    {
+      id: 'prints-button',
+      text: 'Hide Prints',
+      handler: onShowPrints,
+      tooltip: 'Toggle print messages',
+    },
+    {
+      id: 'warnings-button',
+      text: 'Hide Warnings',
+      handler: onShowWarnings,
+      tooltip: 'Toggle warning messages',
+    },
+    {
+      id: 'timestamps-button',
+      text: 'Show Timestamps',
+      handler: onShowTimestamps,
+      tooltip: 'Toggle timestamps',
+      active: true,
+    },
+    {
+      id: 'reconnect-button',
+      text: 'Auto-Reconnect: On',
+      handler: onAutoReconnect,
+      tooltip: 'Toggle auto reconnection',
+    },
+    { id: 'save-button', text: 'Save Log', handler: onSaveLog, tooltip: 'Save log to file' },
+  ];
+
+  filterBtns.forEach((btn) => {
+    const button = document.createElement('button');
+    button.id = btn.id;
+    button.className = 'vscode-button';
+    if (btn.active) {
+      button.classList.add('active');
+    }
+    button.textContent = btn.text;
+    button.title = btn.tooltip;
+    button.addEventListener('click', btn.handler);
+    filterButtons.appendChild(button);
+  });
+
+  // Add all components to the toolbar
+  buttonsContainer.appendChild(controlButtons);
+  buttonsContainer.appendChild(filterButtons);
+
+  toolbar.appendChild(statusContainer);
+  toolbar.appendChild(teamNumberContainer);
+  toolbar.appendChild(searchContainer);
+  toolbar.appendChild(buttonsContainer);
+
+  return toolbar;
+}
+
+export function setLivePage() {
+  const mainDiv = document.getElementById('mainDiv');
+  if (!mainDiv) {
+    return;
+  }
+
+  // Clear the container
+  mainDiv.innerHTML = '';
+
+  const toolbar = createToolbar();
+  toolbar.id = 'toolbar';
+  mainDiv.appendChild(toolbar);
+
+  // Create log container
+  const logContainer = document.createElement('div');
+  logContainer.id = 'log-container';
+  mainDiv.appendChild(logContainer);
+
+  if (!window.__riologHasLoaded) {
+    const welcomeMessage: IPrintMessage = {
+      messageType: MessageType.Print,
+      line:
+        '\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m\n' +
+        '\u001b[32mWaiting for robot connection...\u001b[0m\n' +
+        '\u001b[33mTIPS:\u001b[0m\n' +
+        '• \u001b[0mUse \u001b[1mSet\u001b[0m button to change team number\n' +
+        '• \u001b[0mClick on errors/warnings to expand details\n' +
+        '• \u001b[0mUse search box to filter messages\n' +
+        '• \u001b[0mToggle auto-scrolling for viewing older logs\n' +
+        '• \u001b[0mSave logs to file for later analysis',
+      timestamp: Date.now() / 1000,
+      seqNumber: 0,
+    };
+    addMessage(welcomeMessage);
+    window.__riologHasLoaded = true;
+  }
+
+  // Ensure timestamps button starts in correct state
+  const timestampsButton = document.getElementById('timestamps-button');
+  if (timestampsButton) {
+    if (!showTimestamps) {
+      timestampsButton.classList.add('active');
+    } else {
+      timestampsButton.classList.remove('active');
+    }
+  }
+
+  // Ensure warnings button starts in correct state
+  const warningsButton = document.getElementById('warnings-button');
+  if (warningsButton) {
+    if (!showWarnings) {
+      warningsButton.classList.add('active');
+      warningsButton.textContent = 'Show Warnings';
+    } else {
+      warningsButton.classList.remove('active');
+      warningsButton.textContent = 'Hide Warnings';
+    }
+  }
+}
+
+export function setViewerPage() {
+  setLivePage(); // Reuse the same UI for now with minor modifications
+
+  // Add file input control for loading logs
+  const toolbar = document.getElementById('toolbar');
+  if (toolbar) {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'log-file-input';
+    fileInput.accept = '.json';
+    fileInput.className = 'file-input';
+    fileInput.addEventListener('change', handleFileSelect, false);
+
+    const fileLabel = document.createElement('label');
+    fileLabel.htmlFor = 'log-file-input';
+    fileLabel.textContent = 'Load Log File';
+    fileLabel.className = 'vscode-button';
+
+    toolbar.insertBefore(fileLabel, toolbar.firstChild);
+    toolbar.insertBefore(fileInput, toolbar.firstChild);
+
+    // Hide reconnect button in viewer mode
+    const reconnectButton = document.getElementById('reconnect-button');
+    if (reconnectButton) {
+      reconnectButton.style.display = 'none';
+    }
+
+    // Hide team number input in viewer mode
+    const teamNumberContainer = document.querySelector('.team-number-container') as HTMLElement;
+    if (teamNumberContainer) {
+      teamNumberContainer.style.display = 'none';
+    }
+  }
+}
 
 function handleFileSelect(evt: Event) {
   const files = (evt.target as HTMLInputElement).files!;
@@ -408,203 +945,39 @@ function handleFileSelect(evt: Event) {
   const reader = new FileReader();
   reader.onload = (loaded: Event) => {
     const target: FileReader = loaded.target as FileReader;
-    const parsed = JSON.parse(target.result as string) as (IPrintMessage | IErrorMessage)[];
-    for (const p of parsed) {
-      addMessage(p);
+    try {
+      const parsed = JSON.parse(target.result as string) as (IPrintMessage | IErrorMessage)[];
+
+      // Clear existing logs first
+      onClear();
+
+      // Add all logs from the file
+      for (const p of parsed) {
+        addMessage(p);
+      }
+    } catch (error) {
+      console.error('Error parsing log file:', error);
+
+      // Show error message in the log
+      const errorMessage: IErrorMessage = {
+        callStack: '',
+        details: 'Failed to parse log file: ' + (error as Error).message,
+        errorCode: 0,
+        flags: 1,
+        location: '',
+        messageType: MessageType.Error,
+        numOccur: 1,
+        seqNumber: 0,
+        timestamp: Date.now() / 1000,
+      };
+      addMessage(errorMessage);
     }
-    checkResize();
   };
   reader.readAsText(firstFile);
 }
 
-let currentScreenHeight = 100;
-
-export function checkResizeImpl(element: HTMLElement) {
-  const allowedHeight = element.clientHeight - currentScreenHeight;
-  const ul = document.getElementById('list');
-  if (ul === null) {
-    return;
-  }
-  const listHeight = ul.clientHeight;
-  if (listHeight < allowedHeight) {
-    ul.style.position = 'fixed';
-    ul.style.bottom = currentScreenHeight + 'px';
-  } else {
-    ul.style.position = 'static';
-    ul.style.bottom = 'auto';
+declare global {
+  interface Window {
+    __riologHasLoaded?: boolean;
   }
 }
-
-export function handleMessage(data: IIPCSendMessage): void {
-  switch (data.type) {
-    case SendTypes.New:
-      addMessage(data.message as IPrintMessage | IErrorMessage);
-      scrollImpl();
-      break;
-    case SendTypes.Batch:
-      for (const message of data.message as (IPrintMessage | IErrorMessage)[]) {
-        addMessage(message);
-      }
-      scrollImpl();
-      break;
-    case SendTypes.PauseUpdate:
-      const pause = document.getElementById('pause');
-      if (pause !== null) {
-        pause.innerHTML = 'Paused: ' + (data.message as number);
-      }
-      break;
-    case SendTypes.ConnectionChanged:
-      const bMessage: boolean = data.message as boolean;
-      if (bMessage === true) {
-        onConnect();
-      } else {
-        onDisconnect();
-      }
-      break;
-    default:
-      break;
-  }
-  checkResize();
-}
-
-function createSplitUl(left: boolean): HTMLUListElement {
-  const splitDiv = document.createElement('ul');
-  splitDiv.style.position = 'fixed';
-  splitDiv.style.bottom = '0px';
-  if (left) {
-    splitDiv.style.left = '0px';
-  } else {
-    splitDiv.style.right = '0px';
-  }
-  splitDiv.style.listStyleType = 'none';
-  splitDiv.style.padding = '0';
-  splitDiv.style.width = '49.8%';
-  splitDiv.style.marginBottom = '1px';
-  return splitDiv;
-}
-
-function createButton(id: string, text: string, callback: () => void): HTMLLIElement {
-  const li = document.createElement('li');
-  const button = document.createElement('button');
-  button.id = id;
-  button.style.width = '100%';
-  button.appendChild(document.createTextNode(text));
-  button.addEventListener('click', callback);
-  li.appendChild(button);
-  return li;
-}
-
-function onChangeTeamNumber() {
-  const newNumber = document.getElementById('teamNumber');
-  console.log('finding team number');
-  if (newNumber === null) {
-    return;
-  }
-  console.log('sending message');
-  sendMessage({
-    message: parseInt((newNumber as HTMLInputElement).value, 10),
-    type: ReceiveTypes.ChangeNumber,
-  });
-  console.log('sent message');
-}
-
-function setLivePage() {
-  const mdv = document.getElementById('mainDiv');
-  if (mdv === undefined) {
-    return;
-  }
-  const mainDiv: HTMLDivElement = mdv as HTMLDivElement;
-  currentScreenHeight = 100;
-  mainDiv.innerHTML = '';
-  const ul = document.createElement('ul');
-  ul.id = 'list';
-  ul.style.listStyleType = 'none';
-  ul.style.padding = '0';
-  mainDiv.appendChild(ul);
-  const splitDiv = document.createElement('div');
-  splitDiv.style.height = '100px';
-  mainDiv.appendChild(splitDiv);
-  const leftList = createSplitUl(true);
-  leftList.appendChild(createButton('pause', 'Pause', onPause));
-  leftList.appendChild(createButton('discard', 'Discard', onDiscard));
-  leftList.appendChild(createButton('clear', 'Clear', onClear));
-  leftList.appendChild(createButton('showprints', "Don't Show Prints", onShowPrints));
-  leftList.appendChild(
-    createButton('switchPage', 'Switch to Viewer', () => {
-      setViewerPage();
-    })
-  );
-  mainDiv.appendChild(leftList);
-
-  const rightList = createSplitUl(false);
-  rightList.appendChild(createButton('showwarnings', "Don't Show Warnings", onShowWarnings));
-  rightList.appendChild(createButton('autoreconnect', 'Disconnect', onAutoReconnect));
-  rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
-  rightList.appendChild(createButton('savelot', 'Save Log', onSaveLog));
-  const teamNumberUl = document.createElement('li');
-  const teamNumberI = document.createElement('input');
-  teamNumberI.id = 'teamNumber';
-  teamNumberI.type = 'number';
-  teamNumberI.style.width = '50%';
-  const teamNumberB = document.createElement('button');
-  teamNumberB.id = 'changeTeamNumber';
-  teamNumberB.style.width = '24.9%';
-  teamNumberB.style.right = '0';
-  teamNumberB.style.position = 'fixed';
-  teamNumberB.addEventListener('click', onChangeTeamNumber);
-  teamNumberB.appendChild(document.createTextNode('Set Team Number'));
-  teamNumberUl.appendChild(teamNumberI);
-  teamNumberUl.appendChild(teamNumberB);
-  rightList.appendChild(teamNumberUl);
-  mainDiv.appendChild(rightList);
-  if (autoReconnect !== true) {
-    onAutoReconnect();
-  }
-}
-
-export function setViewerPage() {
-  const mdv = document.getElementById('mainDiv');
-  if (mdv === undefined) {
-    return;
-  }
-  if (autoReconnect === true) {
-    onAutoReconnect();
-  }
-  const mainDiv: HTMLDivElement = mdv as HTMLDivElement;
-  currentScreenHeight = 60;
-  mainDiv.innerHTML = '';
-  const ul = document.createElement('ul');
-  ul.id = 'list';
-  ul.style.listStyleType = 'none';
-  ul.style.padding = '0';
-  mainDiv.appendChild(ul);
-  const splitDiv = document.createElement('div');
-  splitDiv.style.height = '60px';
-  mainDiv.appendChild(splitDiv);
-
-  const leftList = createSplitUl(true);
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.id = 'openFile';
-  fileInput.name = 'files[]';
-  fileInput.style.width = '100%';
-  fileInput.addEventListener('change', handleFileSelect, false);
-  leftList.appendChild(fileInput);
-  leftList.appendChild(createButton('showprints', "Don't Show Prints", onShowPrints));
-  leftList.appendChild(
-    createButton('switchPage', 'Switch to Live', () => {
-      setLivePage();
-    })
-  );
-  mainDiv.appendChild(leftList);
-
-  const rightList = createSplitUl(false);
-  rightList.appendChild(createButton('showwarnings', "Don't Show Warnings", onShowWarnings));
-  rightList.appendChild(createButton('timestamps', 'Show Timestamps', onShowTimestamps));
-
-  mainDiv.appendChild(rightList);
-}
-
-window.addEventListener('load', (_: Event) => {
-  setLivePage();
-});
