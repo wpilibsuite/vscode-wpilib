@@ -16,7 +16,7 @@ export interface IJsonList {
   uuid: string;
   description: string;
   website: string;
-  instructions: string;
+  instructions?: string;
 }
 
 export interface IDepInstalled {
@@ -234,7 +234,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
           if (success) {
             if (avail.instructions) {
-              await vscode.commands.executeCommand('simpleBrowser.show', avail.instructions);
+              try {
+                new URL(avail.instructions);
+                await vscode.commands.executeCommand('simpleBrowser.show', avail.instructions);
+              } catch (e) {
+                vscode.window.showErrorMessage(`Could not display website! Invalid URL: "${avail.instructions}"`);
+              }
             }
             this.changed = Date.now();
 
@@ -453,7 +458,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         uuid: i18n('ui', homedep.uuid),
         description: i18n('ui', 'Loaded from Local Copy'),
         website: i18n('ui', 'Loaded from Local Copy'),
-        instructions: i18n('ui', 'Loaded from Local Copy'),
       };
       const found = this.onlineDeps.find(
         (onlinedep) => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version
