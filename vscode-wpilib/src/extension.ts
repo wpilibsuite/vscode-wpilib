@@ -237,11 +237,8 @@ async function handleAfterTrusted(
         );
         const vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
         context.subscriptions.push(vendorDepsWatcher);
-        const localW = w;
 
-        const fireEvent = () => {
-          fireVendorDepsChanged(localW);
-        };
+        const fireEvent = () => fireVendorDepsChanged(w);
 
         vendorDepsWatcher.onDidChange(fireEvent, null, context.subscriptions);
 

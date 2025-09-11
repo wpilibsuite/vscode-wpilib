@@ -60,14 +60,13 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
       for (const w of wp) {
         const prefs = coreExports.getPreferencesAPI().getPreferences(w);
         if (prefs.getIsWPILibProject()) {
-          const localW = w;
-          const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
+          const buildGradle = path.join(w.uri.fsPath, 'build.gradle');
           try {
             await access(buildGradle);
             const buildGradleUri = vscode.Uri.file(buildGradle);
             onVendorDepsChanged(
               async (workspace) => {
-                if (workspace.index === localW.index) {
+                if (workspace.index === w.index) {
                   await vscode.commands.executeCommand(
                     'java.projectConfiguration.update',
                     buildGradleUri
