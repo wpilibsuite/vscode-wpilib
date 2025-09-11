@@ -175,11 +175,9 @@ async function handleAfterTrusted(
     creationError = true;
   }
 
-  let depProvider: DependencyViewProvider | undefined;
-
   try {
     if (projectInfo && vendorLibs) {
-      depProvider = new DependencyViewProvider(
+      const depProvider = new DependencyViewProvider(
         context.extensionUri,
         projectInfo,
         vendorLibs,
@@ -190,29 +188,12 @@ async function handleAfterTrusted(
         vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider)
       );
 
-      if (depProvider !== undefined) {
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.addDependency', () => {
-            depProvider?.addDependency();
-          })
-        );
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.refreshVendordeps', async () => {
-            await depProvider?.refresh();
-          })
-        );
-
-        /*         context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.removeDependency', () => {
-            depProvider?.removeDependency();
-          })) */
-
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.updateDependencies', () => {
-            depProvider?.updateDependencies();
-          })
-        );
-      }
+      context.subscriptions.push(
+        vscode.commands.registerCommand(
+          'wpilib.refreshVendordeps',
+          async () => await depProvider.refresh()
+        )
+      );
 
       context.subscriptions.push(depProvider);
     }
