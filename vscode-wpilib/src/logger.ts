@@ -3,13 +3,6 @@
 import * as path from 'path';
 import * as winston from 'winston';
 
-export interface ILogger {
-  error(message: string, ...meta: unknown[]): void;
-  warn(message: string, ...meta: unknown[]): void;
-  info(message: string, ...meta: unknown[]): void;
-  log(message: string, ...meta: unknown[]): void;
-}
-
 const myFormat = winston.format.printf((info) => {
   return `${info.timestamp} ${info.level}: ${info.message}`;
 });
@@ -44,7 +37,7 @@ export function setLoggerDirectory(dirname: string) {
   );
 }
 
-class LoggerImpl implements ILogger {
+class Logger {
   public error(message: string, ...meta: unknown[]): void {
     winstonLogger.log({ level: 'error', message, meta });
   }
@@ -59,4 +52,4 @@ class LoggerImpl implements ILogger {
   }
 }
 
-export const logger: ILogger = new LoggerImpl();
+export const logger = new Logger();
