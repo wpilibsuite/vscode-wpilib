@@ -40,7 +40,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   private lastBuildTime = 1;
 
   constructor(externalApi: IExternalAPI) {
-    super(externalApi.getUtilitiesAPI());
+    super();
     this.externalApi = externalApi;
 
     this.disposables.push(

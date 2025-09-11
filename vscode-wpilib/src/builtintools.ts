@@ -3,7 +3,8 @@
 import * as cp from 'child_process';
 import { access, readFile } from 'fs/promises';
 import * as path from 'path';
-import { IExternalAPI, IPreferencesAPI, IToolRunner, IUtilitiesAPI } from './api';
+import { IExternalAPI, IPreferencesAPI, IToolRunner } from './api';
+import { getWPILibHomeDir } from './shared/utilitiesapi';
 import { getIsWindows } from './utilities';
 
 interface ITool {
@@ -56,7 +57,7 @@ class VbsToolRunner implements IToolRunner {
 
 export async function registerBuiltinTools(api: IExternalAPI) {
   const toolApi = api.getToolAPI();
-  const homeTools = await enumerateHomeTools(api.getUtilitiesAPI());
+  const homeTools = await enumerateHomeTools();
   const isWindows = getIsWindows();
   for (const ht of homeTools.tools) {
     const toolPath = path.join(homeTools.dir, ht.name + (isWindows ? '.exe' : ''));
@@ -70,8 +71,8 @@ export async function registerBuiltinTools(api: IExternalAPI) {
   }
 }
 
-async function enumerateHomeTools(utilities: IUtilitiesAPI): Promise<IEnumerateResult> {
-  const homeDir = utilities.getWPILibHomeDir();
+async function enumerateHomeTools(): Promise<IEnumerateResult> {
+  const homeDir = getWPILibHomeDir();
   const toolsDir = path.join(homeDir, 'tools');
 
   const toolsJson = path.join(toolsDir, 'tools.json');
