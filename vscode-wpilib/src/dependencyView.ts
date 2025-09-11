@@ -451,12 +451,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public addDependency() {
-    if (this._view) {
-      this._view.webview.postMessage({ type: 'addDependency' });
-    }
-  }
-
   public updateDependencies() {
     this._view?.webview.postMessage({
       type: 'updateDependencies',
@@ -546,7 +540,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async refresh() {
     if (this.wp) {
-      void this._refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
