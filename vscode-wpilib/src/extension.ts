@@ -43,7 +43,7 @@ class ExternalAPI implements IExternalAPI {
   // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
-    const deployDebugApi = await DeployDebugAPI.Create(resourceFolder, preferencesApi);
+    const deployDebugApi = new DeployDebugAPI(resourceFolder, preferencesApi);
     const buildTestApi = new BuildTestAPI(preferencesApi);
     const externalApi = new ExternalAPI(preferencesApi, deployDebugApi, buildTestApi);
     return externalApi;
