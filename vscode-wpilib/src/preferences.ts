@@ -157,19 +157,11 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoStartRioLog(): boolean {
-    const res = this.getConfiguration().get<boolean>('autoStartRioLog');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('autoStartRioLog');
   }
 
   public getAutoSaveOnDeploy(): boolean {
-    const res = this.getConfiguration().get<boolean>('autoSaveOnDeploy');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('autoSaveOnDeploy');
   }
 
   public getAdditionalGradleArguments(): string {
@@ -181,43 +173,23 @@ export class Preferences implements IPreferences {
   }
 
   public getOffline(): boolean {
-    const res = this.getConfiguration().get<boolean>('offline');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('offline');
   }
 
   public getSkipTests(): boolean {
-    const res = this.getConfiguration().get<boolean>('skipTests');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('skipTests');
   }
 
   public getSkipSelectSimulateExtension(): boolean {
-    const res = this.getConfiguration().get<boolean>('skipSelectSimulateExtension');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('skipSelectSimulateExtension');
   }
 
   public getStopSimulationOnEntry(): boolean {
-    const res = this.getConfiguration().get<boolean>('stopSimulationOnEntry');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('stopSimulationOnEntry');
   }
 
   public getDeployOffline(): boolean {
-    const res = this.getConfiguration().get<boolean>('deployOffline');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('deployOffline');
   }
 
   public dispose() {
