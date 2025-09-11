@@ -5,13 +5,13 @@ import { access } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from '../api';
-import { localize as i18n } from '../locale';
-import { Examples } from '../shared/examples';
-import { Templates } from '../shared/templates';
+import { registerExamples } from '../shared/examples';
+import { registerProjectTemplates } from '../shared/templates';
 import { onVendorDepsChanged } from '../vendorlibraries';
-import { BuildTest } from './buildtest';
-import { Commands } from './commands';
-import { DeployDebug } from './deploydebug';
+import { registerCodeBuilderAndTester } from './buildtest';
+import { registerCommandTemplates } from './commands';
+import { registerCodeDeployerAndDebugger } from './deploydebug';
+import { localize as i18n } from '../locale';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -34,24 +34,17 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   }
 
   // Setup build and test
-
-  const buildTest = new BuildTest(coreExports);
-
-  context.subscriptions.push(buildTest);
+  registerCodeBuilderAndTester(coreExports);
 
   // Setup debug and deploy
-  const deployDebug = new DeployDebug(coreExports, allowDebug);
-  context.subscriptions.push(deployDebug);
+  registerCodeDeployerAndDebugger(coreExports, allowDebug);
 
   // Setup commands
-  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
-  context.subscriptions.push(commands);
+  registerCommandTemplates(extensionResourceLocation, commandApi, preferences);
 
   // Setup examples and template
-  const examples: Examples = new Examples(extensionResourceLocation, true, exampleTemplate);
-  context.subscriptions.push(examples);
-  const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
-  context.subscriptions.push(templates);
+  registerExamples(extensionResourceLocation, true, exampleTemplate);
+  registerProjectTemplates(extensionResourceLocation, true, exampleTemplate);
 
   if (vscode.extensions.getExtension('redhat.java')) {
     // Add handlers for each workspace if java is installed

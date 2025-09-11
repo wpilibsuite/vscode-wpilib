@@ -19,22 +19,25 @@ export interface ITemplateJsonLayout {
   hasunittests?: boolean;
 }
 
-export class Templates {
-  private readonly exampleResourceName = 'templates.json';
+const exampleResourceName = 'templates.json';
 
-  constructor(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
-    const templatesFolder = path.join(resourceRoot, 'src', 'templates');
-    const templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
-    const resourceFile = path.join(templatesFolder, this.exampleResourceName);
-    const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
-    fs.readFile(resourceFile, 'utf8', (err, data) => {
-      if (err) {
-        logger.log('Template error: ', err);
-        return;
-      }
-      const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
-      for (const e of templates) {
-        const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
+export function registerProjectTemplates(
+  resourceRoot: string,
+  java: boolean,
+  core: IExampleTemplateAPI
+) {
+  const templatesFolder = path.join(resourceRoot, 'src', 'templates');
+  const templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
+  const resourceFile = path.join(templatesFolder, exampleResourceName);
+  const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
+  fs.readFile(resourceFile, 'utf8', (err, data) => {
+    if (err) {
+      logger.log('Template error: ', err);
+      return;
+    }
+    const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
+    for (const e of templates) {
+      const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
         const commandVersion: string =
           e.commandversion !== undefined ? e.commandversion.toString() : '2';
         if (commandVersion === '3') {
@@ -42,70 +45,67 @@ export class Templates {
         } else {
           vendordeps.push('commandsv2');
         }
-        const provider: IExampleTemplateCreator = {
-          getLanguage(): string {
-            return java ? 'java' : 'cpp';
-          },
-          getDescription(): string {
-            return e.description;
-          },
-          getDisplayName(): string {
-            return e.name;
-          },
-          async generate(folderInto: vscode.Uri): Promise<boolean> {
-            try {
-              let testFolder;
-              if (e.hasunittests) {
-                testFolder = path.join(templatesTestFolder, e.foldername);
-              }
-              if (java) {
-                if (
-                  !(await generateCopyJava(
-                    resourceRoot,
-                    path.join(templatesFolder, e.foldername),
-                    testFolder,
-                    path.join(gradleBasePath, e.gradlebase),
-                    folderInto.fsPath,
-                    'frc.robot.Main',
-                    path.join('frc', 'robot'),
-                    false,
-                    vendordeps
-                  ))
-                ) {
-                  vscode.window.showErrorMessage(
-                    i18n('message', 'Cannot create into non empty folder')
-                  );
-                  return false;
-                }
-              } else {
-                if (
-                  !(await generateCopyCpp(
-                    resourceRoot,
-                    path.join(templatesFolder, e.foldername),
-                    testFolder,
-                    path.join(gradleBasePath, e.gradlebase),
-                    folderInto.fsPath,
-                    false,
-                    vendordeps
-                  ))
-                ) {
-                  vscode.window.showErrorMessage(
-                    i18n('message', 'Cannot create into non empty folder')
-                  );
-                  return false;
-                }
-              }
-            } catch (err) {
-              logger.error('template creation error', err);
-              return false;
+      const provider: IExampleTemplateCreator = {
+        getLanguage(): string {
+          return java ? 'java' : 'cpp';
+        },
+        getDescription(): string {
+          return e.description;
+        },
+        getDisplayName(): string {
+          return e.name;
+        },
+        async generate(folderInto: vscode.Uri): Promise<boolean> {
+          try {
+            let testFolder;
+            if (e.hasunittests) {
+              testFolder = path.join(templatesTestFolder, e.foldername);
             }
-            return true;
-          },
-        };
-        core.addTemplateProvider(provider);
-      }
-    });
-  }
-
-  public dispose() {}
+            if (java) {
+              if (
+                !(await generateCopyJava(
+                  resourceRoot,
+                  path.join(templatesFolder, e.foldername),
+                  testFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
+                  'frc.robot.Main',
+                  path.join('frc', 'robot'),
+                  false,
+                  vendordeps
+                ))
+              ) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            } else {
+              if (
+                !(await generateCopyCpp(
+                  resourceRoot,
+                  path.join(templatesFolder, e.foldername),
+                  testFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
+                  false,
+                  vendordeps
+                ))
+              ) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            }
+          } catch (err) {
+            logger.error('template creation error', err);
+            return false;
+          }
+          return true;
+        },
+      };
+      core.addTemplateProvider(provider);
+    }
+  });
 }

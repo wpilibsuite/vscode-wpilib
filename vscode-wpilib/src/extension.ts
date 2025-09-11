@@ -11,7 +11,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
-import { BuiltinTools } from './builtintools';
+import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
@@ -131,9 +131,9 @@ async function handleAfterTrusted(
 
   try {
     // Add built in tools
-    context.subscriptions.push(await BuiltinTools.Create(externalApi));
+    await registerBuiltinTools(externalApi);
   } catch (err) {
-    logger.error('error creating built in tool handler', err);
+    logger.error('error registering built in tool handler', err);
     creationError = true;
   }
 
