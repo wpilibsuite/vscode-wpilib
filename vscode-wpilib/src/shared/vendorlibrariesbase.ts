@@ -2,8 +2,8 @@
 
 import { access, mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises';
 import * as path from 'path';
-import { IUtilitiesAPI } from '../api';
 import { logger } from '../logger';
+import { getWPILibHomeDir } from './utilitiesapi';
 
 export interface IJsonDependency {
   name: string;
@@ -40,12 +40,6 @@ export function isJsonDependency(arg: unknown): arg is IJsonDependency {
 }
 
 export class VendorLibrariesBase {
-  private utilities: IUtilitiesAPI;
-
-  public constructor(utilities: IUtilitiesAPI) {
-    this.utilities = utilities;
-  }
-
   public async findForUUIDs(uuid: string[]): Promise<IJsonDependency[]> {
     const homeDirDeps = await this.getHomeDirDeps();
     const foundDeps = homeDirDeps.filter((value) => {
@@ -92,7 +86,7 @@ export class VendorLibrariesBase {
   }
 
   public getHomeDirDeps(): Promise<IJsonDependency[]> {
-    return this.getDependencies(path.join(this.utilities.getWPILibHomeDir(), 'vendordeps'));
+    return this.getDependencies(path.join(getWPILibHomeDir(), 'vendordeps'));
   }
 
   protected async readFile(file: string): Promise<IJsonDependency | undefined> {

@@ -11,7 +11,8 @@ import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
 import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
-import { WPILibUpdates } from './wpilibupdates';
+import { getWPILibHomeDir } from './shared/utilitiesapi';
+import { getUpdatePersistentState } from './wpilibupdates';
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command
@@ -307,7 +308,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         );
         return;
       }
-      const persistState = WPILibUpdates.getUpdatePersistentState(workspace);
+      const persistState = getUpdatePersistentState(workspace);
       persistState.Value = false;
     })
   );
@@ -366,7 +367,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const pick = await vscode.window.showQuickPick(['Java', 'C++'], {
         placeHolder: i18n('ui', 'Pick a language'),
       });
-      const homeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+      const homeDir = getWPILibHomeDir();
       if (pick === 'Java') {
         const indexFile = path.join(homeDir, 'documentation', 'java', 'index.html');
         try {

@@ -9,277 +9,216 @@ import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
 import { isNewerVersion } from './versions';
+import { getFrcYear, getWPILibHomeDir } from './shared/utilitiesapi';
 
-function getGradleRioRegex() {
-  return /(id\s*?["|']edu\.wpi\.first\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
-}
+const gradleRioRegex = /id\s*?["|']edu\.wpi\.first\.GradleRIO["|'].*?version\s*?["|'](.+?)["|']/g;
 
 interface IOnlineTuple {
   online: boolean;
   newVersion?: string;
 }
 
-export class WPILibUpdates {
-  public static getUpdatePersistentState(
-    workspace: vscode.WorkspaceFolder
-  ): PersistentFolderState<boolean> {
-    return new PersistentFolderState('wpilib.projectUpdate', false, workspace.uri.fsPath);
-  }
+export function getUpdatePersistentState(
+  workspace: vscode.WorkspaceFolder
+): PersistentFolderState<boolean> {
+  return new PersistentFolderState('wpilib.projectUpdate', false, workspace.uri.fsPath);
+}
 
-  private externalApi: IExternalAPI;
-  private disposables: vscode.Disposable[] = [];
-
-  constructor(externalApi: IExternalAPI) {
-    this.externalApi = externalApi;
-
-    this.disposables.push(
-      vscode.commands.registerCommand(
-        'wpilibcore.checkForUpdates',
-        async () => {
-          if (!(await this.checkForUpdates())) {
-            logger.log('no update installed');
-          }
-        },
-        this
-      )
-    );
-  }
-
-  public async checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<boolean> {
-    const grVersion = await this.getGradleRIOVersion(wp);
-    if (grVersion === undefined) {
-      return false;
-    }
-    const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
-    const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
-    if (newVersion && !persistentState.Value) {
-      const result = await vscode.window.showInformationMessage(
-        i18n(
-          'message',
-          `This project is currently using WPILib version ({1}). Would you like to update the project ` +
-            `to WPILib version {0}?`,
-          newVersion,
-          grVersion
-        ),
-        {
-          modal: true,
-        },
-        i18n('ui', 'Yes'),
-        i18n('ui', 'No'),
-        i18n('ui', "No, Don't ask again")
-      );
-      if (result === i18n('ui', 'Yes')) {
-        await this.setGradleRIOVersion(newVersion, wp);
-        return true;
-      } else if (result === i18n('ui', "No, Don't ask again")) {
-        persistentState.Value = true;
-      }
-    }
+export async function checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<boolean> {
+  const grVersion = await getGradleRIOVersion(wp);
+  if (grVersion === undefined) {
     return false;
   }
-
-  public async checkForUpdates(): Promise<boolean> {
-    const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
-      logger.warn('no workspace');
-      return false;
-    }
-    const grVersion = await this.getGradleRIOVersion(wp);
-    if (grVersion === undefined) {
-      return false;
-    }
-    const newVersion = await this.checkForGradleRIOUpdate(grVersion);
-    if (newVersion === undefined || newVersion.newVersion === undefined) {
-      logger.log('no update found');
-      vscode.window.showInformationMessage(i18n('message', 'No WPILib Update Found'));
-      return false;
-    } else {
-      const result = await vscode.window.showInformationMessage(
-        i18n(
-          'message',
-          `This project is currently using WPILib version ({1}). Would you like to update the project ` +
-            `to WPILib version {0}?`,
-          newVersion.newVersion,
-          grVersion
-        ),
-        {
-          modal: true,
-        },
-        i18n('ui', 'Yes'),
-        i18n('ui', 'No')
-      );
-      if (result === i18n('ui', 'Yes')) {
-        await this.setGradleRIOVersion(newVersion.newVersion, wp);
-        if (newVersion.online) {
-          const buildRes = await vscode.window.showInformationMessage(
-            i18n(
-              'message',
-              'It is recommended to run a "Build" and update tools after a ' +
-                'WPILib update to ensure dependencies are installed correctly. Would you like to do this now?'
-            ),
-            {
-              modal: true,
-            },
-            i18n('ui', 'Yes'),
-            i18n('ui', 'Yes (Build Only)'),
-            i18n('ui', 'No')
-          );
-          if (buildRes === i18n('ui', 'Yes')) {
-            await this.externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
-          } else if (buildRes === i18n('ui', 'Yes (Build Only)')) {
-            await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
-          }
-        } else {
-          const buildRes = await vscode.window.showInformationMessage(
-            i18n(
-              'message',
-              'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
-                'Would you like to do this now?'
-            ),
-            {
-              modal: true,
-            },
-            { title: i18n('ui', 'Yes') },
-            { title: i18n('ui', 'No'), isCloseAffordance: true }
-          );
-          if (buildRes?.title !== i18n('ui', 'Yes')) {
-            await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
-          }
-        }
-      }
-    }
-
-    return true;
-  }
-
-  public dispose() {
-    for (const d of this.disposables) {
-      d.dispose();
-    }
-  }
-
-  public async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
-    try {
-      const gradleBuildFile = await readFile(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
-      const matchRes = getGradleRioRegex().exec(gradleBuildFile);
-
-      if (matchRes === null) {
-        logger.warn('matching error');
-        return undefined;
-      }
-
-      if (matchRes.length !== 4) {
-        logger.warn('matching length not correct');
-        return undefined;
-      }
-
-      logger.log('Local GradleRIO Version ' + matchRes[2]);
-
-      return matchRes[2];
-    } catch (err) {
-      logger.warn('local gradlerio version exception', err);
-      return undefined;
-    }
-  }
-
-  public async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
-    try {
-      const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
-      const gradleBuildFile = await readFile(buildFile, 'utf8');
-
-      const newgFile = gradleBuildFile.replace(getGradleRioRegex(), `$1${version}$3`);
-
-      await writeFile(buildFile, newgFile);
-    } catch (err) {
-      logger.error('error setting wpilib (gradlerio) version', err);
-      return;
-    }
-  }
-
-  private async checkForGradleRIOUpdate(currentVersion: string): Promise<IOnlineTuple | undefined> {
-    const qResult = await vscode.window.showInformationMessage(
-      i18n('message', 'Check offline or online?'),
-      { modal: true },
-      i18n('ui', 'Online'),
-      i18n('ui', 'Offline')
+  const newVersion = await checkForLocalGradleRIOUpdate(grVersion);
+  const persistentState = getUpdatePersistentState(wp);
+  if (newVersion && !persistentState.Value) {
+    const result = await vscode.window.showInformationMessage(
+      i18n(
+        'message',
+        `This project is currently using WPILib version ({1}). Would you like to update the project ` +
+          `to WPILib version {0}?`,
+        newVersion,
+        grVersion
+      ),
+      {
+        modal: true,
+      },
+      i18n('ui', 'Yes'),
+      i18n('ui', 'No'),
+      i18n('ui', "No, Don't ask again")
     );
-    if (qResult === undefined) {
-      return undefined;
-    } else if (qResult === i18n('ui', 'Online')) {
-      return {
-        newVersion: await this.checkForRemoteGradleRIOUpdate(currentVersion),
-        online: true,
-      };
-    } else {
-      return {
-        newVersion: await this.checkForLocalGradleRIOUpdate(currentVersion),
-        online: false,
-      };
+    if (result === i18n('ui', 'Yes')) {
+      await setGradleRIOVersion(newVersion, wp);
+      return true;
+    } else if (result === i18n('ui', "No, Don't ask again")) {
+      persistentState.Value = true;
     }
   }
+  return false;
+}
 
-  private async checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-    const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
-    try {
-      const response = await fetch(metaDataUrl, {
-        signal: AbortSignal.timeout(5000),
-      });
-      if (response === undefined) {
-        logger.warn('failed to fetch URL: ' + metaDataUrl);
-        return undefined;
-      }
-      if (response.ok) {
-        const text = await response.text();
-        const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
-          .version;
-        if (versions === undefined) {
-          logger.warn('parse failure');
-          return undefined;
+export async function checkForUpdates(externalApi: IExternalAPI): Promise<boolean> {
+  const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
+  if (wp === undefined) {
+    logger.warn('no workspace');
+    return false;
+  }
+  const grVersion = await getGradleRIOVersion(wp);
+  if (grVersion === undefined) {
+    return false;
+  }
+  const newVersion = await checkForGradleRIOUpdate(grVersion);
+  if (newVersion === undefined || newVersion.newVersion === undefined) {
+    logger.log('no update found');
+    vscode.window.showInformationMessage(i18n('message', 'No WPILib Update Found'));
+    return false;
+  } else {
+    const result = await vscode.window.showInformationMessage(
+      i18n(
+        'message',
+        `This project is currently using WPILib version ({1}). Would you like to update the project ` +
+          `to WPILib version {0}?`,
+        newVersion.newVersion,
+        grVersion
+      ),
+      {
+        modal: true,
+      },
+      i18n('ui', 'Yes'),
+      i18n('ui', 'No')
+    );
+    if (result === i18n('ui', 'Yes')) {
+      await setGradleRIOVersion(newVersion.newVersion, wp);
+      if (newVersion.online) {
+        const buildRes = await vscode.window.showInformationMessage(
+          i18n(
+            'message',
+            'It is recommended to run a "Build" and update tools after a ' +
+              'WPILib update to ensure dependencies are installed correctly. Would you like to do this now?'
+          ),
+          {
+            modal: true,
+          },
+          i18n('ui', 'Yes'),
+          i18n('ui', 'Yes (Build Only)'),
+          i18n('ui', 'No')
+        );
+        if (buildRes === i18n('ui', 'Yes')) {
+          await externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
+        } else if (buildRes === i18n('ui', 'Yes (Build Only)')) {
+          await externalApi.getBuildTestAPI().buildCode(wp, undefined);
         }
-        if (versions.length === 0) {
-          return undefined;
-        }
-        let newestVersion = '0';
-        const wpilibYear = this.externalApi.getUtilitiesAPI().getWPILibYear();
-        for (const v of versions) {
-          if (v.startsWith(wpilibYear) && isNewerVersion(v, newestVersion)) {
-            newestVersion = v;
-          }
-        }
-        if (isNewerVersion(newestVersion, currentVersion)) {
-          return newestVersion;
-        }
-        return undefined;
       } else {
-        logger.warn('bad status: ' + response.status.toString());
-        return undefined;
+        const buildRes = await vscode.window.showInformationMessage(
+          i18n(
+            'message',
+            'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
+              'Would you like to do this now?'
+          ),
+          {
+            modal: true,
+          },
+          { title: i18n('ui', 'Yes') },
+          { title: i18n('ui', 'No'), isCloseAffordance: true }
+        );
+        if (buildRes?.title !== i18n('ui', 'Yes')) {
+          await externalApi.getBuildTestAPI().buildCode(wp, undefined);
+        }
       }
-    } catch (err) {
-      logger.warn('remote gradlerio exception', err);
-      return undefined;
     }
   }
 
-  private async checkForLocalGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-    const wpilibHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
-    const gradleRioPath = path.join(wpilibHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
-    try {
-      const files = await readdir(gradleRioPath);
-      const versions = [];
-      for (const file of files) {
-        try {
-          await access(path.join(gradleRioPath, file, `GradleRIO-${file}.pom`));
-          versions.push(file);
-        } catch {
-          // Ignore
-        }
+  return true;
+}
+
+export async function getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
+  try {
+    const gradleBuildFile = await readFile(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
+    const matchRes = gradleRioRegex.exec(gradleBuildFile);
+
+    if (matchRes === null) {
+      logger.warn('matching error');
+      return undefined;
+    }
+
+    if (matchRes.length !== 4) {
+      logger.warn('matching length not correct');
+      return undefined;
+    }
+
+    logger.log('Local GradleRIO Version ' + matchRes[2]);
+
+    return matchRes[2];
+  } catch (err) {
+    logger.warn('local gradlerio version exception', err);
+    return undefined;
+  }
+}
+
+export async function setGradleRIOVersion(
+  version: string,
+  wp: vscode.WorkspaceFolder
+): Promise<void> {
+  try {
+    const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
+    const gradleBuildFile = await readFile(buildFile, 'utf8');
+
+    const newgFile = gradleBuildFile.replace(gradleRioRegex, `$1${version}$3`);
+
+    await writeFile(buildFile, newgFile);
+  } catch (err) {
+    logger.error('error setting wpilib (gradlerio) version', err);
+    return;
+  }
+}
+
+async function checkForGradleRIOUpdate(currentVersion: string): Promise<IOnlineTuple | undefined> {
+  const qResult = await vscode.window.showInformationMessage(
+    i18n('message', 'Check offline or online?'),
+    { modal: true },
+    i18n('ui', 'Online'),
+    i18n('ui', 'Offline')
+  );
+  if (qResult === undefined) {
+    return undefined;
+  } else if (qResult === i18n('ui', 'Online')) {
+    return {
+      newVersion: await checkForRemoteGradleRIOUpdate(currentVersion),
+      online: true,
+    };
+  } else {
+    return {
+      newVersion: await checkForLocalGradleRIOUpdate(currentVersion),
+      online: false,
+    };
+  }
+}
+
+async function checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
+  const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
+  try {
+    const response = await fetch(metaDataUrl, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (response === undefined) {
+      logger.warn('failed to fetch URL: ' + metaDataUrl);
+      return undefined;
+    }
+    if (response.ok) {
+      const text = await response.text();
+      const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
+        .version;
+      if (versions === undefined) {
+        logger.warn('parse failure');
+        return undefined;
       }
       if (versions.length === 0) {
         return undefined;
       }
-      let newestVersion = versions[0];
+      let newestVersion = '0';
+      const wpilibYear = getWPILibYear();
       for (const v of versions) {
-        if (isNewerVersion(v, newestVersion)) {
+        if (v.startsWith(wpilibYear) && isNewerVersion(v, newestVersion)) {
           newestVersion = v;
         }
       }
@@ -287,9 +226,45 @@ export class WPILibUpdates {
         return newestVersion;
       }
       return undefined;
-    } catch (err) {
-      logger.warn('local gradlerio exception', err);
+    } else {
+      logger.warn('bad status: ' + response.status.toString());
       return undefined;
     }
+  } catch (err) {
+    logger.warn('remote gradlerio exception', err);
+    return undefined;
+  }
+}
+
+async function checkForLocalGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
+  const wpilibHome = getWPILibHomeDir();
+  const gradleRioPath = path.join(wpilibHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
+  try {
+    const files = await readdir(gradleRioPath);
+    const versions = [];
+    for (const file of files) {
+      try {
+        await access(path.join(gradleRioPath, file, `GradleRIO-${file}.pom`));
+        versions.push(file);
+      } catch {
+        // Ignore
+      }
+    }
+    if (versions.length === 0) {
+      return undefined;
+    }
+    let newestVersion = versions[0];
+    for (const v of versions) {
+      if (isNewerVersion(v, newestVersion)) {
+        newestVersion = v;
+      }
+    }
+    if (isNewerVersion(newestVersion, currentVersion)) {
+      return newestVersion;
+    }
+    return undefined;
+  } catch (err) {
+    logger.warn('local gradlerio exception', err);
+    return undefined;
   }
 }

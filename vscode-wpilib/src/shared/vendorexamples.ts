@@ -4,11 +4,12 @@ import { readdir, readFile, stat } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../api';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { extensionContext } from '../utilities';
 import { generateCopyCpp, generateCopyJava } from './generator';
+import { getWPILibHomeDir } from './utilitiesapi';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
 
 interface IJsonExample {
@@ -41,7 +42,6 @@ function isJsonExample(arg: unknown): arg is IJsonExample {
 export async function addVendorExamples(
   resourceRoot: string,
   core: IExampleTemplateAPI,
-  utilities: IUtilitiesAPI,
   vendorlibs: VendorLibrariesBase
 ): Promise<void> {
   const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
@@ -50,7 +50,7 @@ export async function addVendorExamples(
     return;
   }
 
-  const exampleDir = path.join(utilities.getWPILibHomeDir(), 'vendorexamples');
+  const exampleDir = path.join(getWPILibHomeDir(), 'vendorexamples');
   const gradleBasePath = path.join(resourceRoot, 'gradle');
 
   try {
