@@ -1,10 +1,10 @@
-'use scrict';
+'use strict';
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { logger } from './logger';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
+import { logger } from './logger';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
 import { deleteFileAsync, readdirAsync } from './utilities';
 import { isNewerVersion } from './versions';

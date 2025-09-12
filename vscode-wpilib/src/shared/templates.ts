@@ -2,10 +2,10 @@
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
-import { localize as i18n } from '../locale';
+import * as vscode from 'vscode';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { logger } from '../logger';
-import * as vscode from '../vscodeshim';
-import { IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
+import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava } from './generator';
 
 export interface ITemplateJsonLayout {

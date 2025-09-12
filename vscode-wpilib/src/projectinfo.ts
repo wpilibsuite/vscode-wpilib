@@ -3,7 +3,7 @@
 import * as json from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { logger } from './logger';
 import { extensionContext, readFileAsync } from './utilities';
 import { VendorLibraries } from './vendorlibraries';

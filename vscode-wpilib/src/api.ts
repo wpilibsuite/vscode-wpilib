@@ -1,5 +1,5 @@
-"use strict";
-import * as vscode from "vscode";
+'use strict';
+import * as vscode from 'vscode';
 
 export interface IPreferencesChangedPair {
   workspace: vscode.WorkspaceFolder;
@@ -21,7 +21,7 @@ export interface IExecuteAPI {
     name: string,
     rootDir: string,
     workspace: vscode.WorkspaceFolder,
-    env?: { [key: string]: string },
+    env?: { [key: string]: string }
   ): Promise<number>;
   cancelCommands(): Promise<number>;
 }
@@ -38,16 +38,13 @@ export interface IExampleTemplateAPI {
     toFolder: string,
     newFolder: boolean,
     projectName: string,
-    teamNumber: number,
+    teamNumber: number
   ): Promise<boolean>;
 }
 
 export interface ICommandAPI {
   addCommandProvider(provider: ICommandCreator): void;
-  createCommand(
-    workspace: vscode.WorkspaceFolder,
-    folder: vscode.Uri,
-  ): Promise<boolean>;
+  createCommand(workspace: vscode.WorkspaceFolder, folder: vscode.Uri): Promise<boolean>;
 }
 
 export interface IDeployDebugAPI {
@@ -131,20 +128,14 @@ export interface IPreferences {
   getStopSimulationOnEntry(): boolean;
   getAdditionalGradleArguments(): string;
   setSkipTests(value: boolean, global: boolean): Promise<void>;
-  setSelectDefaultSimulateExtension(
-    value: boolean,
-    global: boolean,
-  ): Promise<void>;
+  setSelectDefaultSimulateExtension(value: boolean, global: boolean): Promise<void>;
   setStopSimulationOnEntry(value: boolean, global: boolean): Promise<void>;
   getOffline(): boolean;
   setOffline(value: boolean, global: boolean): Promise<void>;
   getDeployOffline(): boolean;
   setDeployOffline(value: boolean, global: boolean): Promise<void>;
   getSkipSelectSimulateExtension(): boolean;
-  setSkipSelectSimulateExtension(
-    value: boolean,
-    global: boolean,
-  ): Promise<void>;
+  setSkipSelectSimulateExtension(value: boolean, global: boolean): Promise<void>;
 }
 
 export interface IExampleTemplateCreator {
@@ -159,10 +150,7 @@ export interface ICommandCreator {
   getDisplayName(): string;
   getDescription(): string;
   getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
-  generate(
-    folder: vscode.Uri,
-    workspace: vscode.WorkspaceFolder,
-  ): Promise<boolean>;
+  generate(folder: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<boolean>;
 }
 
 export interface IToolRunner {
@@ -227,8 +215,9 @@ export interface ICodeBuilder {
 }
 
 export async function getWPILibApi(): Promise<IExternalAPI | undefined> {
-  const wpilib: vscode.Extension<IExternalAPI> | undefined =
-    vscode.extensions.getExtension("wpilibsuite.vscode-wpilib");
+  const wpilib: vscode.Extension<IExternalAPI> | undefined = vscode.extensions.getExtension(
+    'wpilibsuite.vscode-wpilib'
+  );
   let extension: IExternalAPI | undefined;
 
   if (wpilib) {
