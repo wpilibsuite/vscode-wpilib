@@ -1,6 +1,6 @@
 'use strict';
 
-import * as extract from 'extract-zip';
+import extract from 'extract-zip';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { downloadFileToStream } from './fetchhelpers';
