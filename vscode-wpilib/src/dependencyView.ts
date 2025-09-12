@@ -238,7 +238,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 new URL(avail.instructions);
                 await vscode.commands.executeCommand('simpleBrowser.show', avail.instructions);
               } catch (e) {
-                vscode.window.showErrorMessage(`Could not display website! Invalid URL: "${avail.instructions}"`);
+                vscode.window.showErrorMessage(
+                  `Could not display website! Invalid URL: "${avail.instructions}"`
+                );
               }
             }
             this.changed = Date.now();
