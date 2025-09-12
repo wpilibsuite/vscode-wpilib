@@ -30,6 +30,8 @@ export interface IJSMessage {
   url?: string;
 }
 
+const sort = (a: { name: string }, b: { name: string }) => Intl.Collator().compare(a.name, b.name);
+
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
   private projectInfo: ProjectInfoGatherer;
@@ -560,39 +562,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private sortInstalled() {
-    this.installedList.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.installedList.sort(sort);
   }
 
   private sortInstalledDeps() {
-    this.installedDeps.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.installedDeps.sort(sort);
   }
 
   private sortAvailable() {
-    this.availableDepsList.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.availableDepsList.sort(sort);
   }
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
