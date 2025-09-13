@@ -26,15 +26,6 @@
         "onCommand:wpilibcore.simulateCode",
         "onCommand:wpilibcore.simulateHwCode",
         "onCommand:wpilibcore.setLanguage",
-        "onCommand:wpilibcore.setAutoSave",
-        "onCommand:wpilibcore.setSkipTests",
-        "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
-        "onCommand:wpilibcore.setSkipSelectSimulateExtension",
-        "onCommand:wpilibcore.setOffline",
-        "onCommand:wpilibcore.setStopSimulationOnEntry",
-        "onCommand:wpilibcore.setUseWinDbgX",
-        "onCommand:wpilibcore.setStartRioLog",
-        "onCommand:wpilibcore.setDeployOffline",
         "onCommand:wpilibcore.createCommand",
         "onCommand:wpilibcore.cancelTasks",
         "onCommand:wpilibcore.help",
@@ -238,60 +229,6 @@
             {
                 "command": "wpilibcore.setLanguage",
                 "title": "%wpilibcore.setLanguage.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setAutoSave",
-                "title": "%wpilibcore.setAutoSave.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSkipTests",
-                "title": "%wpilibcore.setSkipTests.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSelectDefaultSimulateExtension",
-                "title": "%wpilibcore.setSelectDefaultSimulateExtension.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSkipSelectSimulateExtension",
-                "title": "%wpilibcore.setSkipSelectSimulateExtension.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setOffline",
-                "title": "%wpilibcore.setOffline.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setStopSimulationOnEntry",
-                "title": "%wpilibcore.setStopSimulationOnEntry.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setUseWinDbgX",
-                "title": "%wpilibcore.setUseWinDbgX.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setStartRioLog",
-                "title": "%wpilibcore.setStartRioLog.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setDeployOffline",
-                "title": "%wpilibcore.setDeployOffline.title%",
                 "category": "WPILib",
                 "enablement": "isWorkspaceTrusted"
             },

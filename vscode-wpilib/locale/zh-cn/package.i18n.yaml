@@ -8,13 +8,6 @@ wpilibcore.debugCode.title: 调试机器人代码
 wpilibcore.simulateCode.title: 在电脑上模拟运行机器人代码
 wpilibcore.simulateHwCode.title: Hardware Sim Robot Code
 wpilibcore.setLanguage.title: 设置语言
-wpilibcore.setAutoSave.title: 设置部署时自动保存
-wpilibcore.setSkipTests.title: 设置是否跳过测试API
-wpilibcore.setSkipSelectSimulateExtension.title: Change Skip Selection of Simulation Extensions Setting
-wpilibcore.setSelectDefaultSimulateExtension.title: Change Default Selection of Simulation Extensions Setting
-wpilibcore.setStopSimulationOnEntry.title: 设置是否在进入时停止模拟运行
-wpilibcore.setUseWinDbgX.title: Change Use WinDbg Preview (From Store) as Windows Debugger Setting
-wpilibcore.setStartRioLog.title: 设置是否在部署时启动 RioLog
 wpilibcore.createCommand.title: 创建一个新的类/命令
 wpilibcore.cancelTasks.title: 取消正在运行的任务
 wpilibcore.help.title: 打开 WPILib 帮助
@@ -31,8 +24,6 @@ wpilibcore.showLogFolder.title: 显示目录文件夹
 wpilibcore.resetAutoUpdate.title: 重制自动检查 WPILib 更新设置
 wpilibcore.runGradleCommand.title: 在 Gradle 中执行命令
 wpilibcore.changeDesktop.title: 设置桌面支持属性
-wpilibcore.setDeployOffline.title: 在离线模式中 更改 部署/调试命令 设置
-wpilibcore.setOffline.title: 在离线模式中 更改 部署/调试命令 外的设置
 wpilibcore.selectCppBinaryTypes.title: 选择 C++ Intellisense Binary Types
 wpilibcore.openApiDocumentation.title: 打开 API 文档
 wpilibcore.getProjectInformation.title: 显示项目信息

@@ -18,17 +18,11 @@ No dependencies installed: 没有安装任何依赖
 # Check offline or online?
 # Cannot deploy code in an empty workspace
 # Cannot debug code in an empty workspace
-# Cannot simulate number in an empty workspace
+# Cannot simulate code in an empty workspace
 # Cannot start tests in an empty workspace
 # Cannot create command in an empty workspace
 # Cannot set team number in an empty workspace
 # Cannot set language in an empty workspace
-# Cannot set skip tests in an empty workspace
-# Cannot set offline in an empty workspace
-# Cannot set deploy offline in an empty workspace
-# Cannot set stop simulation in an empty workspace
-# Cannot set auto save in an empty workspace
-# Cannot set team number in an empty workspace
 # Cannot run command on empty workspace
 # Cannot reset auto update with an empty workspace
 # Cannot install gradle tools with an empty workspace
@@ -36,13 +30,6 @@ No dependencies installed: 没有安装任何依赖
 # Cannot create into non empty folder
 # Must select a folder to create a command
 # No languages available to set
-# Skip tests on deploy? Currently {0}
-# Run commands other then deploy in offline mode? Currently {0}
-# Run deploy command in offline mode? Currently {0}
-# Stop simulation debugging on entry? Currently {0}
-Automatically save on deploy? Currently {0}: 部署时自动保存吗？当前为 {0}
-# Cannot set start RioLog in an empty workspace
-# Automatically start RioLog on deploy? Currently {0}
 # Successfully set java.home
 # Enable Desktop Support for Project? Currently ${isEnabled}
 # Invalid project format to add or remove desktop support.
