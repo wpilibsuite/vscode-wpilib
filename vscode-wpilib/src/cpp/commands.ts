@@ -1,11 +1,13 @@
 'use strict';
 import * as fs from 'fs';
+import { copyFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
-import { getClassName, ncpAsync } from '../utilities';
+import { getClassName } from '../utilities';
+import * as fileUtils from '../shared/fileUtils';
 
 export interface ICppJsonLayout {
   name: string;
@@ -25,158 +27,38 @@ async function performCopy(
   includeRoot: vscode.Uri,
   replaceName: string
 ): Promise<boolean> {
-  const commandFolder = path.join(commandRoot, command.foldername);
-  const copiedSrcFiles: string[] = [];
-  const copiedHeaderFiles: string[] = [];
-  await ncpAsync(commandFolder, folderSrc.fsPath, {
-    filter: (cf: string): boolean => {
-      if (!fs.lstatSync(cf).isFile()) {
-        return true;
-      }
-      const bn = path.basename(cf);
-      if (command.source.indexOf(bn) > -1) {
-        copiedSrcFiles.push(path.relative(commandFolder, cf));
-        return true;
-      } else {
-        return false;
-      }
-    },
-  });
+  try {
+    const commandFolder = path.join(commandRoot, command.foldername);
 
-  await ncpAsync(commandFolder, folderHeader.fsPath, {
-    filter: (cf: string): boolean => {
-      if (!fs.lstatSync(cf).isFile()) {
-        return true;
-      }
-      const bn = path.basename(cf);
-      if (command.headers.indexOf(bn) > -1) {
-        copiedHeaderFiles.push(path.relative(commandFolder, cf));
-        return true;
-      } else {
-        return false;
-      }
-    },
-  });
+    const renamedHeader = path.join(folderHeader.fsPath, `${replaceName}.h`);
+    const renamedSource = path.join(folderSrc.fsPath, `${replaceName}.cpp`);
+    // The source and header arrays are always one item long
+    await copyFile(path.join(commandFolder, command.headers[0]), renamedHeader);
+    await copyFile(path.join(commandFolder, command.source[0]), renamedSource);
 
-  let promiseArray: Promise<void>[] = [];
+    // Process header files
+    const headerReplacements = new Map<RegExp, string>();
+    headerReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
 
-  for (const f of copiedHeaderFiles) {
-    const file = path.join(folderHeader.fsPath, f);
-    promiseArray.push(
-      new Promise<void>((resolve, reject) => {
-        fs.readFile(file, 'utf8', (err, dataIn) => {
-          if (err) {
-            reject(err);
-          } else {
-            const dataOut = dataIn.replace(new RegExp(command.replacename, 'g'), replaceName);
-            fs.writeFile(file, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      })
+    await fileUtils.processFile(renamedHeader, headerReplacements);
+    // Process source files with more complex replacements
+    const sourceReplacements = new Map<RegExp, string>();
+    const joinedName = path
+      .join(path.relative(includeRoot.path, folderHeader.path), replaceName)
+      .replace(/\\/g, '/');
+
+    sourceReplacements.set(
+      new RegExp(`#include "${command.replacename}.h"`, 'g'),
+      `#include "${joinedName}.h"`
     );
+    sourceReplacements.set(new RegExp(command.replacename, 'g'), replaceName);
+
+    await fileUtils.processFile(renamedSource, sourceReplacements);
+    return true;
+  } catch (error) {
+    logger.error('Error performing copy operation:', error);
+    return false;
   }
-
-  await Promise.all(promiseArray);
-
-  promiseArray = [];
-
-  for (const f of copiedSrcFiles) {
-    const file = path.join(folderSrc.fsPath, f);
-    promiseArray.push(
-      new Promise<void>((resolve, reject) => {
-        fs.readFile(file, 'utf8', (err, dataIn) => {
-          if (err) {
-            reject(err);
-          } else {
-            const joinedName = path
-              .join(path.relative(includeRoot.path, folderHeader.path), replaceName)
-              .replace(/\\/g, '/');
-
-            const dataOut = dataIn
-              .replace(
-                new RegExp(`#include "${command.replacename}.h"`, 'g'),
-                `#include "${joinedName}.h"`
-              )
-              .replace(new RegExp(command.replacename, 'g'), replaceName);
-
-            fs.writeFile(file, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      })
-    );
-  }
-
-  await Promise.all(promiseArray);
-
-  let movePromiseArray: Promise<void>[] = [];
-  for (const f of copiedSrcFiles) {
-    const file = path.join(folderSrc.fsPath, f);
-    const bname = path.basename(file);
-    const dirname = path.dirname(file);
-    if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(
-        dirname,
-        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
-      );
-      movePromiseArray.push(
-        new Promise<void>((resolve, reject) => {
-          fs.rename(file, newname, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        })
-      );
-    }
-  }
-
-  if (movePromiseArray.length > 0) {
-    await Promise.all(movePromiseArray);
-  }
-
-  movePromiseArray = [];
-  for (const f of copiedHeaderFiles) {
-    const file = path.join(folderHeader.fsPath, f);
-    const bname = path.basename(file);
-    const dirname = path.dirname(file);
-    if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(
-        dirname,
-        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
-      );
-      movePromiseArray.push(
-        new Promise<void>((resolve, reject) => {
-          fs.rename(file, newname, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        })
-      );
-    }
-  }
-
-  if (movePromiseArray.length > 0) {
-    await Promise.all(movePromiseArray);
-  }
-
-  return true;
 }
 
 export class Commands {
