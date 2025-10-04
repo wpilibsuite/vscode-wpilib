@@ -119,12 +119,18 @@ export async function generateCopyJava(
     }
 
     // Process template files
-    await Promise.all(files.map((file) => fileUtils.processFile(file, replacements)));
+    await Promise.all(
+      files.map((file) => fileUtils.processFile(path.join(codePath, file), replacements))
+    );
 
     // Process test files if they exist
     if (fromTemplateTestFolder !== undefined) {
       const testFiles = await genUtils.findMatchingFiles(testPath);
-      await Promise.all(testFiles.map((testFile) => fileUtils.processFile(testFile, replacements)));
+      await Promise.all(
+        testFiles.map((testFile) =>
+          fileUtils.processFile(path.join(testPath, testFile), replacements)
+        )
+      );
     }
 
     // Setup project structure
