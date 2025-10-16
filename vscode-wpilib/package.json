@@ -109,7 +109,7 @@
         ],
         "configuration": {
             "type": "object",
-            "title": "WPILib configuration",
+            "title": "WPILib",
             "properties": {
                 "wpilib.additionalGradleArguments": {
                     "type": "string",
