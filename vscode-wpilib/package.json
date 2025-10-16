@@ -149,12 +149,6 @@
                     "description": "Skip selection of simulation extensions",
                     "scope": "resource"
                 },
-                "wpilib.selectDefaultSimulateExtension": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Select all simulation extensions by default",
-                    "scope": "resource"
-                },
                 "wpilib.stopSimulationOnEntry": {
                     "type": "boolean",
                     "default": false,

@@ -180,14 +180,6 @@ export class Preferences implements IPreferences {
     return res;
   }
 
-  public getSelectDefaultSimulateExtension(): boolean {
-    const res = this.getConfiguration().get<boolean>('selectDefaultSimulateExtension');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
-  }
-
   public getStopSimulationOnEntry(): boolean {
     const res = this.getConfiguration().get<boolean>('stopSimulationOnEntry');
     if (res === undefined) {

@@ -122,7 +122,6 @@ export interface IPreferences {
   getProjectYear(): string;
   setProjectYear(year: string): Promise<void>;
   getSkipTests(): boolean;
-  getSelectDefaultSimulateExtension(): boolean;
   getStopSimulationOnEntry(): boolean;
   getAdditionalGradleArguments(): string;
   getOffline(): boolean;
