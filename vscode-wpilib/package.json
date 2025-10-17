@@ -26,15 +26,6 @@
         "onCommand:wpilibcore.simulateCode",
         "onCommand:wpilibcore.simulateHwCode",
         "onCommand:wpilibcore.setLanguage",
-        "onCommand:wpilibcore.setAutoSave",
-        "onCommand:wpilibcore.setSkipTests",
-        "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
-        "onCommand:wpilibcore.setSkipSelectSimulateExtension",
-        "onCommand:wpilibcore.setOffline",
-        "onCommand:wpilibcore.setStopSimulationOnEntry",
-        "onCommand:wpilibcore.setUseWinDbgX",
-        "onCommand:wpilibcore.setStartRioLog",
-        "onCommand:wpilibcore.setDeployOffline",
         "onCommand:wpilibcore.createCommand",
         "onCommand:wpilibcore.cancelTasks",
         "onCommand:wpilibcore.help",
@@ -113,7 +104,7 @@
                 "wpilib.additionalGradleArguments": {
                     "type": "string",
                     "default": "",
-                    "description": "For debugging only, passes extra arguments to gradle invocations",
+                    "description": "For debugging only, passes extra arguments to Gradle invocations",
                     "scope": "resource"
                 },
                 "wpilib.autoSaveOnDeploy": {
@@ -137,43 +128,37 @@
                 "wpilib.offline": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Perform gradle commands other then deploy/debug with offline flag",
+                    "description": "Perform Gradle commands other then deploy/debug in offline mode (will not attempt to automatically pull missing dependencies from the Internet)",
                     "scope": "resource"
                 },
                 "wpilib.deployOffline": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Perform gradle deploy command with offline flag",
+                    "description": "Perform Gradle deploy command in offline mode (will not attempt to automatically pull missing dependencies from the Internet)",
                     "scope": "resource"
                 },
                 "wpilib.skipTests": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to skip running tests on build",
+                    "description": "Skip running tests on build",
                     "scope": "resource"
                 },
                 "wpilib.skipSelectSimulateExtension": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to skip selection of simulation extensions",
-                    "scope": "resource"
-                },
-                "wpilib.selectDefaultSimulateExtension": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Set to select all simulation extensions by default",
+                    "description": "Skip selection of simulation extensions",
                     "scope": "resource"
                 },
                 "wpilib.stopSimulationOnEntry": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to make simulation code stop automatically on entry",
+                    "description": "Make simulation code stop automatically on entry",
                     "scope": "resource"
                 },
                 "wpilib.useWindbgX": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Use WinDbg Preview (from store) as C++ debugger (Windows only)",
+                    "description": "Use WinDbg Preview (from the Microsoft Store) as C++ debugger (Windows only)",
                     "scope": "resource"
                 }
             }
@@ -238,60 +223,6 @@
             {
                 "command": "wpilibcore.setLanguage",
                 "title": "%wpilibcore.setLanguage.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setAutoSave",
-                "title": "%wpilibcore.setAutoSave.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSkipTests",
-                "title": "%wpilibcore.setSkipTests.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSelectDefaultSimulateExtension",
-                "title": "%wpilibcore.setSelectDefaultSimulateExtension.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSkipSelectSimulateExtension",
-                "title": "%wpilibcore.setSkipSelectSimulateExtension.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setOffline",
-                "title": "%wpilibcore.setOffline.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setStopSimulationOnEntry",
-                "title": "%wpilibcore.setStopSimulationOnEntry.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setUseWinDbgX",
-                "title": "%wpilibcore.setUseWinDbgX.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setStartRioLog",
-                "title": "%wpilibcore.setStartRioLog.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setDeployOffline",
-                "title": "%wpilibcore.setDeployOffline.title%",
                 "category": "WPILib",
                 "enablement": "isWorkspaceTrusted"
             },
