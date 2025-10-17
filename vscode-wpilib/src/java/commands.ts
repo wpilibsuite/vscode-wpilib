@@ -1,11 +1,13 @@
 'use strict';
-import * as fs from 'fs';
+import { readFile } from 'fs';
+import { copyFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
-import { getClassName, getPackageName, ncpAsync } from '../utilities';
+import * as fileUtils from '../shared/fileUtils';
+import { getClassName, getPackageName } from '../utilities';
 
 export interface IJavaJsonLayout {
   name: string;
@@ -22,86 +24,33 @@ async function performCopy(
   replaceName: string,
   javaPackage: string
 ): Promise<boolean> {
-  const commandFolder = path.join(commandRoot, command.foldername);
-  const copiedFiles: string[] = [];
-  await ncpAsync(commandFolder, folder.fsPath, {
-    filter: (cf: string): boolean => {
-      if (fs.lstatSync(cf).isFile()) {
-        copiedFiles.push(path.relative(commandFolder, cf));
-      }
-      return true;
-    },
-  });
-
-  const replacePackageFrom = 'edu\\.wpi\\.first\\.wpilibj\\.(?:commands)\\..+?(?=;|\\.)';
-  const replacePackageTo = javaPackage;
-
-  const promiseArray: Promise<void>[] = [];
-
-  for (const f of copiedFiles) {
-    const file = path.join(folder.fsPath, f);
-    promiseArray.push(
-      new Promise<void>((resolve, reject) => {
-        fs.readFile(file, 'utf8', (err, dataIn) => {
-          if (err) {
-            reject(err);
-          } else {
-            const dataOut = dataIn
-              .replace(new RegExp(replacePackageFrom, 'g'), replacePackageTo)
-              .replace(new RegExp(command.replacename, 'g'), replaceName);
-            fs.writeFile(file, dataOut, 'utf8', (err1) => {
-              if (err1) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
-        });
-      })
+  try {
+    // Copy files and track them
+    const renamedCommand = path.join(folder.fsPath, `${replaceName}.java`);
+    await copyFile(
+      path.join(commandRoot, command.foldername, `${command.replacename}.java`),
+      renamedCommand
     );
+
+    // Create replacements map
+    const replacements = new Map<RegExp, string>();
+
+    // Add package replacement
+    replacements.set(/edu\.wpi\.first\.wpilibj\.(?:commands)\..+?(?=;|\.)/g, javaPackage);
+
+    // Add classname replacement
+    replacements.set(new RegExp(command.replacename, 'g'), replaceName);
+
+    // Process files with replacements
+    await fileUtils.processFile(renamedCommand, replacements);
+
+    const document = await vscode.workspace.openTextDocument(vscode.Uri.file(renamedCommand));
+    await vscode.window.showTextDocument(document);
+    return true;
+  } catch (error) {
+    logger.error('Error performing copy operation:', error);
+    return false;
   }
-
-  await Promise.all(promiseArray);
-
-  const movePromiseArray: Promise<string>[] = [];
-  for (const f of copiedFiles) {
-    const file = path.join(folder.fsPath, f);
-    const bname = path.basename(file);
-    const dirname = path.dirname(file);
-    if (path.basename(file).indexOf(command.replacename) > -1) {
-      const newname = path.join(
-        dirname,
-        bname.replace(new RegExp(command.replacename, 'g'), replaceName)
-      );
-      movePromiseArray.push(
-        new Promise<string>((resolve, reject) => {
-          fs.rename(file, newname, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(newname);
-            }
-          });
-        })
-      );
-    }
-  }
-
-  if (movePromiseArray.length > 0) {
-    const renamedCopiedFiles = await Promise.all(movePromiseArray);
-    for (const file of renamedCopiedFiles) {
-      const uri = vscode.Uri.file(file);
-      try {
-        const td = await vscode.workspace.openTextDocument(uri);
-        await vscode.window.showTextDocument(td);
-      } catch (err) {
-        logger.warn('Failed to open copied file: ' + file, err);
-      }
-    }
-  }
-
-  return true;
 }
 
 export class Commands {
@@ -110,7 +59,7 @@ export class Commands {
   constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
     const commandFolder = path.join(resourceRoot, 'src', 'commands');
     const resourceFile = path.join(commandFolder, this.commandResourceName);
-    fs.readFile(resourceFile, 'utf8', (err, data) => {
+    readFile(resourceFile, 'utf8', (err, data) => {
       if (err) {
         logger.error('Command file error: ', err);
         return;
@@ -147,7 +96,7 @@ export class Commands {
               }
               logger.log(packageslash);
             } else {
-              // Coult not root path, ask for one
+              // Could not root path, ask for one
               const res = await getPackageName();
               if (res === undefined) {
                 return false;
