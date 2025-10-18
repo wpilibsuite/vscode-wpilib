@@ -33,7 +33,7 @@ export class Gradle2020Import extends WebViewBase {
   private onLoad?: () => Promise<void>;
 
   private constructor(resourceRoot: string) {
-    super('wpilibgradle2020import', 'WPILib Gradle 2020-2024 Import', resourceRoot);
+    super('wpilibgradle2020import', 'WPILib Gradle 2020-2025 Import', resourceRoot);
 
     this.disposables.push(
       vscode.commands.registerCommand('wpilibcore.importGradle2020Project', () => {
