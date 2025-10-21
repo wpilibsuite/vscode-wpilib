@@ -62,43 +62,44 @@ export class VendorLibrariesBase {
     return foundDeps;
   }
 
-  public getVendorFolder(root: string): string {
-    return path.join(root, 'vendordeps');
-  }
-
   public async installDependency(
     dep: IJsonDependency,
     url: string,
     override: boolean
   ): Promise<boolean> {
-    const dirExists = await existsAsync(url);
+    try {
+      const dirExists = await existsAsync(url);
 
-    if (!dirExists) {
-      await mkdirpAsync(url);
-      // Directly write file
-      await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-      return true;
-    }
+      if (!dirExists) {
+        await mkdirpAsync(url);
+        // Directly write file
+        await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+        return true;
+      }
 
-    const files = await readdirAsync(url);
+      const files = await readdirAsync(url);
 
-    for (const file of files) {
-      const fullPath = path.join(url, file);
-      const result = await this.readFile(fullPath);
-      if (result !== undefined) {
-        if (result.uuid === dep.uuid) {
-          if (override) {
-            await deleteFileAsync(fullPath);
-            break;
-          } else {
-            return false;
+      for (const file of files) {
+        const fullPath = path.join(url, file);
+        const result = await this.readFile(fullPath);
+        if (result !== undefined) {
+          if (result.uuid === dep.uuid) {
+            if (override) {
+              await deleteFileAsync(fullPath);
+              break;
+            } else {
+              return false;
+            }
           }
         }
       }
-    }
 
-    await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-    return true;
+      await writeFileAsync(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+      return true;
+    } catch (error) {
+      logger.error(`Failed to install dependency ${dep.name}:`, error);
+      return false;
+    }
   }
 
   public getHomeDirDeps(): Promise<IJsonDependency[]> {
@@ -140,22 +141,30 @@ export class VendorLibrariesBase {
   }
 
   protected async loadFileFromUrl(url: string): Promise<IJsonDependency> {
-    const response = await fetch.default(url, {
-      timeout: 5000,
-    });
-    if (response === undefined) {
-      throw new Error('Failed to fetch file');
-    }
-    if (response.status >= 200 && response.status <= 300) {
-      const text = await response.text();
-      const json = JSON.parse(text);
-      if (isJsonDependency(json)) {
-        return json;
-      } else {
-        throw new Error('Incorrect JSON format');
+    try {
+      const response = await fetch.default(url, {
+        timeout: 5000,
+      });
+
+      if (response === undefined) {
+        throw new Error('Failed to fetch file');
       }
-    } else {
-      throw new Error('Bad status ' + response.status);
+
+      if (response.status >= 200 && response.status <= 300) {
+        const text = await response.text();
+        const json = JSON.parse(text);
+
+        if (isJsonDependency(json)) {
+          return json;
+        } else {
+          throw new Error('Incorrect JSON format');
+        }
+      } else {
+        throw new Error(`Bad status ${response.status}`);
+      }
+    } catch (error) {
+      logger.error(`Failed to load file from URL: ${url}`, error);
+      throw error;
     }
   }
 }

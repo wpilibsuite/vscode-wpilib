@@ -16,7 +16,6 @@ wpilibcore.refreshCppProperties.title: 更新 Gradle C++ 属性
 wpilibcore.selectCppToolchain.title: 选择当前的 C++ 工具链
 wpilibcore.importGradle2025Project.title: 将 Gradle 2025 项目迁移到 VSCode
 wpilibcore.createNewProject.title: 创建一个新项目
-wpilibcore.manageVendorLibs.title: 管理外部供应商库
 wpilibcore.setJavaHome.title: 设置 Java 环境
 wpilibcore.checkForUpdates.title: 检查 WPILib 更新
 wpilibcore.installGradleTools.title: 从 GradleRIO 安装工具

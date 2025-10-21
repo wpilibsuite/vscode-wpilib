@@ -29,6 +29,7 @@ export interface IJSMessage {
   type: string;
   version: string;
   index: string;
+  url?: string;
 }
 
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
@@ -47,6 +48,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
   private wp: vscode.WorkspaceFolder | undefined;
   private changed = 0;
+  private refreshInProgress = false; // Prevent concurrent refreshes
 
   private _view?: vscode.WebviewView;
 
@@ -72,12 +74,40 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       // Allow scripts in the webview
       enableScripts: true,
 
-      localResourceRoots: [this._extensionUri, vscode.Uri.joinPath(this._extensionUri, 'media')],
+      localResourceRoots: [
+        this._extensionUri,
+        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media'),
+      ],
     };
 
     this.wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
     if (this.wp === undefined) {
       logger.warn('no workspace');
+      return;
+    }
+
+    const prefs = this.externalApi.getPreferencesAPI().getPreferences(this.wp);
+    if (prefs.getProjectYear() === 'none' || !prefs.getIsWPILibProject()) {
+      webviewView.webview.html = `
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>WPILib Vendor Dependencies</title>
+            <link rel="stylesheet" href="${webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'))}">
+            <link rel="stylesheet" href="${webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'))}" id="vscode-codicon-stylesheet">
+          </head>
+          <body>
+            <div class="error-content" style="max-width: 500px; margin: 48px auto; text-align: center;">
+              <span class="codicon codicon-warning" style="font-size: 32px; display: block; margin-bottom: 16px;"></span>
+              <b>This is not a WPILib project.</b><br/>
+              Vendor dependency management is only available for WPILib projects.<br/>
+              <br/>
+              To use vendor dependencies, open a WPILib project or create a new one from the WPILib extension.
+            </div>
+          </body>
+        </html>
+      `;
       return;
     }
 
@@ -123,6 +153,10 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           }
           case 'updateall': {
             void this.updateall();
+            break;
+          }
+          case 'installFromUrl': {
+            void this.installFromUrl(data.url);
             break;
           }
           case 'blur': {
@@ -292,6 +326,127 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     return dependency;
   }
 
+  /**
+   * Install a vendor dependency from a URL
+   * @param url The URL to install the dependency from
+   */
+  private async installFromUrl(url: string | undefined) {
+    if (!url || !this.wp) {
+      logger.warn('installFromUrl called with invalid parameters', {
+        url,
+        hasWorkspace: !!this.wp,
+      });
+      return;
+    }
+
+    // Validate URL format
+    if (!url.trim()) {
+      vscode.window.showErrorMessage(i18n('message', 'Please enter a valid URL'));
+      return;
+    }
+
+    try {
+      // Attempt to fetch and parse the dependency from the URL
+      const file = await this.vendorLibraries.getJsonDepURL(url.trim());
+
+      if (!file) {
+        vscode.window.showErrorMessage(i18n('message', 'Failed to load vendor file from URL.'));
+        return;
+      }
+
+      // Load existing libraries to check for conflicts and duplicates
+      const existing = await this.vendorLibraries.getCurrentlyInstalledLibraries(this.wp);
+
+      // Check if already installed
+      for (const dep of existing) {
+        if (dep.uuid === file.uuid) {
+          if (dep.version === file.version) {
+            vscode.window.showInformationMessage(
+              i18n('message', '{0} version {1} is already installed.', file.name, file.version)
+            );
+            return;
+          } else {
+            const res = await vscode.window.showWarningMessage(
+              i18n(
+                'message',
+                '{0} version {1} is already installed. Would you like to update to {2}?',
+                file.name,
+                dep.version,
+                file.version
+              ),
+              { modal: true },
+              i18n('ui', 'Yes'),
+              i18n('ui', 'No')
+            );
+            if (res !== i18n('ui', 'Yes')) {
+              return;
+            }
+          }
+        }
+      }
+
+      // Check for conflicts with currently installed dependencies
+      let conflictDep = undefined;
+      if (file.conflictsWith) {
+        for (const conflict of file.conflictsWith) {
+          const existingDep = existing.find((installedDep) => installedDep.uuid === conflict.uuid);
+          if (existingDep) {
+            conflictDep = conflict;
+            break;
+          }
+        }
+      }
+
+      // If no conflict is found, proceed with installation
+      if (!conflictDep) {
+        const success = await this.vendorLibraries.installDependency(
+          file,
+          this.vendorLibraries.getWpVendorFolder(this.wp),
+          true
+        );
+
+        if (success) {
+          this.changed = Date.now();
+
+          // Install required dependencies if any
+          if (file.requires) {
+            for (const required of file.requires) {
+              try {
+                const requiredDep = await this.vendorLibraries.getJsonDepURL(required.onlineUrl);
+                await this.vendorLibraries.installDependency(
+                  requiredDep,
+                  this.vendorLibraries.getWpVendorFolder(this.wp),
+                  true
+                );
+              } catch (err) {
+                vscode.window.showWarningMessage(
+                  i18n(
+                    'message',
+                    'Failed to install required dependency: {0}',
+                    required.errorMessage
+                  )
+                );
+              }
+            }
+          }
+
+          // Refresh the view to show the newly installed dependency
+          await this._refresh(this.wp);
+        } else {
+          vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
+        }
+      } else {
+        // Show conflict error
+        vscode.window.showErrorMessage(i18n('message', '{0}', conflictDep.errorMessage), {
+          modal: true,
+        });
+      }
+    } catch (err) {
+      // Error handling matches the command palette version
+      vscode.window.showErrorMessage(i18n('message', 'Failed to load vendor file from URL.'));
+    }
+  }
+
   public addDependency() {
     if (this._view) {
       this._view.webview.postMessage({ type: 'addDependency' });
@@ -315,68 +470,80 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async _refresh(workspace: vscode.WorkspaceFolder) {
-    this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
-    this.installedList = [];
-    this.availableDepsList = [];
+    // Prevent concurrent refreshes
+    if (this.refreshInProgress) {
+      return;
+    }
 
-    this.availableDeps = await this.getAvailableDependencies();
-    if (this.availableDeps.length !== 0) {
-      // Check Github for the VendorDep list
-      if (this.installedDeps.length !== 0) {
-        for (const id of this.installedDeps) {
-          let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-          for (const ad of this.availableDeps) {
-            if (id.uuid === ad.uuid) {
-              // Populate version array with version and button text
-              if (id.version !== ad.version) {
-                if (isNewerVersion(ad.version, id.version)) {
-                  versionList.push({
-                    version: ad.version,
-                    buttonText: i18n('ui', 'Update'),
-                  });
-                } else {
-                  versionList.push({
-                    version: ad.version,
-                    buttonText: i18n('ui', 'Downgrade'),
-                  });
+    this.refreshInProgress = true;
+
+    try {
+      this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
+      this.installedList = [];
+      this.availableDepsList = [];
+
+      this.availableDeps = await this.getAvailableDependencies();
+      if (this.availableDeps.length !== 0) {
+        // Check Github for the VendorDep list
+        if (this.installedDeps.length !== 0) {
+          for (const id of this.installedDeps) {
+            let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
+            for (const ad of this.availableDeps) {
+              if (id.uuid === ad.uuid) {
+                // Populate version array with version and button text
+                if (id.version !== ad.version) {
+                  if (isNewerVersion(ad.version, id.version)) {
+                    versionList.push({
+                      version: ad.version,
+                      buttonText: i18n('ui', 'Update'),
+                    });
+                  } else {
+                    versionList.push({
+                      version: ad.version,
+                      buttonText: i18n('ui', 'Downgrade'),
+                    });
+                  }
                 }
               }
             }
-          }
-          // Now we need to sort the version list newest to oldest
-          versionList = this.sortVersions(versionList);
+            // Now we need to sort the version list newest to oldest
+            versionList = this.sortVersions(versionList);
 
-          this.installedList.push({
-            name: id.name,
-            currentVersion: id.version,
-            versionInfo: versionList,
-          });
+            this.installedList.push({
+              name: id.name,
+              currentVersion: id.version,
+              versionInfo: versionList,
+            });
+          }
         }
+
+        // We need to group the available deps and filter out the installed ones
+        this.availableDeps.forEach((dep) => {
+          // See if the dep is one of the installed deps if so don't add it
+          const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
+          if (installedDep < 0) {
+            // Check to see if it is already in the available list
+            const foundDep = this.availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
+            if (foundDep < 0) {
+              // Not in the list so just add it
+              this.availableDepsList.push(dep);
+            } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
+              // It was in the list but this version is newer so lets use that
+              this.availableDepsList[foundDep] = dep;
+            }
+          }
+        });
+
+        this.sortInstalled();
+        this.sortAvailable();
+
+        this.updateDependencies();
       }
-
-      // We need to group the available deps and filter out the installed ones
-      this.availableDeps.forEach((dep) => {
-        // See if the dep is one of the installed deps if so don't add it
-        const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
-        if (installedDep < 0) {
-          // Check to see if it is already in the available list
-          const foundDep = this.availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
-          if (foundDep < 0) {
-            // Not in the list so just add it
-            this.availableDepsList.push(dep);
-          } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
-            // It was in the list but this version is newer so lets use that
-            this.availableDepsList[foundDep] = dep;
-          }
-        }
-      });
-
-      this.sortInstalled();
-      this.sortAvailable();
-
-      this.updateDependencies();
+    } finally {
+      this.refreshInProgress = false;
     }
   }
+
   public async refresh() {
     if (this.wp) {
       void this._refresh(this.wp);
@@ -511,41 +678,161 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       return webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...fp.split('/')));
     };
 
-    const scriptUri = createUri(`media/main.js`);
-    const styleUri = createUri(`media/main.css`);
-    const codiconUri = createUri(`media/icons.css`);
-    const projectYear = this.wp
-      ? this.externalApi.getPreferencesAPI().getPreferences(this.wp).getProjectYear()
-      : 'Unknown';
+    const scriptUri = createUri(`resources/media/main.js`);
+    const styleUri = createUri(`resources/media/main.css`);
+    const codiconUri = createUri(`resources/media/icons.css`);
 
     // Return the complete HTML
     return `
-            <!DOCTYPE html>
-            <html lang="en">
-                    <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Vendor Dependencies</title>
-                <script type="module">
-                  ${elements}
-                </script>
-                
-                <link rel="preload" href="${styleUri}" as="style">
-                <link rel="preload" href="${codiconUri}" as="style">
-                <link rel="preload" href="${scriptUri}" as="script">
-                
-                <link rel="stylesheet" href="${styleUri}">
-                <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
-            </head>
-            <body>
-                <div class="top-line">
-                    <vscode-button id="updateall-action">Update All</vscode-button>
-                </div>
-                <vscode-collapsible title="Installed Dependencies: ${projectYear}" id="installed-dependencies" open></vscode-collapsible>
-                <vscode-collapsible title="Available Dependencies: ${projectYear}" id="available-dependencies" open></vscode-collapsible>
-                <script src="${scriptUri}"></script>
-            </body>
-            </html>
-        `;
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WPILib Vendor Dependencies</title>                
+        <link rel="preload" href="${styleUri}" as="style">
+        <link rel="preload" href="${codiconUri}" as="style">
+        <link rel="preload" href="${scriptUri}" as="script">
+        
+        <link rel="stylesheet" href="${styleUri}">
+        <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
+        <style>
+          .dependency-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+          }
+          .dependency-name {
+            font-weight: 600;
+            font-size: 14px;
+          }
+          .dependency-version {
+            margin-left: 8px;
+          }
+          .dependency-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .dependency-description {
+            color: var(--vscode-descriptionForeground);
+            margin-top: 4px;
+            font-size: 12px;
+            line-height: 1.4;
+          }
+          .section-header {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--vscode-foreground);
+          }
+          .empty-state {
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+          }
+          .url-install-section {
+            padding: 10px 0;
+          }
+          .url-input-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+          }
+          #url-input {
+            flex: 1;
+            min-width: 50px;
+            max-width: 100%;
+          }
+          .url-help-text {
+            font-size: 12px;
+            color: var(--vscode-descriptionForeground);
+            line-height: 1.4;
+          }
+          .uninstall-button {
+          /* Fix for height mismatch between select and buttons */
+          .vscode-select select {
+            height: 24px;
+            box-sizing: border-box;
+            line-height: 18px;
+            padding: 2px 4px;
+            border-radius: 2px;
+          }
+          button[id*="version-action"],
+          button[id*="uninstall-action"],
+          button[id*="install-action"] {
+            width: 72px;
+            height: 24px;
+            box-sizing: border-box;
+            padding: 1px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+            background-color: var(--vscode-button-secondaryBackground, transparent);
+            color: var(--vscode-button-secondaryForeground);
+            border: 1px solid var(--vscode-button-border);
+          }
+        </style>
+      </head>
+      <body>
+        <div class="top-line">
+          <button id="updateall-action" class="vscode-button block">
+            <i class="codicon codicon-sync"></i>
+            Update All Dependencies
+          </button>
+        </div>
+        
+        <details class="vscode-collapsible">
+          <summary>
+            <i class="codicon codicon-chevron-right icon-arrow"></i>
+            <h2 class="title">
+              Install from URL
+            </h2>
+          </summary>
+          <div class="url-install-section">
+            <div class="url-input-container">
+              <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep URL..." />
+              <button id="install-action" class="vscode-button">
+                <i class="codicon codicon-cloud-download"></i>
+                Install
+              </button>
+            </div>
+            <div class="url-help-text">
+              Enter a vendor dependency JSON URL to install a library not listed in the available dependencies.
+            </div>
+          </div>
+        </details>
+        
+        <details class="vscode-collapsible" open>
+          <summary>
+            <i class="codicon codicon-chevron-right icon-arrow"></i>
+            <h2 class="title">
+              Installed Dependencies
+            </h2>
+            <div class="actions" id="installed-actions"></div>
+          </summary>
+          <div id="installed-dependencies"></div>
+        </details>
+        
+        <details class="vscode-collapsible" open>
+          <summary>
+            <i class="codicon codicon-chevron-right icon-arrow"></i>
+            <h2 class="title">
+              Available Dependencies
+            </h2>
+            <div class="actions" id="available-actions"></div>
+          </summary>
+          <div id="available-dependencies"></div>
+        </details>
+        
+        <script src="${scriptUri}"></script>
+      </body>
+    </html>
+  `;
   }
 }

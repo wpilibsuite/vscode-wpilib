@@ -1,7 +1,6 @@
 'use strict';
 
 import * as path from 'path';
-import { MESSAGE } from 'triple-beam';
 import * as winston from 'winston';
 
 export interface ILogger {
@@ -12,12 +11,12 @@ export interface ILogger {
 }
 
 const myFormat = winston.format.printf((info) => {
-  return `${info.timestamp} ${info[MESSAGE]}`;
+  return `${info.timestamp} ${info.level}: ${info.message}`;
 });
 
 const winstonLogger = winston.createLogger({
   exitOnError: false,
-  format: winston.format.combine(winston.format.simple(), winston.format.timestamp(), myFormat),
+  format: winston.format.combine(winston.format.timestamp(), winston.format.simple(), myFormat),
   level: 'verbose',
   transports: [new winston.transports.Console()],
 });
@@ -47,16 +46,16 @@ export function setLoggerDirectory(dirname: string) {
 
 class LoggerImpl implements ILogger {
   public error(message: string, ...meta: unknown[]): void {
-    winstonLogger.log('error', message, meta);
+    winstonLogger.log({ level: 'error', message, meta });
   }
   public warn(message: string, ...meta: unknown[]): void {
-    winstonLogger.log('warn', message, meta);
+    winstonLogger.log({ level: 'warn', message, meta });
   }
   public info(message: string, ...meta: unknown[]): void {
-    winstonLogger.log('info', message, meta);
+    winstonLogger.log({ level: 'info', message, meta });
   }
   public log(message: string, ...meta: unknown[]): void {
-    winstonLogger.log('verbose', message, meta);
+    winstonLogger.log({ level: 'verbose', message, meta });
   }
 }
 

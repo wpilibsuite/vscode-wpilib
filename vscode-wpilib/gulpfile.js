@@ -13,7 +13,7 @@ const jsontransform = require('gulp-json-transform');
 const del = require('del');
 const nls = require('vscode-nls-dev');
 
-// If all VS Code langaues are support you can use nls.coreLanguages
+// If all VS Code languages are supported you can use nls.coreLanguages
 const languages = [
   {
     id: 'zh-CN',

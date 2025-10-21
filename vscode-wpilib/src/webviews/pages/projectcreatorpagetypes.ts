@@ -1,8 +1,15 @@
 'use strict';
 
+import { ICreatorQuickPick } from '../../api';
+
 export enum ProjectType {
   Example,
   Template,
+}
+
+export interface IBaseOption {
+  label: string;
+  description: string;
 }
 
 export interface IProjectIPCData {
@@ -23,5 +30,5 @@ export interface IProjectIPCReceive {
 
 export interface IProjectIPCSend {
   type: string;
-  data: string | boolean | ProjectType;
+  data: string | boolean | ProjectType | string[] | IBaseOption[] | ICreatorQuickPick[];
 }

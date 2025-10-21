@@ -2,23 +2,81 @@
 <html>
   <head>
     <title>WPILib Help</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS will be injected here by WebViewBase's loadWebpage method -->
   </head>
 
   <body>
-    <h1>WPILib Help</h1>
+    <div class="project-container">
+      <img src="replaceresource/resources/wpilib-generic.svg" height="75" />
 
-    <img src="replaceresource/resources/wpilib-generic.svg" height="75" />
+      <h1 class="project-title">WPILib Help</h1>
 
-    <p>Welcome to WPILib Help!</p>
+      <div class="project-row">
+        <p>
+          Welcome to WPILib Help! To open this window again, open the Command Palette (F1 or
+          View->Command Palette), and select
+          <b>Open WPILib Help.</b>
+        </p>
+        <p>
+          For more help, see
+          <a href="https://docs.wpilib.org/en/stable">the WPILib documentation.</a>
+        </p>
+      </div>
 
-    <p>
-      To open this window again, open the Command Palette (F1 or View->Command Palette), and select
-      <b>Open WPILib Help.</b>
-    </p>
+      <div class="project-row">
+        <h2 class="project-subtitle">Common Tasks</h2>
+        <ul>
+          <li>
+            Create a new project: Click on the Command Palette and type "WPILib: Create a new
+            project"
+          </li>
+          <li>
+            Deploy code to the robot: Click on the Command Palette and type "WPILib: Deploy Robot
+            Code"
+          </li>
+          <li>
+            Start a simulation: Click on the Command Palette and type "WPILib: Simulate Robot Code"
+          </li>
+          <li>Install vendor libraries: Click on "WPILib Dependencies" in the Activity Bar</li>
+        </ul>
+      </div>
 
-    <p>
-      For more help, see
-      <a href="https://docs.wpilib.org/en/stable">the WPILib documentation.</a>
-    </p>
+      <div class="project-row">
+        <h2 class="project-subtitle">Setting Up Your Workspace</h2>
+        <ul>
+          <li>
+            Set your team number: Click on the Command Palette and type "WPILib: Set Team Number"
+          </li>
+          <li>
+            Enable desktop support: Click on the Command Palette and type "WPILib: Set Desktop
+            Support"
+          </li>
+          <li>Run RioLog: Click on the Command Palette and type "WPILib: Start RioLog"</li>
+          <li>
+            Import a project: Click on the Command Palette and type "WPILib: Import a WPILib 2025
+            Gradle project"
+          </li>
+        </ul>
+      </div>
+
+      <div class="project-actions">
+        <button id="openCommandPalette" class="vscode-button">Open Command Palette</button>
+        <button id="openDocumentation" class="vscode-button">Open WPILib Documentation</button>
+      </div>
+    </div>
+
+    <script>
+      const vscode = acquireVsCodeApi();
+
+      document.getElementById('openCommandPalette').addEventListener('click', () => {
+        vscode.postMessage({ command: 'openCommandPalette' });
+      });
+
+      document.getElementById('openDocumentation').addEventListener('click', () => {
+        vscode.postMessage({ command: 'openDocumentation' });
+      });
+    </script>
   </body>
 </html>
