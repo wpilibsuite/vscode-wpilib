@@ -99,7 +99,7 @@
         ],
         "configuration": {
             "type": "object",
-            "title": "WPILib configuration",
+            "title": "WPILib",
             "properties": {
                 "wpilib.additionalGradleArguments": {
                     "type": "string",
@@ -450,6 +450,7 @@
             ],
             "view/title": [
                 {
+                    "when": "view.wpilib.dependencyView.visible",
                     "command": "wpilib.refreshVendordeps",
                     "group": "navigation"
                 }

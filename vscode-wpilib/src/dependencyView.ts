@@ -47,6 +47,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
   private wp: vscode.WorkspaceFolder | undefined;
   private changed = 0;
+  private showingInstructions = false;
 
   private _view?: vscode.WebviewView;
 
@@ -92,7 +93,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         if (webviewView.visible) {
           void this._refresh(this.wp);
         } else {
-          if (this.changed > this.vendorLibraries.getLastBuild()) {
+          if (this.showingInstructions) {
+            this.showingInstructions = false;
+          } else if (this.changed > this.vendorLibraries.getLastBuild()) {
             this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
             this.changed = 0;
           }
@@ -127,7 +130,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           }
           case 'blur': {
             if (this.wp) {
-              if (this.changed > this.vendorLibraries.getLastBuild()) {
+              if (this.showingInstructions) {
+                this.showingInstructions = false;
+              } else if (this.changed > this.vendorLibraries.getLastBuild()) {
                 this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
                 this.changed = 0;
               }
