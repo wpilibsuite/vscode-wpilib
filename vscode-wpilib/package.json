@@ -525,6 +525,7 @@
             ],
             "view/title": [
                 {
+                    "when": "view.wpilib.dependencyView.visible",
                     "command": "wpilib.refreshVendordeps",
                     "group": "navigation"
                 }
