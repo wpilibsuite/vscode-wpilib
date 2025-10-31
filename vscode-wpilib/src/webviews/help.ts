@@ -47,13 +47,8 @@ export class Help extends WebViewBase {
   }
 
   private async asyncInitialize() {
-    // Load the help.html page with CSS styling
-    const htmlPath = path.join(
-      extensionContext.extensionPath,
-      'resources',
-      'webviews',
-      'help.html'
+    await this.loadWebpage(
+      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'help.html')
     );
-    await this.loadWebpage(htmlPath);
   }
 }

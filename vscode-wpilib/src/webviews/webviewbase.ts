@@ -39,7 +39,7 @@ export abstract class WebViewBase {
 
     this.html = this.html.replace(
       '</head>',
-      `<link rel="stylesheet" href="replaceresource/resources/media/icons.css" />\r\n<link rel="stylesheet" href="replaceresource/resources/media/main.css" />\r\n</head>`
+      `<link rel="stylesheet" href="replaceresource/resources/media/icons.css" />\r\n<link rel="stylesheet" href="replaceresource/resources/media/vscode-elements.css" />\r\n<link rel="stylesheet" href="replaceresource/resources/media/main.css" />\r\n</head>`
     );
 
     if (localeDomains) {
@@ -62,13 +62,22 @@ export abstract class WebViewBase {
     const cssUri = webview.asWebviewUri(
       vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css'))
     );
+    // Add CSS for vscode-elements.css
+    const elementsCssUri = webview.asWebviewUri(
+      vscode.Uri.file(
+        path.join(extensionContext.extensionPath, 'resources', 'media', 'vscode-elements.css')
+      )
+    );
     // Add CSS for icons.css
     const iconsCssUri = webview.asWebviewUri(
       vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css'))
     );
-
     // Update the CSS paths with the webview URI
     this.html = this.html.replace('replaceresource/media/main.css', cssUri.toString());
+    this.html = this.html.replace(
+      'replaceresource/media/vscode-elements.css',
+      elementsCssUri.toString()
+    );
     this.html = this.html.replace('replaceresource/media/icons.css', iconsCssUri.toString());
 
     // Add script path if provided

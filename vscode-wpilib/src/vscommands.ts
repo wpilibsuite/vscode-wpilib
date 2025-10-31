@@ -4,12 +4,12 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { downloadDocs } from './docsapi';
+import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
+import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
 import { existsAsync, getDesktopEnabled, gradleRun, javaHome } from './utilities';
-import { localize as i18n } from './locale';
-import { setDesktopEnabled } from './shared/generator';
 import { WPILibUpdates } from './wpilibupdates';
 
 // Most of our commands are created here.

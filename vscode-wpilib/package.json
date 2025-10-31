@@ -35,6 +35,7 @@
         "onCommand:wpilibcore.selectCppBinaryTypes",
         "onCommand:wpilibcore.importGradle2025Project",
         "onCommand:wpilibcore.createNewProject",
+        "onCommand:wpilibcore.manageVendorLibs",
         "onCommand:wpilibcore.setJavaHome",
         "onCommand:wpilibcore.checkForUpdates",
         "onCommand:wpilibcore.installGradleTools",
@@ -280,6 +281,12 @@
                 "category": "WPILib"
             },
             {
+                "command": "wpilibcore.manageVendorLibs",
+                "title": "%wpilibcore.manageVendorLibs.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
                 "command": "wpilibcore.setJavaHome",
                 "title": "%wpilibcore.setJavaHome.title%",
                 "category": "WPILib",
@@ -428,6 +435,11 @@
                 {
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.testCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.manageVendorLibs",
                     "group": "wpilib"
                 },
                 {

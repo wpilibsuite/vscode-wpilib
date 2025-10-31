@@ -4,6 +4,7 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../api';
+import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import {
   existsAsync,
@@ -12,7 +13,6 @@ import {
   readFileAsync,
   statAsync,
 } from '../utilities';
-import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
 

@@ -680,6 +680,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
     const scriptUri = createUri(`resources/media/main.js`);
     const styleUri = createUri(`resources/media/main.css`);
+    const vscodeElementsUri = createUri(`resources/media/vscode-elements.css`);
     const codiconUri = createUri(`resources/media/icons.css`);
 
     // Return the complete HTML
@@ -690,10 +691,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>WPILib Vendor Dependencies</title>                
+        <link rel="preload" href="${vscodeElementsUri}" as="style">
         <link rel="preload" href="${styleUri}" as="style">
         <link rel="preload" href="${codiconUri}" as="style">
         <link rel="preload" href="${scriptUri}" as="script">
         
+        <link rel="stylesheet" href="${vscodeElementsUri}">
         <link rel="stylesheet" href="${styleUri}">
         <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
         <style>
