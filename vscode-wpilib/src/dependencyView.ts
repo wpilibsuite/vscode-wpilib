@@ -696,12 +696,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WPILib Vendor Dependencies</title>                
+        <title>WPILib Vendor Dependencies</title>
         <link rel="preload" href="${vscodeElementsUri}" as="style">
         <link rel="preload" href="${styleUri}" as="style">
         <link rel="preload" href="${codiconUri}" as="style">
         <link rel="preload" href="${scriptUri}" as="script">
-        
+
         <link rel="stylesheet" href="${vscodeElementsUri}">
         <link rel="stylesheet" href="${styleUri}">
         <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
@@ -713,7 +713,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             Update All Dependencies
           </button>
         </div>
-        
+
         <details class="vscode-collapsible">
           <summary>
             <i class="codicon codicon-chevron-right icon-arrow"></i>
@@ -734,8 +734,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             </div>
           </div>
         </details>
-        
-  <details class="vscode-collapsible always-show-actions" open>
+
+        <details class="vscode-collapsible always-show-actions" open>
           <summary>
             <i class="codicon codicon-chevron-right icon-arrow"></i>
             <h2 class="title">
@@ -745,8 +745,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           </summary>
           <div id="installed-dependencies"></div>
         </details>
-        
-  <details class="vscode-collapsible always-show-actions" open>
+
+        <details class="vscode-collapsible always-show-actions" open>
           <summary>
             <i class="codicon codicon-chevron-right icon-arrow"></i>
             <h2 class="title">
@@ -756,7 +756,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           </summary>
           <div id="available-dependencies"></div>
         </details>
-        
+
         <script src="${scriptUri}"></script>
       </body>
     </html>
