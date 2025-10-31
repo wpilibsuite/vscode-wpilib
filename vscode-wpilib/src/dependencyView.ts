@@ -724,7 +724,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           <div class="url-install-section">
             <div class="url-input-container">
               <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep URL..." />
-              <button id="install-action" class="vscode-button">
+              <button id="install-url-action" class="vscode-button">
                 <i class="codicon codicon-cloud-download"></i>
                 Install
               </button>
