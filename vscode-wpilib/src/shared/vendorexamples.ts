@@ -54,8 +54,10 @@ export async function addVendorExamples(
   if (storagePath === undefined) {
     return;
   }
+
   const exampleDir = path.join(utilities.getWPILibHomeDir(), 'vendorexamples');
   const gradleBasePath = path.join(resourceRoot, 'gradle');
+
   if (await existsAsync(exampleDir)) {
     const files = await readdirAsync(exampleDir);
     for (const file of files) {
@@ -63,89 +65,100 @@ export async function addVendorExamples(
       if ((await statAsync(filePath)).isDirectory()) {
         continue;
       }
-      const fileContents = await readFileAsync(filePath, 'utf8');
-      const parsed = jsonc.parse(fileContents);
-      if (Array.isArray(parsed)) {
-        for (const ex of parsed) {
-          if (isJsonExample(ex)) {
-            if (ex.language !== 'java' && ex.language !== 'cpp') {
-              // Only handle java and cpp
-              continue;
-            }
-            const extraVendordeps: string[] =
-              ex.extravendordeps !== undefined ? ex.extravendordeps : [];
-            const provider: IExampleTemplateCreator = {
-              getLanguage(): string {
-                return ex.language;
-              },
-              getDescription(): string {
-                return ex.description;
-              },
-              getDisplayName(): string {
-                return ex.name;
-              },
-              async generate(folderInto: vscode.Uri): Promise<boolean> {
-                try {
-                  if (ex.language === 'java') {
-                    if (
-                      !(await generateCopyJava(
-                        shimmedResourceRoot,
-                        path.join(exampleDir, ex.foldername),
-                        undefined,
-                        path.join(gradleBasePath, ex.gradlebase),
-                        folderInto.fsPath,
-                        'frc.robot.' + ex.mainclass,
-                        path.join('frc', 'robot'),
-                        false,
-                        extraVendordeps,
-                        ex.packagetoreplace
-                      ))
-                    ) {
-                      vscode.window.showErrorMessage(
-                        i18n('message', 'Cannot create into non empty folder')
-                      );
-                      return false;
-                    }
-                  } else {
-                    if (
-                      !(await generateCopyCpp(
-                        shimmedResourceRoot,
-                        path.join(exampleDir, ex.foldername),
-                        undefined,
-                        path.join(gradleBasePath, ex.gradlebase),
-                        folderInto.fsPath,
-                        false,
-                        extraVendordeps
-                      ))
-                    ) {
-                      vscode.window.showErrorMessage(
-                        i18n('message', 'Cannot create into non empty folder')
-                      );
-                      return false;
-                    }
-                  }
-                  const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
-                  for (const vendorFile of vendorFiles) {
-                    await vendorlibs.installDependency(
-                      vendorFile,
-                      vendorlibs.getVendorFolder(folderInto.fsPath),
-                      true
-                    );
-                  }
-                } catch (err) {
-                  logger.error('Example generation error: ', err);
-                  return false;
-                }
-                return true;
-              },
-            };
-            core.addExampleProvider(provider);
-          } else {
-            logger.log('item not example', ex);
-          }
+
+      try {
+        const fileContents = await readFileAsync(filePath, 'utf8');
+        const parsed = jsonc.parse(fileContents);
+
+        if (!Array.isArray(parsed)) {
+          logger.log('file not array', fileContents);
+          break;
         }
-      } else {
-        logger.log('file not array', fileContents);
+        for (const ex of parsed) {
+          if (!isJsonExample(ex)) {
+            logger.log('item not example', ex);
+            continue;
+          }
+          if (ex.language !== 'java' && ex.language !== 'cpp') {
+            // Only handle java and cpp
+            continue;
+          }
+
+          const extraVendordeps: string[] =
+            ex.extravendordeps !== undefined ? ex.extravendordeps : [];
+          const provider: IExampleTemplateCreator = {
+            getLanguage(): string {
+              return ex.language;
+            },
+            getDescription(): string {
+              return ex.description;
+            },
+            getDisplayName(): string {
+              return ex.name;
+            },
+            async generate(folderInto: vscode.Uri): Promise<boolean> {
+              try {
+                const exampleFolderPath = path.join(exampleDir, ex.foldername);
+                const gradlePath = path.join(gradleBasePath, ex.gradlebase);
+
+                if (ex.language === 'java') {
+                  if (
+                    !(await generateCopyJava(
+                      shimmedResourceRoot,
+                      exampleFolderPath,
+                      undefined,
+                      gradlePath,
+                      folderInto.fsPath,
+                      'frc.robot.' + ex.mainclass,
+                      path.join('frc', 'robot'),
+                      false,
+                      extraVendordeps,
+                      ex.packagetoreplace
+                    ))
+                  ) {
+                    vscode.window.showErrorMessage(
+                      i18n('message', 'Cannot create into non empty folder')
+                    );
+                    return false;
+                  }
+                } else {
+                  if (
+                    !(await generateCopyCpp(
+                      shimmedResourceRoot,
+                      exampleFolderPath,
+                      undefined,
+                      gradlePath,
+                      folderInto.fsPath,
+                      false,
+                      extraVendordeps
+                    ))
+                  ) {
+                    vscode.window.showErrorMessage(
+                      i18n('message', 'Cannot create into non empty folder')
+                    );
+                    return false;
+                  }
+                }
+
+                // Install vendor dependencies
+                const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
+                const vendorFolder = path.join(folderInto.fsPath, 'vendordeps');
+
+                for (const vendorFile of vendorFiles) {
+                  await vendorlibs.installDependency(vendorFile, vendorFolder, true);
+                }
+              } catch (err) {
+                logger.error('Example generation error: ', err);
+                return false;
+              }
+              return true;
+            },
+          };
+
+          core.addExampleProvider(provider);
+        }
+      } catch (error) {
+        logger.error(`Error processing vendor example file: ${filePath}`, error);
       }
     }
   } else {

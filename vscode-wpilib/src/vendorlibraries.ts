@@ -151,7 +151,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     workspace: vscode.WorkspaceFolder
   ): Promise<boolean> {
     let anySucceeded = false;
-    if (toRemove !== undefined) {
+    if (toRemove !== undefined && toRemove.length > 0) {
       const url = this.getWpVendorFolder(workspace);
       const files = await readdirAsync(url);
       for (const file of files) {
@@ -159,9 +159,18 @@ export class VendorLibraries extends VendorLibrariesBase {
         const result = await this.readFile(fullPath);
         if (result !== undefined) {
           for (const ti of toRemove) {
-            if (ti.uuid === result.uuid) {
-              await deleteFileAsync(fullPath);
-              anySucceeded = true;
+            if (result.uuid === ti.uuid) {
+              try {
+                await deleteFileAsync(fullPath);
+                anySucceeded = true;
+                // Found and deleted, break from inner loop
+                break;
+              } catch (err) {
+                logger.error('Failed to delete vendor dependency file', {
+                  file: fullPath,
+                  error: err,
+                });
+              }
             }
           }
         }
@@ -356,7 +365,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
-    return this.getVendorFolder(workspace.uri.fsPath);
+    return path.join(workspace.uri.fsPath, 'vendordeps');
   }
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {

@@ -1,0 +1,422 @@
+.installed-dependency,
+.available-dependency {
+  margin-bottom: 10px;
+
+  &:first-of-type {
+    margin-top: 10px;
+  }
+}
+
+.uninstall-button .vscode-select select {
+  height: 24px;
+  box-sizing: border-box;
+  line-height: 18px;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.uninstall-button button[id*='version-action'],
+.uninstall-button button[id*='uninstall-action'],
+.uninstall-button button[id*='install-action'] {
+  width: 72px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 1px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uninstall-button {
+  background-color: var(--vscode-button-secondaryBackground, transparent);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+}
+
+.dependency-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.dependency-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.dependency-version {
+  margin-left: 8px;
+}
+.dependency-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dependency-description {
+  color: var(--vscode-descriptionForeground);
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.section-header {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+.empty-state {
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  padding: 10px;
+  text-align: center;
+}
+.url-install-section {
+  padding: 10px 0;
+}
+.url-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+#url-input {
+  flex: 1;
+  min-width: 50px;
+  max-width: 100%;
+}
+.url-help-text {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  line-height: 1.4;
+}
+
+.top-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+
+  &:has(#updateall-action) {
+    margin-top: 4px;
+  }
+}
+
+#updateall-action {
+  width: 100%;
+}
+
+i {
+  margin-right: 4px !important;
+}
+
+.uninstall-button {
+  padding: 4px !important;
+
+  & > i {
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+  }
+}
+
+.vscode-collapsible div {
+  overflow: visible;
+}
+
+.vscode-select select,
+.vscode-select {
+  flex-shrink: 2;
+}
+
+button[id*='install-action'] {
+  flex-shrink: 0;
+}
+
+button[id*='version-action'] {
+  overflow: visible;
+  padding: 1px 6px;
+}
+
+/* Project Creator and Import Styles */
+.project-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 16px;
+  max-width: 800px;
+}
+
+.project-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.project-label {
+  flex: 0 0 140px;
+  font-weight: 500;
+}
+
+.vscode-textfield[id*='gradle2025Input'],
+.vscode-textfield[id*='projectFolder'],
+.vscode-textfield[id*='projectName'],
+.vscode-textfield[id*='teamNumber'] {
+  min-width: 250px;
+  width: 100%;
+}
+
+.project-select {
+  min-width: 250px;
+  background-color: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  color: var(--vscode-dropdown-foreground);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.project-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  gap: 12px;
+}
+
+.project-title {
+  font-size: 20px;
+  margin-bottom: 24px;
+  color: var(--vscode-foreground);
+  font-weight: 500;
+}
+
+.project-subtitle {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--vscode-foreground);
+  width: 100%;
+}
+
+.project-error-text {
+  color: var(--vscode-testing-iconFailed, #f44336);
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+}
+
+.project-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* Wizard Styles */
+.wizard-progress {
+  display: flex;
+  margin-bottom: 24px;
+  position: relative;
+  justify-content: space-between;
+}
+
+.wizard-progress::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--vscode-editor-lineHighlightBorder, rgba(255, 255, 255, 0.1));
+  z-index: 1;
+}
+
+.progress-step {
+  position: relative;
+  padding: 0 10px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--vscode-disabledForeground);
+  z-index: 2;
+  background-color: var(--vscode-editor-background);
+  font-weight: 500;
+}
+
+.progress-step::before {
+  content: attr(data-step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 0 auto 8px;
+  background-color: var(--vscode-editor-lineHighlightBackground, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--vscode-editor-lineHighlightBorder, rgba(255, 255, 255, 0.1));
+  color: var(--vscode-disabledForeground);
+}
+
+.progress-step.active {
+  color: var(--vscode-foreground);
+}
+
+.progress-step.active::before {
+  background-color: var(--vscode-button-background);
+  border-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.progress-step.completed::before {
+  content: '✓';
+  background-color: var(--vscode-testing-iconPassed, #4caf50);
+  border-color: var(--vscode-testing-iconPassed, #4caf50);
+  color: var(--vscode-button-foreground);
+}
+
+.wizard-step {
+  display: none;
+}
+
+.wizard-step.active {
+  display: block;
+}
+
+.wizard-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  border-top: 1px solid var(--vscode-panel-border);
+  padding-top: 16px;
+}
+
+.step-header {
+  margin-bottom: 24px;
+}
+
+.step-header h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.step-header p {
+  color: var(--vscode-descriptionForeground);
+  margin: 0;
+}
+
+.selection-cards {
+  display: flex;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.selection-card {
+  flex: 1;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.selection-card:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.selection-card.selected {
+  border-color: var(--vscode-button-background);
+  background-color: var(--vscode-editor-lineHighlightBackground, rgba(255, 255, 255, 0.05));
+}
+
+.selection-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.selection-card p {
+  color: var(--vscode-descriptionForeground);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.card-icon {
+  color: var(--vscode-descriptionForeground);
+}
+
+.selection-card.selected .card-icon {
+  color: var(--vscode-button-background);
+}
+
+.select-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.project-field-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.checkbox-help {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  margin-left: 8px;
+}
+
+.summary-box {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+  background-color: var(--vscode-editor-lineHighlightBackground, rgba(255, 255, 255, 0.05));
+}
+
+.summary-row {
+  margin-bottom: 8px;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.import-note {
+  width: 100%;
+  padding: 12px;
+  border-left: 4px solid var(--vscode-textLink-activeForeground);
+  background-color: var(--vscode-editorHoverWidget-background, rgba(255, 255, 255, 0.05));
+  border-radius: 2px;
+}
+
+.import-note p {
+  margin: 8px 0;
+}
+
+.import-note a {
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+}
+
+.import-note a:hover {
+  text-decoration: underline;
+}
+
+/* Add basic styling for form elements to ensure they appear regardless of project-* classes */
+button {
+  font-size: 13px;
+  padding: 4px 8px;
+  margin: 0;
+  cursor: pointer;
+  background-color: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, white);
+  border: none;
+  border-radius: 2px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
