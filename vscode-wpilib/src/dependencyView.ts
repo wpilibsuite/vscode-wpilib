@@ -699,88 +699,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         <link rel="stylesheet" href="${vscodeElementsUri}">
         <link rel="stylesheet" href="${styleUri}">
         <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
-        <style>
-          .dependency-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-          }
-          .dependency-name {
-            font-weight: 600;
-            font-size: 14px;
-          }
-          .dependency-version {
-            margin-left: 8px;
-          }
-          .dependency-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          .dependency-description {
-            color: var(--vscode-descriptionForeground);
-            margin-top: 4px;
-            font-size: 12px;
-            line-height: 1.4;
-          }
-          .section-header {
-            margin-top: 16px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--vscode-foreground);
-          }
-          .empty-state {
-            color: var(--vscode-descriptionForeground);
-            font-style: italic;
-            padding: 10px;
-            text-align: center;
-          }
-          .url-install-section {
-            padding: 10px 0;
-          }
-          .url-input-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-          }
-          #url-input {
-            flex: 1;
-            min-width: 50px;
-            max-width: 100%;
-          }
-          .url-help-text {
-            font-size: 12px;
-            color: var(--vscode-descriptionForeground);
-            line-height: 1.4;
-          }
-          .uninstall-button {
-          /* Fix for height mismatch between select and buttons */
-          .vscode-select select {
-            height: 24px;
-            box-sizing: border-box;
-            line-height: 18px;
-            padding: 2px 4px;
-            border-radius: 2px;
-          }
-          button[id*="version-action"],
-          button[id*="uninstall-action"],
-          button[id*="install-action"] {
-            width: 72px;
-            height: 24px;
-            box-sizing: border-box;
-            padding: 1px 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-            background-color: var(--vscode-button-secondaryBackground, transparent);
-            color: var(--vscode-button-secondaryForeground);
-            border: 1px solid var(--vscode-button-border);
-          }
-        </style>
       </head>
       <body>
         <div class="top-line">
@@ -811,7 +729,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           </div>
         </details>
         
-        <details class="vscode-collapsible" open>
+  <details class="vscode-collapsible always-show-actions" open>
           <summary>
             <i class="codicon codicon-chevron-right icon-arrow"></i>
             <h2 class="title">
@@ -822,7 +740,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           <div id="installed-dependencies"></div>
         </details>
         
-        <details class="vscode-collapsible" open>
+  <details class="vscode-collapsible always-show-actions" open>
           <summary>
             <i class="codicon codicon-chevron-right icon-arrow"></i>
             <h2 class="title">
