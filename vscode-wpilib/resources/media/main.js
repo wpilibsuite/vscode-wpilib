@@ -10,53 +10,91 @@
   // Function to generate HTML for installed dependencies
   function populateInstalledList(installed, container) {
     // Create HTML for installed dependencies
-    const badge = Object.assign(document.createElement('vscode-badge'), {
-      variant: 'counter',
-      slot: 'decorations',
+    const badge = Object.assign(document.createElement('span'), {
+      className: 'vscode-badge counter',
       textContent: installed.length,
     });
-    container.replaceChildren(badge);
+    document.querySelector('#installed-actions')?.replaceChildren(badge);
+    container.replaceChildren();
+
+    if (installed.length === 0) {
+      const emptyState = Object.assign(document.createElement('div'), {
+        className: 'empty-state',
+        textContent: 'No dependencies installed',
+      });
+      container.appendChild(emptyState);
+      return;
+    }
+
     installed.forEach((dep, index) => {
       const installedDep = Object.assign(document.createElement('div'), {
         className: 'installed-dependency',
       });
-      const topLine = Object.assign(document.createElement('div'), {
-        className: 'top-line',
+
+      const header = Object.assign(document.createElement('div'), {
+        className: 'dependency-header',
       });
-      topLine.appendChild(
+
+      const nameContainer = Object.assign(document.createElement('div'), {
+        className: 'dependency-title',
+      });
+
+      nameContainer.appendChild(
         Object.assign(document.createElement('span'), {
           textContent: dep.name,
-          className: 'name',
+          className: 'dependency-name',
         })
       );
-      topLine.appendChild(
+
+      nameContainer.appendChild(
         Object.assign(document.createElement('span'), {
           textContent: dep.currentVersion,
+          className: 'dependency-version',
         })
       );
-      installedDep.appendChild(topLine);
-      const update = Object.assign(document.createElement('div'), {
-        className: 'update',
+
+      header.appendChild(nameContainer);
+      installedDep.appendChild(header);
+
+      const controls = Object.assign(document.createElement('div'), {
+        className: 'dependency-controls',
       });
-      const versionSelect = update.appendChild(
-        Object.assign(document.createElement('vscode-single-select'), {
+
+      const selectContainer = controls.appendChild(
+        Object.assign(document.createElement('div'), {
+          className: 'vscode-select',
+          style: 'margin: 4px 0',
+        })
+      );
+
+      selectContainer.appendChild(
+        Object.assign(document.createElement('i'), {
+          className: 'codicon codicon-chevron-right chevron-icon',
+        })
+      );
+
+      const versionSelect = selectContainer.appendChild(
+        Object.assign(document.createElement('select'), {
           id: `version-select-${index}`,
         })
       );
-      const versionAction = update.appendChild(
-        Object.assign(document.createElement('vscode-button'), {
+
+      const versionAction = controls.appendChild(
+        Object.assign(document.createElement('button'), {
+          className: 'vscode-button',
           id: `version-action-${index}`,
         })
       );
+
       dep.versionInfo.forEach((versionTuple, i) => {
-        const option = document.createElement('vscode-option');
+        const option = document.createElement('option');
         option.value = versionTuple.version;
         option.textContent = versionTuple.version;
         if (dep.currentVersion === versionTuple.version) {
           option.selected = true;
           versionAction.textContent = versionTuple.buttonText;
           if (i === 0) {
-            //This is the first element of the version array thus the most current
+            // This is the first element of the version array thus the most current
             versionAction.setAttribute('disabled', 'true');
           }
         }
@@ -64,7 +102,6 @@
       });
 
       versionAction.addEventListener('click', () => {
-        const action = versionAction.getAttribute('id');
         if (versionSelect) {
           var selectedText = versionSelect.options[versionSelect.selectedIndex].label;
           // Handle update logic here
@@ -75,6 +112,7 @@
           });
         }
       });
+
       versionSelect.addEventListener('change', () => {
         const versions = dep.versionInfo;
         var selectedText = versionSelect.options[versionSelect.selectedIndex].label;
@@ -86,23 +124,24 @@
           versionSelect.selectedIndex === 0 &&
           version.version === message.installed[index].currentVersion
         ) {
-          //This is the first element of the version array thus the most current
+          // This is the first element of the version array thus the most current
           versionAction.disabled = true;
         } else {
           versionAction.disabled = false;
         }
       });
 
-      const uninstallAction = update.appendChild(
-        Object.assign(document.createElement('vscode-button'), {
+      const uninstallAction = controls.appendChild(
+        Object.assign(document.createElement('button'), {
           id: `uninstall-action-${index}`,
-          className: 'uninstall-button',
+          className: 'uninstall-button vscode-button',
+          title: `Uninstall ${dep.name}`,
         })
       );
-      uninstallAction.setAttribute('data-dependency', dep.name);
+
       uninstallAction.appendChild(
-        Object.assign(document.createElement('vscode-icon'), {
-          name: 'trash',
+        Object.assign(document.createElement('i'), {
+          className: 'codicon codicon-trash',
         })
       );
 
@@ -110,49 +149,79 @@
         vscode.postMessage({ type: 'uninstall', index: index });
       });
 
-      installedDep.appendChild(update);
+      installedDep.appendChild(controls);
       container.appendChild(installedDep);
     });
   }
 
   // Function to generate HTML for available dependencies
   function populateAvailableList(available, container) {
-    const badge = Object.assign(document.createElement('vscode-badge'), {
-      variant: 'counter',
-      slot: 'decorations',
+    const badge = Object.assign(document.createElement('span'), {
+      className: 'vscode-badge counter',
       textContent: available.length,
     });
-    container.replaceChildren(badge);
+    document.querySelector('#available-actions')?.replaceChildren(badge);
+    container.replaceChildren();
+
+    if (available.length === 0) {
+      const emptyState = Object.assign(document.createElement('div'), {
+        className: 'empty-state',
+        textContent: 'No additional dependencies available',
+      });
+      container.appendChild(emptyState);
+      return;
+    }
+
     available.forEach((dep, index) => {
       const availableDep = Object.assign(document.createElement('div'), {
         className: 'available-dependency',
       });
-      const topLine = Object.assign(document.createElement('div'), {
-        className: 'top-line',
+
+      const header = Object.assign(document.createElement('div'), {
+        className: 'dependency-header',
       });
-      topLine.appendChild(
+
+      header.appendChild(
         Object.assign(document.createElement('span'), {
           textContent: dep.name,
-          className: 'name',
+          className: 'dependency-name',
         })
       );
 
-      const installAction = topLine.appendChild(
-        Object.assign(document.createElement('vscode-button'), {
+      const installAction = header.appendChild(
+        Object.assign(document.createElement('button'), {
           id: `install-action-${index}`,
-          textContent: 'Install',
+          className: 'vscode-button',
         })
       );
+
+      installAction.appendChild(
+        Object.assign(document.createElement('i'), {
+          className: 'codicon codicon-add',
+        })
+      );
+
+      installAction.appendChild(document.createTextNode(' Install'));
+
       installAction.addEventListener('click', () => {
         vscode.postMessage({ type: 'install', index: index });
       });
 
-      availableDep.appendChild(topLine);
+      availableDep.appendChild(header);
+
       const details = Object.assign(document.createElement('div'), {
-        className: 'details',
-        textContent: `${dep.version} - ${dep.description}`,
+        className: 'dependency-description',
       });
+
+      const versionSpan = details.appendChild(
+        Object.assign(document.createElement('span'), {
+          textContent: dep.version,
+        })
+      );
+
+      details.appendChild(document.createTextNode(` - ${dep.description}`));
       availableDep.appendChild(details);
+
       container.appendChild(availableDep);
     });
   }
@@ -186,6 +255,25 @@
 
     document.getElementById('updateall-action')?.addEventListener('click', () => {
       vscode.postMessage({ type: 'updateall' });
+    });
+
+    document.getElementById('install-url-action')?.addEventListener('click', () => {
+      const urlInput = /** @type {HTMLInputElement | null} */ (
+        document.getElementById('url-input')
+      );
+      if (urlInput && urlInput.value.trim()) {
+        vscode.postMessage({
+          type: 'installFromUrl',
+          url: urlInput.value.trim(),
+        });
+        urlInput.value = '';
+      }
+    });
+
+    document.getElementById('url-input')?.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        document.getElementById('install-url-action')?.click();
+      }
     });
 
     // Listen for focus events

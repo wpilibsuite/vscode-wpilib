@@ -43,7 +43,7 @@ export class Preferences implements IPreferences {
     return prefs;
   }
 
-  public static getPrefrencesFilePath(root: string): string {
+  public static getPreferencesFilePath(root: string): string {
     return path.join(root, Preferences.wpilibPreferencesFolder, Preferences.preferenceFileName);
   }
 
@@ -203,7 +203,7 @@ export class Preferences implements IPreferences {
   }
 
   private async asyncInitialize() {
-    const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+    const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
 
     if (await existsAsync(configFilePath)) {
       vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
@@ -233,7 +233,7 @@ export class Preferences implements IPreferences {
 
   private async writePreferences(): Promise<void> {
     if (this.preferencesFile === undefined) {
-      const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+      const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
       this.preferencesFile = vscode.Uri.file(configFilePath);
       await mkdirAsync(path.dirname(this.preferencesFile.fsPath));
     }

@@ -64,3 +64,5 @@ Failed to start tool: 工具运行失败
 No tools found. Would you like to use Gradle to grab some?: 没找到工具，要使用 Gradle 来装一些吗？
 # Can only extract to absolute path
 # Please select project type, language, and base.
+# Could not find cpptools C++ extension. Debugging is disabled.
+# Could not find Debugger for Java extension. Debugging is disabled.

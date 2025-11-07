@@ -1,87 +1,202 @@
 <!doctype html>
 <html>
   <head>
-    <title>WPILib Project Create</title>
-    <style>
-      .error {
-        color: red;
-        border-color: red;
-        border-width: 2px;
-      }
-    </style>
+    <title>WPILib Project Creator</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS will be injected here by WebViewBase's loadWebpage method -->
   </head>
 
   <body>
-    <img src="replaceresource/resources/wpilib-generic.svg" height="75" />
+    <div class="project-container">
+      <img src="replaceresource/resources/wpilib-generic.svg" height="75" />
 
-    <h1 data-i18n-trans>Welcome to WPILib New Project Creator</h1>
+      <h1 class="project-title">Welcome to WPILib New Project Creator</h1>
 
-    <button id="projectType" data-i18n-trans>Select a project type (Example or Template)</button>
+      <div class="wizard-progress">
+        <div class="progress-step active" data-step="1">Project Type</div>
+        <div class="progress-step" data-step="2">Project Settings</div>
+        <div class="progress-step" data-step="3">Location & Config</div>
+        <div class="progress-step" data-step="4">Review & Create</div>
+      </div>
 
-    <button id="language" data-i18n-trans disabled>Select a language</button>
+      <!-- Step 1: Project Type -->
+      <div class="wizard-step active" id="step-1">
+        <div class="step-header">
+          <h2>Step 1: Select Project Type</h2>
+          <p>Choose whether to create a project from a template or an example.</p>
+        </div>
 
-    <button id="projectBase" data-i18n-trans disabled>Select a project base</button>
-    <br />
-    <br />
-    <div id="projectfolderdiv" data-i18n-trans="ui" class="error" style="font-weight: bold">
-      Base Folder:
+        <div class="selection-cards">
+          <div class="selection-card" data-value="Template">
+            <h3>Template</h3>
+            <p>Start with a basic robot program structure</p>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path
+                  fill="currentColor"
+                  d="M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="selection-card" data-value="Example">
+            <h3>Example</h3>
+            <p>Start with a complete example project</p>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path
+                  fill="currentColor"
+                  d="M8,16H16V18H8V16M8,12H16V14H8V12M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-navigation">
+          <div></div>
+          <!-- Empty div for alignment -->
+          <button id="next-to-step-2" class="vscode-button next-button" disabled>Next</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Project Settings -->
+      <div class="wizard-step" id="step-2">
+        <div class="step-header">
+          <h2>Step 2: Select Language & Base</h2>
+          <p>Choose the programming language and project base to use.</p>
+        </div>
+
+        <div class="project-row">
+          <div class="project-label"><b>Language</b></div>
+          <div class="select-wrapper">
+            <select id="language-select" class="project-select" disabled>
+              <option value="" selected disabled>Select a language</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="project-row">
+          <div class="project-label"><b>Project Base</b></div>
+          <div class="select-wrapper">
+            <select id="base-select" class="project-select" disabled>
+              <option value="" selected disabled>Select a project base</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="wizard-navigation">
+          <button id="back-to-step-1" class="vscode-button secondary">Back</button>
+          <button id="next-to-step-3" class="vscode-button next-button" disabled>Next</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Location & Configuration -->
+      <div class="wizard-step" id="step-3">
+        <div class="step-header">
+          <h2>Step 3: Project Location & Configuration</h2>
+          <p>Set where to save your project and configure basic settings.</p>
+        </div>
+
+        <div class="project-row">
+          <div id="projectfolderdiv" class="project-label"><b>Base Folder</b></div>
+          <div class="project-field-container">
+            <input id="projectFolder" type="text" class="vscode-textfield" readonly />
+            <div id="projectFolderError" class="project-error-text">Base folder is required</div>
+          </div>
+        </div>
+
+        <div class="project-row">
+          <button id="projectSelectButton" class="vscode-button">Select Folder</button>
+        </div>
+
+        <div class="project-row">
+          <div id="projectnamediv" class="project-label"><b>Project Name</b></div>
+          <div class="project-field-container">
+            <input id="projectName" type="text" class="vscode-textfield" />
+            <div id="projectNameError" class="project-error-text">Project name is required</div>
+          </div>
+        </div>
+
+        <div class="project-row">
+          <div class="project-label"><b>Team Number</b></div>
+          <div class="project-field-container">
+            <input
+              id="teamNumber"
+              type="number"
+              inputmode="numeric"
+              class="vscode-textfield"
+              required
+            />
+            <div id="teamNumberError" class="project-error-text">Invalid Team Number</div>
+          </div>
+        </div>
+
+        <div class="project-row">
+          <div class="vscode-checkbox">
+            <input id="newFolderCB" type="checkbox" checked />
+            <label for="newFolderCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Create a new folder</span>
+            </label>
+            <span class="checkbox-help">Creates a new folder at Base Folder/Project Name</span>
+          </div>
+        </div>
+
+        <div class="project-row">
+          <div class="vscode-checkbox">
+            <input id="desktopCB" type="checkbox" />
+            <label for="desktopCB">
+              <span class="icon">
+                <i class="codicon codicon-check icon-checked"></i>
+              </span>
+              <span class="text">Enable Desktop Support</span>
+            </label>
+            <span class="checkbox-help">This enables unit testing and simulation support</span>
+          </div>
+        </div>
+
+        <div class="wizard-navigation">
+          <button id="back-to-step-2" class="vscode-button secondary">Back</button>
+          <button id="next-to-step-4" class="vscode-button next-button">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Review & Create -->
+      <div class="wizard-step" id="step-4">
+        <div class="step-header">
+          <h2>Step 4: Review & Create</h2>
+          <p>Review your selections and create the project.</p>
+        </div>
+
+        <div class="project-row">
+          <div class="summary-box">
+            <div class="summary-row">
+              <strong>Project Type:</strong> <span id="summary-type"></span>
+            </div>
+            <div class="summary-row">
+              <strong>Language:</strong> <span id="summary-language"></span>
+            </div>
+            <div class="summary-row">
+              <strong>Project Base:</strong> <span id="summary-base"></span>
+            </div>
+            <div class="summary-row">
+              <strong>Location:</strong> <span id="summary-location"></span>
+            </div>
+            <div class="summary-row">
+              <strong>Team Number:</strong> <span id="summary-team"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-navigation">
+          <button id="back-to-step-3" class="vscode-button secondary">Back</button>
+          <button id="generateProject" class="vscode-button">Create Project</button>
+        </div>
+      </div>
     </div>
-    <span data-i18n-trans>Select a base folder to place the new project into.</span>
-    <br />
-    <input
-      id="projectFolder"
-      type="text"
-      class="error"
-      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
-    />
-    <br />
-    <button id="projectSelectButton" data-i18n-trans>Select a new project folder</button>
-    <br />
-    <br />
-    <div id="projectnamediv" data-i18n-trans="ui" class="error" style="font-weight: bold">
-      Project Name
-    </div>
-    <input
-      id="projectName"
-      type="text"
-      class="error"
-      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
-    />
-    <br />
-    <br />
-    <span data-i18n-trans STYLE="font-weight:bold">Create a new folder?</span>
-    <input id="newFolderCB" type="checkbox" checked />
-    <br />
-    <span data-i18n-trans
-      >This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be
-      checked. Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project
-      Name</span
-    >
-    <br />
-    <br />
-    <div id="teamnumberdiv" class="error" data-i18n-trans="ui" style="font-weight: bold">
-      Team Number
-    </div>
-    <input
-      id="teamNumber"
-      class="error"
-      type="text"
-      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
-    />
-    <br />
-    <div id="desktopdiv">
-      <span data-i18n-trans STYLE="font-weight:bold">Enable Desktop Support</span>
-      <input id="desktopCB" type="checkbox" />
-      <br />
-      <span data-i18n-trans data-i18n-key="hintDesktopSupport">
-        This is needed for simulation and unit testing support, however there are some cases where
-        this will do some unexpected things during build. In addition, not all vendor libraries
-        support desktop. This option can be set with the command "WPILib: Set Desktop Support" at
-        any time.
-      </span>
-    </div>
-    <br />
-
-    <button id="generateProject" data-i18n-trans>Generate Project</button>
   </body>
 </html>
