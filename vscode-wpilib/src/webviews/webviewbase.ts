@@ -39,7 +39,10 @@ export abstract class WebViewBase {
 
     this.html = this.html.replace(
       '</head>',
-      `<link rel="stylesheet" href="replaceresource/resources/media/icons.css" />\r\n<link rel="stylesheet" href="replaceresource/resources/media/vscode-elements.css" />\r\n<link rel="stylesheet" href="replaceresource/resources/media/main.css" />\r\n</head>`
+      `<link rel="stylesheet" href="replaceresource/resources/media/icons.css" />
+      <link rel="stylesheet" href="replaceresource/resources/media/vscode-elements.css" />
+      <link rel="stylesheet" href="replaceresource/resources/media/main.css" /></head>
+      `
     );
 
     if (localeDomains) {
