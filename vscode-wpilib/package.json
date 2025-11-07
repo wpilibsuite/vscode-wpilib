@@ -8,7 +8,7 @@
     "license": "BSD-3-Clause",
     "icon": "resources/wpilib-icon-128.png",
     "engines": {
-        "vscode": "^1.90.0"
+        "vscode": "^1.105.0"
     },
     "categories": [
         "Other"
@@ -444,8 +444,8 @@
         "@eslint/js": "^9.29.0",
         "@types/micromatch": "^4.0.9",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^20.19.11",
-        "@types/vscode": "1.74.0",
+        "@types/node": "^22.19.0",
+        "@types/vscode": "1.105.0",
         "@types/xml2js": "^0.4.14",
         "@vscode/vsce": "^3.5.0",
         "eslint": "^9.34.0",
