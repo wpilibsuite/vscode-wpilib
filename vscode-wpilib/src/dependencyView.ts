@@ -6,8 +6,7 @@ import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
 import { IJsonDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
-// @ts-ignore
-import elements from '!!raw-loader!@vscode-elements/elements/dist/bundled.js';
+
 export interface IJsonList {
   path: string;
   name: string;
