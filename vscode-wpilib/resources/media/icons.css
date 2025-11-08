@@ -91,3 +91,11 @@
 .codicon-chrome-minimize:before {
   content: '\eaba';
 }
+
+.codicon-notebook:before {
+  content: '\ebaf';
+}
+
+.codicon-notebook-template:before {
+  content: '\ebbf';
+}
