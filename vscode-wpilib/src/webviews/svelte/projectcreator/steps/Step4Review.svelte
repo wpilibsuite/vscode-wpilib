@@ -5,11 +5,21 @@
 
   const dispatch = createEventDispatcher();
 
-  export let projectType: ProjectType = ProjectType.Template;
-  export let language = '';
-  export let base = '';
-  export let location = '';
-  export let teamNumber = '';
+  interface Props {
+    projectType?: ProjectType;
+    language?: string;
+    base?: string;
+    location?: string;
+    teamNumber?: string;
+  }
+
+  let {
+    projectType = ProjectType.Template,
+    language = '',
+    base = '',
+    location = '',
+    teamNumber = ''
+  }: Props = $props();
 
   const back = () => dispatch('back');
   const createProject = () => dispatch('create');
@@ -35,10 +45,10 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-3" type="button" class="vscode-button secondary" on:click={back}>
+  <button id="back-to-step-3" type="button" class="vscode-button secondary" onclick={back}>
     Back
   </button>
-  <button id="generateProject" type="button" class="vscode-button" on:click={createProject}>
+  <button id="generateProject" type="button" class="vscode-button" onclick={createProject}>
     Create Project
   </button>
 </div>

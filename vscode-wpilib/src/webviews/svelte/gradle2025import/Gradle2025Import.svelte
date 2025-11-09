@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
   import { WizardProgress, WizardStep } from '../components/shared';
   import Step1SelectSource from './steps/Step1SelectSource.svelte';
@@ -10,7 +12,7 @@
   type WizardStepNumber = 1 | 2 | 3;
   type HardwareOption = 'none' | 'romi' | 'xrp';
 
-  let logoPath = '';
+  let logoPath = $state('');
 
   const steps = [
     { step: 1, label: 'Select Source' },
@@ -18,22 +20,22 @@
     { step: 3, label: 'Review & Import' },
   ];
 
-  let currentStep: WizardStepNumber = 1;
-  let sourcePath = '';
-  let projectFolder = '';
-  let projectName = '';
-  let teamNumber = '';
-  let newFolder = true;
-  let desktop = false;
-  let hardware: HardwareOption = 'none';
+  let currentStep: WizardStepNumber = $state(1);
+  let sourcePath = $state('');
+  let projectFolder = $state('');
+  let projectName = $state('');
+  let teamNumber = $state('');
+  let newFolder = $state(true);
+  let desktop = $state(false);
+  let hardware: HardwareOption = $state('none');
 
-  let projectFolderError: string | null = null;
-  let projectNameError: string | null = null;
-  let teamNumberError: string | null = null;
+  let projectFolderError: string | null = $state(null);
+  let projectNameError: string | null = $state(null);
+  let teamNumberError: string | null = $state(null);
 
-  let showProjectFolderError = false;
-  let showProjectNameError = false;
-  let showTeamNumberError = false;
+  let showProjectFolderError = $state(false);
+  let showProjectNameError = $state(false);
+  let showTeamNumberError = $state(false);
 
   const validateProjectName = (value: string): string | null => {
     if (value.trim() === '') {
@@ -107,11 +109,13 @@
     postMessage({ type: 'importproject', data: payload });
   };
 
-  let destinationPath = '';
+  let destinationPath = $state('');
 
-  $: destinationPath = newFolder && projectName
-    ? `${projectFolder}/${projectName}`
-    : projectFolder;
+  run(() => {
+    destinationPath = newFolder && projectName
+      ? `${projectFolder}/${projectName}`
+      : projectFolder;
+  });
 
   onMount(() => {
     const appElement = document.getElementById('app');
@@ -142,9 +146,15 @@
     return () => unsubscribe();
   });
 
-  $: projectFolderError = validateProjectFolder(projectFolder);
-  $: projectNameError = validateProjectName(projectName);
-  $: teamNumberError = validateTeamNumber(teamNumber);
+  run(() => {
+    projectFolderError = validateProjectFolder(projectFolder);
+  });
+  run(() => {
+    projectNameError = validateProjectName(projectName);
+  });
+  run(() => {
+    teamNumberError = validateTeamNumber(teamNumber);
+  });
 </script>
 
 <div class="project-container">

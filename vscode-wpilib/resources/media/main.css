@@ -291,15 +291,25 @@
   text-align: center;
   position: relative;
   transition: all 0.2s;
+  background-color: var(--vscode-editor-background);
 }
 
 .selection-card:hover {
-  background-color: var(--vscode-list-hoverBackground);
+  background-color: var(--vscode-button-background);
+  border-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.selection-card:hover h3,
+.selection-card:hover p,
+.selection-card:hover .card-icon {
+  color: var(--vscode-button-foreground);
 }
 
 .selection-card.selected {
   border-color: var(--vscode-button-background);
-  background-color: var(--vscode-editor-lineHighlightBackground, rgba(255, 255, 255, 0.05));
+  background-color: var(--vscode-editor-background);
+  color: inherit;
 }
 
 .selection-card h3 {
@@ -308,22 +318,22 @@
 }
 
 .selection-card p {
-  color: var(--vscode-descriptionForeground);
+  /* color: var(--vscode-descriptionForeground); */
   font-size: 13px;
   margin-bottom: 16px;
 }
 
-.card-icon {
+/* .card-icon {
   color: var(--vscode-descriptionForeground);
-}
+} */
 
 .card-icon i.codicon {
   font-size: 48px;
 }
 
-.selection-card.selected .card-icon {
+/* .selection-card.selected .card-icon {
   color: var(--vscode-button-background);
-}
+} */
 
 .select-wrapper {
   position: relative;

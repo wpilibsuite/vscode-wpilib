@@ -4,9 +4,13 @@
 
   const dispatch = createEventDispatcher();
 
-  export let sourcePath = '';
-  export let destinationPath = '';
-  export let teamNumber = '';
+  interface Props {
+    sourcePath?: string;
+    destinationPath?: string;
+    teamNumber?: string;
+  }
+
+  let { sourcePath = '', destinationPath = '', teamNumber = '' }: Props = $props();
 
   const back = () => dispatch('back');
   const importProject = () => dispatch('import');
@@ -45,10 +49,10 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-2" type="button" class="vscode-button secondary" on:click={back}>
+  <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={back}>
     Back
   </button>
-  <button id="importProject" type="button" class="vscode-button" on:click={importProject}>
+  <button id="importProject" type="button" class="vscode-button" onclick={importProject}>
     Import Project
   </button>
 </div>

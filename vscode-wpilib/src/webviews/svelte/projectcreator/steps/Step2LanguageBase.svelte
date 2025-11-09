@@ -1,37 +1,61 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import type { BaseOption } from '../types';
 
-  const dispatch = createEventDispatcher();
-
-  export let languages: string[] = [];
-  export let selectedLanguage = '';
-  export let bases: BaseOption[] = [];
-  export let selectedBase = '';
-
-  let languageValue = selectedLanguage;
-  let baseValue = selectedBase;
-
-  $: canProceed = languageValue !== '' && baseValue !== '';
-
-  $: if (selectedLanguage !== languageValue) {
-    languageValue = selectedLanguage;
+  interface Props {
+    languages?: string[];
+    selectedLanguage?: string;
+    bases?: BaseOption[];
+    selectedBase?: string;
+    onLanguageChange?: (language: string) => void;
+    onBaseChange?: (base: string) => void;
+    onNext?: () => void;
+    onBack?: () => void;
   }
 
-  $: if (selectedBase !== baseValue) {
-    baseValue = selectedBase;
-  }
+  let {
+    languages = [],
+    selectedLanguage = '',
+    bases = [],
+    selectedBase = '',
+    onLanguageChange = () => {},
+    onBaseChange = () => {},
+    onNext = () => {},
+    onBack = () => {}
+  }: Props = $props();
+
+  let languageValue = $state(selectedLanguage);
+  let baseValue = $state(selectedBase);
+
+  let previousSelectedLanguage = selectedLanguage;
+  let previousSelectedBase = selectedBase;
+
+  const canProceed = $derived(languageValue !== '' && baseValue !== '');
+
+  $effect(() => {
+    if (selectedLanguage !== previousSelectedLanguage) {
+      previousSelectedLanguage = selectedLanguage;
+      languageValue = selectedLanguage;
+    }
+  });
+
+  $effect(() => {
+    if (selectedBase !== previousSelectedBase) {
+      previousSelectedBase = selectedBase;
+      baseValue = selectedBase;
+    }
+  });
+
 
   const notifyLanguageChange = () => {
-    dispatch('languageChange', languageValue);
+    onLanguageChange(languageValue);
   };
 
   const notifyBaseChange = () => {
-    dispatch('baseChange', baseValue);
+    onBaseChange(baseValue);
   };
 
-  const next = () => dispatch('next');
-  const back = () => dispatch('back');
+  const next = () => onNext();
+  const back = () => onBack();
 </script>
 
 <div class="step-header">
@@ -50,7 +74,7 @@
       on:change={notifyLanguageChange}
       disabled={languages.length === 0}
     >
-      <option value="" disabled selected={languageValue === ''}>Select a language</option>
+  <option value="" disabled>Select a language</option>
       {#each languages as lang}
         <option value={lang}>{lang}</option>
       {/each}
@@ -69,7 +93,7 @@
       on:change={notifyBaseChange}
       disabled={bases.length === 0}
     >
-      <option value="" disabled selected={baseValue === ''}>Select a project base</option>
+  <option value="" disabled>Select a project base</option>
       {#each bases as base}
         <option value={base.label}>{base.label}</option>
       {/each}

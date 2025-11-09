@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { postMessage } from '../lib';
 
-  let logoPath = '';
+  let logoPath = $state('');
 
   onMount(() => {
     const appElement = document.getElementById('app');
@@ -79,10 +79,10 @@
   </div>
 
   <div class="project-actions">
-    <button id="openCommandPalette" type="button" class="vscode-button" on:click={openCommandPalette}>
+    <button id="openCommandPalette" type="button" class="vscode-button" onclick={openCommandPalette}>
       Open Command Palette
     </button>
-    <button id="openDocumentation" type="button" class="vscode-button" on:click={openDocumentation}>
+    <button id="openDocumentation" type="button" class="vscode-button" onclick={openDocumentation}>
       Open WPILib Documentation
     </button>
   </div>

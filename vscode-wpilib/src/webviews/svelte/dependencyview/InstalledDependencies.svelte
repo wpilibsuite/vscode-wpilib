@@ -1,14 +1,20 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { createEventDispatcher } from 'svelte';
   import type { InstalledDependency } from './types';
 
   const dispatch = createEventDispatcher();
 
-  export let dependencies: InstalledDependency[] = [];
+  interface Props {
+    dependencies?: InstalledDependency[];
+  }
 
-  let selectedVersions: string[] = [];
+  let { dependencies = [] }: Props = $props();
 
-  $: {
+  let selectedVersions: string[] = $state([]);
+
+  run(() => {
     const nextSelected = dependencies.map((dep, index) => selectedVersions[index] ?? dep.currentVersion);
     if (
       nextSelected.length !== selectedVersions.length ||
@@ -16,7 +22,7 @@
     ) {
       selectedVersions = nextSelected;
     }
-  }
+  });
 
   const getButtonText = (dependency: InstalledDependency, selectedVersion: string) => {
     const entry = dependency.versionInfo.find((info) => info.version === selectedVersion);
@@ -56,7 +62,7 @@
         <button
           class="vscode-button"
           disabled={isUpdateDisabled(dependency, selectedVersions[index])}
-          on:click={() => dispatch('update', { index, version: selectedVersions[index] })}
+          onclick={() => dispatch('update', { index, version: selectedVersions[index] })}
         >
           {getButtonText(dependency, selectedVersions[index])}
         </button>
@@ -64,7 +70,7 @@
         <button
           class="uninstall-button vscode-button"
           title={`Uninstall ${dependency.name}`}
-          on:click={() => dispatch('uninstall', { index })}
+          onclick={() => dispatch('uninstall', { index })}
         >
           <i class="codicon codicon-trash"></i>
         </button>

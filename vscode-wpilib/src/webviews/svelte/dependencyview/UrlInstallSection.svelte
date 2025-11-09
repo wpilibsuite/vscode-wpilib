@@ -3,7 +3,11 @@
 
   const dispatch = createEventDispatcher();
 
-  export let url = '';
+  interface Props {
+    url?: string;
+  }
+
+  let { url = $bindable('') }: Props = $props();
 
   const install = () => {
     if (url.trim().length === 0) {
@@ -28,9 +32,9 @@
       type="text"
       placeholder="Enter vendordep URL..."
       bind:value={url}
-      on:keypress={onKeyPress}
+      onkeypress={onKeyPress}
     />
-    <button id="install-url-action" class="vscode-button" on:click={install}>
+    <button id="install-url-action" class="vscode-button" onclick={install}>
       <i class="codicon codicon-cloud-download"></i>
       <span> Install</span>
     </button>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
   import { WizardProgress, WizardStep } from '../components/shared';
   import Step1ProjectType from './steps/Step1ProjectType.svelte';
@@ -12,7 +14,7 @@
     type ProjectCreationData,
   } from './types';
 
-  let logoPath = '';
+  let logoPath = $state('');
 
   interface WizardStepConfig {
     step: number;
@@ -28,25 +30,25 @@
     { step: 4, label: 'Review & Create' },
   ];
 
-  let currentStep: ProjectWizardStep = 1;
-  let projectType: ProjectType | null = null;
-  let languages: string[] = [];
-  let selectedLanguage = '';
-  let bases: BaseOption[] = [];
-  let selectedBase = '';
-  let projectFolder = '';
-  let projectName = '';
-  let teamNumber = '';
-  let newFolder = true;
-  let desktop = false;
+  let currentStep: ProjectWizardStep = $state(1);
+  let projectType: ProjectType | null = $state(null);
+  let languages: string[] = $state([]);
+  let selectedLanguage = $state('');
+  let bases: BaseOption[] = $state([]);
+  let selectedBase = $state('');
+  let projectFolder = $state('');
+  let projectName = $state('');
+  let teamNumber = $state('');
+  let newFolder = $state(true);
+  let desktop = $state(false);
 
-  let projectFolderError: string | null = null;
-  let projectNameError: string | null = null;
-  let teamNumberError: string | null = null;
+  let projectFolderError: string | null = $state(null);
+  let projectNameError: string | null = $state(null);
+  let teamNumberError: string | null = $state(null);
 
-  let showProjectFolderError = false;
-  let showProjectNameError = false;
-  let showTeamNumberError = false;
+  let showProjectFolderError = $state(false);
+  let showProjectNameError = $state(false);
+  let showTeamNumberError = $state(false);
 
   const goToStep = (step: ProjectWizardStep) => {
     currentStep = step;
@@ -244,13 +246,21 @@
     };
   });
 
-  $: projectFolderError = validateProjectFolder(projectFolder);
-  $: projectNameError = validateProjectName(projectName);
-  $: teamNumberError = validateTeamNumber(teamNumber);
+  run(() => {
+    projectFolderError = validateProjectFolder(projectFolder);
+  });
+  run(() => {
+    projectNameError = validateProjectName(projectName);
+  });
+  run(() => {
+    teamNumberError = validateTeamNumber(teamNumber);
+  });
 
-  const summaryLocation = newFolder && projectName
-    ? `${projectFolder}/${projectName}`
-    : projectFolder;
+  const summaryLocation = $derived(
+    newFolder && projectName
+      ? `${projectFolder}/${projectName}`
+      : projectFolder
+  );
 </script>
 
 <div class="project-container">
@@ -274,10 +284,10 @@
       {bases}
       selectedLanguage={selectedLanguage}
       selectedBase={selectedBase}
-      on:languageChange={(event) => handleLanguageChange(event.detail)}
-      on:baseChange={(event) => handleBaseChange(event.detail)}
-      on:next={() => goToStep(3)}
-      on:back={() => goToStep(1)}
+      onLanguageChange={handleLanguageChange}
+      onBaseChange={handleBaseChange}
+      onNext={() => goToStep(3)}
+      onBack={() => goToStep(1)}
     />
   </WizardStep>
 

@@ -1,10 +1,21 @@
 <script lang="ts">
-  export let active = false;
-  export let step: number | string | undefined = undefined;
-  export let element: 'section' | 'div' = 'div';
-  export let ariaLabelledBy: string | undefined = undefined;
+  interface Props {
+    active?: boolean;
+    step?: number | string | undefined;
+    element?: 'section' | 'div';
+    ariaLabelledBy?: string | undefined;
+    children?: import('svelte').Snippet;
+  }
 
-  $: classes = ['wizard-step', active ? 'active' : ''].filter(Boolean).join(' ');
+  let {
+    active = false,
+    step = undefined,
+    element = 'div',
+    ariaLabelledBy = undefined,
+    children
+  }: Props = $props();
+
+  let classes = $derived(['wizard-step', active ? 'active' : ''].filter(Boolean).join(' '));
 </script>
 
 {#if element === 'section'}
@@ -13,7 +24,7 @@
     data-step={step}
     aria-labelledby={ariaLabelledBy}
   >
-    <slot />
+    {@render children?.()}
   </section>
 {:else}
   <div
@@ -22,7 +33,7 @@
     aria-expanded={active}
     aria-labelledby={ariaLabelledBy}
   >
-    <slot />
+    {@render children?.()}
   </div>
 {/if}
 

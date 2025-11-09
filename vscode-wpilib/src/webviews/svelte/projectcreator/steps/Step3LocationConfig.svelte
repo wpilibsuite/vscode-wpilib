@@ -4,19 +4,35 @@
 
   const dispatch = createEventDispatcher();
 
-  export let projectFolder = '';
-  export let projectFolderError: string | null = null;
-  export let projectName = '';
-  export let projectNameError: string | null = null;
-  export let teamNumber = '';
-  export let teamNumberError: string | null = null;
-  export let newFolder = true;
-  export let desktop = false;
-  export let showProjectFolderError = false;
-  export let showProjectNameError = false;
-  export let showTeamNumberError = false;
+  interface Props {
+    projectFolder?: string;
+    projectFolderError?: string | null;
+    projectName?: string;
+    projectNameError?: string | null;
+    teamNumber?: string;
+    teamNumberError?: string | null;
+    newFolder?: boolean;
+    desktop?: boolean;
+    showProjectFolderError?: boolean;
+    showProjectNameError?: boolean;
+    showTeamNumberError?: boolean;
+  }
 
-  $: canProceed = !projectFolderError && !projectNameError;
+  let {
+    projectFolder = '',
+    projectFolderError = null,
+    projectName = '',
+    projectNameError = null,
+    teamNumber = '',
+    teamNumberError = null,
+    newFolder = $bindable(true),
+    desktop = $bindable(false),
+    showProjectFolderError = false,
+    showProjectNameError = false,
+    showTeamNumberError = false
+  }: Props = $props();
+
+  let canProceed = $derived(!projectFolderError && !projectNameError);
 
   const selectFolder = () => dispatch('selectFolder');
   const back = () => dispatch('back');
@@ -65,7 +81,7 @@
 </div>
 
 <div class="project-row">
-  <button id="projectSelectButton" type="button" class="vscode-button" on:click={selectFolder}>
+  <button id="projectSelectButton" type="button" class="vscode-button" onclick={selectFolder}>
     Select Folder
   </button>
 </div>
@@ -78,7 +94,7 @@
       class="vscode-textfield"
       type="text"
       value={projectName}
-      on:input={handleProjectNameInput}
+      oninput={handleProjectNameInput}
     />
     <ValidationError
       id="projectNameError"
@@ -96,7 +112,7 @@
       class="vscode-textfield"
       type="number"
       value={teamNumber}
-      on:input={handleTeamNumberInput}
+      oninput={handleTeamNumberInput}
     />
     <ValidationError
       id="teamNumberError"
@@ -112,7 +128,7 @@
       id="newFolderCB"
       type="checkbox"
       bind:checked={newFolder}
-      on:change={handleNewFolderChange}
+      onchange={handleNewFolderChange}
     />
     <label for="newFolderCB">
       <span class="icon">
@@ -130,7 +146,7 @@
       id="desktopCB"
       type="checkbox"
       bind:checked={desktop}
-      on:change={handleDesktopChange}
+      onchange={handleDesktopChange}
     />
     <label for="desktopCB">
       <span class="icon">
@@ -143,7 +159,7 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-2" type="button" class="vscode-button secondary" on:click={back}>
+  <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={back}>
     Back
   </button>
   <button
@@ -151,7 +167,7 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    on:click={next}
+    onclick={next}
   >
     Next
   </button>

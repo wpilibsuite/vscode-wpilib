@@ -12,9 +12,9 @@
     available?: AvailableDependency[];
   }
 
-  let installedDependencies: InstalledDependency[] = [];
-  let availableDependencies: AvailableDependency[] = [];
-  let urlInput = '';
+  let installedDependencies: InstalledDependency[] = $state([]);
+  let availableDependencies: AvailableDependency[] = $state([]);
+  let urlInput = $state('');
 
   const updateAll = () => {
     postMessage({ type: 'updateall' });
@@ -57,7 +57,7 @@
 </script>
 
 <div class="top-line">
-  <button id="updateall-action" class="vscode-button block" disabled={installedDependencies.length === 0} on:click={updateAll}>
+  <button id="updateall-action" class="vscode-button block" disabled={installedDependencies.length === 0} onclick={updateAll}>
     <i class="codicon codicon-sync"></i>
     <span>Update All Dependencies</span>
   </button>

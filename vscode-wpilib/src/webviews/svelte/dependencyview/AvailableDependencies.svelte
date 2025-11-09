@@ -4,7 +4,11 @@
 
   const dispatch = createEventDispatcher();
 
-  export let dependencies: AvailableDependency[] = [];
+  interface Props {
+    dependencies?: AvailableDependency[];
+  }
+
+  let { dependencies = [] }: Props = $props();
 </script>
 
 {#if dependencies.length === 0}
@@ -14,7 +18,7 @@
     <div class="available-dependency">
       <div class="dependency-header">
         <span class="dependency-name">{dependency.name}</span>
-        <button class="vscode-button" on:click={() => dispatch('install', { index })}>
+        <button class="vscode-button" onclick={() => dispatch('install', { index })}>
           <i class="codicon codicon-add"></i>
           <span> Install</span>
         </button>

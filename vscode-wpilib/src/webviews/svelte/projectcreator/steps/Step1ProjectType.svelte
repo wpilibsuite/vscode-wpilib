@@ -4,7 +4,11 @@
 
   const dispatch = createEventDispatcher();
 
-  export let selected: ProjectType | null = null;
+  interface Props {
+    selected?: ProjectType | null;
+  }
+
+  let { selected = null }: Props = $props();
 
   const select = (type: ProjectType) => {
     dispatch('select', type);
@@ -24,7 +28,7 @@
     class:selected={selected === ProjectType.Template}
     class="selection-card"
     data-value="Template"
-    on:click={() => select(ProjectType.Template)}
+    onclick={() => select(ProjectType.Template)}
     aria-pressed={selected === ProjectType.Template}
   >
     <h3>Template</h3>
@@ -38,7 +42,7 @@
     class:selected={selected === ProjectType.Example}
     class="selection-card"
     data-value="Example"
-    on:click={() => select(ProjectType.Example)}
+    onclick={() => select(ProjectType.Example)}
     aria-pressed={selected === ProjectType.Example}
   >
     <h3>Example</h3>
@@ -56,7 +60,7 @@
     type="button"
     class="vscode-button"
     disabled={selected === null}
-    on:click={next}
+    onclick={next}
   >
     Next
   </button>

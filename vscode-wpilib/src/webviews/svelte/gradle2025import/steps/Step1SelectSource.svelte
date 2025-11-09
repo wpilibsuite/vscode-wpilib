@@ -3,12 +3,16 @@
 
   const dispatch = createEventDispatcher();
 
-  export let sourcePath = '';
+  interface Props {
+    sourcePath?: string;
+  }
+
+  let { sourcePath = '' }: Props = $props();
 
   const selectSource = () => dispatch('selectSource');
   const next = () => dispatch('next');
 
-  $: canProceed = sourcePath.trim().length > 0;
+  let canProceed = $derived(sourcePath.trim().length > 0);
 </script>
 
 <div class="step-header">
@@ -26,7 +30,7 @@
 </div>
 
 <div class="project-row">
-  <button id="gradle2025SelectButton" type="button" class="vscode-button" on:click={selectSource}>
+  <button id="gradle2025SelectButton" type="button" class="vscode-button" onclick={selectSource}>
     Select Source Project
   </button>
 </div>
@@ -38,7 +42,7 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    on:click={next}
+    onclick={next}
   >
     Next
   </button>

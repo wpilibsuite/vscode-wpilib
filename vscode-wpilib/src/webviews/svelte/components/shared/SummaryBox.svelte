@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface SummaryItem {
     label: string;
     value?: string | number | null;
@@ -6,8 +6,13 @@
 </script>
 
 <script lang="ts">
-  export let title: string | undefined = undefined;
-  export let items: SummaryItem[] = [];
+  interface Props {
+    title?: string | undefined;
+    items?: SummaryItem[];
+    children?: import('svelte').Snippet;
+  }
+
+  let { title = undefined, items = [], children }: Props = $props();
 </script>
 
 <div class="summary-box">
@@ -15,13 +20,13 @@
     <h3>{title}</h3>
   {/if}
 
-  <slot>
+  {#if children}{@render children()}{:else}
     {#each items as item (item.label)}
       <div class="summary-row">
         <strong>{item.label}:</strong>
         <span>{item.value ?? ''}</span>
       </div>
     {/each}
-  </slot>
+  {/if}
 </div>
 

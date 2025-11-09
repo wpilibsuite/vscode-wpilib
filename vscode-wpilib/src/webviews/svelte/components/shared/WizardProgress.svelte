@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface WizardProgressStep {
     step: number;
     label: string;
@@ -6,8 +6,12 @@
 </script>
 
 <script lang="ts">
-  export let steps: WizardProgressStep[] = [];
-  export let currentStep = 1;
+  interface Props {
+    steps?: WizardProgressStep[];
+    currentStep?: number;
+  }
+
+  let { steps = [], currentStep = 1 }: Props = $props();
 </script>
 
 <div class="wizard-progress" role="list" aria-label="Wizard progress">
