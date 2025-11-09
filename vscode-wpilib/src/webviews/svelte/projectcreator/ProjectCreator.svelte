@@ -1,0 +1,319 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { WizardProgress, WizardStep } from '../components/shared';
+  import Step1ProjectType from './steps/Step1ProjectType.svelte';
+  import Step2LanguageBase from './steps/Step2LanguageBase.svelte';
+  import Step3LocationConfig from './steps/Step3LocationConfig.svelte';
+  import Step4Review from './steps/Step4Review.svelte';
+  import { postMessage, subscribeToMessages } from '../lib';
+  import {
+    ProjectType,
+    type BaseOption,
+    type ProjectCreationData,
+  } from './types';
+
+  let logoPath = '';
+
+  interface WizardStepConfig {
+    step: number;
+    label: string;
+  }
+
+  type ProjectWizardStep = 1 | 2 | 3 | 4;
+
+  const steps: WizardStepConfig[] = [
+    { step: 1, label: 'Project Type' },
+    { step: 2, label: 'Project Settings' },
+    { step: 3, label: 'Location & Config' },
+    { step: 4, label: 'Review & Create' },
+  ];
+
+  let currentStep: ProjectWizardStep = 1;
+  let projectType: ProjectType | null = null;
+  let languages: string[] = [];
+  let selectedLanguage = '';
+  let bases: BaseOption[] = [];
+  let selectedBase = '';
+  let projectFolder = '';
+  let projectName = '';
+  let teamNumber = '';
+  let newFolder = true;
+  let desktop = false;
+
+  let projectFolderError: string | null = null;
+  let projectNameError: string | null = null;
+  let teamNumberError: string | null = null;
+
+  let showProjectFolderError = false;
+  let showProjectNameError = false;
+  let showTeamNumberError = false;
+
+  const goToStep = (step: ProjectWizardStep) => {
+    currentStep = step;
+  };
+
+  const requestLanguageList = (type: ProjectType) => {
+    const payload: ProjectCreationData = {
+      base: '',
+      desktop: false,
+      language: '',
+      newFolder: false,
+      projectName: '',
+      projectType: type,
+      teamNumber: '',
+      toFolder: '',
+    };
+    postMessage({ type: 'language', data: payload });
+  };
+
+  const requestBaseList = (type: ProjectType, language: string) => {
+    const payload: ProjectCreationData = {
+      base: '',
+      desktop: false,
+      language,
+      newFolder: false,
+      projectName: '',
+      projectType: type,
+      teamNumber: '',
+      toFolder: '',
+    };
+    postMessage({ type: 'base', data: payload });
+  };
+
+  const validateProjectName = (value: string): string | null => {
+    if (value.trim() === '') {
+      return 'Project name is required';
+    }
+    return null;
+  };
+
+  const validateProjectFolder = (value: string): string | null => {
+    const trimmed = value.trim();
+    if (trimmed === '') {
+      return 'Base folder is required';
+    }
+    if (trimmed.includes('OneDrive')) {
+      return "Invalid Base Folder - Folder can't be in OneDrive";
+    }
+    return null;
+  };
+
+  const validateTeamNumber = (value: string): string | null => {
+    const trimmed = value.trim();
+    if (trimmed === '') {
+      return null;
+    }
+    if (!/^\d+$/.test(trimmed)) {
+      return 'Invalid Team Number';
+    }
+    const numberValue = Number.parseInt(trimmed, 10);
+    if (Number.isNaN(numberValue) || numberValue < 1 || numberValue > 25599) {
+      return 'Invalid Team Number';
+    }
+    return null;
+  };
+
+  const handleProjectTypeSelection = (type: ProjectType) => {
+    projectType = type;
+    languages = [];
+    selectedLanguage = '';
+    bases = [];
+    selectedBase = '';
+    requestLanguageList(type);
+  };
+
+  const handleStep1Next = () => {
+    if (projectType !== null) {
+      goToStep(2);
+    }
+  };
+
+  const handleLanguageChange = (language: string) => {
+    selectedLanguage = language;
+    selectedBase = '';
+    bases = [];
+    if (projectType !== null) {
+      requestBaseList(projectType, language);
+    }
+  };
+
+  const handleBaseChange = (base: string) => {
+    selectedBase = base;
+  };
+
+  const handleProjectNameChange = (name: string) => {
+    projectName = name;
+    showProjectNameError = true;
+  };
+
+  const handleTeamNumberChange = (value: string) => {
+    teamNumber = value;
+    showTeamNumberError = true;
+  };
+
+  const handleProjectFolderUpdate = (folder: string) => {
+    projectFolder = folder;
+    showProjectFolderError = true;
+  };
+
+  const selectProjectFolder = () => {
+    const payload: ProjectCreationData = {
+      base: selectedBase,
+      desktop,
+      language: selectedLanguage,
+      newFolder,
+      projectName,
+      projectType: projectType ?? ProjectType.Template,
+      teamNumber,
+      toFolder: projectFolder,
+    };
+    postMessage({ type: 'newproject', data: payload });
+  };
+
+  const handleStep3Next = () => {
+    showProjectFolderError = true;
+    showProjectNameError = true;
+    showTeamNumberError = true;
+    projectFolderError = validateProjectFolder(projectFolder);
+    projectNameError = validateProjectName(projectName);
+    teamNumberError = validateTeamNumber(teamNumber);
+    if (!projectFolderError && !projectNameError && !teamNumberError) {
+      goToStep(4);
+    }
+  };
+
+  const createProject = () => {
+    if (projectType === null) {
+      return;
+    }
+    const payload: ProjectCreationData = {
+      base: selectedBase,
+      desktop,
+      language: selectedLanguage,
+      newFolder,
+      projectName,
+      projectType,
+      teamNumber,
+      toFolder: projectFolder,
+    };
+    postMessage({ type: 'createproject', data: payload });
+  };
+
+  onMount(() => {
+    const appElement = document.getElementById('app');
+    const resourceBase = appElement?.getAttribute('data-resource-base') || '';
+    logoPath = `${resourceBase}/resources/wpilib-generic.svg`;
+
+    const unsubscribe = subscribeToMessages<{ type: string; data: unknown }>((event) => {
+      switch (event.type) {
+        case 'newproject': {
+          if (typeof event.data === 'string') {
+            handleProjectFolderUpdate(event.data);
+          }
+          break;
+        }
+        case 'projecttype': {
+          if (typeof event.data === 'number') {
+            projectType = event.data as ProjectType;
+          }
+          break;
+        }
+        case 'language': {
+          if (Array.isArray(event.data)) {
+            languages = event.data as string[];
+          } else if (typeof event.data === 'string') {
+            selectedLanguage = event.data;
+          }
+          break;
+        }
+        case 'base': {
+          if (Array.isArray(event.data)) {
+            bases = event.data as BaseOption[];
+          } else if (typeof event.data === 'string') {
+            selectedBase = event.data;
+          }
+          break;
+        }
+        default:
+          break;
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  });
+
+  $: projectFolderError = validateProjectFolder(projectFolder);
+  $: projectNameError = validateProjectName(projectName);
+  $: teamNumberError = validateTeamNumber(teamNumber);
+
+  const summaryLocation = newFolder && projectName
+    ? `${projectFolder}/${projectName}`
+    : projectFolder;
+</script>
+
+<div class="project-container">
+  <img src={logoPath} alt="WPILib" height="75" />
+
+  <h1 class="project-title">Welcome to WPILib New Project Creator</h1>
+
+  <WizardProgress {steps} currentStep={currentStep} />
+
+  <WizardStep active={currentStep === 1} step={1}>
+    <Step1ProjectType
+      selected={projectType}
+      on:select={(event) => handleProjectTypeSelection(event.detail)}
+      on:next={handleStep1Next}
+    />
+  </WizardStep>
+
+  <WizardStep active={currentStep === 2} step={2}>
+    <Step2LanguageBase
+      {languages}
+      {bases}
+      selectedLanguage={selectedLanguage}
+      selectedBase={selectedBase}
+      on:languageChange={(event) => handleLanguageChange(event.detail)}
+      on:baseChange={(event) => handleBaseChange(event.detail)}
+      on:next={() => goToStep(3)}
+      on:back={() => goToStep(1)}
+    />
+  </WizardStep>
+
+  <WizardStep active={currentStep === 3} step={3}>
+    <Step3LocationConfig
+      {projectFolder}
+      {projectName}
+      {teamNumber}
+      {newFolder}
+      {desktop}
+      {projectFolderError}
+      {projectNameError}
+      {teamNumberError}
+      showProjectFolderError={showProjectFolderError}
+      showProjectNameError={showProjectNameError}
+      showTeamNumberError={showTeamNumberError}
+      on:selectFolder={selectProjectFolder}
+      on:projectNameChange={(event) => handleProjectNameChange(event.detail)}
+      on:teamNumberChange={(event) => handleTeamNumberChange(event.detail)}
+      on:newFolderChange={(event) => (newFolder = event.detail)}
+      on:desktopChange={(event) => (desktop = event.detail)}
+      on:back={() => goToStep(2)}
+      on:next={handleStep3Next}
+    />
+  </WizardStep>
+
+  <WizardStep active={currentStep === 4} step={4}>
+    <Step4Review
+      projectType={projectType ?? ProjectType.Template}
+      language={selectedLanguage}
+      base={selectedBase}
+      location={summaryLocation}
+      teamNumber={teamNumber}
+      on:back={() => goToStep(3)}
+      on:create={createProject}
+    />
+  </WizardStep>
+</div>
+

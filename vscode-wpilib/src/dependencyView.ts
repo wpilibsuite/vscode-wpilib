@@ -1,4 +1,7 @@
-import * as fetch from 'node-fetch';
+import * as fs from 'fs';
+import fetch from 'node-fetch';
+import type { RequestInit } from 'node-fetch';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
@@ -8,7 +11,6 @@ import { IJsonDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 // @ts-ignore
-import elements from '!!raw-loader!@vscode-elements/elements/dist/bundled.js';
 export interface IJsonList {
   path: string;
   name: string;
@@ -32,6 +34,8 @@ export interface IJSMessage {
   url?: string;
 }
 
+type NodeFetchOptions = RequestInit & { timeout?: number };
+
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
   private projectInfo: ProjectInfoGatherer;
@@ -50,6 +54,14 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private changed = 0;
   private refreshInProgress = false;
   private showingInstructions = false;
+  private viewReady = false;
+  private pendingDependenciesUpdate:
+    | {
+        type: 'updateDependencies';
+        installed: IDepInstalled[];
+        available: IJsonList[];
+      }
+    | undefined;
 
   private _view?: vscode.WebviewView;
 
@@ -70,6 +82,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken
   ) {
     this._view = webviewView;
+    this.viewReady = false;
+    this.pendingDependenciesUpdate = undefined;
 
     webviewView.webview.options = {
       // Allow scripts in the webview
@@ -78,6 +92,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [
         this._extensionUri,
         vscode.Uri.joinPath(this._extensionUri, 'resources', 'media'),
+        vscode.Uri.joinPath(this._extensionUri, 'resources', 'dist'),
       ],
     };
 
@@ -139,9 +154,23 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+    const disposeListener = webviewView.onDidDispose(() => {
+      this.viewReady = false;
+      this.pendingDependenciesUpdate = undefined;
+    });
+    this.disposables.push(disposeListener);
+
     webviewView.webview.onDidReceiveMessage((data) => {
       if (this.isJSMessage(data)) {
         switch (data.type) {
+          case 'loaded': {
+            this.viewReady = true;
+            if (this.pendingDependenciesUpdate) {
+              void this._view?.webview.postMessage(this.pendingDependenciesUpdate);
+              this.pendingDependenciesUpdate = undefined;
+            }
+            break;
+          }
           case 'install': {
             void this.install(data.index);
             break;
@@ -460,12 +489,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   public updateDependencies() {
+    const message = {
+      type: 'updateDependencies' as const,
+      installed: this.installedList,
+      available: this.availableDepsList,
+    };
+
+    if (!this.viewReady) {
+      this.pendingDependenciesUpdate = message;
+      return;
+    }
+
     if (this._view) {
-      this._view.webview.postMessage({
-        type: 'updateDependencies',
-        installed: this.installedList,
-        available: this.availableDepsList,
-      });
+      this._view.webview.postMessage(message);
     }
   }
 
@@ -489,62 +525,48 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.availableDepsList = [];
 
       this.availableDeps = await this.getAvailableDependencies();
-      if (this.availableDeps.length !== 0) {
-        // Check Github for the VendorDep list
-        if (this.installedDeps.length !== 0) {
-          for (const id of this.installedDeps) {
-            let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-            for (const ad of this.availableDeps) {
-              if (id.uuid === ad.uuid) {
-                // Populate version array with version and button text
-                if (id.version !== ad.version) {
-                  if (isNewerVersion(ad.version, id.version)) {
-                    versionList.push({
-                      version: ad.version,
-                      buttonText: i18n('ui', 'Update'),
-                    });
-                  } else {
-                    versionList.push({
-                      version: ad.version,
-                      buttonText: i18n('ui', 'Downgrade'),
-                    });
-                  }
-                }
+
+      if (this.installedDeps.length !== 0) {
+        for (const id of this.installedDeps) {
+          let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
+          for (const ad of this.availableDeps) {
+            if (id.uuid === ad.uuid) {
+              if (id.version !== ad.version) {
+                versionList.push({
+                  version: ad.version,
+                  buttonText: isNewerVersion(ad.version, id.version)
+                    ? i18n('ui', 'Update')
+                    : i18n('ui', 'Downgrade'),
+                });
               }
             }
-            // Now we need to sort the version list newest to oldest
-            versionList = this.sortVersions(versionList);
+          }
+          versionList = this.sortVersions(versionList);
 
-            this.installedList.push({
-              name: id.name,
-              currentVersion: id.version,
-              versionInfo: versionList,
-            });
+          this.installedList.push({
+            name: id.name,
+            currentVersion: id.version,
+            versionInfo: versionList,
+          });
+        }
+      }
+
+      this.availableDeps.forEach((dep) => {
+        const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
+        if (installedDep < 0) {
+          const foundDep = this.availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
+          if (foundDep < 0) {
+            this.availableDepsList.push(dep);
+          } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
+            this.availableDepsList[foundDep] = dep;
           }
         }
+      });
 
-        // We need to group the available deps and filter out the installed ones
-        this.availableDeps.forEach((dep) => {
-          // See if the dep is one of the installed deps if so don't add it
-          const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
-          if (installedDep < 0) {
-            // Check to see if it is already in the available list
-            const foundDep = this.availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
-            if (foundDep < 0) {
-              // Not in the list so just add it
-              this.availableDepsList.push(dep);
-            } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
-              // It was in the list but this version is newer so lets use that
-              this.availableDepsList[foundDep] = dep;
-            }
-          }
-        });
+      this.sortInstalled();
+      this.sortAvailable();
 
-        this.sortInstalled();
-        this.sortAvailable();
-
-        this.updateDependencies();
-      }
+      this.updateDependencies();
     } finally {
       this.refreshInProgress = false;
     }
@@ -646,9 +668,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {
-    const response = await fetch.default(url, {
+    const response = await fetch(url, {
       timeout: 5000,
-    });
+    } as NodeFetchOptions);
     if (response === undefined) {
       throw new Error('Failed to fetch file');
     }
@@ -684,82 +706,45 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       return webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...fp.split('/')));
     };
 
-    const scriptUri = createUri(`resources/media/main.js`);
     const styleUri = createUri(`resources/media/main.css`);
     const vscodeElementsUri = createUri(`resources/media/vscode-elements.css`);
     const codiconUri = createUri(`resources/media/icons.css`);
+    const scriptUri = createUri(`resources/dist/dependencyview.js`);
 
-    // Return the complete HTML
-    return `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WPILib Vendor Dependencies</title>
-        <link rel="preload" href="${vscodeElementsUri}" as="style">
-        <link rel="preload" href="${styleUri}" as="style">
-        <link rel="preload" href="${codiconUri}" as="style">
-        <link rel="preload" href="${scriptUri}" as="script">
+    const htmlPath = path.join(this._extensionUri.fsPath, 'resources', 'dist', 'dependencyview.html');
+    let html = fs.readFileSync(htmlPath, 'utf8');
 
-        <link rel="stylesheet" href="${vscodeElementsUri}">
-        <link rel="stylesheet" href="${styleUri}">
-        <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
-      </head>
-      <body>
-        <div class="top-line">
-          <button id="updateall-action" class="vscode-button block">
-            <i class="codicon codicon-sync"></i>
-            Update All Dependencies
-          </button>
-        </div>
+    const headInsert = `
+    <link rel="preload" href="${vscodeElementsUri}" as="style">
+    <link rel="preload" href="${styleUri}" as="style">
+    <link rel="preload" href="${codiconUri}" as="style">
+    <link rel="preload" href="${scriptUri}" as="script">
 
-        <details class="vscode-collapsible">
-          <summary>
-            <i class="codicon codicon-chevron-right icon-arrow"></i>
-            <h2 class="title">
-              Install from URL
-            </h2>
-          </summary>
-          <div class="url-install-section">
-            <div class="url-input-container">
-              <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep URL..." />
-              <button id="install-url-action" class="vscode-button">
-                <i class="codicon codicon-cloud-download"></i>
-                Install
-              </button>
-            </div>
-            <div class="url-help-text">
-              Enter a vendor dependency JSON URL to install a library not listed in the available dependencies.
-            </div>
-          </div>
-        </details>
-
-        <details class="vscode-collapsible always-show-actions" open>
-          <summary>
-            <i class="codicon codicon-chevron-right icon-arrow"></i>
-            <h2 class="title">
-              Installed Dependencies
-            </h2>
-            <div class="actions" id="installed-actions"></div>
-          </summary>
-          <div id="installed-dependencies"></div>
-        </details>
-
-        <details class="vscode-collapsible always-show-actions" open>
-          <summary>
-            <i class="codicon codicon-chevron-right icon-arrow"></i>
-            <h2 class="title">
-              Available Dependencies
-            </h2>
-            <div class="actions" id="available-actions"></div>
-          </summary>
-          <div id="available-dependencies"></div>
-        </details>
-
-        <script src="${scriptUri}"></script>
-      </body>
-    </html>
+    <link rel="stylesheet" href="${vscodeElementsUri}">
+    <link rel="stylesheet" href="${styleUri}">
+    <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
   `;
+
+    html = html.replace('</head>', `${headInsert}
+</head>`);
+    
+    // Convert replaceresource/dist/ script tags to webview URIs
+    html = html.replace(
+      /<script\s+src="replaceresource\/dist\/([^"]+)"><\/script>/g,
+      (_match, fileName) => {
+        if (fileName === 'dependencyview.js') {
+          return `<script src="${scriptUri}"></script>`;
+        }
+        // For other scripts, convert replaceresource to webview URI
+        const otherScriptUri = createUri(`resources/dist/${fileName}`);
+        return `<script src="${otherScriptUri}"></script>`;
+      }
+    );
+    
+    // Replace remaining replaceresource references
+    const extensionUri = webview.asWebviewUri(this._extensionUri);
+    html = html.replace(/replaceresource/g, extensionUri.toString());
+
+    return html;
   }
 }

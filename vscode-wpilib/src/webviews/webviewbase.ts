@@ -3,23 +3,20 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { loadLocaleFile } from '../locale';
-import { extensionContext, readFileAsync } from '../utilities';
 import { logger } from '../logger';
+import { extensionContext, readFileAsync } from '../utilities';
 
 export abstract class WebViewBase {
-  protected html: string = '';
-  protected webview: vscode.WebviewPanel | undefined;
+  protected html = '';
+  protected webview?: vscode.WebviewPanel;
   protected disposables: vscode.Disposable[] = [];
-  protected viewType: string;
-  protected title: string;
-  protected resourceRoot: string;
-  protected scriptPath?: string = undefined;
+  protected scriptPath?: string;
 
-  protected constructor(viewType: string, title: string, resourceRoot: string) {
-    this.viewType = viewType;
-    this.title = title;
-    this.resourceRoot = resourceRoot;
-  }
+  constructor(
+    protected readonly viewType: string,
+    protected readonly title: string,
+    protected readonly resourceRoot: string
+  ) {}
 
   public async loadWebpage(
     htmlPath: string,
@@ -33,9 +30,7 @@ export abstract class WebViewBase {
       return;
     }
 
-    if (scriptPath) {
-      this.scriptPath = scriptPath;
-    }
+    this.scriptPath = scriptPath;
 
     this.html = this.html.replace(
       '</head>',
@@ -45,67 +40,39 @@ export abstract class WebViewBase {
       `
     );
 
-    if (localeDomains) {
-      localeDomains.push('ui');
-    } else {
-      localeDomains = ['ui'];
+    const specifiedDomains = Array.isArray(localeDomains) ? localeDomains.filter(Boolean) : [];
+    if (!specifiedDomains.includes('ui')) {
+      specifiedDomains.push('ui');
     }
-    const defaultDomain = localeDomains[0];
+    const uniqueDomains = [...new Set(specifiedDomains)];
 
-    localeDomains.forEach((domain) => {
-      this.html +=
-        `\r\n<script data-locale data-domain="${domain}"${defaultDomain === domain ? ' data-default-domain' : ''} type="application/json">` +
-        JSON.stringify(loadLocaleFile(domain)) +
-        '</script>\r\n';
-    });
-  }
+    if (uniqueDomains.length > 0) {
+      const defaultDomain = uniqueDomains[0];
+      const scriptBlocks = uniqueDomains
+        .map((domain) => {
+          const localeJson = JSON.stringify(loadLocaleFile(domain)).replace(
+            /<\/(script)/gi,
+            '<\\/$1'
+          );
+          const defaultAttr = defaultDomain === domain ? ' data-default-domain' : '';
+          return `<script data-locale data-domain="${domain}"${defaultAttr} type="application/json">${localeJson}</script>`;
+        })
+        .join('\n');
 
-  private replaceResources(webview: vscode.Webview) {
-    // Add CSS for main.css
-    const cssUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css'))
-    );
-    // Add CSS for vscode-elements.css
-    const elementsCssUri = webview.asWebviewUri(
-      vscode.Uri.file(
-        path.join(extensionContext.extensionPath, 'resources', 'media', 'vscode-elements.css')
-      )
-    );
-    // Add CSS for icons.css
-    const iconsCssUri = webview.asWebviewUri(
-      vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css'))
-    );
-    // Update the CSS paths with the webview URI
-    this.html = this.html.replace('replaceresource/media/main.css', cssUri.toString());
-    this.html = this.html.replace(
-      'replaceresource/media/vscode-elements.css',
-      elementsCssUri.toString()
-    );
-    this.html = this.html.replace('replaceresource/media/icons.css', iconsCssUri.toString());
-
-    // Add script path if provided
-    if (this.scriptPath) {
-      this.html += this.getScriptTag(this.scriptPath, webview);
+      if (this.html.includes('</body>')) {
+        this.html = this.html.replace('</body>', `${scriptBlocks}\n</body>`);
+      } else {
+        this.html += `\n${scriptBlocks}\n`;
+      }
     }
-
-    // Add locale loader script
-    this.html += this.getScriptTag(
-      path.join(extensionContext.extensionPath, 'resources', 'dist', 'localeloader.js'),
-      webview
-    );
-
-    // Replace resource paths
-    const onDiskPath = vscode.Uri.file(extensionContext.extensionPath);
-    const replacePath = webview.asWebviewUri(onDiskPath);
-    this.html = this.html.replace(/replaceresource/g, replacePath.toString());
   }
 
   public displayWebView(
     showOptions: vscode.ViewColumn | { preserveFocus: boolean; viewColumn: vscode.ViewColumn },
     reveal?: boolean,
     options?: vscode.WebviewPanelOptions & vscode.WebviewOptions
-  ) {
-    if (this.webview === undefined) {
+  ): void {
+    if (!this.webview) {
       this.webview = vscode.window.createWebviewPanel(this.viewType, this.title, showOptions, {
         enableScripts: true,
         retainContextWhenHidden: true,
@@ -115,36 +82,74 @@ export abstract class WebViewBase {
           vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media')),
         ],
       });
+
       this.webview.iconPath = vscode.Uri.file(path.join(this.resourceRoot, 'wpilib-icon-128.png'));
       this.replaceResources(this.webview.webview);
       this.webview.webview.html = this.html;
-      this.webview.onDidDispose(() => {
-        this.webview = undefined;
-      });
+
+      this.webview.onDidDispose(() => (this.webview = undefined));
     }
-    if (reveal) {
-      this.webview.reveal();
-    }
+
+    if (reveal) this.webview.reveal();
   }
 
-  public dispose() {
-    if (this.webview !== undefined) {
-      this.webview.dispose();
-    }
-    for (const d of this.disposables) {
-      d.dispose();
-    }
+  public dispose(): void {
+    this.webview?.dispose();
+    for (const d of this.disposables) d.dispose();
   }
 
-  private getScriptTag(scriptPath: string, webview: vscode.Webview) {
-    let html = '';
-    const scriptOnDisk = vscode.Uri.file(scriptPath);
-    // get the special URI to use with the webview
-    const scriptResourcePath = webview.asWebviewUri(scriptOnDisk);
-    html += '\r\n<script src="';
-    html += scriptResourcePath.toString();
-    html += '">\r\n';
-    html += '\r\n</script>\r\n';
-    return html;
+  private replaceResources(webview: vscode.Webview): void {
+    const cssMain = webview.asWebviewUri(
+      vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css'))
+    );
+    const cssElems = webview.asWebviewUri(
+      vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'vscode-elements.css'))
+    );
+    const cssIcons = webview.asWebviewUri(
+      vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css'))
+    );
+
+    this.html = this.html
+      .replace('replaceresource/resources/media/main.css', cssMain.toString())
+      .replace('replaceresource/resources/media/vscode-elements.css', cssElems.toString())
+      .replace('replaceresource/resources/media/icons.css', cssIcons.toString());
+
+    this.html = this.html.replace(
+      /<script\s+src\s*=\s*["']replaceresource\/dist\/([^"']+)["']\s*><\/script>/gi,
+      (_, fileName: string) => {
+        const abs = path.join(extensionContext.extensionPath, 'resources', 'dist', fileName);
+        const uri = webview.asWebviewUri(vscode.Uri.file(abs));
+        return `<script src="${uri.toString()}"></script>`;
+      }
+    );
+
+    if (this.scriptPath && !this.html.includes(path.basename(this.scriptPath))) {
+      const tag = this.buildScriptTag(this.scriptPath, webview);
+      this.html = this.html.includes('</body>')
+        ? this.html.replace('</body>', `${tag}</body>`)
+        : this.html + tag;
+    }
+
+    const localeLoaderPath = path.join(
+      extensionContext.extensionPath,
+      'resources',
+      'dist',
+      'localeloader.js'
+    );
+    const localeLoaderFileName = path.basename(localeLoaderPath);
+    if (!this.html.includes(localeLoaderFileName)) {
+      const loaderTag = this.buildScriptTag(localeLoaderPath, webview);
+      this.html = this.html.includes('</body>')
+        ? this.html.replace('</body>', `${loaderTag}</body>`)
+        : this.html + loaderTag;
+    }
+
+    const baseUri = webview.asWebviewUri(vscode.Uri.file(extensionContext.extensionPath));
+    this.html = this.html.replace(/replaceresource/g, baseUri.toString());
+  }
+
+  private buildScriptTag(scriptPath: string, webview: vscode.Webview): string {
+    const uri = webview.asWebviewUri(vscode.Uri.file(scriptPath));
+    return `\n<script src="${uri.toString()}"></script>\n`;
   }
 }

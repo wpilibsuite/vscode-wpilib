@@ -1,28 +1,11 @@
 .installed-dependency,
 .available-dependency {
   margin-bottom: 10px;
-
-  &:first-of-type {
-    margin-top: 10px;
-  }
 }
 
-.uninstall-button button[id*='version-action'],
-.uninstall-button button[id*='uninstall-action'],
-.uninstall-button button[id*='install-action'] {
-  width: 72px;
-  height: 24px;
-  box-sizing: border-box;
-  padding: 1px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.uninstall-button {
-  background-color: var(--vscode-button-secondaryBackground, transparent);
-  color: var(--vscode-button-secondaryForeground);
-  border: 1px solid var(--vscode-button-border);
+.installed-dependency:first-of-type,
+.available-dependency:first-of-type {
+  margin-top: 10px;
 }
 
 .dependency-header {
@@ -87,27 +70,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
 
-  &:has(#updateall-action) {
-    margin-top: 4px;
-  }
+.top-line:has(#updateall-action) {
+  margin-top: 4px;
 }
 
 #updateall-action {
   width: 100%;
-}
-
-i {
-  margin-right: 4px !important;
-}
-
-.uninstall-button {
-  padding: 4px !important;
-
-  & > i {
-    margin-right: 4px !important;
-    margin-left: 4px !important;
-  }
 }
 
 .vscode-collapsible div {
@@ -119,13 +89,35 @@ i {
   flex-shrink: 2;
 }
 
-button[id*='install-action'] {
-  flex-shrink: 0;
+.dependency-controls .vscode-button,
+.available-dependency .vscode-button,
+.top-line .vscode-button,
+.url-install-section .vscode-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 10px;
+  min-height: 26px;
+  box-sizing: border-box;
 }
 
-button[id*='version-action'] {
-  overflow: visible;
-  padding: 1px 6px;
+.dependency-controls .vscode-button span,
+.available-dependency .vscode-button span,
+.url-install-section .vscode-button span {
+  line-height: 1.2;
+}
+
+.dependency-controls .uninstall-button {
+  background-color: var(--vscode-button-secondaryBackground, transparent);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+  min-width: 32px;
+  padding: 4px;
+}
+
+.dependency-controls .uninstall-button i {
+  margin: 0;
 }
 
 /* Project Creator and Import Styles */
