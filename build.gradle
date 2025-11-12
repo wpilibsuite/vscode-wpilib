@@ -69,7 +69,7 @@ task extractJavaDependencies(type: Copy) {
 
 def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv2/CommandsV2.json'
-  dest 'vscode-wpilib/resources/vendordeps/WPILibNewCommands.json'
+  dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
   overwrite true
 }
 
