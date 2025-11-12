@@ -2,6 +2,357 @@
   {
     "fileMatcher": "**/*.java",
     "flags": "g",
-    "replacements": []
+    "replacements": [
+      {
+        "from": "edu.wpi.first.util.ClassPreloader",
+        "to": "org.wpilib.util.runtime.ClassPreloader"
+      },
+      {
+        "from": "edu.wpi.first.util.CombinedRuntimeLoader",
+        "to": "org.wpilib.util.runtime.CombinedRuntimeLoader"
+      },
+      {
+        "from": "edu.wpi.first.util.MsvcRuntimeException",
+        "to": "org.wpilib.util.runtime.MsvcRuntimeException"
+      },
+      {
+        "from": "edu.wpi.first.util.RuntimeDetector",
+        "to": "org.wpilib.util.runtime.RuntimeDetector"
+      },
+      { "from": "edu.wpi.first.util.RuntimeLoader", "to": "org.wpilib.util.runtime.RuntimeLoader" },
+      {
+        "from": "edu.wpi.first.util.DoubleCircularBuffer",
+        "to": "org.wpilib.util.container.DoubleCircularBuffer"
+      },
+      {
+        "from": "edu.wpi.first.util.CircularBuffer",
+        "to": "org.wpilib.util.container.CircularBuffer"
+      },
+      { "from": "edu.wpi.first.util.WPICleaner", "to": "org.wpilib.util.cleanup.WPICleaner" },
+      { "from": "edu.wpi.first.util.EventVector", "to": "org.wpilib.util.concurrent.EventVector" },
+      { "from": "edu.wpi.first.wpilibj2.commands.DevMain", "to": "org.wpilib.commands2.DevMain" },
+      {
+        "from": "edu.wpi.first.wpilibj2.MockHardwareExtension",
+        "to": "org.wpilib.MockHardwareExtension"
+      },
+      { "from": "edu.wpi.first.math.DARE", "to": "org.wpilib.math.linalg.DARE" },
+      { "from": "edu.wpi.first.math.VecBuilder", "to": "org.wpilib.math.linalg.VecBuilder" },
+      { "from": "edu.wpi.first.math.Vector", "to": "org.wpilib.math.linalg.Vector" },
+      { "from": "edu.wpi.first.math.Matrix", "to": "org.wpilib.math.linalg.Matrix" },
+      { "from": "edu.wpi.first.math.MatBuilder", "to": "org.wpilib.math.linalg.MatBuilder" },
+      {
+        "from": "edu.wpi.first.math.proto.VectorProto",
+        "to": "org.wpilib.math.linalg.proto.VectorProto"
+      },
+      {
+        "from": "edu.wpi.first.math.proto.MatrixProto",
+        "to": "org.wpilib.math.linalg.proto.MatrixProto"
+      },
+      {
+        "from": "edu.wpi.first.math.struct.VectorStruct",
+        "to": "org.wpilib.math.linalg.struct.VectorStruct"
+      },
+      {
+        "from": "edu.wpi.first.math.struct.MatrixStruct",
+        "to": "org.wpilib.math.linalg.struct.MatrixStruct"
+      },
+      { "from": "edu.wpi.first.math.MathUtil", "to": "org.wpilib.math.util.MathUtil" },
+      { "from": "edu.wpi.first.math.StateSpaceUtil", "to": "org.wpilib.math.util.StateSpaceUtil" },
+      {
+        "from": "edu.wpi.first.math.ComputerVisionUtil",
+        "to": "org.wpilib.math.util.ComputerVisionUtil"
+      },
+      { "from": "edu.wpi.first.math.MathShared", "to": "org.wpilib.math.util.MathShared" },
+      {
+        "from": "edu.wpi.first.math.MathSharedStore",
+        "to": "org.wpilib.math.util.MathSharedStore"
+      },
+      { "from": "edu.wpi.first.math.Pair", "to": "org.wpilib.math.util.Pair" },
+      { "from": "edu.wpi.first.math.Num", "to": "org.wpilib.math.util.Num" },
+      { "from": "edu.wpi.first.math.Nat", "to": "org.wpilib.math.util.Nat" },
+      {
+        "from": "edu.wpi.first.math.InterpolatingMatrixTreeMap",
+        "to": "org.wpilib.math.interpolation.InterpolatingMatrixTreeMap"
+      },
+      { "from": "edu.wpi.first.wpilibj.ProtoTestBase", "to": "org.wpilib.ProtoTestBase" },
+      { "from": "edu.wpi.first.wpilibj.StructTestBase", "to": "org.wpilib.StructTestBase" },
+      { "from": "edu.wpi.first.wpilibj.UtilityClassTest", "to": "org.wpilib.UtilityClassTest" },
+      {
+        "from": "edu.wpi.first.wpilibj.DriverStation",
+        "to": "org.wpilib.driverstation.DriverStation"
+      },
+      { "from": "edu.wpi.first.wpilibj.GenericHID", "to": "org.wpilib.driverstation.GenericHID" },
+      { "from": "edu.wpi.first.wpilibj.Joystick", "to": "org.wpilib.driverstation.Joystick" },
+      { "from": "edu.wpi.first.wpilibj.Gamepad", "to": "org.wpilib.driverstation.Gamepad" },
+      {
+        "from": "edu.wpi.first.wpilibj.PS4Controller",
+        "to": "org.wpilib.driverstation.PS4Controller"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.PS5Controller",
+        "to": "org.wpilib.driverstation.PS5Controller"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.StadiaController",
+        "to": "org.wpilib.driverstation.StadiaController"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.XboxController",
+        "to": "org.wpilib.driverstation.XboxController"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.DSControlWord",
+        "to": "org.wpilib.driverstation.DSControlWord"
+      },
+      { "from": "edu.wpi.first.wpilibj.CAN", "to": "org.wpilib.hardware.bus.CAN" },
+      { "from": "edu.wpi.first.wpilibj.I2C", "to": "org.wpilib.hardware.bus.I2C" },
+      { "from": "edu.wpi.first.wpilibj.SerialPort", "to": "org.wpilib.hardware.bus.SerialPort" },
+      {
+        "from": "edu.wpi.first.wpilibj.ADXL345_I2C",
+        "to": "org.wpilib.hardware.accelerometer.ADXL345_I2C"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.AnalogAccelerometer",
+        "to": "org.wpilib.hardware.accelerometer.AnalogAccelerometer"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.AnalogInput",
+        "to": "org.wpilib.hardware.discrete.AnalogInput"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.CounterBase",
+        "to": "org.wpilib.hardware.discrete.CounterBase"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.DigitalInput",
+        "to": "org.wpilib.hardware.discrete.DigitalInput"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.DigitalOutput",
+        "to": "org.wpilib.hardware.discrete.DigitalOutput"
+      },
+      { "from": "edu.wpi.first.wpilibj.PWM", "to": "org.wpilib.hardware.discrete.PWM" },
+      { "from": "edu.wpi.first.wpilibj.OnboardIMU", "to": "org.wpilib.hardware.imu.OnboardIMU" },
+      {
+        "from": "edu.wpi.first.wpilibj.AddressableLED",
+        "to": "org.wpilib.hardware.led.AddressableLED"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.AddressableLEDBuffer",
+        "to": "org.wpilib.hardware.led.AddressableLEDBuffer"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.AddressableLEDBufferView",
+        "to": "org.wpilib.hardware.led.AddressableLEDBufferView"
+      },
+      { "from": "edu.wpi.first.wpilibj.LEDPattern", "to": "org.wpilib.hardware.led.LEDPattern" },
+      { "from": "edu.wpi.first.wpilibj.LEDReader", "to": "org.wpilib.hardware.led.LEDReader" },
+      { "from": "edu.wpi.first.wpilibj.LEDWriter", "to": "org.wpilib.hardware.led.LEDWriter" },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.MotorController",
+        "to": "org.wpilib.hardware.motor.MotorController"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup",
+        "to": "org.wpilib.hardware.motor.MotorControllerGroup"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.MotorSafety",
+        "to": "org.wpilib.hardware.motor.MotorSafety"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMMotorController",
+        "to": "org.wpilib.hardware.motor.PWMMotorController"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.MotorSafety",
+        "to": "org.wpilib.hardware.motor.MotorSafety"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.DMC60",
+        "to": "org.wpilib.hardware.motor.DMC60"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.Jaguar",
+        "to": "org.wpilib.hardware.motor.Jaguar"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.Koors40",
+        "to": "org.wpilib.hardware.motor.Koors40"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMSparkFlex",
+        "to": "org.wpilib.hardware.motor.PWMSparkFlex"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax",
+        "to": "org.wpilib.hardware.motor.PWMSparkMax"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX",
+        "to": "org.wpilib.hardware.motor.PWMTalonFX"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX",
+        "to": "org.wpilib.hardware.motor.PWMTalonSRX"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMVenom",
+        "to": "org.wpilib.hardware.motor.PWMVenom"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX",
+        "to": "org.wpilib.hardware.motor.PWMVictorSPX"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.SD540",
+        "to": "org.wpilib.hardware.motor.SD540"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.Spark",
+        "to": "org.wpilib.hardware.motor.Spark"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.SparkMini",
+        "to": "org.wpilib.hardware.motor.SparkMini"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.Talon",
+        "to": "org.wpilib.hardware.motor.Talon"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.Victor",
+        "to": "org.wpilib.hardware.motor.Victor"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.VictorSP",
+        "to": "org.wpilib.hardware.motor.VictorSP"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.MockPWMMotorController",
+        "to": "org.wpilib.hardware.motor.MockPWMMotorController"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.motorcontrol.MockMotorController",
+        "to": "org.wpilib.hardware.motor.MockMotorController"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.Compressor",
+        "to": "org.wpilib.hardware.pneumatic.Compressor"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.CompressorConfigType",
+        "to": "org.wpilib.hardware.pneumatic.CompressorConfigType"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.DoubleSolenoid",
+        "to": "org.wpilib.hardware.pneumatic.DoubleSolenoid"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.PneumaticHub",
+        "to": "org.wpilib.hardware.pneumatic.PneumaticHub"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.PneumaticsBase",
+        "to": "org.wpilib.hardware.pneumatic.PneumaticsBase"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.PneumaticsControlModule",
+        "to": "org.wpilib.hardware.pneumatic.PneumaticsControlModule"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.PneumaticsModuleType",
+        "to": "org.wpilib.hardware.pneumatic.PneumaticsModuleType"
+      },
+      { "from": "edu.wpi.first.wpilibj.Solenoid", "to": "org.wpilib.hardware.pneumatic.Solenoid" },
+      {
+        "from": "edu.wpi.first.wpilibj.DoubleSolenoidTestCTRE",
+        "to": "org.wpilib.hardware.pneumatic.DoubleSolenoidTestCTRE"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.DoubleSolenoidTestREV",
+        "to": "org.wpilib.hardware.pneumatic.DoubleSolenoidTestREV"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.SolenoidTestCTRE",
+        "to": "org.wpilib.hardware.pneumatic.SolenoidTestCTRE"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.SolenoidTestREV",
+        "to": "org.wpilib.hardware.pneumatic.SolenoidTestREV"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.PowerDistribution",
+        "to": "org.wpilib.hardware.power.PowerDistribution"
+      },
+      { "from": "edu.wpi.first.wpilibj.SharpIR", "to": "org.wpilib.hardware.range.SharpIR" },
+      {
+        "from": "edu.wpi.first.wpilibj.AnalogEncoder",
+        "to": "org.wpilib.hardware.rotation.AnalogEncoder"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj.AnalogPotentiometer",
+        "to": "org.wpilib.hardware.rotation.AnalogPotentiometer"
+      },
+      { "from": "edu.wpi.first.wpilibj.DutyCycle", "to": "org.wpilib.hardware.rotation.DutyCycle" },
+      {
+        "from": "edu.wpi.first.wpilibj.DutyCycleEncoder",
+        "to": "org.wpilib.hardware.rotation.DutyCycleEncoder"
+      },
+      { "from": "edu.wpi.first.wpilibj.Encoder", "to": "org.wpilib.hardware.rotation.Encoder" },
+      { "from": "edu.wpi.first.wpilibj.Servo", "to": "org.wpilib.hardware.servo.Servo" },
+      {
+        "from": "edu.wpi.first.wpilibj.IterativeRobotBase",
+        "to": "org.wpilib.framework.IterativeRobotBase"
+      },
+      { "from": "edu.wpi.first.wpilibj.RobotBase", "to": "org.wpilib.framework.RobotBase" },
+      { "from": "edu.wpi.first.wpilibj.RobotState", "to": "org.wpilib.framework.RobotState" },
+      { "from": "edu.wpi.first.wpilibj.TimedRobot", "to": "org.wpilib.framework.TimedRobot" },
+      {
+        "from": "edu.wpi.first.wpilibj.TimesliceRobot",
+        "to": "org.wpilib.framework.TimesliceRobot"
+      },
+      { "from": "edu.wpi.first.wpilibj.DataLogManager", "to": "org.wpilib.system.DataLogManager" },
+      { "from": "edu.wpi.first.wpilibj.Filesystem", "to": "org.wpilib.system.Filesystem" },
+      { "from": "edu.wpi.first.wpilibj.Notifier", "to": "org.wpilib.system.Notifier" },
+      { "from": "edu.wpi.first.wpilibj.Resource", "to": "org.wpilib.system.Resource" },
+      {
+        "from": "edu.wpi.first.wpilibj.RobotController",
+        "to": "org.wpilib.system.RobotController"
+      },
+      { "from": "edu.wpi.first.wpilibj.RuntimeType", "to": "org.wpilib.system.RuntimeType" },
+      { "from": "edu.wpi.first.wpilibj.SensorUtil", "to": "org.wpilib.system.SensorUtil" },
+      { "from": "edu.wpi.first.wpilibj.SystemServer", "to": "org.wpilib.system.SystemServer" },
+      { "from": "edu.wpi.first.wpilibj.Threads", "to": "org.wpilib.system.Threads" },
+      { "from": "edu.wpi.first.wpilibj.Timer", "to": "org.wpilib.system.Timer" },
+      { "from": "edu.wpi.first.wpilibj.Tracer", "to": "org.wpilib.system.Tracer" },
+      { "from": "edu.wpi.first.wpilibj.Watchdog", "to": "org.wpilib.system.Watchdog" },
+      { "from": "edu.wpi.first.wpilibj.Alert", "to": "org.wpilib.util.Alert" },
+      { "from": "edu.wpi.first.wpilibj.Preferences", "to": "org.wpilib.util.Preferences" },
+      { "from": "edu.wpi.first.util", "to": "org.wpilib.util" },
+      { "from": "edu.wpi.first.math", "to": "org.wpilib.math" },
+      { "from": "edu.wpi.first.net", "to": "org.wpilib.net" },
+      { "from": "edu.wpi.first.datalog", "to": "org.wpilib.datalog" },
+      { "from": "edu.wpi.first.wpilibj2.command", "to": "org.wpilib.command2" },
+      { "from": "org.wpilib.commands3", "to": "org.wpilib.command3" },
+      { "from": "edu.wpi.first.networktables", "to": "org.wpilib.networktables" },
+      { "from": "edu.wpi.first.fields", "to": "org.wpilib.fields" },
+      { "from": "edu.wpi.first.hal", "to": "org.wpilib.hardware.hal" },
+      { "from": "edu.wpi.first.units", "to": "org.wpilib.units" },
+      { "from": "edu.wpi.first.apriltag", "to": "org.wpilib.vision.apriltag" },
+      { "from": "edu.wpi.first.epilogue.processor", "to": "org.wpilib.epilogue.processor" },
+      { "from": "edu.wpi.first.epilogue", "to": "org.wpilib.epilogue" },
+      { "from": "edu.wpi.first.epilogue.logging", "to": "org.wpilib.epilogue.logging" },
+      { "from": "edu.wpi.first.cscore", "to": "org.wpilib.vision.camera" },
+      { "from": "edu.wpi.first.vision", "to": "org.wpilib.vision.process" },
+      { "from": "edu.wpi.first.cameraserver", "to": "org.wpilib.vision.stream" },
+      { "from": "edu.wpi.first.wpilibj.xrp", "to": "org.wpilib.xrp" },
+      { "from": "edu.wpi.first.wpilibj.romi", "to": "org.wpilib.romi" },
+      { "from": "edu.wpi.first.wpilibj.commands", "to": "org.wpilib.commands" },
+      { "from": "edu.wpi.first.wpilibj.examples", "to": "org.wpilib.examples" },
+      { "from": "edu.wpi.first.wpilibj.snippets", "to": "org.wpilib.snippets" },
+      { "from": "edu.wpi.first.wpilibj.templates", "to": "org.wpilib.templates" },
+      { "from": "edu.wpi.first.wpilibj", "to": "org.wpilib" }
+    ]
   }
 ]
