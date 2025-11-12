@@ -67,7 +67,7 @@ task extractJavaDependencies(type: Copy) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
+def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv2/CommandsV2.json'
   dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
   overwrite true
@@ -87,7 +87,7 @@ def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
 
 build.dependsOn extractCppDependencies
 build.dependsOn extractJavaDependencies
-build.dependsOn downloadNewCommands
+build.dependsOn downloadCommandsV2
 build.dependsOn downloadRomiVendordep
 build.dependsOn downloadXRPVendordep
 
