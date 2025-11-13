@@ -22,7 +22,7 @@ export const ReplacementPatterns = {
  * Common vendordep file names
  */
 export const VendorDepFiles = {
-  COMMANDS: 'WPILibNewCommands.json',
+  COMMANDS: 'CommandsV2.json',
   ROMI: 'RomiVendordep.json',
   XRP: 'XRPVendordep.json',
 };
@@ -164,7 +164,7 @@ export async function setupVendorDeps(
     const vendorDir = path.join(toFolder, 'vendordeps');
     await mkdirpAsync(vendorDir);
 
-    // Add WPILib New Commands
+    // Add Commands V2
     await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDS, vendorDir);
 
     // Add extra vendordeps
