@@ -1,5 +1,6 @@
 'use strict';
 
+import { readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as mm from 'micromatch';
 import * as path from 'path';
@@ -13,7 +14,7 @@ import {
 import { IExecuteAPI, IExternalAPI, IPreferences } from '../api';
 import { logger } from '../logger';
 import { PersistentFolderState } from '../persistentState';
-import { gradleRun, readFileAsync } from '../utilities';
+import { gradleRun } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { HeaderExplorer } from './headertreeprovider';
 import { ISource, IToolChain } from './jsonformats';
@@ -285,10 +286,7 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     let file = '';
     try {
-      file = await readFileAsync(
-        path.join(this.workspace.uri.fsPath, 'build', this.configFile),
-        'utf8'
-      );
+      file = await readFile(path.join(this.workspace.uri.fsPath, 'build', this.configFile), 'utf8');
     } catch (err) {
       this.statusBar.show();
       this.binaryTypeStatusBar.show();

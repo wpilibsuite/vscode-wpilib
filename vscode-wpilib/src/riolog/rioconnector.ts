@@ -247,8 +247,9 @@ export async function connectToRobot(
       p.dispose();
       try {
         await p.promise;
-        // eslint-disable-next-line no-empty
-      } catch {}
+      } catch {
+        //
+      }
     }
   } else {
     // Kill all but me
@@ -259,8 +260,9 @@ export async function connectToRobot(
         p.dispose();
         try {
           await p.promise;
-          // eslint-disable-next-line no-empty
-        } catch {}
+        } catch {
+          //
+        }
       }
     }
   }

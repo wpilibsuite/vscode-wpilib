@@ -1,4 +1,3 @@
-import * as fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
@@ -7,8 +6,7 @@ import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
 import { IJsonDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
-// @ts-ignore
-import elements from '!!raw-loader!@vscode-elements/elements/dist/bundled.js';
+
 export interface IJsonList {
   path: string;
   name: string;
@@ -646,15 +644,14 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {
-    const response = await fetch.default(url, {
-      timeout: 5000,
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(5000),
     });
     if (response === undefined) {
       throw new Error('Failed to fetch file');
     }
-    if (response.status >= 200 && response.status <= 300) {
-      const text = await response.text();
-      const json = JSON.parse(text) as IJsonList[];
+    if (response.ok) {
+      const json = (await response.json()) as IJsonList[];
       if (this.isJsonList(json)) {
         return json;
       } else {

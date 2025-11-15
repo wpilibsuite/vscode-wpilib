@@ -78,7 +78,6 @@ export async function startWindowsSimulation(
   if (commands.environment !== undefined) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
-      /* tslint:disable-next-line:no-unsafe-any */
       config.environment.push({
         name: envVar,
         value,
