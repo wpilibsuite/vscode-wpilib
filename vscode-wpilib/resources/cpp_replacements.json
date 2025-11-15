@@ -2,6 +2,813 @@
   {
     "fileMatcher": "**/*{.cpp,.c,.cc,.h,.hh,.hpp}",
     "flags": "gi",
-    "replacements": []
+    "replacements": [
+      { "from": "ntcore_test.h", "to": "wpi/nt/ntcore_test.hpp" },
+      { "from": "ntcore.h", "to": "wpi/nt/ntcore.h" },
+      { "from": "ntcore_c.h", "to": "wpi/nt/ntcore_c.h" },
+      { "from": "ntcore_cpp.h", "to": "wpi/nt/ntcore_cpp.hpp" },
+      { "from": "hal/UsageReporting.h", "to": "wpi/hal/UsageReporting.h" },
+      { "from": "fields/fields.h", "to": "wpi/fields/fields.hpp" },
+      { "from": "ntcore_c_types.h", "to": "wpi/nt/ntcore_c_types.h" },
+      { "from": "ntcore_cpp_types.h", "to": "wpi/nt/ntcore_cpp_types.hpp" },
+      { "from": "wpimath/MathShared.h", "to": "wpi/math/util/MathShared.hpp" },
+      { "from": "frc/DARE.h", "to": "wpi/math/linalg/DARE.hpp" },
+      { "from": "frc/ct_matrix.h", "to": "wpi/math/linalg/ct_matrix.hpp" },
+      { "from": "frc/EigenCore.h", "to": "wpi/math/linalg/EigenCore.hpp" },
+      { "from": "frc/proto/MatrixProto.h", "to": "wpi/math/linalg/proto/MatrixProto.hpp" },
+      { "from": "frc/proto/VectorProto.h", "to": "wpi/math/linalg/proto/VectorProto.hpp" },
+      { "from": "frc/struct/MatrixStruct.h", "to": "wpi/math/linalg/struct/StructProto.hpp" },
+      { "from": "frc/struct/VectorStruct.h", "to": "wpi/math/linalg/struct/VectorStruct.hpp" },
+      { "from": "frc/ComputerVisionUtil.h", "to": "wpi/math/util/ComputerVisionUtil.hpp" },
+      { "from": "frc/MathUtil.h", "to": "wpi/math/util/MathUtil.hpp" },
+      { "from": "frc/StateSpaceUtil.h", "to": "wpi/math/util/StateSpaceUtil.hpp" },
+      { "from": "cscore_cv.h", "to": "wpi/cs/cscore_cv.hpp" },
+      { "from": "cscore_cpp.h", "to": "wpi/cs/cscore_cpp.hpp" },
+      { "from": "cscore.h", "to": "wpi/cs/cscore.h" },
+      { "from": "cscore_raw.h", "to": "wpi/cs/cscore_raw.h" },
+      { "from": "cscore_c.h", "to": "wpi/cs/cscore_c.h" },
+      { "from": "cscore_oo.h", "to": "wpi/cs/cscore_oo.hpp" },
+      { "from": "cscore_runloop.h", "to": "wpi/cs/cscore_runloop.hpp" },
+      { "from": "wpigui_openurl.h", "to": "wpi/gui/wpigui_openurl.hpp" },
+      { "from": "portable-file-dialogs.h", "to": "wpi/gui/portable-file-dialogs.h" },
+      { "from": "wpigui_internal.h", "to": "wpi/gui/wpigui_internal.hpp" },
+      { "from": "wpigui.h", "to": "wpi/gui/wpigui.hpp" },
+      { "from": "WPILibVersion.h", "to": "wpi/system/WPILibVersion.hpp" },
+      { "from": "frc/DriverStation.h", "to": "wpi/driverstation/DriverStation.hpp" },
+      { "from": "frc/GenericHID.h", "to": "wpi/driverstation/GenericHID.hpp" },
+      { "from": "frc/Joystick.h", "to": "wpi/driverstation/Joystick.hpp" },
+      { "from": "frc/Gamepad.h", "to": "wpi/driverstation/Gamepad.hpp" },
+      { "from": "frc/ADXL345_I2C.h", "to": "wpi/hardware/accelerometer/ADXL345_I2C.hpp" },
+      { "from": "frc/DSControlWord.h", "to": "wpi/driverstation/DSControlWord.hpp" },
+      {
+        "from": "frc/AnalogAccelerometer.h",
+        "to": "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
+      },
+      { "from": "frc/CAN.h", "to": "wpi/hardware/bus/CAN.hpp" },
+      { "from": "frc/I2C.h", "to": "wpi/hardware/bus/I2C.hpp" },
+      { "from": "frc/SerialPort.h", "to": "wpi/hardware/bus/SerialPort.hpp" },
+      { "from": "frc/AnalogInput.h", "to": "wpi/hardware/discrete/AnalogInput.hpp" },
+      { "from": "frc/CounterBase.h", "to": "wpi/hardware/discrete/CounterBase.hpp" },
+      { "from": "frc/DigitalInput.h", "to": "wpi/hardware/discrete/DigitalInput.hpp" },
+      { "from": "frc/DigitalOutput.h", "to": "wpi/hardware/discrete/DigitalOutput.hpp" },
+      { "from": "frc/PWM.h", "to": "wpi/hardware/discrete/PWM.hpp" },
+      { "from": "frc/Errors.h", "to": "wpi/system/Errors.hpp" },
+      { "from": "frc/WPIErrors.mac", "to": "wpi/system/WPIErrors.mac" },
+      { "from": "frc/WPIWarnings.mac", "to": "wpi/system/WPIWarnings.mac" },
+      { "from": "frc/OnboardIMU.h", "to": "wpi/hardware/imu/OnboardIMU.hpp" },
+      { "from": "frc/RuntimeType.h", "to": "wpi/system/RuntimeType.hpp" },
+      { "from": "frc/SensorUtil.h", "to": "wpi/util/SensorUtil.hpp" },
+      { "from": "frc/SharpIR.h", "to": "wpi/hardware/range/SharpIR.hpp" },
+      { "from": "frc/SystemServer.h", "to": "wpi/system/SystemServer.hpp" },
+      { "from": "frc/AddressableLED.h", "to": "wpi/hardware/led/AddressableLED.hpp" },
+      { "from": "frc/LEDPattern.h", "to": "wpi/hardware/led/LEDPattern.hpp" },
+      {
+        "from": "frc/motorcontrol/MotorController.h",
+        "to": "wpi/hardware/motor/MotorController.hpp"
+      },
+      {
+        "from": "frc/motorcontrol/MotorControllerGroup.h",
+        "to": "wpi/hardware/motor/MotorControllerGroup.hpp"
+      },
+      { "from": "frc/MotorSafety.h", "to": "wpi/hardware/motor/MotorSafety.hpp" },
+      {
+        "from": "frc/motorcontrol/PWMMotorController.h",
+        "to": "wpi/hardware/motor/PWMMotorController.hpp"
+      },
+      { "from": "frc/Compressor.h", "to": "wpi/hardware/pneumatic/Compressor.hpp" },
+      {
+        "from": "frc/CompressorConfigType.h",
+        "to": "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+      },
+      { "from": "frc/DoubleSolenoid.h", "to": "wpi/hardware/pneumatic/DoubleSolenoid.hpp" },
+      { "from": "frc/PneumaticHub.h", "to": "wpi/hardware/pneumatic/PneumaticHub.hpp" },
+      { "from": "frc/PneumaticsBase.h", "to": "wpi/hardware/pneumatic/PneumaticsBase.hpp" },
+      {
+        "from": "frc/PneumaticsControlModule.h",
+        "to": "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
+      },
+      {
+        "from": "frc/PneumaticsModuleType.h",
+        "to": "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+      },
+      { "from": "frc/Solenoid.h", "to": "wpi/hardware/pneumatic/Solenoid.hpp" },
+      { "from": "frc/PowerDistribution.h", "to": "wpi/hardware/power/PowerDistribution.hpp" },
+      { "from": "frc/AnalogEncoder.h", "to": "wpi/hardware/rotation/AnalogEncoder.hpp" },
+      {
+        "from": "frc/AnalogPotentiometer.h",
+        "to": "wpi/hardware/rotation/AnalogPotentiometer.hpp"
+      },
+      { "from": "frc/DutyCycle.h", "to": "wpi/hardware/rotation/DutyCycle.hpp" },
+      { "from": "frc/DutyCycleEncoder.h", "to": "wpi/hardware/rotation/DutyCycleEncoder.hpp" },
+      { "from": "frc/Encoder.h", "to": "wpi/hardware/rotation/Encoder.hpp" },
+      { "from": "frc/Servo.h", "to": "wpi/hardware/servo/Servo.hpp" },
+      { "from": "frc/IterativeRobotBase.h", "to": "wpi/framework/IterativeRobotBase.hpp" },
+      { "from": "frc/RobotBase.h", "to": "wpi/framework/RobotBase.hpp" },
+      { "from": "frc/RobotState.h", "to": "wpi/framework/RobotState.hpp" },
+      { "from": "frc/TimedRobot.h", "to": "wpi/framework/TimedRobot.hpp" },
+      { "from": "frc/TimesliceRobot.h", "to": "wpi/framework/TimesliceRobot.hpp" },
+      { "from": "frc/DataLogManager.h", "to": "wpi/system/DataLogManager.hpp" },
+      { "from": "frc/Filesystem.h", "to": "wpi/system/Filesystem.hpp" },
+      { "from": "frc/Notifier.h", "to": "wpi/system/Notifier.hpp" },
+      { "from": "frc/Resource.h", "to": "wpi/system/Resource.hpp" },
+      { "from": "frc/RobotController.h", "to": "wpi/system/RobotController.hpp" },
+      { "from": "frc/ScopedTracer.h", "to": "wpi/system/ScopedTracer.hpp" },
+      { "from": "frc/Threads.h", "to": "wpi/system/Threads.hpp" },
+      { "from": "frc/Timer.h", "to": "wpi/system/Timer.hpp" },
+      { "from": "frc/Tracer.h", "to": "wpi/system/Tracer.hpp" },
+      { "from": "frc/WPILibVersion.h", "to": "wpi/system/WPILibVersion.hpp" },
+      { "from": "frc/Watchdog.h", "to": "wpi/system/Watchdog.hpp" },
+      { "from": "frc/Alert.h", "to": "wpi/util/Alert.hpp" },
+      { "from": "frc/Preferences.h", "to": "wpi/util/Preferences.hpp" },
+      { "from": "frc/StadiaController.h", "to": "wpi/driverstation/StadiaController.hpp" },
+      { "from": "frc/PS4Controller.h", "to": "wpi/driverstation/PS4Controller.hpp" },
+      { "from": "frc/PS5Controller.h", "to": "wpi/driverstation/PS5Controller.hpp" },
+      { "from": "frc/XboxController.h", "to": "wpi/driverstation/XboxController.hpp" },
+      { "from": "frc/motorcontrol/PWMSparkFlex.h", "to": "wpi/hardware/motor/PWMSparkFlex.hpp" },
+      { "from": "frc/motorcontrol/SparkMini.h", "to": "wpi/hardware/motor/SparkMini.hpp" },
+      { "from": "frc/motorcontrol/PWMVictorSPX.h", "to": "wpi/hardware/motor/PWMVictorSPX.hpp" },
+      { "from": "frc/motorcontrol/Jaguar.h", "to": "wpi/hardware/motor/Jaguar.hpp" },
+      { "from": "frc/motorcontrol/Victor.h", "to": "wpi/hardware/motor/Victor.hpp" },
+      { "from": "frc/motorcontrol/DMC60.h", "to": "wpi/hardware/motor/DMC60.hpp" },
+      { "from": "frc/motorcontrol/VictorSP.h", "to": "wpi/hardware/motor/VictorSP.hpp" },
+      { "from": "frc/motorcontrol/PWMVenom.h", "to": "wpi/hardware/motor/PWMVenom.hpp" },
+      { "from": "frc/motorcontrol/Koors40.h", "to": "wpi/hardware/motor/Koors40.hpp" },
+      { "from": "frc/motorcontrol/SD540.h", "to": "wpi/hardware/motor/SD540.hpp" },
+      { "from": "frc/motorcontrol/Talon.h", "to": "wpi/hardware/motor/Talon.hpp" },
+      { "from": "frc/motorcontrol/Spark.h", "to": "wpi/hardware/motor/Spark.hpp" },
+      { "from": "frc/motorcontrol/PWMTalonSRX.h", "to": "wpi/hardware/motor/PWMTalonSRX.hpp" },
+      { "from": "frc/motorcontrol/PWMTalonFX.h", "to": "wpi/hardware/motor/PWMTalonFX.hpp" },
+      { "from": "frc/motorcontrol/PWMSparkMax.h", "to": "wpi/hardware/motor/PWMSparkMax.hpp" },
+      { "from": "DSCommJoystickPacket.h", "to": "wpi/halsim/ds_socket/DSCommJoystickPacket.hpp" },
+      { "from": "DSCommPacket.h", "to": "wpi/halsim/ds_socket/DSCommPacket.hpp" },
+      { "from": "HALDataSource.h", "to": "wpi/halsim/gui/HALDataSource.hpp" },
+      { "from": "HALProvider.h", "to": "wpi/halsim/gui/HALProvider.hpp" },
+      { "from": "HALSimGui.h", "to": "wpi/halsim/gui/HALSimGui.hpp" },
+      { "from": "HALSimGuiExt.h", "to": "wpi/halsim/gui/HALSimGuiExt.hpp" },
+      { "from": "SimDeviceGui.h", "to": "wpi/halsim/gui/SimDeviceGui.hpp" },
+      { "from": "HALSimWS.h", "to": "wpi/halsim/ws_client/HALSimWS.hpp" },
+      { "from": "HALSimWSClient.h", "to": "wpi/halsim/ws_client/HALSimWSClient.hpp" },
+      {
+        "from": "HALSimWSClientConnection.h",
+        "to": "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
+      },
+      {
+        "from": "HALSimBaseWebSocketConnection.h",
+        "to": "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
+      },
+      { "from": "WSBaseProvider.h", "to": "wpi/halsim/ws_core/WSBaseProvider.hpp" },
+      { "from": "WSHalProviders.h", "to": "wpi/halsim/ws_core/WSHalProviders.hpp" },
+      { "from": "WSProviderContainer.h", "to": "wpi/halsim/ws_core/WSProviderContainer.hpp" },
+      {
+        "from": "WSProvider_AddressableLED.h",
+        "to": "wpi/halsim/ws_core/WSProvider_AddressableLED.hpp"
+      },
+      { "from": "WSProvider_Analog.h", "to": "wpi/halsim/ws_core/WSProvider_Analog.hpp" },
+      { "from": "WSProvider_DIO.h", "to": "wpi/halsim/ws_core/WSProvider_DIO.hpp" },
+      {
+        "from": "WSProvider_DriverStation.h",
+        "to": "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
+      },
+      { "from": "WSProvider_Encoder.h", "to": "wpi/halsim/ws_core/WSProvider_Encoder.hpp" },
+      { "from": "WSProvider_HAL.h", "to": "wpi/halsim/ws_core/WSProvider_HAL.hpp" },
+      { "from": "WSProvider_Joystick.h", "to": "wpi/halsim/ws_core/WSProvider_Joystick.hpp" },
+      { "from": "WSProvider_PCM.h", "to": "wpi/halsim/ws_core/WSProvider_PCM.hpp" },
+      { "from": "WSProvider_PWM.h", "to": "wpi/halsim/ws_core/WSProvider_PWM.hpp" },
+      { "from": "WSProvider_RoboRIO.h", "to": "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp" },
+      { "from": "WSProvider_SimDevice.h", "to": "wpi/halsim/ws_core/WSProvider_SimDevice.hpp" },
+      { "from": "WSProvider_Solenoid.h", "to": "wpi/halsim/ws_core/WSProvider_Solenoid.hpp" },
+      { "from": "WSProvider_dPWM.h", "to": "wpi/halsim/ws_core/WSProvider_dPWM.hpp" },
+      { "from": "HALSimHttpConnection.h", "to": "wpi/halsim/ws_server/HALSimHttpConnection.hpp" },
+      { "from": "HALSimWSServer.h", "to": "wpi/halsim/ws_server/HALSimWSServer.hpp" },
+      { "from": "HALSimWeb.h", "to": "wpi/halsim/ws_server/HALSimWeb.hpp" },
+      { "from": "HALSimXRP.h", "to": "wpi/halsim/xrp/HALSimXRP.hpp" },
+      { "from": "HALSimXRPClient.h", "to": "wpi/halsim/xrp/HALSimXRPClient.hpp" },
+      { "from": "XRP.h", "to": "wpi/halsim/xrp/XRP.hpp" },
+      { "from": "frc2/command/([\\w\/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
+      { "from": "frc/controller/([\\w\/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
+      { "from": "units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
+      { "from": "hal/([\\w\/]*)\\.h", "to": "wpi/hal/$1.h" },
+      { "from": "cameraserver/([\\w\/]*)\\.h", "to": "wpi/cameraserver/$1.hpp" },
+      { "from": "frc/([\\w\/]*)\\.h", "to": "wpi/$1.hpp" },
+      { "from": "(\\b)wpi::contains(\\b)", "to": "$1wpi::util::contains$2" },
+      { "from": "(\\b)wpi::contains_lower(\\b)", "to": "$1wpi::util::contains_lower$2" },
+      { "from": "(\\b)wpi::slice(\\b)", "to": "$1wpi::util::slice$2" },
+      { "from": "(\\b)wpi::split(\\b)", "to": "$1wpi::util::split$2" },
+      { "from": "(\\b)wpi::trim(\\b)", "to": "$1wpi::util::trim$2" },
+      { "from": "(\\b)wpi::remove_prefix(\\b)", "to": "$1wpi::util::remove_prefix$2" },
+      { "from": "(\\b)wpi::remove_suffix(\\b)", "to": "$1wpi::util::remove_suffix$2" },
+      { "from": "(\\b)wpi::to_string_view(\\b)", "to": "$1wpi::util::to_string_view$2" },
+      { "from": "(\\b)wpi::make_string(\\b)", "to": "$1wpi::util::make_string$2" },
+      { "from": "(\\b)wpi::parse_float(\\b)", "to": "$1wpi::util::parse_float$2" },
+      { "from": "(\\b)wpi::find_lower(\\b)", "to": "$1wpi::util::find_lower$2" },
+      { "from": "(\\b)wpi::ct_string(\\b)", "to": "$1wpi::util::ct_string$2" },
+      { "from": "(\\b)wpi::hexdigit(\\b)", "to": "$1wpi::util::hexdigit$2" },
+      { "from": "(\\b)wpi::isDigit(\\b)", "to": "$1wpi::util::isDigit$2" },
+      { "from": "(\\b)wpi::isHexDigit(\\b)", "to": "$1wpi::util::isHexDigit$2" },
+      { "from": "(\\b)wpi::isPrint(\\b)", "to": "$1wpi::util::isPrint$2" },
+      { "from": "(\\b)wpi::format_to_n_c_str(\\b)", "to": "$1wpi::util::format_to_n_c_str$2" },
+      { "from": "(\\b)wpi::PrintTo(\\b)", "to": "$1wpi::util::PrintTo$2" },
+      { "from": "(\\b)wpi::UnescapeCString(\\b)", "to": "$1wpi::util::UnescapeCString$2" },
+      { "from": "(\\b)wpi::NullDeleter(\\b)", "to": "$1wpi::util::NullDeleter$2" },
+      { "from": "(\\b)wpi::DecayedDerivedFrom(\\b)", "to": "$1wpi::util::DecayedDerivedFrom$2" },
+      { "from": "(\\b)wpi::Event(\\b)", "to": "$1wpi::util::Event$2" },
+      { "from": "(\\b)wpi::function_ref(\\b)", "to": "$1wpi::util::function_ref$2" },
+      { "from": "(\\b)wpi::array(\\b)", "to": "$1wpi::util::array$2" },
+      { "from": "(\\b)wpi::mutex(\\b)", "to": "$1wpi::util::mutex$2" },
+      { "from": "(\\b)wpi::recursive_spinlock(\\b)", "to": "$1wpi::util::recursive_spinlock$2" },
+      { "from": "(\\b)wpi::recursive_mutex(\\b)", "to": "$1wpi::util::recursive_mutex$2" },
+      { "from": "(\\b)wpi::priority_queue(\\b)", "to": "$1wpi::util::priority_queue$2" },
+      { "from": "(\\b)wpi::condition_variable(\\b)", "to": "$1wpi::util::condition_variable$2" },
+      { "from": "(\\b)wpi::spinlock(\\b)", "to": "$1wpi::util::spinlock$2" },
+      { "from": "(\\b)wpi::circular_buffer(\\b)", "to": "$1wpi::util::circular_buffer$2" },
+      { "from": "(\\b)wpi::unique_function(\\b)", "to": "$1wpi::util::unique_function$2" },
+      { "from": "(\\b)wpi::insert_sorted(\\b)", "to": "$1wpi::util::insert_sorted$2" },
+      { "from": "(\\b)wpi::FastQueue(\\b)", "to": "$1wpi::util::FastQueue$2" },
+      { "from": "(\\b)wpi::MemoryBuffer(\\b)", "to": "$1wpi::util::MemoryBuffer$2" },
+      { "from": "(\\b)wpi::array(\\b)", "to": "$1wpi::util::array$2" },
+      { "from": "(\\b)wpi::empty_array(\\b)", "to": "$1wpi::util::empty_array$2" },
+      { "from": "(\\b)wpi::expected(\\b)", "to": "$1wpi::util::expected$2" },
+      { "from": "(\\b)wpi::unexpected(\\b)", "to": "$1wpi::util::unexpected$2" },
+      { "from": "(\\b)wpi::byteswap(\\b)", "to": "$1wpi::util::byteswap$2" },
+      { "from": "(\\b)wpi::for_each(\\b)", "to": "$1wpi::util::for_each$2" },
+      { "from": "(\\b)wpi::Base64Decode(\\b)", "to": "$1wpi::util::Base64Decode$2" },
+      { "from": "(\\b)wpi::EventVector(\\b)", "to": "$1wpi::util::EventVector$2" },
+      { "from": "(\\b)wpi::GetStackTrace(\\b)", "to": "$1wpi::util::GetStackTrace$2" },
+      { "from": "(\\b)wpi::Lerp(\\b)", "to": "$1wpi::util::Lerp$2" },
+      { "from": "(\\b)wpi::DecodeLimits(\\b)", "to": "$1wpi::util::DecodeLimits$2" },
+      { "from": "(\\b)wpi::NumToCtString(\\b)", "to": "$1wpi::util::NumToCtString$2" },
+      {
+        "from": "(\\b)wpi::CallbackListenerData(\\b)",
+        "to": "$1wpi::util::CallbackListenerData$2"
+      },
+      { "from": "(\\b)wpi::CallbackThread(\\b)", "to": "$1wpi::util::CallbackThread$2" },
+      { "from": "(\\b)wpi::CallbackManager(\\b)", "to": "$1wpi::util::CallbackManager$2" },
+      { "from": "(\\b)wpi::DenseMap(\\b)", "to": "$1wpi::util::DenseMap$2" },
+      { "from": "(\\b)wpi::CreateEvent(\\b)", "to": "$1wpi::util::CreateEvent$2" },
+      { "from": "(\\b)wpi::print(\\b)", "to": "$1wpi::util::print$2" },
+      { "from": "(\\b)wpi::is_constexpr(\\b)", "to": "$1wpi::util::is_constexpr$2" },
+      { "from": "(\\b)wpi::sgn(\\b)", "to": "$1wpi::util::sgn$2" },
+      { "from": "(\\b)wpi::json(\\b)", "to": "$1wpi::util::json$2" },
+      { "from": "(\\b)wpi::WPI_LOG_INFO(\\b)", "to": "$1wpi::util::WPI_LOG_INFO$2" },
+      { "from": "(\\b)wpi::WPI_LOG_CRITICAL(\\b)", "to": "$1wpi::util::WPI_LOG_CRITICAL$2" },
+      { "from": "(\\b)wpi::WPI_LOG_ERROR(\\b)", "to": "$1wpi::util::WPI_LOG_ERROR$2" },
+      { "from": "(\\b)wpi::WPI_LOG_WARNING(\\b)", "to": "$1wpi::util::WPI_LOG_WARNING$2" },
+      { "from": "(\\b)wpi::WPI_LOG_DEBUG(\\b)", "to": "$1wpi::util::WPI_LOG_DEBUG$2" },
+      { "from": "(\\b)wpi::WPI_LOG_DEBUG1(\\b)", "to": "$1wpi::util::WPI_LOG_DEBUG1$2" },
+      { "from": "(\\b)wpi::WPI_LOG_DEBUG2(\\b)", "to": "$1wpi::util::WPI_LOG_DEBUG2$2" },
+      { "from": "(\\b)wpi::WPI_LOG_DEBUG3(\\b)", "to": "$1wpi::util::WPI_LOG_DEBUG3$2" },
+      { "from": "(\\b)wpi::WPI_LOG_DEBUG4(\\b)", "to": "$1wpi::util::WPI_LOG_DEBUG4$2" },
+      { "from": "(\\b)wpi::sys::windows(\\b)", "to": "$1wpi::util::sys::windows$2" },
+      { "from": "(\\b)wpi::UTF16(\\b)", "to": "$1wpi::util::UTF16$2" },
+      {
+        "from": "(\\b)wpi::convertUTF16ToUTF8String(\\b)",
+        "to": "$1wpi::util::convertUTF16ToUTF8String$2"
+      },
+      { "from": "(\\b)wpi::Now(\\b)", "to": "$1wpi::util::Now$2" },
+      { "from": "(\\b)wpi::SetNowImpl(\\b)", "to": "$1wpi::util::SetNowImpl$2" },
+      { "from": "(\\b)wpi::NowDefault(\\b)", "to": "$1wpi::util::NowDefault$2" },
+      { "from": "(\\b)wpi::GetSystemTime(\\b)", "to": "$1wpi::util::GetSystemTime$2" },
+      { "from": "(\\b)wpi::RawFrame(\\b)", "to": "$1wpi::util::RawFrame$2" },
+      { "from": "(\\b)wpi::SetFrameData(\\b)", "to": "$1wpi::util::SetFrameData$2" },
+      { "from": "(\\b)wpi::SignalObject(\\b)", "to": "$1wpi::util::SignalObject$2" },
+      { "from": "(\\b)wpi::SetEvent(\\b)", "to": "$1wpi::util::SetEvent$2" },
+      { "from": "(\\b)wpi::SafeThreadEvent(\\b)", "to": "$1wpi::util::SafeThreadEvent$2" },
+      { "from": "(\\b)wpi::WaitForObject(\\b)", "to": "$1wpi::util::WaitForObject$2" },
+      { "from": "(\\b)wpi::WaitForObjects(\\b)", "to": "$1wpi::util::WaitForObjects$2" },
+      { "from": "(\\b)wpi::iterator_range(\\b)", "to": "$1wpi::util::iterator_range$2" },
+      { "from": "(\\b)wpi::GetTypeName(\\b)", "to": "$1wpi::util::GetTypeName$2" },
+      { "from": "(\\b)wpi::Concat(\\b)", "to": "$1wpi::util::Concat$2" },
+      { "from": "(\\b)wpi::Struct(\\b)", "to": "$1wpi::util::Struct$2" },
+      { "from": "(\\b)wpi::Protobuf(\\b)", "to": "$1wpi::util::Protobuf$2" },
+      {
+        "from": "(\\b)wpi::ProtobufSerializable(\\b)",
+        "to": "$1wpi::util::ProtobufSerializable$2"
+      },
+      { "from": "(\\b)wpi::StructSerializable(\\b)", "to": "$1wpi::util::StructSerializable$2" },
+      { "from": "(\\b)wpi::ProtobufMessage(\\b)", "to": "$1wpi::util::ProtobufMessage$2" },
+      {
+        "from": "(\\b)wpi::ForEachStructSchema(\\b)",
+        "to": "$1wpi::util::ForEachStructSchema$2"
+      },
+      { "from": "(\\b)wpi::StructArrayBuffer(\\b)", "to": "$1wpi::util::StructArrayBuffer$2" },
+      {
+        "from": "(\\b)wpi::MakeStructArrayTypeString(\\b)",
+        "to": "$1wpi::util::MakeStructArrayTypeString$2"
+      },
+      { "from": "(\\b)wpi::UnpackStructInto(\\b)", "to": "$1wpi::util::UnpackStructInto$2" },
+      {
+        "from": "(\\b)wpi::GetStructTypeString(\\b)",
+        "to": "$1wpi::util::GetStructTypeString$2"
+      },
+      { "from": "(\\b)wpi::UnpackStruct(\\b)", "to": "$1wpi::util::UnpackStruct$2" },
+      { "from": "(\\b)wpi::PackStruct(\\b)", "to": "$1wpi::util::PackStruct$2" },
+      { "from": "(\\b)wpi::GetStructSize(\\b)", "to": "$1wpi::util::GetStructSize$2" },
+      { "from": "(\\b)wpi::UnpackCallback(\\b)", "to": "$1wpi::util::UnpackCallback$2" },
+      { "from": "(\\b)wpi::PackCallback(\\b)", "to": "$1wpi::util::PackCallback$2" },
+      {
+        "from": "(\\b)wpi::StdVectorUnpackCallback(\\b)",
+        "to": "$1wpi::util::StdVectorUnpackCallback$2"
+      },
+      { "from": "(\\b)wpi::ProtoInputStream(\\b)", "to": "$1wpi::util::ProtoInputStream$2" },
+      { "from": "(\\b)wpi::ProtoOutputStream(\\b)", "to": "$1wpi::util::ProtoOutputStream$2" },
+      { "from": "(\\b)wpi::HasNestedStruct(\\b)", "to": "$1wpi::util::HasNestedStruct$2" },
+      {
+        "from": "(\\b)wpi::WpiArrayUnpackCallback(\\b)",
+        "to": "$1wpi::util::WpiArrayUnpackCallback$2"
+      },
+      { "from": "(\\b)wpi::UnpackStructArray(\\b)", "to": "$1wpi::util::UnpackStructArray$2" },
+      { "from": "(\\b)wpi::PackStructArray(\\b)", "to": "$1wpi::util::PackStructArray$2" },
+      {
+        "from": "(\\b)wpi::StructFieldDescriptor(\\b)",
+        "to": "$1wpi::util::StructFieldDescriptor$2"
+      },
+      { "from": "(\\b)wpi::DynamicStruct(\\b)", "to": "$1wpi::util::DynamicStruct$2" },
+      { "from": "(\\b)wpi::StructFieldType(\\b)", "to": "$1wpi::util::StructFieldType$2" },
+      {
+        "from": "(\\b)wpi::StructDescriptorDatabase(\\b)",
+        "to": "$1wpi::util::StructDescriptorDatabase$2"
+      },
+      { "from": "(\\b)wpi::Sendable(\\b)", "to": "$1wpi::util::Sendable$2" },
+      { "from": "(\\b)wpi::SendableBuilder(\\b)", "to": "$1wpi::util::SendableBuilder$2" },
+      { "from": "(\\b)wpi::SendableHelper(\\b)", "to": "$1wpi::util::SendableHelper$2" },
+      { "from": "(\\b)wpi::SendableRegistry(\\b)", "to": "$1wpi::util::SendableRegistry$2" },
+      { "from": "(\\b)wpi::support::endian(\\b)", "to": "$1wpi::util::support::endian$2" },
+      { "from": "(\\b)wpi::endianness::native(\\b)", "to": "$1wpi::util::endianness::native$2" },
+      {
+        "from": "(\\b)wpi::sig::ScopedConnection(\\b)",
+        "to": "$1wpi::util::sig::ScopedConnection$2"
+      },
+      { "from": "(\\b)wpi::sig::Signal(\\b)", "to": "$1wpi::util::sig::Signal$2" },
+      { "from": "(\\b)wpi::sig::Signal_mt(\\b)", "to": "$1wpi::util::sig::Signal_mt$2" },
+      { "from": "(\\b)wpi::sig::SignalBase(\\b)", "to": "$1wpi::util::sig::SignalBase$2" },
+      { "from": "(\\b)wpi::SetSignalObject(\\b)", "to": "$1wpi::util::SetSignalObject$2" },
+      { "from": "(\\b)wpi::DenseMap(\\b)", "to": "$1wpi::util::DenseMap$2" },
+      { "from": "(\\b)wpi::Logger(\\b)", "to": "$1wpi::util::Logger$2" },
+      { "from": "(\\b)wpi::SmallDenseMap(\\b)", "to": "$1wpi::util::SmallDenseMap$2" },
+      { "from": "(\\b)wpi::SmallPtrSet(\\b)", "to": "$1wpi::util::SmallPtrSet$2" },
+      { "from": "(\\b)wpi::SmallSet(\\b)", "to": "$1wpi::util::SmallSet$2" },
+      { "from": "(\\b)wpi::SmallString(\\b)", "to": "$1wpi::util::SmallString$2" },
+      { "from": "(\\b)wpi::SmallVector(\\b)", "to": "$1wpi::util::SmallVector$2" },
+      { "from": "(\\b)wpi::SmallVectorImpl(\\b)", "to": "$1wpi::util::SmallVectorImpl$2" },
+      { "from": "(\\b)wpi::StringMap(\\b)", "to": "$1wpi::util::StringMap$2" },
+      { "from": "(\\b)wpi::drop_back(\\b)", "to": "$1wpi::util::drop_back$2" },
+      { "from": "(\\b)wpi::drop_front(\\b)", "to": "$1wpi::util::drop_front$2" },
+      { "from": "(\\b)wpi::ends_with(\\b)", "to": "$1wpi::util::ends_with$2" },
+      { "from": "(\\b)wpi::ends_with_lower(\\b)", "to": "$1wpi::util::ends_with_lower$2" },
+      { "from": "(\\b)wpi::equals_lower(\\b)", "to": "$1wpi::util::equals_lower$2" },
+      { "from": "(\\b)wpi::ltrim(\\b)", "to": "$1wpi::util::ltrim$2" },
+      { "from": "(\\b)wpi::rsplit(\\b)", "to": "$1wpi::util::rsplit$2" },
+      { "from": "(\\b)wpi::rtrim(\\b)", "to": "$1wpi::util::rtrim$2" },
+      { "from": "(\\b)wpi::starts_with(\\b)", "to": "$1wpi::util::starts_with$2" },
+      { "from": "(\\b)wpi::substr(\\b)", "to": "$1wpi::util::substr$2" },
+      { "from": "(\\b)wpi::take_back(\\b)", "to": "$1wpi::util::take_back$2" },
+      { "from": "(\\b)wpi::take_front(\\b)", "to": "$1wpi::util::take_front$2" },
+      { "from": "(\\b)wpi::hexDigitValue(\\b)", "to": "$1wpi::util::hexDigitValue$2" },
+      { "from": "(\\b)wpi::parse_integer(\\b)", "to": "$1wpi::util::parse_integer$2" },
+      { "from": "(\\b)wpi::SafeThread(\\b)", "to": "$1wpi::util::SafeThread$2" },
+      { "from": "(\\b)wpi::SafeThreadOwner(\\b)", "to": "$1wpi::util::SafeThreadOwner$2" },
+      { "from": "(\\b)wpi::PromiseFactory(\\b)", "to": "$1wpi::util::PromiseFactory$2" },
+      { "from": "(\\b)wpi::raw_istream(\\b)", "to": "$1wpi::util::raw_istream$2" },
+      { "from": "(\\b)wpi::raw_ostream(\\b)", "to": "$1wpi::util::raw_ostream$2" },
+      {
+        "from": "(\\b)wpi::raw_svector_ostream(\\b)",
+        "to": "$1wpi::util::raw_svector_ostream$2"
+      },
+      {
+        "from": "(\\b)wpi::raw_uvector_ostream(\\b)",
+        "to": "$1wpi::util::raw_uvector_ostream$2"
+      },
+      { "from": "(\\b)wpi::raw_string_ostream(\\b)", "to": "$1wpi::util::raw_string_ostream$2" },
+      { "from": "(\\b)wpi::raw_fd_istream(\\b)", "to": "$1wpi::util::raw_fd_istream$2" },
+      { "from": "(\\b)wpi::raw_fd_ostream(\\b)", "to": "$1wpi::util::raw_fd_ostream$2" },
+      { "from": "(\\b)wpi::safe_malloc(\\b)", "to": "$1wpi::util::safe_malloc$2" },
+      { "from": "(\\b)wpi::safe_calloc(\\b)", "to": "$1wpi::util::safe_calloc$2" },
+      { "from": "(\\b)wpi::SHA1(\\b)", "to": "$1wpi::util::SHA1$2" },
+      { "from": "(\\b)wpi::future<(\\b)", "to": "$1wpi::util::future<$2" },
+      { "from": "(\\b)wpi::promise<(\\b)", "to": "$1wpi::util::promise<$2" },
+      { "from": "(\\b)wpi::SpanEq(\\b)", "to": "$1wpi::util::SpanEq$2" },
+      { "from": "(\\b)wpi::Base64Encode(\\b)", "to": "$1wpi::util::Base64Encode$2" },
+      { "from": "(\\b)wpi::UidVector(\\b)", "to": "$1wpi::util::UidVector$2" },
+      { "from": "([ !\\(])DenseMap(\\b)", "to": "$1wpi::util::DenseMap$2" },
+      { "from": "([ !\\(])Logger(\\b)", "to": "$1wpi::util::Logger$2" },
+      { "from": "([ !\\(])SmallDenseMap(\\b)", "to": "$1wpi::util::SmallDenseMap$2" },
+      { "from": "([ !\\(])SmallPtrSet(\\b)", "to": "$1wpi::util::SmallPtrSet$2" },
+      { "from": "([ !\\(])SmallSet(\\b)", "to": "$1wpi::util::SmallSet$2" },
+      { "from": "([ !\\(])SmallString(\\b)", "to": "$1wpi::util::SmallString$2" },
+      { "from": "([ !\\(])SmallVector(\\b)", "to": "$1wpi::util::SmallVector$2" },
+      { "from": "([ !\\(])SmallVectorImpl(\\b)", "to": "$1wpi::util::SmallVectorImpl$2" },
+      { "from": "([ !\\(])StringMap(\\b)", "to": "$1wpi::util::StringMap$2" },
+      { "from": "([ !\\(])drop_back(\\b)", "to": "$1wpi::util::drop_back$2" },
+      { "from": "([ !\\(])drop_front(\\b)", "to": "$1wpi::util::drop_front$2" },
+      { "from": "([ !\\(])ends_with(\\b)", "to": "$1wpi::util::ends_with$2" },
+      { "from": "([ !\\(])ends_with_lower(\\b)", "to": "$1wpi::util::ends_with_lower$2" },
+      { "from": "([ !\\(])equals_lower(\\b)", "to": "$1wpi::util::equals_lower$2" },
+      { "from": "([ !\\(])ltrim(\\b)", "to": "$1wpi::util::ltrim$2" },
+      { "from": "([ !\\(])rsplit(\\b)", "to": "$1wpi::util::rsplit$2" },
+      { "from": "([ !\\(])rtrim(\\b)", "to": "$1wpi::util::rtrim$2" },
+      { "from": "([ !\\(])starts_with(\\b)", "to": "$1wpi::util::starts_with$2" },
+      { "from": "([ !\\(])substr(\\b)", "to": "$1wpi::util::substr$2" },
+      { "from": "([ !\\(])take_back(\\b)", "to": "$1wpi::util::take_back$2" },
+      { "from": "([ !\\(])take_front(\\b)", "to": "$1wpi::util::take_front$2" },
+      { "from": "([ !\\(])hexDigitValue(\\b)", "to": "$1wpi::util::hexDigitValue$2" },
+      { "from": "([ !\\(])parse_integer(\\b)", "to": "$1wpi::util::parse_integer$2" },
+      { "from": "([ !\\(])SafeThread(\\b)", "to": "$1wpi::util::SafeThread$2" },
+      { "from": "([ !\\(])SafeThreadOwner(\\b)", "to": "$1wpi::util::SafeThreadOwner$2" },
+      { "from": "([ !\\(])PromiseFactory(\\b)", "to": "$1wpi::util::PromiseFactory$2" },
+      { "from": "([ !\\(])raw_istream(\\b)", "to": "$1wpi::util::raw_istream$2" },
+      { "from": "([ !\\(])raw_ostream(\\b)", "to": "$1wpi::util::raw_ostream$2" },
+      { "from": "([ !\\(])raw_svector_ostream(\\b)", "to": "$1wpi::util::raw_svector_ostream$2" },
+      { "from": "([ !\\(])raw_uvector_ostream(\\b)", "to": "$1wpi::util::raw_uvector_ostream$2" },
+      { "from": "([ !\\(])raw_string_ostream(\\b)", "to": "$1wpi::util::raw_string_ostream$2" },
+      { "from": "([ !\\(])raw_fd_istream(\\b)", "to": "$1wpi::util::raw_fd_istream$2" },
+      { "from": "([ !\\(])raw_fd_ostream(\\b)", "to": "$1wpi::util::raw_fd_ostream$2" },
+      { "from": "([ !\\(])safe_malloc(\\b)", "to": "$1wpi::util::safe_malloc$2" },
+      { "from": "([ !\\(])safe_calloc(\\b)", "to": "$1wpi::util::safe_calloc$2" },
+      { "from": "([ !\\(])SHA1(\\b)", "to": "$1wpi::util::SHA1$2" },
+      { "from": "([ !\\(])future<(\\b)", "to": "$1wpi::util::future<$2" },
+      { "from": "([ !\\(])promise<(\\b)", "to": "$1wpi::util::promise<$2" },
+      { "from": "([ !\\(])SpanEq(\\b)", "to": "$1wpi::util::SpanEq$2" },
+      { "from": "([ !\\(])Base64Encode(\\b)", "to": "$1wpi::util::Base64Encode$2" },
+      { "from": "([ !\\(])UidVector(\\b)", "to": "$1wpi::util::UidVector$2" },
+      { "from": "wpi::java", "to": "wpi::util::java" },
+      { "from": "wpi::kHandleType", "to": "wpi::util::kHandleType" },
+      { "from": " support::endian::", "to": " wpi::util::support::endian::" },
+      { "from": "(\\b)frc::Pose2d(\\b)", "to": "$1wpi::math::Pose2d$2" },
+      { "from": "([ \\b{<!\\(])Pose2d(\\b)", "to": "$1wpi::math::Pose2d$2" },
+      { "from": "^Pose2d(\\b)", "to": "$1wpi::math::Pose2d" },
+      { "from": "(\\b)frc::Pose3d(\\b)", "to": "$1wpi::math::Pose3d$2" },
+      { "from": "([ \\b{<!\\(])Pose3d(\\b)", "to": "$1wpi::math::Pose3d$2" },
+      { "from": "^Pose3d(\\b)", "to": "$1wpi::math::Pose3d" },
+      { "from": "(\\b)frc::Quaternion(\\b)", "to": "$1wpi::math::Quaternion$2" },
+      { "from": "([ \\b{<!\\(])Quaternion(\\b)", "to": "$1wpi::math::Quaternion$2" },
+      { "from": "^Quaternion(\\b)", "to": "$1wpi::math::Quaternion" },
+      { "from": "(\\b)frc::Rotation2d(\\b)", "to": "$1wpi::math::Rotation2d$2" },
+      { "from": "([ \\b{<!\\(])Rotation2d(\\b)", "to": "$1wpi::math::Rotation2d$2" },
+      { "from": "^Rotation2d(\\b)", "to": "$1wpi::math::Rotation2d" },
+      { "from": "(\\b)frc::Rotation3d(\\b)", "to": "$1wpi::math::Rotation3d$2" },
+      { "from": "([ \\b{<!\\(])Rotation3d(\\b)", "to": "$1wpi::math::Rotation3d$2" },
+      { "from": "^Rotation3d(\\b)", "to": "$1wpi::math::Rotation3d" },
+      { "from": "(\\b)frc::Transform2d(\\b)", "to": "$1wpi::math::Transform2d$2" },
+      { "from": "([ \\b{<!\\(])Transform2d(\\b)", "to": "$1wpi::math::Transform2d$2" },
+      { "from": "^Transform2d(\\b)", "to": "$1wpi::math::Transform2d" },
+      { "from": "(\\b)frc::Transform3d(\\b)", "to": "$1wpi::math::Transform3d$2" },
+      { "from": "([ \\b{<!\\(])Transform3d(\\b)", "to": "$1wpi::math::Transform3d$2" },
+      { "from": "^Transform3d(\\b)", "to": "$1wpi::math::Transform3d" },
+      { "from": "(\\b)frc::Translation2d(\\b)", "to": "$1wpi::math::Translation2d$2" },
+      { "from": "([ \\b{<!\\(])Translation2d(\\b)", "to": "$1wpi::math::Translation2d$2" },
+      { "from": "^Translation2d(\\b)", "to": "$1wpi::math::Translation2d" },
+      { "from": "(\\b)frc::Translation3d(\\b)", "to": "$1wpi::math::Translation3d$2" },
+      { "from": "([ \\b{<!\\(])Translation3d(\\b)", "to": "$1wpi::math::Translation3d$2" },
+      { "from": "^Translation3d(\\b)", "to": "$1wpi::math::Translation3d" },
+      { "from": "(\\b)frc::LinearSystem(\\b)", "to": "$1wpi::math::LinearSystem$2" },
+      { "from": "([ \\b{<!\\(])LinearSystem(\\b)", "to": "$1wpi::math::LinearSystem$2" },
+      { "from": "^LinearSystem(\\b)", "to": "$1wpi::math::LinearSystem" },
+      { "from": "(\\b)frc::LinearSystemLoop(\\b)", "to": "$1wpi::math::LinearSystemLoop$2" },
+      { "from": "([ \\b{<!\\(])LinearSystemLoop(\\b)", "to": "$1wpi::math::LinearSystemLoop$2" },
+      { "from": "^LinearSystemLoop(\\b)", "to": "$1wpi::math::LinearSystemLoop" },
+      { "from": "(\\b)frc::InputModulus(\\b)", "to": "$1wpi::math::InputModulus$2" },
+      { "from": "([ \\b{<!\\(])InputModulus(\\b)", "to": "$1wpi::math::InputModulus$2" },
+      { "from": "^InputModulus(\\b)", "to": "$1wpi::math::InputModulus" },
+      { "from": "(\\b)frc::DCMotor(\\b)", "to": "$1wpi::math::DCMotor$2" },
+      { "from": "([ \\b{<!\\(])DCMotor(\\b)", "to": "$1wpi::math::DCMotor$2" },
+      { "from": "^DCMotor(\\b)", "to": "$1wpi::math::DCMotor" },
+      { "from": "(\\b)frc::Matrixd(\\b)", "to": "$1wpi::math::Matrixd$2" },
+      { "from": "([ \\b{<!\\(])Matrixd(\\b)", "to": "$1wpi::math::Matrixd$2" },
+      { "from": "^Matrixd(\\b)", "to": "$1wpi::math::Matrixd" },
+      { "from": "(\\b)frc::Vectord(\\b)", "to": "$1wpi::math::Vectord$2" },
+      { "from": "([ \\b{<!\\(])Vectord(\\b)", "to": "$1wpi::math::Vectord$2" },
+      { "from": "^Vectord(\\b)", "to": "$1wpi::math::Vectord" },
+      {
+        "from": "(\\b)frc::MakeWhiteNoiseVector(\\b)",
+        "to": "$1wpi::math::MakeWhiteNoiseVector$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])MakeWhiteNoiseVector(\\b)",
+        "to": "$1wpi::math::MakeWhiteNoiseVector$2"
+      },
+      { "from": "^MakeWhiteNoiseVector(\\b)", "to": "$1wpi::math::MakeWhiteNoiseVector" },
+      {
+        "from": "(\\b)frc::DesaturateInputVector(\\b)",
+        "to": "$1wpi::math::DesaturateInputVector$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])DesaturateInputVector(\\b)",
+        "to": "$1wpi::math::DesaturateInputVector$2"
+      },
+      { "from": "^DesaturateInputVector(\\b)", "to": "$1wpi::math::DesaturateInputVector" },
+      { "from": "(\\b)frc::PIDController(\\b)", "to": "$1wpi::math::PIDController$2" },
+      { "from": "([ \\b{<!\\(])PIDController(\\b)", "to": "$1wpi::math::PIDController$2" },
+      { "from": "^PIDController(\\b)", "to": "$1wpi::math::PIDController" },
+      {
+        "from": "(\\b)frc::ProfiledPIDController(\\b)",
+        "to": "$1wpi::math::ProfiledPIDController$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])ProfiledPIDController(\\b)",
+        "to": "$1wpi::math::ProfiledPIDController$2"
+      },
+      { "from": "^ProfiledPIDController(\\b)", "to": "$1wpi::math::ProfiledPIDController" },
+      { "from": "(\\b)frc::FloorMod(\\b)", "to": "$1wpi::math::FloorMod$2" },
+      { "from": "([ \\b{<!\\(])FloorMod(\\b)", "to": "$1wpi::math::FloorMod$2" },
+      { "from": "^FloorMod(\\b)", "to": "$1wpi::math::FloorMod" },
+      { "from": "(\\b)frc::ChassisSpeeds(\\b)", "to": "$1wpi::math::ChassisSpeeds$2" },
+      { "from": "([ \\b{<!\\(])ChassisSpeeds(\\b)", "to": "$1wpi::math::ChassisSpeeds$2" },
+      { "from": "^ChassisSpeeds(\\b)", "to": "$1wpi::math::ChassisSpeeds" },
+      {
+        "from": "(\\b)frc::DifferentialDriveKinematics(\\b)",
+        "to": "$1wpi::math::DifferentialDriveKinematics$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])DifferentialDriveKinematics(\\b)",
+        "to": "$1wpi::math::DifferentialDriveKinematics$2"
+      },
+      {
+        "from": "^DifferentialDriveKinematics(\\b)",
+        "to": "$1wpi::math::DifferentialDriveKinematics"
+      },
+      {
+        "from": "(\\b)frc::DifferentialDriveKinematicsConstraint(\\b)",
+        "to": "$1wpi::math::DifferentialDriveKinematicsConstraint$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])DifferentialDriveKinematicsConstraint(\\b)",
+        "to": "$1wpi::math::DifferentialDriveKinematicsConstraint$2"
+      },
+      {
+        "from": "^DifferentialDriveKinematicsConstraint(\\b)",
+        "to": "$1wpi::math::DifferentialDriveKinematicsConstraint"
+      },
+      {
+        "from": "(\\b)frc::DifferentialDriveWheelSpeeds(\\b)",
+        "to": "$1wpi::math::DifferentialDriveWheelSpeeds$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])DifferentialDriveWheelSpeeds(\\b)",
+        "to": "$1wpi::math::DifferentialDriveWheelSpeeds$2"
+      },
+      {
+        "from": "^DifferentialDriveWheelSpeeds(\\b)",
+        "to": "$1wpi::math::DifferentialDriveWheelSpeeds"
+      },
+      {
+        "from": "(\\b)frc::DifferentialDriveOdometry(\\b)",
+        "to": "$1wpi::math::DifferentialDriveOdometry$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])DifferentialDriveOdometry(\\b)",
+        "to": "$1wpi::math::DifferentialDriveOdometry$2"
+      },
+      {
+        "from": "^DifferentialDriveOdometry(\\b)",
+        "to": "$1wpi::math::DifferentialDriveOdometry"
+      },
+      {
+        "from": "(\\b)frc::DifferentialDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::DifferentialDrivePoseEstimator$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])DifferentialDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::DifferentialDrivePoseEstimator$2"
+      },
+      {
+        "from": "^DifferentialDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::DifferentialDrivePoseEstimator"
+      },
+      {
+        "from": "(\\b)frc::MecanumDriveWheelPositions(\\b)",
+        "to": "$1wpi::math::MecanumDriveWheelPositions$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])MecanumDriveWheelPositions(\\b)",
+        "to": "$1wpi::math::MecanumDriveWheelPositions$2"
+      },
+      {
+        "from": "^MecanumDriveWheelPositions(\\b)",
+        "to": "$1wpi::math::MecanumDriveWheelPositions"
+      },
+      {
+        "from": "(\\b)frc::MecanumDriveWheelSpeeds(\\b)",
+        "to": "$1wpi::math::MecanumDriveWheelSpeeds$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])MecanumDriveWheelSpeeds(\\b)",
+        "to": "$1wpi::math::MecanumDriveWheelSpeeds$2"
+      },
+      { "from": "^MecanumDriveWheelSpeeds(\\b)", "to": "$1wpi::math::MecanumDriveWheelSpeeds" },
+      {
+        "from": "(\\b)frc::MecanumDriveKinematics(\\b)",
+        "to": "$1wpi::math::MecanumDriveKinematics$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])MecanumDriveKinematics(\\b)",
+        "to": "$1wpi::math::MecanumDriveKinematics$2"
+      },
+      { "from": "^MecanumDriveKinematics(\\b)", "to": "$1wpi::math::MecanumDriveKinematics" },
+      {
+        "from": "(\\b)frc::MecanumDriveOdometry(\\b)",
+        "to": "$1wpi::math::MecanumDriveOdometry$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])MecanumDriveOdometry(\\b)",
+        "to": "$1wpi::math::MecanumDriveOdometry$2"
+      },
+      { "from": "^MecanumDriveOdometry(\\b)", "to": "$1wpi::math::MecanumDriveOdometry" },
+      {
+        "from": "(\\b)frc::MecanumDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::MecanumDrivePoseEstimator$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])MecanumDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::MecanumDrivePoseEstimator$2"
+      },
+      {
+        "from": "^MecanumDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::MecanumDrivePoseEstimator"
+      },
+      { "from": "(\\b)frc::SwerveModuleState(\\b)", "to": "$1wpi::math::SwerveModuleState$2" },
+      {
+        "from": "([ \\b{<!\\(])SwerveModuleState(\\b)",
+        "to": "$1wpi::math::SwerveModuleState$2"
+      },
+      { "from": "^SwerveModuleState(\\b)", "to": "$1wpi::math::SwerveModuleState" },
+      {
+        "from": "(\\b)frc::SwerveModulePosition(\\b)",
+        "to": "$1wpi::math::SwerveModulePosition$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])SwerveModulePosition(\\b)",
+        "to": "$1wpi::math::SwerveModulePosition$2"
+      },
+      { "from": "^SwerveModulePosition(\\b)", "to": "$1wpi::math::SwerveModulePosition" },
+      {
+        "from": "(\\b)frc::SwerveDriveKinematics(\\b)",
+        "to": "$1wpi::math::SwerveDriveKinematics$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])SwerveDriveKinematics(\\b)",
+        "to": "$1wpi::math::SwerveDriveKinematics$2"
+      },
+      { "from": "^SwerveDriveKinematics(\\b)", "to": "$1wpi::math::SwerveDriveKinematics" },
+      {
+        "from": "(\\b)frc::SwerveDriveOdometry(\\b)",
+        "to": "$1wpi::math::SwerveDriveOdometry$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])SwerveDriveOdometry(\\b)",
+        "to": "$1wpi::math::SwerveDriveOdometry$2"
+      },
+      { "from": "^SwerveDriveOdometry(\\b)", "to": "$1wpi::math::SwerveDriveOdometry" },
+      {
+        "from": "(\\b)frc::SwerveDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::SwerveDrivePoseEstimator$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])SwerveDrivePoseEstimator(\\b)",
+        "to": "$1wpi::math::SwerveDrivePoseEstimator$2"
+      },
+      { "from": "^SwerveDrivePoseEstimator(\\b)", "to": "$1wpi::math::SwerveDrivePoseEstimator" },
+      {
+        "from": "(\\b)frc::LinearPlantInversionFeedforward(\\b)",
+        "to": "$1wpi::math::LinearPlantInversionFeedforward$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])LinearPlantInversionFeedforward(\\b)",
+        "to": "$1wpi::math::LinearPlantInversionFeedforward$2"
+      },
+      {
+        "from": "^LinearPlantInversionFeedforward(\\b)",
+        "to": "$1wpi::math::LinearPlantInversionFeedforward"
+      },
+      {
+        "from": "(\\b)frc::LinearQuadraticRegulator(\\b)",
+        "to": "$1wpi::math::LinearQuadraticRegulator$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])LinearQuadraticRegulator(\\b)",
+        "to": "$1wpi::math::LinearQuadraticRegulator$2"
+      },
+      { "from": "^LinearQuadraticRegulator(\\b)", "to": "$1wpi::math::LinearQuadraticRegulator" },
+      {
+        "from": "(\\b)frc::SimpleMotorFeedforward(\\b)",
+        "to": "$1wpi::math::SimpleMotorFeedforward$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])SimpleMotorFeedforward(\\b)",
+        "to": "$1wpi::math::SimpleMotorFeedforward$2"
+      },
+      { "from": "^SimpleMotorFeedforward(\\b)", "to": "$1wpi::math::SimpleMotorFeedforward" },
+      {
+        "from": "(\\b)frc::ElevatorFeedforward(\\b)",
+        "to": "$1wpi::math::ElevatorFeedforward$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])ElevatorFeedforward(\\b)",
+        "to": "$1wpi::math::ElevatorFeedforward$2"
+      },
+      { "from": "^ElevatorFeedforward(\\b)", "to": "$1wpi::math::ElevatorFeedforward" },
+      { "from": "(\\b)frc::BangBangController(\\b)", "to": "$1wpi::math::BangBangController$2" },
+      {
+        "from": "([ \\b{<!\\(])BangBangController(\\b)",
+        "to": "$1wpi::math::BangBangController$2"
+      },
+      { "from": "^BangBangController(\\b)", "to": "$1wpi::math::BangBangController" },
+      {
+        "from": "(\\b)frc::LTVUnicycleController(\\b)",
+        "to": "$1wpi::math::LTVUnicycleController$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])LTVUnicycleController(\\b)",
+        "to": "$1wpi::math::LTVUnicycleController$2"
+      },
+      { "from": "^LTVUnicycleController(\\b)", "to": "$1wpi::math::LTVUnicycleController" },
+      { "from": "(\\b)frc::Trajectory(\\b)", "to": "$1wpi::math::Trajectory$2" },
+      { "from": "([ \\b{<!\\(])Trajectory(\\b)", "to": "$1wpi::math::Trajectory$2" },
+      { "from": "^Trajectory(\\b)", "to": "$1wpi::math::Trajectory" },
+      { "from": "(\\b)frc::TrajectoryConfig(\\b)", "to": "$1wpi::math::TrajectoryConfig$2" },
+      { "from": "([ \\b{<!\\(])TrajectoryConfig(\\b)", "to": "$1wpi::math::TrajectoryConfig$2" },
+      { "from": "^TrajectoryConfig(\\b)", "to": "$1wpi::math::TrajectoryConfig" },
+      {
+        "from": "(\\b)frc::TrajectoryGenerator(\\b)",
+        "to": "$1wpi::math::TrajectoryGenerator$2"
+      },
+      {
+        "from": "([ \\b{<!\\(])TrajectoryGenerator(\\b)",
+        "to": "$1wpi::math::TrajectoryGenerator$2"
+      },
+      { "from": "^TrajectoryGenerator(\\b)", "to": "$1wpi::math::TrajectoryGenerator" },
+      { "from": "(\\b)frc::DiscretizeAB(\\b)", "to": "$1wpi::math::DiscretizeAB$2" },
+      { "from": "([ \\b{<!\\(])DiscretizeAB(\\b)", "to": "$1wpi::math::DiscretizeAB$2" },
+      { "from": "^DiscretizeAB(\\b)", "to": "$1wpi::math::DiscretizeAB" },
+      { "from": "(\\b)frc::RKDP(\\b)", "to": "$1wpi::math::RKDP$2" },
+      { "from": "([ \\b{<!\\(])RKDP(\\b)", "to": "$1wpi::math::RKDP$2" },
+      { "from": "^RKDP(\\b)", "to": "$1wpi::math::RKDP" },
+      { "from": "(\\b)frc::LinearFilter(\\b)", "to": "$1wpi::math::LinearFilter$2" },
+      { "from": "([ \\b{<!\\(])LinearFilter(\\b)", "to": "$1wpi::math::LinearFilter$2" },
+      { "from": "^LinearFilter(\\b)", "to": "$1wpi::math::LinearFilter" },
+      { "from": "(\\b)frc::LinearSystem(\\b)", "to": "$1wpi::math::LinearSystem$2" },
+      { "from": "([ \\b{<!\\(])LinearSystem(\\b)", "to": "$1wpi::math::LinearSystem$2" },
+      { "from": "^LinearSystem(\\b)", "to": "$1wpi::math::LinearSystem" },
+      { "from": "(\\b)frc::LinearSystemId(\\b)", "to": "$1wpi::math::LinearSystemId$2" },
+      { "from": "([ \\b{<!\\(])LinearSystemId(\\b)", "to": "$1wpi::math::LinearSystemId$2" },
+      { "from": "^LinearSystemId(\\b)", "to": "$1wpi::math::LinearSystemId" },
+      { "from": "(\\b)frc::MedianFilter(\\b)", "to": "$1wpi::math::MedianFilter$2" },
+      { "from": "([ \\b{<!\\(])MedianFilter(\\b)", "to": "$1wpi::math::MedianFilter$2" },
+      { "from": "^MedianFilter(\\b)", "to": "$1wpi::math::MedianFilter" },
+      { "from": "(\\b)frc::Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
+      { "from": "([ \\b{<!\\(])Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
+      { "from": "^Debouncer(\\b)", "to": "$1wpi::math::Debouncer" },
+      { "from": "(\\b)frc::ApplyDeadband(\\b)", "to": "$1wpi::math::ApplyDeadband$2" },
+      { "from": "([ \\b{<!\\(])ApplyDeadband(\\b)", "to": "$1wpi::math::ApplyDeadband$2" },
+      { "from": "^ApplyDeadband(\\b)", "to": "$1wpi::math::ApplyDeadband" },
+      { "from": "(\\b)frc::CopySignPow(\\b)", "to": "$1wpi::math::CopySignPow$2" },
+      { "from": "([ \\b{<!\\(])CopySignPow(\\b)", "to": "$1wpi::math::CopySignPow$2" },
+      { "from": "^CopySignPow(\\b)", "to": "$1wpi::math::CopySignPow" },
+      { "from": "(\\b)frc::CopyDirectionPow(\\b)", "to": "$1wpi::math::CopyDirectionPow$2" },
+      { "from": "([ \\b{<!\\(])CopyDirectionPow(\\b)", "to": "$1wpi::math::CopyDirectionPow$2" },
+      { "from": "^CopyDirectionPow(\\b)", "to": "$1wpi::math::CopyDirectionPow" },
+      { "from": "(\\b)frc::Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
+      { "from": "([ \\b{<!\\(])Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
+      { "from": "^Debouncer(\\b)", "to": "$1wpi::math::Debouncer" },
+      { "from": "(\\b)frc::TrapezoidProfile(\\b)", "to": "$1wpi::math::TrapezoidProfile$2" },
+      { "from": "([ \\b{<!\\(])TrapezoidProfile(\\b)", "to": "$1wpi::math::TrapezoidProfile$2" },
+      { "from": "^TrapezoidProfile(\\b)", "to": "$1wpi::math::TrapezoidProfile" },
+      { "from": "(\\b)frc::ExponentialProfile(\\b)", "to": "$1wpi::math::ExponentialProfile$2" },
+      {
+        "from": "([ \\b{<!\\(])ExponentialProfile(\\b)",
+        "to": "$1wpi::math::ExponentialProfile$2"
+      },
+      { "from": "^ExponentialProfile(\\b)", "to": "$1wpi::math::ExponentialProfile" },
+      { "from": "(\\b)frc::SlewRateLimiter(\\b)", "to": "$1wpi::math::SlewRateLimiter$2" },
+      { "from": "([ \\b{<!\\(])SlewRateLimiter(\\b)", "to": "$1wpi::math::SlewRateLimiter$2" },
+      { "from": "^SlewRateLimiter(\\b)", "to": "$1wpi::math::SlewRateLimiter" },
+      { "from": "(\\b)frc::KalmanFilter(\\b)", "to": "$1wpi::math::KalmanFilter$2" },
+      { "from": "([ \\b{<!\\(])KalmanFilter(\\b)", "to": "$1wpi::math::KalmanFilter$2" },
+      { "from": "^KalmanFilter(\\b)", "to": "$1wpi::math::KalmanFilter" },
+      { "from": "(\\b)frc::Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
+      { "from": "([ \\b{<!\\(])Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
+      { "from": "^Debouncer(\\b)", "to": "$1wpi::math::Debouncer" },
+      { "from": "(\\b)frc::TravelingSalesman(\\b)", "to": "$1wpi::math::TravelingSalesman$2" },
+      {
+        "from": "([ \\b{<!\\(])TravelingSalesman(\\b)",
+        "to": "$1wpi::math::TravelingSalesman$2"
+      },
+      { "from": "^TravelingSalesman(\\b)", "to": "$1wpi::math::TravelingSalesman" },
+      { "from": "wpi::math::wpi::math::", "to": "wpi::math::" },
+      { "from": "wpi::math::wpi::math::", "to": "wpi::math::" },
+      { "from": "(\\b)units::", "to": "$1wpi::units::" },
+      { "from": "^units::", "to": "wpi::units::" },
+      { "from": "wpi::wpi::units::", "to": "wpi::units::" },
+      { "from": "frc::OnBoardIO", "to": "wpi::romi::OnBoardIO" },
+      { "from": "frc::XRP", "to": "wpi::xrp::XRP" },
+      { "from": "frc::Romi", "to": "wpi::romi::Romi" },
+      { "from": "frc::April", "to": "wpi::apriltag::April" },
+      { "from": " cs::", "to": " wpi::cs::" },
+      { "from": "([ {])nt::", "to": "$1wpi::nt::" },
+      { "from": "frc::ObjectToRobotPose", "to": "wpi::math::ObjectToRobotPose" },
+      { "from": "frc2::", "to": "wpi::cmd::" },
+      { "from": "frc::", "to": "wpi::" },
+      { "from": "hal::", "to": "wpi::hal::" },
+      { "from": "FRC_ReportError", "to": "WPILIB_ReportError" }
+    ]
   }
 ]

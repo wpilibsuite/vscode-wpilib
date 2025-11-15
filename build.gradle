@@ -34,14 +34,14 @@ configurations {
 }
 
 dependencies {
-    cppSource 'edu.wpi.first.wpilibc:examples:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:examples:+:@zip'
+    cppSource 'org.wpilib.wpilibc:examples:+:@zip'
+    javaSource 'org.wpilib.wpilibj:examples:+:@zip'
 
-    cppSource 'edu.wpi.first.wpilibc:templates:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:templates:+:@zip'
+    cppSource 'org.wpilib.wpilibc:templates:+:@zip'
+    javaSource 'org.wpilib.wpilibj:templates:+:@zip'
 
-    cppSource 'edu.wpi.first.wpilibc:commands:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:commands:+:@zip'
+    cppSource 'org.wpilib.wpilibc:commands:+:@zip'
+    javaSource 'org.wpilib.wpilibj:commands:+:@zip'
 }
 
 task extractCppDependencies(type: Copy) {
