@@ -62,9 +62,12 @@ export class ToolAPI implements IToolAPI {
       if (grResult !== undefined && grResult === i18n('ui', 'Yes')) {
         const preferencesApi = this.externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot install gradle tools with an empty workspace')
+            i18n('message', 'Cannot install gradle tools since this is not a WPILib project')
           );
           return false;
         }
