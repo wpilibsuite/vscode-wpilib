@@ -142,11 +142,7 @@ async function handleAfterTrusted(
   try {
     vendorLibs = new VendorLibraries(externalApi);
     context.subscriptions.push(vendorLibs);
-    await addVendorExamples(
-      extensionResourceLocation,
-      externalApi.getExampleTemplateAPI(),
-      vendorLibs
-    );
+    await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI());
   } catch (err) {
     logger.error('error creating vendor lib utilities', err);
     creationError = true;

@@ -41,10 +41,7 @@ export class ProjectInfoGatherer {
   private disposables: vscode.Disposable[] = [];
   private statusBar: vscode.StatusBarItem;
 
-  public constructor(
-    vendorLibraries: VendorLibraries,
-    externalApi: IExternalAPI
-  ) {
+  public constructor(vendorLibraries: VendorLibraries, externalApi: IExternalAPI) {
     this.vendorLibraries = vendorLibraries;
     this.externalApi = externalApi;
 
