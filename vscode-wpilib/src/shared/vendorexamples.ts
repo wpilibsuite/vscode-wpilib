@@ -10,7 +10,7 @@ import { logger } from '../logger';
 import { extensionContext } from '../utilities';
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { getWPILibHomeDir } from './utilitiesapi';
-import { VendorLibrariesBase } from './vendorlibrariesbase';
+import { findForUUIDs, installDependency } from './vendorlibrariesbase';
 
 interface IJsonExample {
   name: string;
@@ -41,8 +41,7 @@ function isJsonExample(arg: unknown): arg is IJsonExample {
 
 export async function addVendorExamples(
   resourceRoot: string,
-  core: IExampleTemplateAPI,
-  vendorlibs: VendorLibrariesBase
+  core: IExampleTemplateAPI
 ): Promise<void> {
   const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
   const storagePath = extensionContext.storagePath;
@@ -142,11 +141,11 @@ export async function addVendorExamples(
                 }
 
                 // Install vendor dependencies
-                const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
+                const vendorFiles = await findForUUIDs(ex.dependencies);
                 const vendorFolder = path.join(folderInto.fsPath, 'vendordeps');
 
                 for (const vendorFile of vendorFiles) {
-                  await vendorlibs.installDependency(vendorFile, vendorFolder, true);
+                  await installDependency(vendorFile, vendorFolder, true);
                 }
               } catch (err) {
                 logger.error('Example generation error: ', err);

@@ -3,7 +3,7 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { IJsonDependency } from './shared/vendorlibrariesbase';
+import { getHomeDirDeps, IJsonDependency, installDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 
@@ -265,7 +265,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
         // If no conflict is found install otherwise show dialog
         if (!conflictdep) {
-          const success = await this.vendorLibraries.installDependency(
+          const success = await installDependency(
             dep,
             this.vendorLibraries.getWpVendorFolder(this.wp),
             true
@@ -294,7 +294,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 );
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  await this.vendorLibraries.installDependency(
+                  await installDependency(
                     newDep,
                     this.vendorLibraries.getWpVendorFolder(this.wp),
                     true
@@ -405,7 +405,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
       // If no conflict is found, proceed with installation
       if (!conflictDep) {
-        const success = await this.vendorLibraries.installDependency(
+        const success = await installDependency(
           file,
           this.vendorLibraries.getWpVendorFolder(this.wp),
           true
@@ -419,7 +419,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             for (const required of file.requires) {
               try {
                 const requiredDep = await this.vendorLibraries.getJsonDepURL(required.onlineUrl);
-                await this.vendorLibraries.installDependency(
+                await installDependency(
                   requiredDep,
                   this.vendorLibraries.getWpVendorFolder(this.wp),
                   true
@@ -590,7 +590,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         this.onlineDeps = [];
       }
     }
-    this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
+    this.homeDeps = await getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
         path: i18n('ui', homedep.jsonUrl),

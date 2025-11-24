@@ -6,7 +6,14 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
-import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import {
+  getDependencies,
+  getHomeDirDeps,
+  IJsonDependency,
+  installDependency,
+  loadFileFromUrl,
+  parseVendordepJson,
+} from './shared/vendorlibrariesbase';
 import { isNewerVersion } from './versions';
 
 class OptionQuickPick implements vscode.QuickPickItem {
@@ -34,13 +41,12 @@ class LibraryQuickPick implements vscode.QuickPickItem {
   }
 }
 
-export class VendorLibraries extends VendorLibrariesBase {
+export class VendorLibraries {
   private disposables: vscode.Disposable[] = [];
   private externalApi: IExternalAPI;
   private lastBuildTime = 1;
 
   constructor(externalApi: IExternalAPI) {
-    super();
     this.externalApi = externalApi;
 
     this.disposables.push(
@@ -121,7 +127,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public async getJsonDepURL(url: string): Promise<IJsonDependency> {
-    return this.loadFileFromUrl(url);
+    return loadFileFromUrl(url);
   }
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
@@ -159,7 +165,7 @@ export class VendorLibraries extends VendorLibrariesBase {
       const files = await readdir(url);
       for (const file of files) {
         const fullPath = path.join(url, file);
-        const result = await this.readFile(fullPath);
+        const result = await parseVendordepJson(fullPath);
         if (result !== undefined) {
           for (const ti of toRemove) {
             if (result.uuid === ti.uuid) {
@@ -186,7 +192,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     const installedDeps = await this.getInstalledDependencies(workspace);
 
     if (installedDeps.length !== 0) {
-      const availableDeps = await this.getHomeDirDeps();
+      const availableDeps = await getHomeDirDeps();
       const updatableDeps = [];
       for (const ad of availableDeps) {
         for (const id of installedDeps) {
@@ -208,7 +214,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         if (toUpdate !== undefined) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
-            const success = await this.installDependency(
+            const success = await installDependency(
               ti.dep,
               this.getWpVendorFolder(workspace),
               true
@@ -240,7 +246,7 @@ export class VendorLibraries extends VendorLibrariesBase {
           return undefined;
         }
         try {
-          return await this.loadFileFromUrl(dep.jsonUrl);
+          return await loadFileFromUrl(dep.jsonUrl);
         } catch (err) {
           logger.log('Error fetching file', err);
           return undefined;
@@ -270,7 +276,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         if (toUpdate !== undefined) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
-            const success = await this.installDependency(
+            const success = await installDependency(
               ti.dep,
               this.getWpVendorFolder(workspace),
               true
@@ -296,7 +302,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   private async offlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
 
-    const availableDeps = await this.getHomeDirDeps();
+    const availableDeps = await getHomeDirDeps();
     const updatableDeps = [];
     for (const ad of availableDeps) {
       let foundDep = false;
@@ -319,11 +325,7 @@ export class VendorLibraries extends VendorLibrariesBase {
       if (toInstall !== undefined) {
         let anySucceeded = false;
         for (const ti of toInstall) {
-          const success = await this.installDependency(
-            ti.dep,
-            this.getWpVendorFolder(workspace),
-            true
-          );
+          const success = await installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           if (!success) {
             vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
           } else {
@@ -347,7 +349,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     });
 
     if (result) {
-      const file = await this.loadFileFromUrl(result);
+      const file = await loadFileFromUrl(result);
       // Load existing libraries
       const existing = await this.getInstalledDependencies(workspace);
 
@@ -358,7 +360,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         }
       }
 
-      const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
+      const success = await installDependency(file, this.getWpVendorFolder(workspace), true);
       if (success) {
         this.offerBuild(workspace, true);
       } else {
@@ -372,7 +374,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
-    return this.getDependencies(this.getWpVendorFolder(workspace));
+    return getDependencies(this.getWpVendorFolder(workspace));
   }
 
   public async offerBuild(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {
