@@ -1,10 +1,11 @@
 'use strict';
 
+import { readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../api';
-import { getIsWindows, gradleRun, readFileAsync } from '../utilities';
+import { getIsWindows, gradleRun } from '../utilities';
 import { IDebugCommands, startDebugging } from './debug';
 import { IUnixSimulateCommands, startUnixSimulation } from './simulateunix';
 import { IWindowsSimulateCommands, startWindowsSimulation } from './simulatewindows';
@@ -100,7 +101,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       return false;
     }
 
-    const debugInfo = await readFileAsync(
+    const debugInfo = await readFile(
       path.join(workspace.uri.fsPath, 'build', 'debug', 'debug_info.json'),
       'utf8'
     );
@@ -132,7 +133,7 @@ class DebugCodeDeployer implements ICodeDeployer {
 
     const debugPath = targetDebugInfo.path;
 
-    const targetReadInfo = await readFileAsync(debugPath, 'utf8');
+    const targetReadInfo = await readFile(debugPath, 'utf8');
     const targetInfoArray: ICppDebugCommand[] = jsonc.parse(targetReadInfo) as ICppDebugCommand[];
 
     if (targetInfoArray.length === 0) {
@@ -287,7 +288,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       return false;
     }
 
-    const simulateInfo = await readFileAsync(
+    const simulateInfo = await readFile(
       path.join(workspace.uri.fsPath, 'build', 'sim', 'debug_native.json'),
       'utf8'
     );

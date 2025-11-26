@@ -1,10 +1,10 @@
 'use strict';
 
+import { readFile } from 'fs/promises';
+import { glob } from 'glob';
 import * as jsonc from 'jsonc-parser';
-import * as glob from 'glob';
 import * as path from 'path';
 import { logger } from '../logger';
-import { readFileAsync } from '../utilities';
 import { updateFileContents } from './fileUtils';
 
 interface IReplaceGroup {
@@ -20,28 +20,15 @@ interface IToUpdate {
 
 export async function ImportUpdate(srcDir: string, updateFile: string): Promise<boolean> {
   try {
-    const toUpdate = await readFileAsync(updateFile, 'utf8');
+    const toUpdate = await readFile(updateFile, 'utf8');
     const toUpdateParsed: IToUpdate[] = jsonc.parse(toUpdate) as IToUpdate[];
 
     // Enumerate through each updater
     for (const updater of toUpdateParsed) {
       // Find files matching the pattern
-      const toUpdateFiles = await new Promise<string[]>((resolve, reject) => {
-        glob(
-          updater.fileMatcher,
-          {
-            cwd: srcDir,
-            nodir: true,
-            nomount: true,
-          },
-          (err: Error | null, matches: string[]) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(matches);
-            }
-          }
-        );
+      const toUpdateFiles = await glob(updater.fileMatcher, {
+        cwd: srcDir,
+        nodir: true,
       });
 
       // Create replacements map

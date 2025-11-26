@@ -1,8 +1,8 @@
 'use strict';
 
+import { cp } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
-import { ncpAsync } from '../utilities';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
@@ -31,9 +31,9 @@ export async function generateCopyCpp(
     const gradleRioVersion = await genUtils.getGradleRioVersion(grRoot);
 
     // Copy template folders
-    await ncpAsync(fromTemplateFolder, codePath);
+    await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
-      await ncpAsync(fromTemplateTestFolder, testPath);
+      await cp(fromTemplateTestFolder, testPath, { recursive: true });
     }
 
     // Setup project structure
@@ -100,9 +100,9 @@ export async function generateCopyJava(
     const gradleRioVersion = await genUtils.getGradleRioVersion(grRoot);
 
     // Copy template folders
-    await ncpAsync(fromTemplateFolder, codePath);
+    await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
-      await ncpAsync(fromTemplateTestFolder, testPath);
+      await cp(fromTemplateTestFolder, testPath, { recursive: true });
     }
 
     // Find files that need template processing

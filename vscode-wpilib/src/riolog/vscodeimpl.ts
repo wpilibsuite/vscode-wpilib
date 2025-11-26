@@ -1,6 +1,7 @@
 'use strict';
 
 import { EventEmitter } from 'events';
+import { readFile } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IErrorMessage, IPrintMessage } from './shared/message';
@@ -13,7 +14,6 @@ import {
   IWindowView,
 } from './shared/interfaces';
 import { RioConsole } from './rioconsole';
-import { readFileAsync } from '../utilities';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;
@@ -133,7 +133,7 @@ export class RioLogHTMLProvider implements IHTMLProvider {
   public static async Create(resourceRoot: string): Promise<RioLogHTMLProvider> {
     const provider = new RioLogHTMLProvider(resourceRoot);
     const htmlFile = path.join(resourceRoot, 'live.html');
-    provider.html = await readFileAsync(htmlFile, 'utf8');
+    provider.html = await readFile(htmlFile, 'utf8');
     return provider;
   }
 
