@@ -35,9 +35,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     vscode.commands.registerCommand('wpilibcore.setTeamNumber', async () => {
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined) {
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set team number in an empty workspace')
+          i18n('message', 'Cannot set team number since this is not a WPILib project')
         );
         return;
       }
@@ -62,9 +65,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       async (source: vscode.Uri | undefined) => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot deploy code in an empty workspace')
+            i18n('message', 'Cannot deploy code since this is not a WPILib project')
           );
           return;
         }
@@ -79,9 +85,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       async (source: vscode.Uri | undefined) => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot debug code in an empty workspace')
+            i18n('message', 'Cannot debug code since this is not a WPILib project')
           );
           return;
         }
@@ -96,9 +105,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       async (source: vscode.Uri | undefined) => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot simulate code in an empty workspace')
+            i18n('message', 'Cannot simulate code since this is not a WPILib project')
           );
           return;
         }
@@ -113,9 +125,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       async (source: vscode.Uri | undefined) => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot simulate code in an empty workspace')
+            i18n('message', 'Cannot simulate code since this is not a WPILib project')
           );
           return;
         }
@@ -130,9 +145,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       async (source: vscode.Uri | undefined) => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot start tests in an empty workspace')
+            i18n('message', 'Cannot start tests since this is not a WPILib project')
           );
           return;
         }
@@ -147,9 +165,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       async (source: vscode.Uri | undefined) => {
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot set team number in an empty workspace')
+            i18n('message', 'Cannot set team number since this is not a WPILib project')
           );
           return;
         }
@@ -170,9 +191,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         }
         const preferencesApi = externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (workspace === undefined) {
+        if (
+          workspace === undefined ||
+          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot create command in an empty workspace')
+            i18n('message', 'Cannot create command since this is not a WPILib project')
           );
           return;
         }
@@ -185,9 +209,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     vscode.commands.registerCommand('wpilibcore.setLanguage', async () => {
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined) {
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set language in an empty workspace')
+          i18n('message', 'Cannot set language since this is not a WPILib project')
         );
         return;
       }
@@ -239,9 +266,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined) {
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot install gradle tools with an empty workspace')
+          i18n('message', 'Cannot install gradle tools since this is not a WPILib project')
         );
         return;
       }
@@ -259,9 +289,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         return;
       }
       const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-      if (wp === undefined) {
+      if (
+        wp === undefined ||
+        !externalApi.getPreferencesAPI().getPreferences(wp).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot run command on empty workspace')
+          i18n('message', 'Cannot run gradle command since this is not a WPILib project')
         );
         return;
       }
@@ -286,9 +319,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     vscode.commands.registerCommand('wpilibcore.resetAutoUpdate', async () => {
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined) {
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot reset auto update with an empty workspace')
+          i18n('message', 'Cannot reset auto update since this is not a WPILib project')
         );
         return;
       }
@@ -301,9 +337,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     vscode.commands.registerCommand('wpilibcore.changeDesktop', async () => {
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined) {
+      if (
+        workspace === undefined ||
+        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot change desktop with an empty workspace')
+          i18n('message', 'Cannot change desktop since this is not a WPILib project')
         );
         return;
       }
@@ -400,9 +439,12 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.runGradleClean', async () => {
       const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-      if (wp === undefined) {
+      if (
+        wp === undefined ||
+        !externalApi.getPreferencesAPI().getPreferences(wp).getIsWPILibProject()
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot run command on empty workspace')
+          i18n('message', 'Cannot run gradle clean since this is not a WPILib project')
         );
         return;
       }
