@@ -15,7 +15,7 @@ import { setExecutePermissions } from './permissions';
 export const ReplacementPatterns = {
   GRADLE_RIO_MARKER: '###GRADLERIOREPLACE###',
   ROBOT_CLASS_MARKER: '###ROBOTCLASSREPLACE###',
-  JAVA_PACKAGE_PATTERN: 'edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)',
+  JAVA_PACKAGE_PATTERN: 'org\\.wpilib\\.(?:examples|templates)\\..+?(?=;|\\.)',
 };
 
 /**
