@@ -22,9 +22,11 @@ export const ReplacementPatterns = {
  * Common vendordep file names
  */
 export const VendorDepFiles = {
-  COMMANDS: 'CommandsV2.json',
+  COMMANDSV2: 'CommandsV2.json',
   ROMI: 'RomiVendordep.json',
   XRP: 'XRPVendordep.json',
+  COMMANDSV3: 'CommandsV3.json',
+  COMMANDSV2_OLD: 'WPILibNewCommands.json',
 };
 
 /**
@@ -144,21 +146,22 @@ directory.`;
 export async function setupVendorDeps(
   resourcesFolder: string,
   toFolder: string,
-  extraVendordeps: string[] = []
+  vendordeps: string[] = []
 ): Promise<boolean> {
   try {
     const vendorDir = path.join(toFolder, 'vendordeps');
     await mkdir(vendorDir, { recursive: true });
 
-    // Add Commands V2
-    await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDS, vendorDir);
-
     // Add extra vendordeps
-    for (const vendordep of extraVendordeps) {
+    for (const vendordep of vendordeps) {
       if (vendordep === 'romi') {
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.ROMI, vendorDir);
       } else if (vendordep === 'xrp') {
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.XRP, vendorDir);
+      } else if (vendordep === 'commandsv2') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV2, vendorDir);
+      } else if (vendordep === 'commandsv3') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV3, vendorDir);
       }
     }
 
