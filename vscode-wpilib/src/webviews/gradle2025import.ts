@@ -16,6 +16,7 @@ import {
   IGradle2025IPCSend,
 } from './pages/gradle2025importpagetypes';
 import { WebViewBase } from './webviewbase';
+import { VendorDepFiles } from '../shared/projectGeneratorUtils';
 
 export class Gradle2025Import extends WebViewBase {
   public static async Create(resourceRoot: string): Promise<Gradle2025Import> {
@@ -260,21 +261,25 @@ export class Gradle2025Import extends WebViewBase {
 
     const gradleBasePath = path.join(extensionContext.extensionPath, 'resources', 'gradle');
     const resourceRoot = path.join(extensionContext.extensionPath, 'resources');
-    const commandsJsonPath = path.join(oldProjectPath, 'vendordeps', 'WPILibOldCommands.json');
+    const commandsV2JsonPath = path.join(oldProjectPath, 'vendordeps', VendorDepFiles.COMMANDSV2);
+    const commandsV2OldJsonPath = path.join(
+      oldProjectPath,
+      'vendordeps',
+      VendorDepFiles.COMMANDSV2_OLD
+    );
+    const commandsV3JsonPath = path.join(oldProjectPath, 'vendordeps', VendorDepFiles.COMMANDSV3);
 
-    if (fs.existsSync(commandsJsonPath)) {
-      await vscode.window.showErrorMessage(
-        i18n(
-          'message',
-          'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'
-        ),
-        {
-          modal: true,
-        }
-      );
+    const vendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
+
+    if (fs.existsSync(commandsV2JsonPath)) {
+      vendordeps.push('commandsv2');
+    } else if (fs.existsSync(commandsV2OldJsonPath)) {
+      vendordeps.push('commandsv2');
+    } else if (fs.existsSync(commandsV3JsonPath)) {
+      vendordeps.push('commandsv3');
+    } else {
+      vendordeps.push('commandsv2');
     }
-
-    const extraVendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
 
     let success = false;
     if (cpp) {
@@ -289,7 +294,7 @@ export class Gradle2025Import extends WebViewBase {
         gradlePath,
         toFolder,
         true,
-        extraVendordeps
+        vendordeps
       );
     } else {
       const gradlePath = path.join(
@@ -305,7 +310,7 @@ export class Gradle2025Import extends WebViewBase {
         javaRobotPackage,
         '',
         true,
-        extraVendordeps
+        vendordeps
       );
     }
 

@@ -79,8 +79,14 @@ export async function addVendorExamples(
             continue;
           }
 
-          const extraVendordeps: string[] =
-            ex.extravendordeps !== undefined ? ex.extravendordeps : [];
+          const vendordeps: string[] = ex.extravendordeps !== undefined ? ex.extravendordeps : [];
+          const commandVersion: string =
+            ex.commandversion !== undefined ? ex.commandversion.toString() : '2';
+          if (commandVersion === '3') {
+            vendordeps.push('commandsv3');
+          } else {
+            vendordeps.push('commandsv2');
+          }
           const provider: IExampleTemplateCreator = {
             getLanguage(): string {
               return ex.language;
@@ -107,7 +113,7 @@ export async function addVendorExamples(
                       'frc.robot.' + ex.mainclass,
                       path.join('frc', 'robot'),
                       false,
-                      extraVendordeps,
+                      vendordeps,
                       ex.packagetoreplace
                     ))
                   ) {
@@ -125,7 +131,7 @@ export async function addVendorExamples(
                       gradlePath,
                       folderInto.fsPath,
                       false,
-                      extraVendordeps
+                      vendordeps
                     ))
                   ) {
                     vscode.window.showErrorMessage(

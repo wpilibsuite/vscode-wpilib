@@ -14,7 +14,7 @@ export async function generateCopyCpp(
   fromGradleFolder: string,
   toFolder: string,
   directGradleImport: boolean,
-  extraVendordeps: string[]
+  vendordeps: string[]
 ): Promise<boolean> {
   try {
     // Check if destination folder is empty
@@ -46,7 +46,7 @@ export async function generateCopyCpp(
     await genUtils.setupDeployDirectory(toFolder, directGradleImport, false);
 
     // Setup vendor dependencies
-    await genUtils.setupVendorDeps(resourcesFolder, toFolder, extraVendordeps);
+    await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
 
     return true;
   } catch (e) {
@@ -65,7 +65,7 @@ export async function generateCopyCpp(
  * @param robotClassTo The main robot class.
  * @param copyRoot The base package in folder form to copy to.
  * @param directGradleImport Whether or not the file in fromTemplateFolder are in the Gradle project structure already.
- * @param extraVendordeps List of extra WPILib vendordeps to add to the project.
+ * @param vendordeps List of extra WPILib vendordeps to add to the project.
  * @param packageReplaceString The base package to replace with frc.robot.
  * @returns True if the project successfully generated, false otherwise.
  */
@@ -78,7 +78,7 @@ export async function generateCopyJava(
   robotClassTo: string,
   copyRoot: string,
   directGradleImport: boolean,
-  extraVendordeps: string[],
+  vendordeps: string[],
   packageReplaceString?: string
 ): Promise<boolean> {
   try {
@@ -147,7 +147,7 @@ export async function generateCopyJava(
     await genUtils.setupDeployDirectory(toFolder, directGradleImport, true);
 
     // Setup vendor dependencies
-    await genUtils.setupVendorDeps(resourcesFolder, toFolder, extraVendordeps);
+    await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
 
     return true;
   } catch (e) {

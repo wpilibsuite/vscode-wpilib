@@ -73,6 +73,12 @@ def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
   overwrite true
 }
 
+def downloadCommandsV3 = tasks.register('downloadCommandsV3', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv3/CommandsV3.json'
+  dest 'vscode-wpilib/resources/vendordeps/CommandsV3.json'
+  overwrite true
+}
+
 def downloadRomiVendordep = tasks.register('downloadRomiVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/romiVendordep/RomiVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/RomiVendordep.json'
@@ -88,6 +94,7 @@ def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
 build.dependsOn extractCppDependencies
 build.dependsOn extractJavaDependencies
 build.dependsOn downloadCommandsV2
+build.dependsOn downloadCommandsV3
 build.dependsOn downloadRomiVendordep
 build.dependsOn downloadXRPVendordep
 
