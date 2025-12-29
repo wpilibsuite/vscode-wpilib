@@ -1,13 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { postMessage } from '../lib';
+  import { getResourceBase, postMessage } from '../lib';
 
   let logoPath = $state('');
 
   onMount(() => {
-    const appElement = document.getElementById('app');
-    const resourceBase = appElement?.getAttribute('data-resource-base') || '';
-    logoPath = `${resourceBase}/resources/wpilib-generic.svg`;
+    logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
   });
 
   const openCommandPalette = () => {
@@ -87,4 +85,3 @@
     </button>
   </div>
 </div>
-

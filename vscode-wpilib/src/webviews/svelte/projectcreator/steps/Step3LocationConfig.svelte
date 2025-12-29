@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { ValidationError } from '../../components/shared';
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     projectFolder?: string;
@@ -16,6 +13,13 @@
     showProjectFolderError?: boolean;
     showProjectNameError?: boolean;
     showTeamNumberError?: boolean;
+    onSelectFolder?: () => void;
+    onProjectNameChange?: (value: string) => void;
+    onTeamNumberChange?: (value: string) => void;
+    onNewFolderChange?: (value: boolean) => void;
+    onDesktopChange?: (value: boolean) => void;
+    onBack?: () => void;
+    onNext?: () => void;
   }
 
   let {
@@ -25,41 +29,48 @@
     projectNameError = null,
     teamNumber = '',
     teamNumberError = null,
-    newFolder = $bindable(true),
-    desktop = $bindable(false),
+    newFolder = true,
+    desktop = false,
     showProjectFolderError = false,
     showProjectNameError = false,
-    showTeamNumberError = false
+    showTeamNumberError = false,
+    onSelectFolder = () => {},
+    onProjectNameChange = () => {},
+    onTeamNumberChange = () => {},
+    onNewFolderChange = () => {},
+    onDesktopChange = () => {},
+    onBack = () => {},
+    onNext = () => {}
   }: Props = $props();
 
   let canProceed = $derived(!projectFolderError && !projectNameError);
 
-  const selectFolder = () => dispatch('selectFolder');
-  const back = () => dispatch('back');
-  const next = () => dispatch('next');
+  const selectFolder = () => onSelectFolder();
+  const back = () => onBack();
+  const next = () => onNext();
 
   const handleProjectNameInput = (event: Event) => {
     const target = event.target as HTMLInputElement | null;
     const inputValue = target?.value ?? projectName;
-    dispatch('projectNameChange', inputValue);
+    onProjectNameChange(inputValue);
   };
 
   const handleTeamNumberInput = (event: Event) => {
     const target = event.target as HTMLInputElement | null;
     const inputValue = target?.value ?? teamNumber;
-    dispatch('teamNumberChange', inputValue);
+    onTeamNumberChange(inputValue);
   };
 
   const handleNewFolderChange = (event: Event) => {
     const target = event.target as HTMLInputElement | null;
     const checkedValue = target?.checked ?? newFolder;
-    dispatch('newFolderChange', checkedValue);
+    onNewFolderChange(checkedValue);
   };
 
   const handleDesktopChange = (event: Event) => {
     const target = event.target as HTMLInputElement | null;
     const checkedValue = target?.checked ?? desktop;
-    dispatch('desktopChange', checkedValue);
+    onDesktopChange(checkedValue);
   };
 </script>
 
@@ -127,7 +138,7 @@
     <input
       id="newFolderCB"
       type="checkbox"
-      bind:checked={newFolder}
+      checked={newFolder}
       onchange={handleNewFolderChange}
     />
     <label for="newFolderCB">
@@ -145,7 +156,7 @@
     <input
       id="desktopCB"
       type="checkbox"
-      bind:checked={desktop}
+      checked={desktop}
       onchange={handleDesktopChange}
     />
     <label for="desktopCB">
@@ -172,4 +183,3 @@
     Next
   </button>
 </div>
-

@@ -71,10 +71,10 @@
       id="language-select"
       class="project-select"
       bind:value={languageValue}
-      on:change={notifyLanguageChange}
+      onchange={notifyLanguageChange}
       disabled={languages.length === 0}
     >
-  <option value="" disabled>Select a language</option>
+      <option value="" disabled>Select a language</option>
       {#each languages as lang}
         <option value={lang}>{lang}</option>
       {/each}
@@ -90,10 +90,10 @@
       id="base-select"
       class="project-select"
       bind:value={baseValue}
-      on:change={notifyBaseChange}
+      onchange={notifyBaseChange}
       disabled={bases.length === 0}
     >
-  <option value="" disabled>Select a project base</option>
+      <option value="" disabled>Select a project base</option>
       {#each bases as base}
         <option value={base.label}>{base.label}</option>
       {/each}
@@ -102,7 +102,7 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-1" type="button" class="vscode-button secondary" on:click={back}>
+  <button id="back-to-step-1" type="button" class="vscode-button secondary" onclick={back}>
     Back
   </button>
   <button
@@ -110,9 +110,8 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    on:click={next}
+    onclick={next}
   >
     Next
   </button>
 </div>
-

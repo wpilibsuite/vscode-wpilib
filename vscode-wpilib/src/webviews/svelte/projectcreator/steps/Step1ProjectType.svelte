@@ -1,20 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { ProjectType } from '../types';
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     selected?: ProjectType | null;
+    onSelect?: (type: ProjectType) => void;
+    onNext?: () => void;
   }
 
-  let { selected = null }: Props = $props();
+  let { selected = null, onSelect = () => {}, onNext = () => {} }: Props = $props();
 
   const select = (type: ProjectType) => {
-    dispatch('select', type);
+    onSelect(type);
   };
 
-  const next = () => dispatch('next');
+  const next = () => onNext();
 </script>
 
 <div class="step-header">
@@ -65,4 +64,3 @@
     Next
   </button>
 </div>
-

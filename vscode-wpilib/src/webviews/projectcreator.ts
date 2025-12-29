@@ -186,6 +186,6 @@ export class ProjectCreator extends WebViewBase {
     );
 
     // Include the 'projectcreator' domain for localization
-    await this.loadWebpage(htmlPath, undefined, ['projectcreator']);
+    await this.loadWebpage(htmlPath, ['projectcreator']);
   }
 }

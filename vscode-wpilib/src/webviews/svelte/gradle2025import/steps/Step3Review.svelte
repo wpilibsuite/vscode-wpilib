@@ -1,19 +1,24 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { SummaryBox } from '../../components/shared';
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     sourcePath?: string;
     destinationPath?: string;
     teamNumber?: string;
+    onBack?: () => void;
+    onImport?: () => void;
   }
 
-  let { sourcePath = '', destinationPath = '', teamNumber = '' }: Props = $props();
+  let {
+    sourcePath = '',
+    destinationPath = '',
+    teamNumber = '',
+    onBack = () => {},
+    onImport = () => {}
+  }: Props = $props();
 
-  const back = () => dispatch('back');
-  const importProject = () => dispatch('import');
+  const back = () => onBack();
+  const importProject = () => onImport();
 </script>
 
 <div class="step-header">
@@ -56,4 +61,3 @@
     Import Project
   </button>
 </div>
-

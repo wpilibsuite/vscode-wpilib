@@ -30,6 +30,16 @@ const webviews = [
     input: 'src/webviews/svelte/dependencyview/main.ts',
     title: 'WPILib Vendor Dependencies',
   },
+  {
+    name: 'riolog',
+    input: 'src/webviews/svelte/riolog/main.ts',
+    title: 'WPILib RioLog',
+  },
+  {
+    name: 'localeloader',
+    input: 'src/webviews/localeloader.ts',
+    title: 'Locale Loader',
+  },
 ];
 
 function createHtmlTemplate(title) {
@@ -117,4 +127,3 @@ module.exports = webviews.map(({ name, input, title }) => ({
     clearScreen: false,
   },
 }));
-

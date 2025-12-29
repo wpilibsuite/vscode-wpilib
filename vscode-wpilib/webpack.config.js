@@ -4,36 +4,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 /**@type {import('webpack').Configuration}*/
 module.exports = [
   {
-    entry: {
-      localeloader: './src/webviews/localeloader.ts',
-      riologpage: ['./src/riolog/shared/sharedscript.ts', './src/riolog/script/implscript.ts'],
-    },
-    devtool: isDevelopment ? 'inline-source-map' : 'source-map',
-    module: {
-      rules: [
-        {
-          test: /\.ts$/,
-          use: 'ts-loader',
-        },
-        {
-          test: /\.js$/,
-          include: [/node_modules/],
-        },
-      ],
-    },
-    resolve: {
-      extensions: ['.ts', '.js'],
-      fallback: {
-        net: false,
-      },
-    },
-    output: {
-      path: path.resolve(__dirname, 'resources', 'dist'),
-      filename: '[name].js',
-      hashFunction: 'sha256',
-    },
-  },
-  {
     target: 'node', // vscode extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
     entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
     output: {

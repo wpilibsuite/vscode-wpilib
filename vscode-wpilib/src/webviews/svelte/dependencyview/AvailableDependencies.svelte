@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import type { AvailableDependency } from './types';
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     dependencies?: AvailableDependency[];
+    onInstall?: (index: number) => void;
   }
 
-  let { dependencies = [] }: Props = $props();
+  let { dependencies = [], onInstall = () => {} }: Props = $props();
 </script>
 
 {#if dependencies.length === 0}
@@ -18,7 +16,7 @@
     <div class="available-dependency">
       <div class="dependency-header">
         <span class="dependency-name">{dependency.name}</span>
-        <button class="vscode-button" onclick={() => dispatch('install', { index })}>
+        <button class="vscode-button" onclick={() => onInstall(index)}>
           <i class="codicon codicon-add"></i>
           <span> Install</span>
         </button>
@@ -30,4 +28,3 @@
     </div>
   {/each}
 {/if}
-

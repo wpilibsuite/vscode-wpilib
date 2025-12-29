@@ -14,6 +14,7 @@ import {
 } from './shared/interfaces';
 import { RioConsole } from './rioconsole';
 import { readFileAsync } from '../utilities';
+import { rewriteDistWebviewHtml } from '../webviews/distWebviewHtml';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;
@@ -23,12 +24,22 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
   private webview: vscode.WebviewPanel;
   private disposables: vscode.Disposable[] = [];
 
-  constructor(resourceName: string, windowName: string, viewColumn: vscode.ViewColumn) {
+  constructor(
+    resourceName: string,
+    windowName: string,
+    viewColumn: vscode.ViewColumn,
+    private readonly extensionRoot: string
+  ) {
     super();
     this.webview = vscode.window.createWebviewPanel(resourceName, windowName, viewColumn, {
       enableCommandUris: true,
       enableScripts: true,
       retainContextWhenHidden: true,
+      localResourceRoots: [
+        vscode.Uri.file(this.extensionRoot),
+        vscode.Uri.file(path.join(this.extensionRoot, 'resources', 'media')),
+        vscode.Uri.file(path.join(this.extensionRoot, 'resources', 'dist')),
+      ],
     });
 
     this.disposables.push(this.webview);
@@ -132,7 +143,7 @@ export class RioLogWindowView extends EventEmitter implements IWindowView {
 export class RioLogHTMLProvider implements IHTMLProvider {
   public static async Create(resourceRoot: string): Promise<RioLogHTMLProvider> {
     const provider = new RioLogHTMLProvider(resourceRoot);
-    const htmlFile = path.join(resourceRoot, 'live.html');
+    const htmlFile = path.join(resourceRoot, 'dist', 'riolog.html');
     provider.html = await readFileAsync(htmlFile, 'utf8');
     return provider;
   }
@@ -145,60 +156,39 @@ export class RioLogHTMLProvider implements IHTMLProvider {
   }
 
   public getHTML(webview: vscode.Webview): string {
-    // Get paths to script and CSS
-    const scriptPath = vscode.Uri.file(
-      path.join(this.resourceRoot, '..', 'resources', 'dist', 'riologpage.js')
-    );
-    const elementsCssPath = vscode.Uri.file(
-      path.join(this.resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')
-    );
-    const rioLogCssPath = vscode.Uri.file(
-      path.join(this.resourceRoot, '..', 'resources', 'media', 'riolog.css')
-    );
-
-    // Convert to webview URIs
-    const scriptUri = webview.asWebviewUri(scriptPath);
-    const elementsCssUri = webview.asWebviewUri(elementsCssPath);
-    const rioLogCssUri = webview.asWebviewUri(rioLogCssPath);
-
-    let html = this.html!;
-
-    // Add CSS link
-    html = html.replace(
-      '</head>',
-      `<link rel="stylesheet" href="${elementsCssUri}" />
-      <link rel="stylesheet" href="${rioLogCssUri}" />\r\n</head>`
-    );
-
-    // Add script with error handling
-    html = html.replace(
-      '</body>',
-      `<script>
-        window.addEventListener('error', (event) => {
-          console.error('Error in RioLog script:', event.error);
-        });
-      </script>
-      <script src="${scriptUri}"></script>
-      </body>`
-    );
-
-    return html;
+    return rewriteDistWebviewHtml({
+      webview,
+      extensionRoot: vscode.Uri.file(path.join(this.resourceRoot, '..')),
+      html: this.html!,
+      extraCss: [
+        vscode.Uri.file(path.join(this.resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')),
+        vscode.Uri.file(path.join(this.resourceRoot, '..', 'resources', 'media', 'riolog.css')),
+      ],
+    });
   }
 }
 
 export class RioLogWebviewProvider implements IWindowProvider {
   public static async Create(resourceRoot: string): Promise<RioLogWebviewProvider> {
     const provider = new RioLogWebviewProvider();
+    provider.resourceRoot = resourceRoot;
     provider.htmlProvider = await RioLogHTMLProvider.Create(resourceRoot);
     return provider;
   }
 
   private htmlProvider: RioLogHTMLProvider | undefined;
+  private resourceRoot: string | undefined;
 
   private constructor() {}
 
   public createWindowView(): IWindowView {
-    const wv = new RioLogWindowView('wpilib:riologlive', 'RioLog', vscode.ViewColumn.Three);
+    const extensionRoot = path.join(this.resourceRoot!, '..');
+    const wv = new RioLogWindowView(
+      'wpilib:riologlive',
+      'RioLog',
+      vscode.ViewColumn.Beside,
+      extensionRoot
+    );
     wv.setHTML(this.htmlProvider!.getHTML(wv.getWebview()));
     return wv;
   }

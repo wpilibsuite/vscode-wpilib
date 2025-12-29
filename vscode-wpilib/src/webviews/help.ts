@@ -57,7 +57,6 @@ export class Help extends WebViewBase {
   private async asyncInitialize() {
     await this.loadWebpage(
       path.join(extensionContext.extensionPath, 'resources', 'dist', 'help.html'),
-      undefined,
       ['help']
     );
   }

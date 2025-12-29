@@ -11,7 +11,12 @@
   "include": [
     "src/webviews/svelte/**/*.ts",
     "src/webviews/svelte/**/*.svelte",
-    "src/webviews/pages/**/*.ts"
+    "src/webviews/pages/**/*.ts",
+    "src/webviews/localeloader.ts",
+    "src/formatter.ts",
+    "src/riolog/ansi/ansiparser.ts",
+    "src/riolog/shared/interfaces.ts",
+    "src/riolog/shared/message.ts"
   ],
   "exclude": [
     "node_modules",
@@ -23,4 +28,3 @@
     "src/webviews/**/*.spec.ts"
   ]
 }
-

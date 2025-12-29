@@ -1,20 +1,17 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import { createEventDispatcher } from 'svelte';
   import type { InstalledDependency } from './types';
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     dependencies?: InstalledDependency[];
+    onUpdate?: (index: number, version: string) => void;
+    onUninstall?: (index: number) => void;
   }
 
-  let { dependencies = [] }: Props = $props();
+  let { dependencies = [], onUpdate = () => {}, onUninstall = () => {} }: Props = $props();
 
   let selectedVersions: string[] = $state([]);
 
-  run(() => {
+  $effect(() => {
     const nextSelected = dependencies.map((dep, index) => selectedVersions[index] ?? dep.currentVersion);
     if (
       nextSelected.length !== selectedVersions.length ||
@@ -62,7 +59,7 @@
         <button
           class="vscode-button"
           disabled={isUpdateDisabled(dependency, selectedVersions[index])}
-          onclick={() => dispatch('update', { index, version: selectedVersions[index] })}
+          onclick={() => onUpdate(index, selectedVersions[index])}
         >
           {getButtonText(dependency, selectedVersions[index])}
         </button>
@@ -70,7 +67,7 @@
         <button
           class="uninstall-button vscode-button"
           title={`Uninstall ${dependency.name}`}
-          onclick={() => dispatch('uninstall', { index })}
+          onclick={() => onUninstall(index)}
         >
           <i class="codicon codicon-trash"></i>
         </button>
@@ -78,4 +75,3 @@
     </div>
   {/each}
 {/if}
-

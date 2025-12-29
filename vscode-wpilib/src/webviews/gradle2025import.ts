@@ -360,7 +360,6 @@ export class Gradle2025Import extends WebViewBase {
   private async asyncInitialize() {
     await this.loadWebpage(
       path.join(extensionContext.extensionPath, 'resources', 'dist', 'gradle2025import.html'),
-      undefined,
       ['gradle2025import']
     );
   }

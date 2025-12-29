@@ -1,9 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { SummaryBox } from '../../components/shared';
   import { ProjectType } from '../types';
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     projectType?: ProjectType;
@@ -11,6 +8,8 @@
     base?: string;
     location?: string;
     teamNumber?: string;
+    onBack?: () => void;
+    onCreate?: () => void;
   }
 
   let {
@@ -18,11 +17,13 @@
     language = '',
     base = '',
     location = '',
-    teamNumber = ''
+    teamNumber = '',
+    onBack = () => {},
+    onCreate = () => {}
   }: Props = $props();
 
-  const back = () => dispatch('back');
-  const createProject = () => dispatch('create');
+  const back = () => onBack();
+  const createProject = () => onCreate();
 
   const projectTypeLabel = projectType === ProjectType.Template ? 'Template' : 'Example';
 </script>
@@ -52,4 +53,3 @@
     Create Project
   </button>
 </div>
-

@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { onMount } from 'svelte';
   import { WizardProgress, WizardStep } from '../components/shared';
   import Step1ProjectType from './steps/Step1ProjectType.svelte';
   import Step2LanguageBase from './steps/Step2LanguageBase.svelte';
   import Step3LocationConfig from './steps/Step3LocationConfig.svelte';
   import Step4Review from './steps/Step4Review.svelte';
-  import { postMessage, subscribeToMessages } from '../lib';
+  import { getResourceBase, onWebviewMessage, postMessage } from '../lib';
   import {
     ProjectType,
     type BaseOption,
@@ -202,11 +200,9 @@
   };
 
   onMount(() => {
-    const appElement = document.getElementById('app');
-    const resourceBase = appElement?.getAttribute('data-resource-base') || '';
-    logoPath = `${resourceBase}/resources/wpilib-generic.svg`;
+    logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
 
-    const unsubscribe = subscribeToMessages<{ type: string; data: unknown }>((event) => {
+    const unsubscribe = onWebviewMessage<{ type: string; data: unknown }>((event) => {
       switch (event.type) {
         case 'newproject': {
           if (typeof event.data === 'string') {
@@ -246,13 +242,13 @@
     };
   });
 
-  run(() => {
+  $effect(() => {
     projectFolderError = validateProjectFolder(projectFolder);
   });
-  run(() => {
+  $effect(() => {
     projectNameError = validateProjectName(projectName);
   });
-  run(() => {
+  $effect(() => {
     teamNumberError = validateTeamNumber(teamNumber);
   });
 
@@ -273,8 +269,8 @@
   <WizardStep active={currentStep === 1} step={1}>
     <Step1ProjectType
       selected={projectType}
-      on:select={(event) => handleProjectTypeSelection(event.detail)}
-      on:next={handleStep1Next}
+      onSelect={handleProjectTypeSelection}
+      onNext={handleStep1Next}
     />
   </WizardStep>
 
@@ -304,13 +300,13 @@
       showProjectFolderError={showProjectFolderError}
       showProjectNameError={showProjectNameError}
       showTeamNumberError={showTeamNumberError}
-      on:selectFolder={selectProjectFolder}
-      on:projectNameChange={(event) => handleProjectNameChange(event.detail)}
-      on:teamNumberChange={(event) => handleTeamNumberChange(event.detail)}
-      on:newFolderChange={(event) => (newFolder = event.detail)}
-      on:desktopChange={(event) => (desktop = event.detail)}
-      on:back={() => goToStep(2)}
-      on:next={handleStep3Next}
+      onSelectFolder={selectProjectFolder}
+      onProjectNameChange={handleProjectNameChange}
+      onTeamNumberChange={handleTeamNumberChange}
+      onNewFolderChange={(value) => (newFolder = value)}
+      onDesktopChange={(value) => (desktop = value)}
+      onBack={() => goToStep(2)}
+      onNext={handleStep3Next}
     />
   </WizardStep>
 
@@ -321,9 +317,8 @@
       base={selectedBase}
       location={summaryLocation}
       teamNumber={teamNumber}
-      on:back={() => goToStep(3)}
-      on:create={createProject}
+      onBack={() => goToStep(3)}
+      onCreate={createProject}
     />
   </WizardStep>
 </div>
-

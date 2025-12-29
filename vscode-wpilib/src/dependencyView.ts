@@ -1,7 +1,5 @@
-import * as fs from 'fs';
 import fetch from 'node-fetch';
 import type { RequestInit } from 'node-fetch';
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
@@ -10,6 +8,7 @@ import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
 import { IJsonDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
+import { loadDistWebviewHtml } from './webviews/distWebviewHtml';
 // @ts-ignore
 export interface IJsonList {
   path: string;
@@ -55,6 +54,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private refreshInProgress = false;
   private showingInstructions = false;
   private viewReady = false;
+  private marketplaceDeps: IJsonList[] = [];
+  private marketplaceDepsYear: string | undefined;
+  private marketplaceLastSuccessAt = 0;
+  private marketplaceLastAttemptAt = 0;
+  private readonly marketplaceCacheTTLms = 5 * 60 * 1000;
+  private readonly marketplaceRetryBackoffMs = 30 * 1000;
   private pendingDependenciesUpdate:
     | {
         type: 'updateDependencies';
@@ -99,31 +104,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     this.wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
     if (this.wp === undefined) {
       logger.warn('no workspace');
+      webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, 'no-workspace');
       return;
     }
 
     const prefs = this.externalApi.getPreferencesAPI().getPreferences(this.wp);
     if (prefs.getProjectYear() === 'none' || !prefs.getIsWPILibProject()) {
-      webviewView.webview.html = `
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>WPILib Vendor Dependencies</title>
-            <link rel="stylesheet" href="${webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'))}">
-            <link rel="stylesheet" href="${webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'))}" id="vscode-codicon-stylesheet">
-          </head>
-          <body>
-            <div class="error-content" style="max-width: 500px; margin: 48px auto; text-align: center;">
-              <span class="codicon codicon-warning" style="font-size: 32px; display: block; margin-bottom: 16px;"></span>
-              <b>This is not a WPILib project.</b><br/>
-              Vendor dependency management is only available for WPILib projects.<br/>
-              <br/>
-              To use vendor dependencies, open a WPILib project or create a new one from the WPILib extension.
-            </div>
-          </body>
-        </html>
-      `;
+      webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, 'not-wpilib');
       return;
     }
 
@@ -136,6 +123,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       if (this.wp) {
         // If the webview becomes visible refresh it, invisible then check for changes
         if (webviewView.visible) {
+          // Show cached data immediately while refresh runs.
+          this.updateDependencies();
           void this._refresh(this.wp);
         } else {
           if (this.showingInstructions) {
@@ -152,7 +141,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       console.log(item.name.concat(' / ', item.version))
     );
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, 'ready');
+    // Populate the webview quickly with any cached data while the refresh runs.
+    this.updateDependencies();
 
     const disposeListener = webviewView.onDidDispose(() => {
       this.viewReady = false;
@@ -520,16 +511,16 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     this.refreshInProgress = true;
 
     try {
-      this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
-      this.installedList = [];
-      this.availableDepsList = [];
+      const installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
+      const availableDeps = await this.getAvailableDependencies();
 
-      this.availableDeps = await this.getAvailableDependencies();
+      const installedList: IDepInstalled[] = [];
+      const availableDepsList: IJsonList[] = [];
 
-      if (this.installedDeps.length !== 0) {
-        for (const id of this.installedDeps) {
+      if (installedDeps.length !== 0) {
+        for (const id of installedDeps) {
           let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-          for (const ad of this.availableDeps) {
+          for (const ad of availableDeps) {
             if (id.uuid === ad.uuid) {
               if (id.version !== ad.version) {
                 versionList.push({
@@ -543,7 +534,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           }
           versionList = this.sortVersions(versionList);
 
-          this.installedList.push({
+          installedList.push({
             name: id.name,
             currentVersion: id.version,
             versionInfo: versionList,
@@ -551,17 +542,22 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         }
       }
 
-      this.availableDeps.forEach((dep) => {
-        const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
+      availableDeps.forEach((dep) => {
+        const installedDep = installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
         if (installedDep < 0) {
-          const foundDep = this.availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
+          const foundDep = availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
           if (foundDep < 0) {
-            this.availableDepsList.push(dep);
-          } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
-            this.availableDepsList[foundDep] = dep;
+            availableDepsList.push(dep);
+          } else if (isNewerVersion(dep.version, availableDepsList[foundDep].version)) {
+            availableDepsList[foundDep] = dep;
           }
         }
       });
+
+      this.installedDeps = installedDeps;
+      this.availableDeps = availableDeps;
+      this.installedList = installedList;
+      this.availableDepsList = availableDepsList;
 
       this.sortInstalled();
       this.sortAvailable();
@@ -639,12 +635,37 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         .getPreferences(this.wp)
         .getProjectYear();
       const manifestURL = this.vendordepMarketplaceURL + `${projectYear}.json`;
-      try {
-        this.onlineDeps = await this.loadFileFromUrl(manifestURL);
-      } catch (err) {
-        logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
-        this.onlineDeps = [];
+
+      const now = Date.now();
+      const cacheValid =
+        this.marketplaceDepsYear === projectYear &&
+        this.marketplaceDeps.length > 0 &&
+        now - this.marketplaceLastSuccessAt < this.marketplaceCacheTTLms;
+
+      const shouldAttemptFetch =
+        !cacheValid && now - this.marketplaceLastAttemptAt >= this.marketplaceRetryBackoffMs;
+
+      if (shouldAttemptFetch) {
+        this.marketplaceLastAttemptAt = now;
+        try {
+          this.marketplaceDeps = await this.loadFileFromUrl(manifestURL);
+          this.marketplaceDepsYear = projectYear;
+          this.marketplaceLastSuccessAt = now;
+        } catch (err) {
+          logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
+          // Avoid mixing years; if year changed and we couldn't fetch, fall back to empty marketplace list.
+          if (this.marketplaceDepsYear !== projectYear) {
+            this.marketplaceDeps = [];
+            this.marketplaceDepsYear = projectYear;
+          }
+        }
+      } else if (this.marketplaceDepsYear !== projectYear) {
+        // Year changed but we are within backoff; don't use stale year data.
+        this.marketplaceDeps = [];
+        this.marketplaceDepsYear = projectYear;
       }
+
+      this.onlineDeps = [...this.marketplaceDeps];
     }
     this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
@@ -700,51 +721,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview): string {
-    // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
-    const createUri = (fp: string) => {
-      return webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...fp.split('/')));
-    };
-
-    const styleUri = createUri(`resources/media/main.css`);
-    const vscodeElementsUri = createUri(`resources/media/vscode-elements.css`);
-    const codiconUri = createUri(`resources/media/icons.css`);
-    const scriptUri = createUri(`resources/dist/dependencyview.js`);
-
-    const htmlPath = path.join(this._extensionUri.fsPath, 'resources', 'dist', 'dependencyview.html');
-    let html = fs.readFileSync(htmlPath, 'utf8');
-
-    const headInsert = `
-    <link rel="preload" href="${vscodeElementsUri}" as="style">
-    <link rel="preload" href="${styleUri}" as="style">
-    <link rel="preload" href="${codiconUri}" as="style">
-    <link rel="preload" href="${scriptUri}" as="script">
-
-    <link rel="stylesheet" href="${vscodeElementsUri}">
-    <link rel="stylesheet" href="${styleUri}">
-    <link rel="stylesheet" href="${codiconUri}" id="vscode-codicon-stylesheet">
-  `;
-
-    html = html.replace('</head>', `${headInsert}
-</head>`);
-    
-    // Convert replaceresource/dist/ script tags to webview URIs
-    html = html.replace(
-      /<script\s+src="replaceresource\/dist\/([^"]+)"><\/script>/g,
-      (_match, fileName) => {
-        if (fileName === 'dependencyview.js') {
-          return `<script src="${scriptUri}"></script>`;
-        }
-        // For other scripts, convert replaceresource to webview URI
-        const otherScriptUri = createUri(`resources/dist/${fileName}`);
-        return `<script src="${otherScriptUri}"></script>`;
-      }
-    );
-    
-    // Replace remaining replaceresource references
-    const extensionUri = webview.asWebviewUri(this._extensionUri);
-    html = html.replace(/replaceresource/g, extensionUri.toString());
-
-    return html;
+  private _getHtmlForWebview(webview: vscode.Webview, viewMode: string): string {
+    return loadDistWebviewHtml({
+      webview,
+      extensionRoot: this._extensionUri,
+      distHtmlFileName: 'dependencyview.html',
+      extraCss: [
+        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'vscode-elements.css'),
+        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'),
+        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'),
+      ],
+      appAttributes: {
+        'data-view-mode': viewMode,
+      },
+    });
   }
 }

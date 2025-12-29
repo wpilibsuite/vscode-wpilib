@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher();
-
   interface Props {
     sourcePath?: string;
+    onSelectSource?: () => void;
+    onNext?: () => void;
   }
 
-  let { sourcePath = '' }: Props = $props();
+  let { sourcePath = '', onSelectSource = () => {}, onNext = () => {} }: Props = $props();
 
-  const selectSource = () => dispatch('selectSource');
-  const next = () => dispatch('next');
+  const selectSource = () => onSelectSource();
+  const next = () => onNext();
 
   let canProceed = $derived(sourcePath.trim().length > 0);
 </script>
@@ -47,4 +45,3 @@
     Next
   </button>
 </div>
-

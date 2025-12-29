@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { onMount } from 'svelte';
   import { WizardProgress, WizardStep } from '../components/shared';
   import Step1SelectSource from './steps/Step1SelectSource.svelte';
   import Step2Configure from './steps/Step2Configure.svelte';
   import Step3Review from './steps/Step3Review.svelte';
-  import { postMessage, subscribeToMessages } from '../lib';
+  import { getResourceBase, onWebviewMessage, postMessage, signalLoaded } from '../lib';
   import type { Gradle2025Message, Gradle2025ImportData } from './types';
 
   type WizardStepNumber = 1 | 2 | 3;
@@ -109,20 +107,16 @@
     postMessage({ type: 'importproject', data: payload });
   };
 
-  let destinationPath = $state('');
-
-  run(() => {
-    destinationPath = newFolder && projectName
+  const destinationPath = $derived(
+    newFolder && projectName
       ? `${projectFolder}/${projectName}`
-      : projectFolder;
-  });
+      : projectFolder
+  );
 
   onMount(() => {
-    const appElement = document.getElementById('app');
-    const resourceBase = appElement?.getAttribute('data-resource-base') || '';
-    logoPath = `${resourceBase}/resources/wpilib-generic.svg`;
+    logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
 
-    const unsubscribe = subscribeToMessages<Gradle2025Message>((event) => {
+    const unsubscribe = onWebviewMessage<Gradle2025Message>((event) => {
       switch (event.type) {
         case 'gradle2025':
           sourcePath = event.data;
@@ -141,18 +135,18 @@
       }
     });
 
-    postMessage({ type: 'loaded' });
+    signalLoaded();
 
     return () => unsubscribe();
   });
 
-  run(() => {
+  $effect(() => {
     projectFolderError = validateProjectFolder(projectFolder);
   });
-  run(() => {
+  $effect(() => {
     projectNameError = validateProjectName(projectName);
   });
-  run(() => {
+  $effect(() => {
     teamNumberError = validateTeamNumber(teamNumber);
   });
 </script>
@@ -167,8 +161,8 @@
   <WizardStep active={currentStep === 1} step={1}>
     <Step1SelectSource
       sourcePath={sourcePath}
-      on:selectSource={selectSourceProject}
-      on:next={() => goToStep(2)}
+      onSelectSource={selectSourceProject}
+      onNext={() => goToStep(2)}
     />
   </WizardStep>
 
@@ -186,20 +180,20 @@
       {showProjectFolderError}
       {showProjectNameError}
       {showTeamNumberError}
-      on:selectFolder={selectDestinationFolder}
-      on:projectNameChange={(event) => {
-        projectName = event.detail;
+      onSelectFolder={selectDestinationFolder}
+      onProjectNameChange={(value) => {
+        projectName = value;
         showProjectNameError = true;
       }}
-      on:teamNumberChange={(event) => {
-        teamNumber = event.detail;
+      onTeamNumberChange={(value) => {
+        teamNumber = value;
         showTeamNumberError = true;
       }}
-      on:newFolderChange={(event) => (newFolder = event.detail)}
-      on:desktopChange={(event) => (desktop = event.detail)}
-      on:hardwareChange={(event) => (hardware = event.detail)}
-      on:back={() => goToStep(1)}
-      on:next={() => {
+      onNewFolderChange={(value) => (newFolder = value)}
+      onDesktopChange={(value) => (desktop = value)}
+      onHardwareChange={(value) => (hardware = value)}
+      onBack={() => goToStep(1)}
+      onNext={() => {
         showProjectFolderError = true;
         showProjectNameError = true;
         showTeamNumberError = true;
@@ -215,9 +209,8 @@
       sourcePath={sourcePath}
       destinationPath={destinationPath}
       teamNumber={teamNumber}
-      on:back={() => goToStep(2)}
-      on:import={submitImport}
+      onBack={() => goToStep(2)}
+      onImport={submitImport}
     />
   </WizardStep>
 </div>
-
