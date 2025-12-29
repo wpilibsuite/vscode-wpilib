@@ -114,7 +114,9 @@ export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
 
   if (options.extraCss && options.extraCss.length > 0) {
     const cssLinks = options.extraCss
-      .map((uri) => `<link rel="stylesheet" href="${options.webview.asWebviewUri(uri).toString()}">`)
+      .map(
+        (uri) => `<link rel="stylesheet" href="${options.webview.asWebviewUri(uri).toString()}">`
+      )
       .join('\n');
     html = insertBeforeHeadClose(html, cssLinks);
   }

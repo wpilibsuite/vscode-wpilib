@@ -13,4 +13,3 @@ export interface Gradle2025Message {
   type: string;
   data: string;
 }
-

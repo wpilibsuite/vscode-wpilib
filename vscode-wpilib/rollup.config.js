@@ -53,11 +53,12 @@ function createHtmlTemplate(title) {
 
     // Fallback to files array if bundle doesn't have entries
     const filesArray = Array.isArray(files) ? files : Object.values(files || {});
-    const entryFiles = jsFiles.length > 0 
-      ? jsFiles 
-      : filesArray.filter(
-          (file) => file.isEntry && file.fileName && file.fileName.endsWith('.js')
-        );
+    const entryFiles =
+      jsFiles.length > 0
+        ? jsFiles
+        : filesArray.filter(
+            (file) => file.isEntry && file.fileName && file.fileName.endsWith('.js')
+          );
 
     // Generate script tags with replaceresource prefix
     // WebViewBase.replaceResources will convert these to webview URIs
@@ -66,7 +67,13 @@ function createHtmlTemplate(title) {
       .join('\n');
 
     return `<!doctype html>
-<html${attributes && attributes.html ? ` ${Object.entries(attributes.html).map(([key, value]) => `${key}="${value}"`).join(' ')}` : ''}>
+<html${
+      attributes && attributes.html
+        ? ` ${Object.entries(attributes.html)
+            .map(([key, value]) => `${key}="${value}"`)
+            .join(' ')}`
+        : ''
+    }>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

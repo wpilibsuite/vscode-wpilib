@@ -58,6 +58,12 @@ window.addEventListener('load', () => {
   });
 });
 
+declare global {
+  interface Window {
+    i18nTrans?: typeof localize;
+    __I18N_LOCALE_DOMAINS?: typeof localeDomains;
+  }
+}
+
 window.i18nTrans = localize;
-// @ts-expect-error Force window object to accept locale domains
 window.__I18N_LOCALE_DOMAINS = localeDomains;

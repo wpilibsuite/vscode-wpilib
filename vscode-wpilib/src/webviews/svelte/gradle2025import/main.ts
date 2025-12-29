@@ -8,4 +8,3 @@ const app = mount(Gradle2025Import, {
 });
 
 export default app;
-

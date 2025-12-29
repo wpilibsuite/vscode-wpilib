@@ -19,10 +19,7 @@ export abstract class WebViewBase {
     protected readonly resourceRoot: string
   ) {}
 
-  public async loadWebpage(
-    htmlPath: string,
-    localeDomains?: string[]
-  ): Promise<void> {
+  public async loadWebpage(htmlPath: string, localeDomains?: string[]): Promise<void> {
     try {
       this.html = await readFile(htmlPath, 'utf8');
     } catch (err) {
@@ -97,11 +94,15 @@ export abstract class WebViewBase {
       extensionRoot: vscode.Uri.file(extensionContext.extensionPath),
       html: this.html,
       extraCss: [
-        vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css')),
+        vscode.Uri.file(
+          path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css')
+        ),
         vscode.Uri.file(
           path.join(extensionContext.extensionPath, 'resources', 'media', 'vscode-elements.css')
         ),
-        vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css')),
+        vscode.Uri.file(
+          path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css')
+        ),
       ],
     });
   }

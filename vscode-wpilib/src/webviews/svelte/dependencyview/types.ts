@@ -11,4 +11,3 @@ export interface AvailableDependency {
   website: string;
   instructions?: string;
 }
-

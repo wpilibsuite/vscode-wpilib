@@ -8,4 +8,3 @@ const app = mount(ProjectCreator, {
 });
 
 export default app;
-

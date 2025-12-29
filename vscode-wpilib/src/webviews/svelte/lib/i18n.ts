@@ -6,7 +6,7 @@ type LocaleDomains = Record<string, Record<string, string>>;
 
 declare global {
   interface Window {
-    i18nTrans: (domain: string, message: string, ...args: unknown[]) => string;
+    i18nTrans?: (domain: string, message: string | string[], ...args: unknown[]) => string;
     __I18N_LOCALE_DOMAINS?: LocaleDomains;
   }
 }
@@ -51,4 +51,3 @@ export function getLocaleDomains(): LocaleDomains {
   }
   return {};
 }
-

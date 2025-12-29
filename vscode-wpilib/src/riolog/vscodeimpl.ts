@@ -161,7 +161,9 @@ export class RioLogHTMLProvider implements IHTMLProvider {
       extensionRoot: vscode.Uri.file(path.join(this.resourceRoot, '..')),
       html: this.html!,
       extraCss: [
-        vscode.Uri.file(path.join(this.resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')),
+        vscode.Uri.file(
+          path.join(this.resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')
+        ),
         vscode.Uri.file(path.join(this.resourceRoot, '..', 'resources', 'media', 'riolog.css')),
       ],
     });

@@ -17,4 +17,3 @@ export function getResourceBase(): string {
 export function getViewMode(defaultMode = 'ready'): string {
   return getWebviewAppElement()?.dataset.viewMode ?? defaultMode;
 }
-

@@ -429,7 +429,7 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "npm run build && gulp build && eslint .",
+        "vscode:prepublish": "gulp build && npm run build && eslint .",
         "clean": "gulp clean",
         "lint": "eslint .",
         "build": "npm-run-all build:webviews webpack",

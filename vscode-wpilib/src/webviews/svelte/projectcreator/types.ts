@@ -18,4 +18,3 @@ export interface ProjectCreationData {
   newFolder: boolean;
   teamNumber: string;
 }
-

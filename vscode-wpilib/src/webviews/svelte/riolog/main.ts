@@ -8,4 +8,3 @@ const app = mount(RioLog, {
 });
 
 export default app;
-

@@ -7,4 +7,3 @@ export function signalLoaded(): void {
 export function onWebviewMessage<TMessage>(handler: (message: TMessage) => void): () => void {
   return subscribeToMessages<TMessage>((message) => handler(message));
 }
-

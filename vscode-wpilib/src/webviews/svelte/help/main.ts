@@ -8,4 +8,3 @@ const app = mount(Help, {
 });
 
 export default app;
-
