@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "outDir": "./resources/dist/.tsbuild",
+    "noEmit": false,
+    "types": ["node", "svelte", "mocha"],
+    "verbatimModuleSyntax": true,
+    "noUnusedLocals": false
+  },
+  "include": [
+    "src/webviews/svelte/**/*.ts",
+    "src/webviews/svelte/**/*.svelte",
+    "src/webviews/pages/**/*.ts",
+    "src/webviews/localeloader.ts",
+    "src/formatter.ts",
+    "src/riolog/ansi/ansiparser.ts",
+    "src/riolog/shared/interfaces.ts",
+    "src/riolog/shared/message.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "out",
+    "resources",
+    "src/unittest",
+    "src/extension.ts",
+    "src/webviews/**/*.test.ts",
+    "src/webviews/**/*.spec.ts"
+  ]
+}

@@ -1,6 +1,6 @@
 'use strict';
 
-import { ICreatorQuickPick } from '../../api';
+import type { ICreatorQuickPick } from '../../api';
 
 export enum ProjectType {
   Example,
