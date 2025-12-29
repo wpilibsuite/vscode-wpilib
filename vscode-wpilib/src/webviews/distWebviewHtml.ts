@@ -20,7 +20,9 @@ type RewriteHtmlOptions = {
 };
 
 function insertBeforeHeadClose(html: string, insert: string): string {
-  if (!insert) return html;
+  if (!insert) {
+    return html;
+  }
   if (html.includes('</head>')) {
     return html.replace('</head>', `${insert}\n</head>`);
   }
@@ -28,7 +30,9 @@ function insertBeforeHeadClose(html: string, insert: string): string {
 }
 
 function insertBeforeBodyClose(html: string, insert: string): string {
-  if (!insert) return html;
+  if (!insert) {
+    return html;
+  }
   if (html.includes('</body>')) {
     return html.replace('</body>', `${insert}\n</body>`);
   }
@@ -36,12 +40,16 @@ function insertBeforeBodyClose(html: string, insert: string): string {
 }
 
 function patchAppAttributes(html: string, attributes: Record<string, string>): string {
-  if (!attributes || Object.keys(attributes).length === 0) return html;
+  if (!attributes || Object.keys(attributes).length === 0) {
+    return html;
+  }
 
   // Prefer the known rollup template shape.
   const appDivPattern = /<div\s+id="app"([^>]*)>/i;
   const match = html.match(appDivPattern);
-  if (!match) return html;
+  if (!match) {
+    return html;
+  }
 
   const existingAttrs = match[1] ?? '';
   const toInject = Object.entries(attributes)
@@ -83,7 +91,9 @@ function ensureScriptIncluded(
   distRootFsPath: string,
   scriptFileName: string
 ): string {
-  if (html.includes(scriptFileName)) return html;
+  if (html.includes(scriptFileName)) {
+    return html;
+  }
   const uri = webview.asWebviewUri(vscode.Uri.file(path.join(distRootFsPath, scriptFileName)));
   return insertBeforeBodyClose(html, `<script src="${uri.toString()}"></script>`);
 }

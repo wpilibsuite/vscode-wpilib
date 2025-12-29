@@ -15,7 +15,6 @@ import {
 } from './shared/interfaces';
 import { RioConsole } from './rioconsole';
 import { rewriteDistWebviewHtml } from '../webviews/distWebviewHtml';
-import { rewriteDistWebviewHtml } from '../webviews/distWebviewHtml';
 
 interface IHTMLProvider {
   getHTML(webview: vscode.Webview): string;

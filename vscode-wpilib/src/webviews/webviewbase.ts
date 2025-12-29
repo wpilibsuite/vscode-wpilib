@@ -79,12 +79,16 @@ export abstract class WebViewBase {
       this.webview.onDidDispose(() => (this.webview = undefined));
     }
 
-    if (reveal) this.webview.reveal();
+    if (reveal) {
+      this.webview.reveal();
+    }
   }
 
   public dispose(): void {
     this.webview?.dispose();
-    for (const d of this.disposables) d.dispose();
+    for (const d of this.disposables) {
+      d.dispose();
+    }
   }
 
   private rewriteHtml(webview: vscode.Webview): string {
