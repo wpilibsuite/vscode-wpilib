@@ -1,7 +1,7 @@
 plugins {
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2024.0.0'
-    id "de.undercouch.download" version "4.1.2"
+    id 'org.wpilib.WPILibRepositoriesPlugin' version '2027.0.0'
+    id 'org.wpilib.WPILibVersioningPlugin' version '2027.0.1'
+    id "de.undercouch.download" version "5.6.0"
     id "base"
 }
 
@@ -34,14 +34,14 @@ configurations {
 }
 
 dependencies {
-    cppSource 'edu.wpi.first.wpilibc:examples:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:examples:+:@zip'
+    cppSource 'org.wpilib.wpilibc:examples:+:@zip'
+    javaSource 'org.wpilib.wpilibj:examples:+:@zip'
 
-    cppSource 'edu.wpi.first.wpilibc:templates:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:templates:+:@zip'
+    cppSource 'org.wpilib.wpilibc:templates:+:@zip'
+    javaSource 'org.wpilib.wpilibj:templates:+:@zip'
 
-    cppSource 'edu.wpi.first.wpilibc:commands:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:commands:+:@zip'
+    cppSource 'org.wpilib.wpilibc:commands:+:@zip'
+    javaSource 'org.wpilib.wpilibj:commands:+:@zip'
 }
 
 task extractCppDependencies(type: Copy) {
@@ -67,9 +67,15 @@ task extractJavaDependencies(type: Copy) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/wpilibNewCommands/WPILibNewCommands.json'
-  dest 'vscode-wpilib/resources/vendordeps/WPILibNewCommands.json'
+def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv2/CommandsV2.json'
+  dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
+  overwrite true
+}
+
+def downloadCommandsV3 = tasks.register('downloadCommandsV3', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv3/CommandsV3.json'
+  dest 'vscode-wpilib/resources/vendordeps/CommandsV3.json'
   overwrite true
 }
 
@@ -87,7 +93,8 @@ def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
 
 build.dependsOn extractCppDependencies
 build.dependsOn extractJavaDependencies
-build.dependsOn downloadNewCommands
+build.dependsOn downloadCommandsV2
+build.dependsOn downloadCommandsV3
 build.dependsOn downloadRomiVendordep
 build.dependsOn downloadXRPVendordep
 
@@ -108,5 +115,5 @@ if (pubVersion == '') {
 apply from: 'versions.gradle'
 
 wrapper {
-    gradleVersion = '8.11'
+    gradleVersion = '9.2.0'
 }

@@ -34,7 +34,14 @@ export class Templates {
       }
       const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
       for (const e of templates) {
-        const extraVendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
+        const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
+        const commandVersion: string =
+          e.commandversion !== undefined ? e.commandversion.toString() : '2';
+        if (commandVersion === '3') {
+          vendordeps.push('commandsv3');
+        } else {
+          vendordeps.push('commandsv2');
+        }
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {
             return java ? 'java' : 'cpp';
@@ -62,7 +69,7 @@ export class Templates {
                     'frc.robot.Main',
                     path.join('frc', 'robot'),
                     false,
-                    extraVendordeps
+                    vendordeps
                   ))
                 ) {
                   vscode.window.showErrorMessage(
@@ -79,7 +86,7 @@ export class Templates {
                     path.join(gradleBasePath, e.gradlebase),
                     folderInto.fsPath,
                     false,
-                    extraVendordeps
+                    vendordeps
                   ))
                 ) {
                   vscode.window.showErrorMessage(

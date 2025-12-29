@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-import type { RequestInit } from 'node-fetch';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
@@ -9,7 +7,6 @@ import { IJsonDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 import { loadDistWebviewHtml } from './webviews/distWebviewHtml';
-// @ts-ignore
 export interface IJsonList {
   path: string;
   name: string;
@@ -32,8 +29,6 @@ export interface IJSMessage {
   index: string;
   url?: string;
 }
-
-type NodeFetchOptions = RequestInit & { timeout?: number };
 
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
@@ -690,14 +685,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {
     const response = await fetch(url, {
-      timeout: 5000,
-    } as NodeFetchOptions);
+      signal: AbortSignal.timeout(5000),
+    });
     if (response === undefined) {
       throw new Error('Failed to fetch file');
     }
-    if (response.status >= 200 && response.status <= 300) {
-      const text = await response.text();
-      const json = JSON.parse(text) as IJsonList[];
+    if (response.ok) {
+      const json = (await response.json()) as IJsonList[];
       if (this.isJsonList(json)) {
         return json;
       } else {

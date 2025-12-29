@@ -1,6 +1,6 @@
 'use strict';
 
-import * as fetch from 'node-fetch';
+import { access, readdir, readFile, writeFile } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as xml2js from 'xml2js';
@@ -8,7 +8,6 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
-import { existsAsync, readdirAsync, readFileAsync, writeFileAsync } from './utilities';
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
@@ -163,7 +162,7 @@ export class WPILibUpdates {
 
   public async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
     try {
-      const gradleBuildFile = await readFileAsync(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
+      const gradleBuildFile = await readFile(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
 
       const matchRes = getGradleRioRegex().exec(gradleBuildFile);
 
@@ -189,11 +188,11 @@ export class WPILibUpdates {
   public async setGradleRIOVersion(version: string, wp: vscode.WorkspaceFolder): Promise<void> {
     try {
       const buildFile = path.join(wp.uri.fsPath, 'build.gradle');
-      const gradleBuildFile = await readFileAsync(buildFile, 'utf8');
+      const gradleBuildFile = await readFile(buildFile, 'utf8');
 
       const newgFile = gradleBuildFile.replace(getGradleRioRegex(), `$1${version}$3`);
 
-      await writeFileAsync(buildFile, newgFile);
+      await writeFile(buildFile, newgFile);
     } catch (err) {
       logger.error('error setting wpilib (gradlerio) version', err);
       return;
@@ -225,24 +224,17 @@ export class WPILibUpdates {
   private async checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
     const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
     try {
-      const response = await fetch.default(metaDataUrl, {
-        timeout: 5000,
+      const response = await fetch(metaDataUrl, {
+        signal: AbortSignal.timeout(5000),
       });
       if (response === undefined) {
         logger.warn('failed to fetch URL: ' + metaDataUrl);
         return undefined;
       }
-      if (response.status >= 200 && response.status <= 300) {
+      if (response.ok) {
         const text = await response.text();
-        const versions = await new Promise<string[]>((resolve, reject) => {
-          xml2js.parseString(text, (err, result) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result.metadata.versioning[0].versions[0].version);
-            }
-          });
-        });
+        const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
+          .version;
         if (versions === undefined) {
           logger.warn('parse failure');
           return undefined;
@@ -275,13 +267,14 @@ export class WPILibUpdates {
     const frcHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
     const gradleRioPath = path.join(frcHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
     try {
-      const files = await readdirAsync(gradleRioPath);
+      const files = await readdir(gradleRioPath);
       const versions = [];
       for (const file of files) {
-        const pth = path.join(gradleRioPath, file, `GradleRIO-${file}.pom`);
-        const isGR = await existsAsync(pth);
-        if (isGR) {
+        try {
+          await access(path.join(gradleRioPath, file, `GradleRIO-${file}.pom`));
           versions.push(file);
+        } catch {
+          // Ignore
         }
       }
       if (versions.length === 0) {

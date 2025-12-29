@@ -1,6 +1,7 @@
 'use strict';
 
 import * as fs from 'fs';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -8,20 +9,14 @@ import { localize as i18n } from '../locale';
 import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
+import { extensionContext, promptForProjectOpen } from '../utilities';
 import {
-  existsAsync,
-  extensionContext,
-  mkdirpAsync,
-  promptForProjectOpen,
-  readFileAsync,
-  writeFileAsync,
-} from '../utilities';
-import {
-  IGradle2025IPCData as IGradle2025IPCData,
+  IGradle2025IPCData,
   IGradle2025IPCReceive,
-  IGradle2025IPCSend as IGradle2025IPCSend,
+  IGradle2025IPCSend,
 } from './pages/gradle2025importpagetypes';
 import { WebViewBase } from './webviewbase';
+import { VendorDepFiles } from '../shared/projectGeneratorUtils';
 
 export class Gradle2025Import extends WebViewBase {
   public static async Create(resourceRoot: string): Promise<Gradle2025Import> {
@@ -100,10 +95,12 @@ export class Gradle2025Import extends WebViewBase {
 
     let teamNumber: string | undefined;
 
-    if (await existsAsync(wpilibJsonFile)) {
-      const wpilibJsonFileContents = await readFileAsync(wpilibJsonFile, 'utf8');
+    try {
+      const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
       teamNumber = wpilibJsonFileParsed.teamNumber.toString(10);
+    } catch {
+      // File doesn't exist, ignore
     }
 
     this.onLoad = async () => {
@@ -187,9 +184,8 @@ export class Gradle2025Import extends WebViewBase {
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
     let cpp = true;
-
-    if (await existsAsync(wpilibJsonFile)) {
-      const wpilibJsonFileContents = await readFileAsync(wpilibJsonFile, 'utf8');
+    try {
+      const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
       if (wpilibJsonFileParsed.currentLanguage === 'cpp') {
         cpp = true;
@@ -207,7 +203,7 @@ export class Gradle2025Import extends WebViewBase {
         );
         return;
       }
-    } else {
+    } catch {
       // Error
       await vscode.window.showErrorMessage(
         i18n(
@@ -224,28 +220,19 @@ export class Gradle2025Import extends WebViewBase {
     const gradleFile = path.join(oldProjectPath, 'build.gradle');
 
     let javaRobotPackage: string = '';
-
-    if ((await existsAsync(gradleFile)) && !cpp) {
-      const gradleContents = await readFileAsync(gradleFile, 'utf8');
-      const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
-      const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
-      if (regexRes !== null && regexRes.length === 2) {
-        javaRobotPackage = regexRes[1];
-      } else {
-        const res = await vscode.window.showInformationMessage(
-          i18n('message', 'Failed to determine robot class. Enter it manually?'),
-          {
-            modal: true,
-          },
-          { title: 'Yes' },
-          { title: 'No', isCloseAffordance: true }
-        );
-        if (res?.title !== 'Yes') {
-          await vscode.window.showErrorMessage('Project Import Failed');
-          return;
+    if (!cpp) {
+      try {
+        const gradleContents = await readFile(gradleFile, 'utf8');
+        const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
+        const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
+        if (regexRes !== null && regexRes.length === 2) {
+          javaRobotPackage = regexRes[1];
         }
+      } catch {
+        // File doesn't exist
       }
-    } else if (!cpp) {
+    }
+    if (javaRobotPackage === '') {
       const res = await vscode.window.showInformationMessage(
         i18n('message', 'Failed to determine robot class. Enter it manually?'),
         {
@@ -267,28 +254,32 @@ export class Gradle2025Import extends WebViewBase {
     }
 
     try {
-      await mkdirpAsync(toFolder);
+      await mkdir(toFolder, { recursive: true });
     } catch {
       //
     }
 
     const gradleBasePath = path.join(extensionContext.extensionPath, 'resources', 'gradle');
     const resourceRoot = path.join(extensionContext.extensionPath, 'resources');
-    const commandsJsonPath = path.join(oldProjectPath, 'vendordeps', 'WPILibOldCommands.json');
+    const commandsV2JsonPath = path.join(oldProjectPath, 'vendordeps', VendorDepFiles.COMMANDSV2);
+    const commandsV2OldJsonPath = path.join(
+      oldProjectPath,
+      'vendordeps',
+      VendorDepFiles.COMMANDSV2_OLD
+    );
+    const commandsV3JsonPath = path.join(oldProjectPath, 'vendordeps', VendorDepFiles.COMMANDSV3);
 
-    if (fs.existsSync(commandsJsonPath)) {
-      await vscode.window.showErrorMessage(
-        i18n(
-          'message',
-          'WPILib no longer supports the Old Command Framework. The Old Command Vendordep has not been imported. Please update to the New Command Framework'
-        ),
-        {
-          modal: true,
-        }
-      );
+    const vendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
+
+    if (fs.existsSync(commandsV2JsonPath)) {
+      vendordeps.push('commandsv2');
+    } else if (fs.existsSync(commandsV2OldJsonPath)) {
+      vendordeps.push('commandsv2');
+    } else if (fs.existsSync(commandsV3JsonPath)) {
+      vendordeps.push('commandsv3');
+    } else {
+      vendordeps.push('commandsv2');
     }
-
-    const extraVendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
 
     let success = false;
     if (cpp) {
@@ -303,7 +294,7 @@ export class Gradle2025Import extends WebViewBase {
         gradlePath,
         toFolder,
         true,
-        extraVendordeps
+        vendordeps
       );
     } else {
       const gradlePath = path.join(
@@ -319,7 +310,7 @@ export class Gradle2025Import extends WebViewBase {
         javaRobotPackage,
         '',
         true,
-        extraVendordeps
+        vendordeps
       );
     }
 
@@ -344,9 +335,9 @@ export class Gradle2025Import extends WebViewBase {
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-    const parsed = JSON.parse(await readFileAsync(jsonFilePath, 'utf8')) as IPreferencesJson;
+    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson;
     parsed.teamNumber = parseInt(data.teamNumber, 10);
-    await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
+    await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     let replacementFile = path.join(resourceRoot, 'java_replacements.json');
     if (cpp) {

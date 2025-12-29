@@ -1,6 +1,7 @@
 'use strict';
 
 import * as extract from 'extract-zip';
+import { mkdir, unlink } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { downloadFileToStream } from './fetchhelpers';
@@ -12,7 +13,6 @@ import {
   getMavenVersions,
   getNewestMavenVersion,
 } from './mavenapi';
-import { deleteFileAsync, existsAsync, mkdirpAsync } from './utilities';
 
 export async function downloadDocs(
   repoRoot: string,
@@ -47,12 +47,14 @@ export async function downloadDocs(
       const downloadUrl = constructDownloadUrl(metaData, repoRoot, newestVersion, ext);
       const tmpFolder = path.join(rootFolder, 'tmp');
 
-      await mkdirpAsync(tmpFolder);
+      await mkdir(tmpFolder, { recursive: true });
 
       const outputFile = path.join(tmpFolder, 'download' + ext);
 
-      if (await existsAsync(outputFile)) {
-        await deleteFileAsync(outputFile);
+      try {
+        await unlink(outputFile);
+      } catch {
+        // Ignore
       }
 
       disposable.dispose();
@@ -62,7 +64,7 @@ export async function downloadDocs(
 
       const outputDir = path.join(rootFolder, innerFolder);
 
-      await mkdirpAsync(outputDir);
+      await mkdir(outputDir, { recursive: true });
 
       disposable.dispose();
       disposable = vscode.window.setStatusBarMessage(i18n('message', 'Extracting API Docs'));

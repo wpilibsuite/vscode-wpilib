@@ -1,10 +1,10 @@
 'use strict';
 
-import * as glob from 'glob';
+import { cp, mkdir, readFile, writeFile } from 'fs/promises';
+import { glob } from 'glob';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { mkdirpAsync, ncpAsync, readFileAsync, writeFileAsync } from '../utilities';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
@@ -15,16 +15,18 @@ import { setExecutePermissions } from './permissions';
 export const ReplacementPatterns = {
   GRADLE_RIO_MARKER: '###GRADLERIOREPLACE###',
   ROBOT_CLASS_MARKER: '###ROBOTCLASSREPLACE###',
-  JAVA_PACKAGE_PATTERN: 'edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)',
+  JAVA_PACKAGE_PATTERN: 'org\\.wpilib\\.(?:examples|templates)\\..+?(?=;|\\.)',
 };
 
 /**
  * Common vendordep file names
  */
 export const VendorDepFiles = {
-  COMMANDS: 'WPILibNewCommands.json',
+  COMMANDSV2: 'CommandsV2.json',
   ROMI: 'RomiVendordep.json',
   XRP: 'XRPVendordep.json',
+  COMMANDSV3: 'CommandsV3.json',
+  COMMANDSV2_OLD: 'WPILibNewCommands.json',
 };
 
 /**
@@ -45,22 +47,9 @@ export async function findMatchingFiles(
   baseDir: string,
   pattern: string = '**/*{.java,.gradle}'
 ): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
-    glob(
-      pattern,
-      {
-        cwd: baseDir,
-        nodir: true,
-        nomount: true,
-      },
-      (err: Error | null, matches: string[]) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(matches);
-        }
-      }
-    );
+  return await glob(pattern, {
+    cwd: baseDir,
+    nodir: true,
   });
 }
 
@@ -77,13 +66,15 @@ export async function setupProjectStructure(
 ): Promise<boolean> {
   try {
     // Copy gradle files
-    await ncpAsync(fromGradleFolder, toFolder, {
+    await cp(fromGradleFolder, toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
+      recursive: true,
     });
 
     // Copy shared gradle files
-    await ncpAsync(path.join(grRoot, 'shared'), toFolder, {
+    await cp(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
+      recursive: true,
     });
 
     // Set execute permissions on gradlew
@@ -128,7 +119,7 @@ export async function setupDeployDirectory(
     }
 
     const deployDir = path.join(toFolder, 'src', 'main', 'deploy');
-    await mkdirpAsync(deployDir);
+    await mkdir(deployDir, { recursive: true });
 
     const hintKey = isJava ? 'generateJavaDeployHint' : 'generateCppDeployHint';
     const hintText = isJava
@@ -140,10 +131,7 @@ to get a proper path relative to the deploy directory.`
 function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
 directory.`;
 
-    await writeFileAsync(
-      path.join(deployDir, 'example.txt'),
-      i18n('generator', [hintKey, hintText])
-    );
+    await writeFile(path.join(deployDir, 'example.txt'), i18n('generator', [hintKey, hintText]));
 
     return true;
   } catch (error) {
@@ -158,21 +146,22 @@ directory.`;
 export async function setupVendorDeps(
   resourcesFolder: string,
   toFolder: string,
-  extraVendordeps: string[] = []
+  vendordeps: string[] = []
 ): Promise<boolean> {
   try {
     const vendorDir = path.join(toFolder, 'vendordeps');
-    await mkdirpAsync(vendorDir);
-
-    // Add WPILib New Commands
-    await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDS, vendorDir);
+    await mkdir(vendorDir, { recursive: true });
 
     // Add extra vendordeps
-    for (const vendordep of extraVendordeps) {
+    for (const vendordep of vendordeps) {
       if (vendordep === 'romi') {
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.ROMI, vendorDir);
       } else if (vendordep === 'xrp') {
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.XRP, vendorDir);
+      } else if (vendordep === 'commandsv2') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV2, vendorDir);
+      } else if (vendordep === 'commandsv3') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV3, vendorDir);
       }
     }
 
@@ -188,5 +177,5 @@ export async function setupVendorDeps(
  */
 export async function getGradleRioVersion(grRoot: string): Promise<string> {
   const grVersionFile = path.join(grRoot, 'version.txt');
-  return (await readFileAsync(grVersionFile, 'utf8')).trim();
+  return (await readFile(grVersionFile, 'utf8')).trim();
 }

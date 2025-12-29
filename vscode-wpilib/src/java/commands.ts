@@ -36,7 +36,7 @@ async function performCopy(
     const replacements = new Map<RegExp, string>();
 
     // Add package replacement
-    replacements.set(/edu\.wpi\.first\.wpilibj\.(?:commands)\..+?(?=;|\.)/g, javaPackage);
+    replacements.set(/org\.wpilib\.(?:commands)\..+?(?=;|\.)/g, javaPackage);
 
     // Add classname replacement
     replacements.set(new RegExp(command.replacename, 'g'), replaceName);

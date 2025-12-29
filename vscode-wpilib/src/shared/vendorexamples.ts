@@ -1,18 +1,13 @@
 'use strict';
 
+import { readdir, readFile, stat } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../api';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import {
-  existsAsync,
-  extensionContext,
-  readdirAsync,
-  readFileAsync,
-  statAsync,
-} from '../utilities';
+import { extensionContext } from '../utilities';
 import { generateCopyCpp, generateCopyJava } from './generator';
 import { VendorLibrariesBase } from './vendorlibrariesbase';
 
@@ -58,16 +53,16 @@ export async function addVendorExamples(
   const exampleDir = path.join(utilities.getWPILibHomeDir(), 'vendorexamples');
   const gradleBasePath = path.join(resourceRoot, 'gradle');
 
-  if (await existsAsync(exampleDir)) {
-    const files = await readdirAsync(exampleDir);
+  try {
+    const files = await readdir(exampleDir);
     for (const file of files) {
       const filePath = path.join(exampleDir, file);
-      if ((await statAsync(filePath)).isDirectory()) {
+      if ((await stat(filePath)).isDirectory()) {
         continue;
       }
 
       try {
-        const fileContents = await readFileAsync(filePath, 'utf8');
+        const fileContents = await readFile(filePath, 'utf8');
         const parsed = jsonc.parse(fileContents);
 
         if (!Array.isArray(parsed)) {
@@ -84,8 +79,14 @@ export async function addVendorExamples(
             continue;
           }
 
-          const extraVendordeps: string[] =
-            ex.extravendordeps !== undefined ? ex.extravendordeps : [];
+          const vendordeps: string[] = ex.extravendordeps !== undefined ? ex.extravendordeps : [];
+          const commandVersion: string =
+            ex.commandversion !== undefined ? ex.commandversion.toString() : '2';
+          if (commandVersion === '3') {
+            vendordeps.push('commandsv3');
+          } else {
+            vendordeps.push('commandsv2');
+          }
           const provider: IExampleTemplateCreator = {
             getLanguage(): string {
               return ex.language;
@@ -112,7 +113,7 @@ export async function addVendorExamples(
                       'frc.robot.' + ex.mainclass,
                       path.join('frc', 'robot'),
                       false,
-                      extraVendordeps,
+                      vendordeps,
                       ex.packagetoreplace
                     ))
                   ) {
@@ -130,7 +131,7 @@ export async function addVendorExamples(
                       gradlePath,
                       folderInto.fsPath,
                       false,
-                      extraVendordeps
+                      vendordeps
                     ))
                   ) {
                     vscode.window.showErrorMessage(
@@ -161,7 +162,7 @@ export async function addVendorExamples(
         logger.error(`Error processing vendor example file: ${filePath}`, error);
       }
     }
-  } else {
+  } catch {
     logger.log('no vendor examples found', exampleDir);
   }
 }
