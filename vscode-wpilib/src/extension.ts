@@ -260,7 +260,7 @@ async function handleAfterTrusted(
 
         if (prefs.getProjectYear() !== '2026') {
           const importPersistantState = new PersistentFolderState(
-            'wpilib.2026ersist',
+            'wpilib.2026persist',
             false,
             w.uri.fsPath
           );
