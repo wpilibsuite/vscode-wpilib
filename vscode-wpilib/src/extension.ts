@@ -258,9 +258,9 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2026beta') {
+        if (prefs.getProjectYear() !== '2026') {
           const importPersistantState = new PersistentFolderState(
-            'wpilib.2026betapersist',
+            'wpilib.2026ersist',
             false,
             w.uri.fsPath
           );
@@ -268,7 +268,7 @@ async function handleAfterTrusted(
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
-                'This project is not compatible with this version of the extension. Would you like to import this project into 2026 beta?'
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2026?'
               ),
               {
                 modal: true,
