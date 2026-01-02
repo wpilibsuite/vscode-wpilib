@@ -170,7 +170,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           !preferencesApi.getPreferences(workspace).getIsWPILibProject()
         ) {
           vscode.window.showInformationMessage(
-            i18n('message', 'Cannot set team number since this is not a WPILib project')
+            i18n('message', 'Cannot build robot code since this is not a WPILib project')
           );
           return;
         }
