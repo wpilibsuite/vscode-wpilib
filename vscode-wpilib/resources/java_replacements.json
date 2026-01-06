@@ -466,7 +466,7 @@
         "to": "edu.wpi.first.units.Measure"
       },
       {
-        "from": "edu[.]wpi[.]first[.]units[.](?!MutableMeasure|ImmutableMeasure|UnitBuilder|Measure)(.*);",
+        "from": "edu[.]wpi[.]first[.]units[.](?!MutableMeasure|ImmutableMeasure|UnitBuilder|Measure|measure)(.*);",
         "to": "edu.wpi.first.units.measure.$1;"
       },
       {
