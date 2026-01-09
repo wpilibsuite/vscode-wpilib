@@ -360,7 +360,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
       if (isEnabled === undefined) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Invalid project format to use the "add or remove desktop support" option with.')
+          i18n('message', 'Invalid project format to add or remove desktop support.')
         );
         return;
       }
