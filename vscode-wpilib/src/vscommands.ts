@@ -360,7 +360,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
       if (isEnabled === undefined) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Invalid project format to use the "add or remove desktop support" option with; this option is only supported for C++ projects.')
+          i18n('message', 'Invalid project format to use the "add or remove desktop support" option with.')
         );
         return;
       }
