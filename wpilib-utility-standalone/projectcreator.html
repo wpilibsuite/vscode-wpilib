@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WPILib Project Create</title>
+  <script>
+    const exports = require('./out/projectcreator.js');
+    const validators = require('./out/validators.js');
+  </script>
+
+  <style>
+    .error {
+      color: red;
+      border-color: red;
+      border-width: 2px;
+    }
+    body {
+        color: white;
+        background-color: #2e2c29;
+      }
+  </style>
+</head>
+
+<body>
+  <img src="./wpilib-generic.svg" height="75" />
+
+  <h1>Welcome to WPILib New Project Creator</h1>
+
+  <select id="projectTypeSelect" style="display: initial" onchange="exports.selectProjectType();">
+    <option value="base">Select a project type</option>
+    <option value="template">Templates</option>
+    <option value="example">Examples</option>
+  </select>
+
+  <select id="languageSelect" style="display: initial" disabled onchange="exports.selectLanguage();">
+    <option value="base">Select a project language</option>
+    <option value="cpp">C++</option>
+    <option value='java'>Java</option>
+  </select>
+
+  <select id="projectBaseSelect" style="display: initial" disabled onchange="exports.selectRobotBase();">
+    <option value="base">Select a project base</option>
+  </select>
+
+  <br/>
+  <br/> <span STYLE="font-weight:bold">Base Folder.</span> <span>Select a base folder to place the new project into.</span>
+  <br/>
+  <input id="projectFolder" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px" />
+  <br/>
+  <button onclick="exports.projectSelectButtonClick();">Select a new project folder</button>
+  <br/> <span data-i18n-trans STYLE="font-weight:bold">Create a new folder?</span>
+  <input id="newFolderCB" type="checkbox" checked/>
+  <br/>
+  <span>This creates a new folder at <i>Base Folder\Project Name</i>. Highly recommended to be checked. Otherwise the folder will be placed at <i>Base Folder</i> and not utilize the Project Name</span>
+  <br/>
+  <div id="projectnamediv" class="error" STYLE="font-weight:bold">Project Name</div>
+  <input id="projectName" class="error" oninput="validators.validateProject(document.getElementById('projectName'), document.getElementById('projectnamediv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
+  <br/>
+  <div id="teamnumberdiv" class="error" STYLE="font-weight:bold">Team Number</div>
+  <input id="teamNumber" class="error" oninput="validators.validateTeamNumber(document.getElementById('teamNumber'), document.getElementById('teamnumberdiv'));" type="text" style="width: 100%; margin-top: 10px; margin-bottom: 10px"
+  />
+  <br/>
+  <div id="desktopdiv">
+    <span STYLE="font-weight:bold">(C++) Enable Desktop Support</span>
+    <input id="desktopCB" type="checkbox" />
+    <br/>
+    <span data-i18n-trans data-i18n-key="hintDesktopSupport">
+      This is needed for simulation and unit testing support, however there are some cases where this will do
+      some unexpected things during build. In addition, not all vendor libraries support desktop.
+      This option can be set with the command "WPILib: Set Desktop Support" for C++ projects at any time.
+    </span>
+  </div>
+  <br/>
+
+  <button id="generateProject" onclick="exports.generateProjectButtonClick()">Generate Project</button>
+</body>
