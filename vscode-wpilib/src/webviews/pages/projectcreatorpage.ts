@@ -316,17 +316,17 @@ function setupEventListeners() {
     if (languageSelect.value !== 'CPP' && (document.getElementById('desktopCB') as HTMLInputElement).checked === true) {
       vscode.postMessage({
         data: { 
-        base:'Error: Desktop Support can only be enabled for C++ projects! Please start again.',
-        desktop: false,
-        language,
-        newFolder: false,
-        projectName: '',
-        projectType,
-        teamNumber: '',
-        toFolder: ''
-      },
+          base:'Error: Desktop Support can only be enabled for C++ projects! Please start again.',
+          desktop: false,
+          language,
+          newFolder: false,
+          projectName: '',
+          projectType,
+          teamNumber: '',
+          toFolder: ''
+        },
         type: ''
-        });
+      });
       resetBaseDropdown();
     } else {
     validateStep2();
