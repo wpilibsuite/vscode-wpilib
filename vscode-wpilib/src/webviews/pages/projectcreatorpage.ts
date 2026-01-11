@@ -318,7 +318,7 @@ function setupEventListeners() {
       (document.getElementById('desktopCB') as HTMLInputElement).checked === true
     ) {
       vscode.postMessage({
-        data: { 
+        data: {
           base: 'Error: Desktop Support can only be enabled for C++ projects! Please start again.',
           desktop: false,
           language,
@@ -332,7 +332,7 @@ function setupEventListeners() {
       });
       resetBaseDropdown();
     } else {
-    validateStep2();
+      validateStep2();
     }
   });
 
