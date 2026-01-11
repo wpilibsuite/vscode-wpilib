@@ -28,7 +28,7 @@ Once you have the project open in VS Code, there are 5 debugging targets set up.
 - `Extension` Will launch the extension to debug
 - `Extension Tests` Will launch the extension tests
 
-In addition, each project has a `compile` and a `lint` npm command. These will compile and lint their respective projects. Please run these before submitting any PR, as CI will check these. In addition, VS Code's lint does not detect the same lint errors as running lint manually would.
+In addition, `vscode-wpilib` has a `compile` and a `lint` npm command. This will compile and lint the project's files. Please run these before submitting any PR, as CI will check these. In addition, VS Code's lint does not detect the same lint errors as running the `vscode-wpilib` linter manually would.
 
 ## Testing
 

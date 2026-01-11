@@ -1,5 +1,6 @@
 'use strict';
 
+import { getDesktopEnabled } from '../../utilities';
 import { IProjectIPCReceive, IProjectIPCSend, ProjectType } from './projectcreatorpagetypes';
 import { validateProject, validateTeamNumber, validateProjectFolder } from './sharedpages';
 
@@ -312,7 +313,24 @@ function setupEventListeners() {
       type: 'base',
     });
 
+    if (languageSelect.value !== 'CPP' && (document.getElementById('desktopCB') as HTMLInputElement).checked === true) {
+      vscode.postMessage({
+        data: { 
+        base:'Error: Desktop Support can only be enabled for C++ projects! Please start again.',
+        desktop: false,
+        language,
+        newFolder: false,
+        projectName: '',
+        projectType,
+        teamNumber: '',
+        toFolder: ''
+      },
+        type: ''
+        });
+      resetBaseDropdown();
+    } else {
     validateStep2();
+    }
   });
 
   const baseSelect = document.getElementById('base-select') as HTMLSelectElement;
