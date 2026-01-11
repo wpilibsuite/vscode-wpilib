@@ -326,9 +326,9 @@ function setupEventListeners() {
           projectName: '',
           projectType,
           teamNumber: '',
-          toFolder: ''
+          toFolder: '',
         },
-        type: ''
+        type: '',
       });
       resetBaseDropdown();
     } else {
