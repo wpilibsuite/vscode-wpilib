@@ -69,10 +69,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     if (workspace === undefined) {
       const prefsApi = this.externalApi.getPreferencesAPI();
       workspace = await prefsApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined || !prefsApi.getPreferences(workspace).getIsWPILibProject()) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot install vendor libraries since this is not a WPILib project')
-        );
+      if (workspace === undefined) {
         return;
       }
     }
