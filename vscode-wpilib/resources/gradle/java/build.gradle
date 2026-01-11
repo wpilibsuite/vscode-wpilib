@@ -87,9 +87,6 @@ wpi.sim.addDriverstation()
 jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     from sourceSets.main.allSource
-    from('src') { into 'backup/src' }
-    from('vendordeps') { into 'backup/vendordeps' }
-    from('build.gradle') { into 'backup' }
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
