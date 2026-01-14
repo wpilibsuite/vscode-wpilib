@@ -420,11 +420,10 @@
                 "title": "Refresh",
                 "icon": "$(refresh)"
             },
-            {                
+            {
                 "command": "extension.showWebsite",
                 "title": "Show Website"
             }
-
         ],
         "views": {
             "explorer": [
@@ -596,7 +595,7 @@
         "vscode-cpptools": "^6.1.0",
         "vscode-jsonrpc": "^8.1.0",
         "vscode-nls": "^5.2.0",
-        "vscode-wpilibapi": "^2021.1.1",
+        "vscode-wpilibapi": "^2026.1.2",
         "winston": "^3.3.3",
         "winston-transport": "^4.4.0",
         "xml2js": "^0.6.2"

@@ -58,13 +58,19 @@ export class ProjectInfoGatherer {
 
     const workspaces = vscode.workspace.workspaceFolders;
     if (workspaces !== undefined) {
-      for (const wp of workspaces) {
-        const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
-        if (prefs.getIsWPILibProject()) {
-          this.statusBar.show();
-          break;
+      // Constructor cannot be async, so run an async check to show the status bar.
+      // Capture locals to avoid using `this` in an async IIFE (prevents TS "used before assigned" checks).
+      const externalApiLocal = this.externalApi;
+      const statusBarLocal = this.statusBar;
+      (async () => {
+        for (const wp of workspaces) {
+          const prefs = externalApiLocal.getPreferencesAPI().getPreferences(wp);
+          if (await prefs.getIsWPILibProject()) {
+            statusBarLocal.show();
+            break;
+          }
         }
-      }
+      })();
     }
 
     this.disposables.push(

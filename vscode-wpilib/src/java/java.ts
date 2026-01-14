@@ -57,7 +57,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
     if (wp) {
       for (const w of wp) {
         const prefs = coreExports.getPreferencesAPI().getPreferences(w);
-        if (prefs.getIsWPILibProject()) {
+        if (await prefs.getIsWPILibProject()) {
           const localW = w;
           const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
           if (await existsAsync(buildGradle)) {

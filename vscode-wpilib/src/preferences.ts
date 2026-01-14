@@ -84,7 +84,16 @@ export class Preferences implements IPreferences {
     });
   }
 
-  public getIsWPILibProject(): boolean {
+  public async getIsWPILibProject(): Promise<boolean> {
+    if (!this.isWPILibProject) {
+      const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+      if (await existsAsync(configFilePath)) {
+        await vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
+        this.isWPILibProject = true;
+        this.preferencesFile = vscode.Uri.file(configFilePath);
+        await this.updatePreferences();
+      }
+    }
     return this.isWPILibProject;
   }
 

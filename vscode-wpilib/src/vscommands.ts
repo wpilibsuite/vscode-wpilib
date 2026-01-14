@@ -77,7 +77,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set team number since this is not a WPILib project')
@@ -107,7 +107,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot deploy code since this is not a WPILib project')
@@ -127,7 +127,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot debug code since this is not a WPILib project')
@@ -147,7 +147,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot simulate code since this is not a WPILib project')
@@ -167,7 +167,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot simulate code since this is not a WPILib project')
@@ -187,7 +187,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot start tests since this is not a WPILib project')
@@ -207,7 +207,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot build robot code since this is not a WPILib project')
@@ -233,7 +233,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
           workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+          !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
         ) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot create command since this is not a WPILib project')
@@ -251,7 +251,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set language since this is not a WPILib project')
@@ -289,7 +289,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set skip tests since this is not a WPILib project')
@@ -317,7 +317,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n(
@@ -352,7 +352,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n(
@@ -387,7 +387,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set offline since this is not a WPILib project')
@@ -419,7 +419,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set deploy offline since this is not a WPILib project')
@@ -451,7 +451,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set stop simulation since this is not a WPILib project')
@@ -483,7 +483,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set windbgx since this is not a WPILib project')
@@ -519,7 +519,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set auto save since this is not a WPILib project')
@@ -551,7 +551,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot set start RioLog since this is not a WPILib project')
@@ -602,7 +602,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot install gradle tools since this is not a WPILib project')
@@ -625,7 +625,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
       if (
         wp === undefined ||
-        !externalApi.getPreferencesAPI().getPreferences(wp).getIsWPILibProject()
+        !(await externalApi.getPreferencesAPI().getPreferences(wp).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot run gradle command since this is not a WPILib project')
@@ -655,7 +655,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
       if (
         workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
+        !(await preferencesApi.getPreferences(workspace).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot reset auto update since this is not a WPILib project')
@@ -771,7 +771,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const wp = await externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
       if (
         wp === undefined ||
-        !externalApi.getPreferencesAPI().getPreferences(wp).getIsWPILibProject()
+        !(await externalApi.getPreferencesAPI().getPreferences(wp).getIsWPILibProject())
       ) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot run gradle clean since this is not a WPILib project')

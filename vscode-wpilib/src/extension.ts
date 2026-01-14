@@ -229,7 +229,7 @@ async function handleAfterTrusted(
   if (wp) {
     for (const w of wp) {
       const prefs = externalApi.getPreferencesAPI().getPreferences(w);
-      if (prefs.getIsWPILibProject()) {
+      if (await prefs.getIsWPILibProject()) {
         const vendorDepsPattern = new vscode.RelativePattern(
           path.join(w.uri.fsPath, 'vendordeps'),
           '**/*.json'

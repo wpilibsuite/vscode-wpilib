@@ -121,7 +121,7 @@ export interface IPreferences {
   setAutoStartRioLog(autoStart: boolean, global: boolean): Promise<void>;
   getAutoSaveOnDeploy(): boolean;
   setAutoSaveOnDeploy(autoSave: boolean, global: boolean): Promise<void>;
-  getIsWPILibProject(): boolean;
+  getIsWPILibProject(): Promise<boolean>;
   getEnableCppIntellisense(): boolean;
   setEnableCppIntellisense(set: boolean): Promise<void>;
   getProjectYear(): string;
