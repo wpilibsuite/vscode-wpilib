@@ -1,11 +1,13 @@
 'use strict';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { IPreferences } from 'vscode-wpilibapi';
 import { localize as i18n } from './locale';
 import { IPreferencesJson } from './shared/preferencesjson';
 import { existsAsync, mkdirAsync, readFileAsync, writeFileAsync } from './utilities';
+import { logger } from './logger';
 
 const defaultPreferences: IPreferencesJson = {
   currentLanguage: 'none',
@@ -85,6 +87,28 @@ export class Preferences implements IPreferences {
   }
 
   public getIsWPILibProject(): boolean {
+    // If we already know, return it
+    if (this.isWPILibProject) {
+      return true;
+    }
+
+    // Synchronously check for the preferences file in the workspace root.
+    // This is intentionally sync to avoid updating vscode-wpilibapi
+    // This can happen if the file watcher missed an update.
+    try {
+      const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+      if (fs.existsSync(configFilePath)) {
+        vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
+        this.isWPILibProject = true;
+        this.preferencesFile = vscode.Uri.file(configFilePath);
+        this.updatePreferences().catch((err) => {
+          logger.error("Failed to update WPILib preferences", err);
+        });
+      }
+    } catch (err) {
+      logger.error("Failed to update WPILib preferences", err);
+    }
+
     return this.isWPILibProject;
   }
 
