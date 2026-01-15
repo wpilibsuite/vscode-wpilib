@@ -102,11 +102,11 @@ export class Preferences implements IPreferences {
         this.isWPILibProject = true;
         this.preferencesFile = vscode.Uri.file(configFilePath);
         this.updatePreferences().catch((err) => {
-          logger.error("Failed to update WPILib preferences", err);
+          logger.error('Failed to update WPILib preferences', err);
         });
       }
     } catch (err) {
-      logger.error("Failed to update WPILib preferences", err);
+      logger.error('Failed to update WPILib preferences', err);
     }
 
     return this.isWPILibProject;
