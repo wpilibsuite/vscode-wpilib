@@ -1,7 +1,7 @@
 'use strict';
+import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
-import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { IPreferences } from 'vscode-wpilibapi';
 import { localize as i18n } from './locale';
