@@ -1,6 +1,5 @@
 'use strict';
 
-import { getDesktopEnabled } from '../../utilities';
 import { IProjectIPCReceive, IProjectIPCSend, ProjectType } from './projectcreatorpagetypes';
 import { validateProject, validateTeamNumber, validateProjectFolder } from './sharedpages';
 
