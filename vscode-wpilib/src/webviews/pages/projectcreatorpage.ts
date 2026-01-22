@@ -312,24 +312,9 @@ function setupEventListeners() {
       type: 'base',
     });
 
-    if (
-      languageSelect.value !== 'CPP' &&
-      (document.getElementById('desktopCB') as HTMLInputElement).checked === true
-    ) {
-      vscode.postMessage({
-        data: {
-          base: 'Error: Desktop Support can only be enabled for C++ projects! Please start again.',
-          desktop: false,
-          language,
-          newFolder: false,
-          projectName: '',
-          projectType,
-          teamNumber: '',
-          toFolder: '',
-        },
-        type: '',
-      });
-      resetBaseDropdown();
+    if (languageSelect.value !== 'CPP') {
+      (document.getElementById('desktopCB') as HTMLInputElement).disabled = true;
+      (document.getElementById('desktopCB') as HTMLInputElement).title = "Desktop Support can only be enabled for C++ projects!";
     } else {
       validateStep2();
     }
