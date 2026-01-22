@@ -314,7 +314,8 @@ function setupEventListeners() {
 
     if (languageSelect.value !== 'CPP') {
       (document.getElementById('desktopCB') as HTMLInputElement).disabled = true;
-      (document.getElementById('desktopCB') as HTMLInputElement).title = "Desktop Support can only be enabled for C++ projects!";
+      (document.getElementById('desktopCB') as HTMLInputElement).title =
+        'Desktop Support can only be enabled for C++ projects!';
     } else {
       validateStep2();
     }
