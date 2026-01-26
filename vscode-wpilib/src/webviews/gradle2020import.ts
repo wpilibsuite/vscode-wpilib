@@ -199,7 +199,7 @@ export class Gradle2020Import extends WebViewBase {
         await vscode.window.showErrorMessage(
           i18n(
             'message',
-            'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java" or "cpp".'
           ),
           {
             modal: true,
