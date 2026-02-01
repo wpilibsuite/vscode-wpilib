@@ -1,6 +1,6 @@
 'use strict';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp';
 import * as ncp from 'ncp';
 import * as path from 'path';
 import * as util from 'util';
@@ -63,7 +63,15 @@ export const copyFileAsync = util.promisify(fs.copyFile);
 
 export const mkdirAsync = util.promisify(fs.mkdir);
 
-export const existsAsync = util.promisify(fs.exists);
+// fs.exists is deprecated, use fs.access instead
+export async function existsAsync(filePath: string): Promise<boolean> {
+  try {
+    await fs.promises.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export const deleteFileAsync = util.promisify(fs.unlink);
 

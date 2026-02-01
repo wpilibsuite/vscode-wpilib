@@ -1,4 +1,5 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /**@type {import('webpack').Configuration}*/
 module.exports = [
@@ -26,14 +27,13 @@ module.exports = [
     },
     resolve: {
       extensions: ['.ts', '.js'],
-    },
-    node: {
-      net: 'empty',
+      fallback: {
+        net: false,
+      },
     },
     output: {
       path: path.resolve(__dirname, 'resources', 'dist'),
       filename: '[name].js',
-      hashFunction: 'sha256',
     },
   },
   {
@@ -41,12 +41,11 @@ module.exports = [
 
     entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
     output: {
-      // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
+      // the bundle is stored in the 'out' folder, 📖 -> https://webpack.js.org/configuration/output/
       path: path.resolve(__dirname, 'out'),
       filename: 'extension.js',
       libraryTarget: 'commonjs2',
       devtoolModuleFilenameTemplate: '../[resource-path]',
-      hashFunction: 'sha256',
     },
     devtool: 'source-map',
     externals: {
@@ -56,7 +55,6 @@ module.exports = [
       // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
       extensions: ['.ts', '.js'],
     },
-    node: false, // no polyfill for node context
     module: {
       rules: [
         {

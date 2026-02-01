@@ -10,7 +10,7 @@ const typescript = require('typescript');
 const sourcemaps = require('gulp-sourcemaps');
 const yaml = require('gulp-yaml');
 const jsontransform = require('gulp-json-transform');
-const del = require('del');
+const { deleteAsync } = require('del');
 const nls = require('vscode-nls-dev');
 
 // If all VS Code langaues are support you can use nls.coreLanguages
@@ -26,6 +26,12 @@ const defaultActivationEvents = [
 ];
 
 //---- internal
+
+// Error handler for Gulp 5 streams
+function handleError(error) {
+  console.error('Error in Gulp task:', error.toString());
+  this.emit('end');
+}
 
 function updateActivationCommands() {
   return gulp
@@ -43,7 +49,9 @@ function updateActivationCommands() {
         return data;
       }, 4)
     )
-    .pipe(gulp.dest('./'));
+    .on('error', handleError)
+    .pipe(gulp.dest('./'))
+    .on('error', handleError);
 }
 
 gulp.task('update-activation', () => {
@@ -51,18 +59,24 @@ gulp.task('update-activation', () => {
 });
 
 gulp.task('i18n-compile', function () {
-  return gulp.src('./locale/**/*.yaml').pipe(yaml()).pipe(gulp.dest('./i18n/'));
+  return gulp.src('./locale/**/*.yaml')
+    .pipe(yaml())
+    .on('error', handleError)
+    .pipe(gulp.dest('./i18n/'))
+    .on('error', handleError);
 });
 
 gulp.task('i18n-additional', function () {
   return gulp
     .src(['package.nls.json'])
     .pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
-    .pipe(gulp.dest('.'));
+    .on('error', handleError)
+    .pipe(gulp.dest('.'))
+    .on('error', handleError);
 });
 
 gulp.task('clean', function () {
-  return del(['package.nls.*.json', 'vscode-wpilib*.vsix']);
+  return deleteAsync(['package.nls.*.json', 'vscode-wpilib*.vsix']);
 });
 
 gulp.task('build', gulp.series('clean', 'i18n-compile', 'i18n-additional', 'update-activation'));

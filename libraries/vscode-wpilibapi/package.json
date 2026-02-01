@@ -5,15 +5,15 @@
   "typings": "./out/api.d.ts",
   "main": "./out/api.js",
   "engines": {
-    "vscode": "^1.26.0"
+    "vscode": "^1.85.0"
   },
   "devDependencies": {
-    "@types/node": "^10.2.0",
-    "@types/vscode": "1.26.0",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
-    "typescript": "^3.9.5"
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "prepublishOnly": "npm run compile && npm run lint",
