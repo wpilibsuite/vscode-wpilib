@@ -21,11 +21,15 @@ export class Help extends WebViewBase {
     );
   }
 
+  private messageHandlerSetup = false;
+
   public displayHelp() {
+    const wasUndefined = this.webview === undefined;
     this.displayWebView(vscode.ViewColumn.Active, true);
 
-    // Set up message handler for button clicks if webview exists
-    if (this.webview) {
+    // Set up message handler for button clicks only when webview is first created
+    if (this.webview && wasUndefined && !this.messageHandlerSetup) {
+      this.messageHandlerSetup = true;
       this.webview.webview.onDidReceiveMessage(
         (message) => {
           switch (message.command) {
@@ -43,12 +47,17 @@ export class Help extends WebViewBase {
         undefined,
         this.disposables
       );
+      // Reset flag when webview is disposed
+      this.webview.onDidDispose(() => {
+        this.messageHandlerSetup = false;
+      });
     }
   }
 
   private async asyncInitialize() {
     await this.loadWebpage(
-      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'help.html')
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'help.html'),
+      ['help']
     );
   }
 }
