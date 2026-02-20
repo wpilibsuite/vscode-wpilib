@@ -297,6 +297,7 @@ export class Gradle2025Import extends WebViewBase {
         vendordeps
       );
     } else {
+      const mainJavaFile = path.join(resourceRoot, 'java', 'src', 'Main.java');
       const gradlePath = path.join(
         gradleBasePath,
         data.romi ? 'javaromi' : data.xrp ? 'javaxrp' : 'java'
@@ -307,6 +308,7 @@ export class Gradle2025Import extends WebViewBase {
         undefined,
         gradlePath,
         toFolder,
+        mainJavaFile,
         javaRobotPackage,
         '',
         true,

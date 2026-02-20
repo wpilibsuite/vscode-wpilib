@@ -33,15 +33,17 @@ configurations {
     javaSource
 }
 
+def wpilibDepVersion = "+"
+
 dependencies {
-    cppSource 'org.wpilib.wpilibc:examples:+:@zip'
-    javaSource 'org.wpilib.wpilibj:examples:+:@zip'
+    cppSource "org.wpilib.wpilibc:examples:${wpilibDepVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:examples:${wpilibDepVersion}:@zip"
 
-    cppSource 'org.wpilib.wpilibc:templates:+:@zip'
-    javaSource 'org.wpilib.wpilibj:templates:+:@zip'
+    cppSource "org.wpilib.wpilibc:templates:${wpilibDepVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:templates:${wpilibDepVersion}:@zip"
 
-    cppSource 'org.wpilib.wpilibc:commands:+:@zip'
-    javaSource 'org.wpilib.wpilibj:commands:+:@zip'
+    cppSource "org.wpilib.wpilibc:commands:${wpilibDepVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:commands:${wpilibDepVersion}:@zip"
 }
 
 task extractCppDependencies(type: Copy) {

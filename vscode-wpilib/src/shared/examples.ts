@@ -14,6 +14,7 @@ export interface IExampleJsonLayout {
   tags: string[];
   foldername: string;
   gradlebase: string;
+  robotclass: string;
   commandversion: number;
   extravendordeps?: string[];
   hasunittests?: boolean;
@@ -59,6 +60,7 @@ export class Examples {
                 testFolder = path.join(examplesTestFolder, e.foldername);
               }
               if (java) {
+                const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
                 if (
                   !(await generateCopyJava(
                     resourceRoot,
@@ -66,8 +68,9 @@ export class Examples {
                     testFolder,
                     path.join(gradleBasePath, e.gradlebase),
                     folderInto.fsPath,
-                    'frc.robot.Main',
-                    path.join('frc', 'robot'),
+                    mainJavaFile,
+                    'first.robot.' + e.robotclass,
+                    path.join('first', 'robot'),
                     false,
                     vendordeps
                   ))
