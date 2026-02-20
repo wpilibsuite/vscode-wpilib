@@ -1,10 +1,10 @@
 const path = require('path');
 
 const commonjs = require('@rollup/plugin-commonjs');
-const html = require('@rollup/plugin-html');
 const resolve = require('@rollup/plugin-node-resolve');
 const typescript = require('@rollup/plugin-typescript');
 const svelte = require('rollup-plugin-svelte');
+const terser = require('terser');
 const svelteConfig = require('./svelte.config');
 
 const production = process.env.NODE_ENV === 'production';
@@ -42,58 +42,92 @@ const webviews = [
   },
 ];
 
-function createHtmlTemplate(title) {
-  return ({ attributes, bundle, files, publicPath, title: templateTitle }) => {
-    // For IIFE format, entry chunks are in the bundle object
-    // Filter for JavaScript entry files from bundle
-    const bundleEntries = Object.values(bundle || {});
-    const jsFiles = bundleEntries.filter(
-      (chunk) => chunk.isEntry && chunk.fileName && chunk.fileName.endsWith('.js')
-    );
-
-    // Fallback to files array if bundle doesn't have entries
-    const filesArray = Array.isArray(files) ? files : Object.values(files || {});
-    const entryFiles =
-      jsFiles.length > 0
-        ? jsFiles
-        : filesArray.filter(
-            (file) => file.isEntry && file.fileName && file.fileName.endsWith('.js')
-          );
-
-    // Generate script tags with replaceresource prefix
-    // WebViewBase.replaceResources will convert these to webview URIs
-    const scriptTags = entryFiles
-      .map((file) => `    <script src="replaceresource/dist/${file.fileName}"></script>`)
-      .join('\n');
-
-    return `<!doctype html>
-<html${
-      attributes && attributes.html
-        ? ` ${Object.entries(attributes.html)
-            .map(([key, value]) => `${key}="${value}"`)
-            .join(' ')}`
-        : ''
-    }>
+function createWebviewHtml(title, entryFileName) {
+  return `<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${templateTitle || title}</title>
+    <title>${title}</title>
   </head>
   <body>
     <div id="app" data-resource-base="replaceresource"></div>
-${scriptTags}
+    <script type="module" src="replaceresource/dist/${entryFileName}"></script>
   </body>
 </html>`;
+}
+
+function generateWebviewHtmlFiles() {
+  return {
+    name: 'generate-webview-html-files',
+    generateBundle(_outputOptions, bundle) {
+      const entryFileNames = new Map();
+
+      for (const file of Object.values(bundle)) {
+        if (file.type === 'chunk' && file.isEntry) {
+          entryFileNames.set(file.name, file.fileName);
+        }
+      }
+
+      for (const webview of webviews) {
+        const entryFileName = entryFileNames.get(webview.name);
+        if (!entryFileName) {
+          this.error(`Missing entry chunk for webview '${webview.name}'`);
+        }
+
+        this.emitFile({
+          type: 'asset',
+          fileName: `${webview.name}.html`,
+          source: createWebviewHtml(webview.title, entryFileName),
+        });
+      }
+    },
   };
 }
 
-module.exports = webviews.map(({ name, input, title }) => ({
-  input: path.resolve(__dirname, input),
+function minifyWithTerser() {
+  return {
+    name: 'minify-with-terser',
+    async renderChunk(code) {
+      const result = await terser.minify(code, {
+        module: true,
+        toplevel: true,
+        compress: {
+          module: true,
+          toplevel: true,
+          passes: 2,
+        },
+        mangle: {
+          toplevel: true,
+        },
+        format: {
+          comments: false,
+        },
+      });
+
+      if (result.code === undefined) {
+        throw new Error('Terser failed to produce output code');
+      }
+
+      return {
+        code: result.code,
+        map: result.map || null,
+      };
+    },
+  };
+}
+
+const webviewInputs = Object.fromEntries(
+  webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
+);
+
+module.exports = {
+  input: webviewInputs,
   output: {
     dir: path.resolve(__dirname, 'resources', 'dist'),
-    entryFileNames: `${name}.js`,
-    format: 'iife',
-    name: `${name}App`,
+    entryFileNames: '[name].js',
+    chunkFileNames: 'chunks/[name]-[hash].js',
+    format: 'es',
     sourcemap: true,
   },
   onwarn(warning, handler) {
@@ -116,6 +150,7 @@ module.exports = webviews.map(({ name, input, title }) => ({
     }),
     resolve({
       browser: true,
+      exportConditions: production ? ['production'] : ['development'],
       dedupe: ['svelte'],
       extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
     }),
@@ -124,13 +159,10 @@ module.exports = webviews.map(({ name, input, title }) => ({
       sourceMap: !production,
       tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
     }),
-    html({
-      fileName: `${name}.html`,
-      title,
-      template: createHtmlTemplate(title),
-    }),
-  ],
+    production && minifyWithTerser(),
+    generateWebviewHtmlFiles(),
+  ].filter(Boolean),
   watch: {
     clearScreen: false,
   },
-}));
+};

@@ -77,10 +77,10 @@ function rewriteDistScriptTags(
   distRootFsPath: string
 ): string {
   return html.replace(
-    /<script\s+src="replaceresource\/dist\/([^"]+)"><\/script>/g,
+    /<script\s+(?:type="module"\s+)?src="replaceresource\/dist\/([^"]+)"><\/script>/g,
     (_match, fileName: string) => {
       const uri = webview.asWebviewUri(vscode.Uri.file(path.join(distRootFsPath, fileName)));
-      return `<script src="${uri.toString()}"></script>`;
+      return `<script type="module" src="${uri.toString()}"></script>`;
     }
   );
 }
@@ -95,7 +95,7 @@ function ensureScriptIncluded(
     return html;
   }
   const uri = webview.asWebviewUri(vscode.Uri.file(path.join(distRootFsPath, scriptFileName)));
-  return insertBeforeBodyClose(html, `<script src="${uri.toString()}"></script>`);
+  return insertBeforeBodyClose(html, `<script type="module" src="${uri.toString()}"></script>`);
 }
 
 export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
