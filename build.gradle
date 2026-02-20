@@ -33,17 +33,23 @@ configurations {
     javaSource
 }
 
-def wpilibDepVersion = "+"
+ext.gradleVersion = project.file('vscode-wpilib/resources/gradle/version.txt').text.trim()
+
+
+def wpilibVersion = '+'
+if (ext.addedRelease) {
+    wpilibVersion = ext.gradleVersion
+}
 
 dependencies {
-    cppSource "org.wpilib.wpilibc:examples:${wpilibDepVersion}:@zip"
-    javaSource "org.wpilib.wpilibj:examples:${wpilibDepVersion}:@zip"
+    cppSource "org.wpilib.wpilibc:examples:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:examples:${wpilibVersion}:@zip"
 
-    cppSource "org.wpilib.wpilibc:templates:${wpilibDepVersion}:@zip"
-    javaSource "org.wpilib.wpilibj:templates:${wpilibDepVersion}:@zip"
+    cppSource "org.wpilib.wpilibc:templates:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:templates:${wpilibVersion}:@zip"
 
-    cppSource "org.wpilib.wpilibc:commands:${wpilibDepVersion}:@zip"
-    javaSource "org.wpilib.wpilibj:commands:${wpilibDepVersion}:@zip"
+    cppSource "org.wpilib.wpilibc:commands:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:commands:${wpilibVersion}:@zip"
 }
 
 task extractCppDependencies(type: Copy) {

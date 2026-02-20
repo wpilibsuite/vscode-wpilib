@@ -13,8 +13,6 @@ ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
     def jsonSlurper = new JsonSlurper()
     def obj = jsonSlurper.parseText(templateFile)
 
-    def gradleVersion = new File(gradleBaseFolder, 'version.txt').text.trim()
-
     obj.each { template ->
 
         def outputFolder = new File(outputDir, template.foldername)
@@ -75,8 +73,6 @@ ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
 ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
     def jsonSlurper = new JsonSlurper()
     def obj = jsonSlurper.parseText(templateFile)
-
-    def gradleVersion = new File(gradleBaseFolder, 'version.txt').text.trim()
 
     obj.each { template ->
 
