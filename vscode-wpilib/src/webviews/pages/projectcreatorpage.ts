@@ -313,8 +313,8 @@ function setupEventListeners() {
     });
   });
 
-    const desktopCb = document.getElementById('desktopCB') as HTMLInputElement;
-    desktopCb.addEventListener('change', () => {
+  const desktopCb = document.getElementById('desktopCB') as HTMLInputElement;
+  desktopCb.addEventListener('change', () => {
     if (languageSelect.value !== 'cpp') {
       desktopCb.disabled = true;
       desktopCb.title = 'Desktop Support can only be enabled for C++ projects!';
