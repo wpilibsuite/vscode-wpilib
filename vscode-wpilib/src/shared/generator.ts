@@ -110,8 +110,6 @@ export async function generateCopyJava(
              .replace('org.wpilib.templates.timed.Robot.class', `${robotClass}.class`)
     );
 
-    const robotMain = `first.Main`;
-
     // Copy template folders
     await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
@@ -152,7 +150,7 @@ export async function generateCopyJava(
     // Update gradle file with correct version and robot class
     await fileUtils.updateFileContents(path.join(toFolder, 'build.gradle'), (content) =>
       content
-        .replace(new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'), robotMain)
+        .replace(new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'), 'first.Main')
         .replace(new RegExp(genUtils.ReplacementPatterns.GRADLE_RIO_MARKER, 'g'), gradleRioVersion)
     );
 
