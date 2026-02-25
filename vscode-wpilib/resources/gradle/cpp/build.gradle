@@ -13,18 +13,21 @@ deploy {
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
             // want to store a team number in this file.
-            team = project.frc.getTeamNumber()
-            debug = project.frc.getDebugOrDefault(false)
+            team = project.first.getTeamNumber()
+            // Use the default systemcore host name. This must be called after setting team
+            // as happens on the line above
+            useDefaultSystemcoreHostName()
+            debug = project.first.getDebugOrDefault(false)
 
             artifacts {
                 // First part is artifact name, 2nd is artifact type
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
-                frcCpp(getArtifactTypeClass('FRCNativeArtifact')) {
+                firstCpp(getArtifactTypeClass('FIRSTNativeArtifact')) {
                 }
 
                 // Static files artifact
-                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                firstStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/systemcore/deploy'
                     deleteOldFiles = false // Change to true to delete files on SystemCore that no
@@ -35,7 +38,7 @@ deploy {
     }
 }
 
-def deployArtifact = deploy.targets.systemcore.artifacts.frcCpp
+def deployArtifact = deploy.targets.systemcore.artifacts.firstCpp
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
@@ -50,7 +53,7 @@ wpi.sim.addDriverstation()
 
 model {
     components {
-        frcUserProgram(NativeExecutableSpec) {
+        firstUserProgram(NativeExecutableSpec) {
             targetPlatform wpi.platforms.systemcore
             if (includeDesktopSupport) {
                 targetPlatform wpi.platforms.desktop
@@ -80,8 +83,8 @@ model {
         }
     }
     testSuites {
-        frcUserProgramTest(GoogleTestTestSuiteSpec) {
-            testing $.components.frcUserProgram
+        firstUserProgramTest(GoogleTestTestSuiteSpec) {
+            testing $.components.firstUserProgram
 
             sources.cpp {
                 source {
