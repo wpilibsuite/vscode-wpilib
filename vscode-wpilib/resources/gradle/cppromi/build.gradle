@@ -15,7 +15,7 @@ wpi.sim.addWebsocketsClient().defaultEnabled = true
 
 model {
     components {
-        frcUserProgram(NativeExecutableSpec) {
+        firstUserProgram(NativeExecutableSpec) {
             targetPlatform wpi.platforms.desktop
 
             sources.cpp {
@@ -38,8 +38,8 @@ model {
         }
     }
     testSuites {
-        frcUserProgramTest(GoogleTestTestSuiteSpec) {
-            testing $.components.frcUserProgram
+        firstUserProgramTest(GoogleTestTestSuiteSpec) {
+            testing $.components.firstUserProgram
 
             sources.cpp {
                 source {
