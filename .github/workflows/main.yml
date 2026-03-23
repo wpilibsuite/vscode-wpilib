@@ -19,10 +19,14 @@ jobs:
           distribution: "temurin"
       - run: ./gradlew build updateVersions -PbuildServer
         name: Build with Gradle
+      - name: Install dependencies
+        run: npm install
+        working-directory: vscode-wpilib
+      - name: Run tests
+        run: xvfb-run -a npm test
+        working-directory: vscode-wpilib
       - run: |
-          npm install
           npm run lint
-          npm run unittest
           npm run gulp
           npm run webpack
           npm run vscePackage
@@ -36,6 +40,33 @@ jobs:
         with:
           name: Distributions
           path: ${{ github.workspace }}/build/distributions/*
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-15, windows-2022]
+    name: Test - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22.x"
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: "temurin"
+      - run: ./gradlew build updateVersions -PbuildServer
+        name: Build with Gradle
+      - name: Install dependencies
+        run: npm install
+        working-directory: vscode-wpilib
+      - name: Run tests
+        run: npm test
+        working-directory: vscode-wpilib
 
   format:
     name: Format
