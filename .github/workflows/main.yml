@@ -19,10 +19,14 @@ jobs:
           distribution: "temurin"
       - run: ./gradlew build updateVersions -PbuildServer
         name: Build with Gradle
+      - name: Install dependencies
+        run: npm install
+        working-directory: vscode-wpilib
+      - name: Run tests
+        run: xvfb-run -a npm test
+        working-directory: vscode-wpilib
       - run: |
-          npm install
           npm run lint
-          npm run unittest
           npm run gulp
           npm run webpack
           npm run vscePackage
