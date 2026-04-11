@@ -32,6 +32,10 @@ gulp.task('clean', async () => {
   globSync(['package.nls.*.json', '*.vsix']).map(async (file) => await rm(file));
 });
 
+gulp.task('clean-webviews', async () => {
+  await rm('resources/dist/', { force: true, recursive: true });
+});
+
 gulp.task('build', gulp.series('clean', 'i18n-compile', 'i18n-additional'));
 
 gulp.task('default', gulp.series('build'));

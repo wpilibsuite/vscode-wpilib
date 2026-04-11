@@ -4,8 +4,10 @@
   import Step1SelectSource from './steps/Step1SelectSource.svelte';
   import Step2Configure from './steps/Step2Configure.svelte';
   import Step3Review from './steps/Step3Review.svelte';
-  import { getResourceBase, onWebviewMessage, postMessage, signalLoaded } from '../lib';
+  import { getResourceBase, onWebviewMessage } from '../lib';
   import type { Gradle2025Message, Gradle2025ImportData } from './types';
+
+  const vscode = acquireVsCodeApi();
 
   type WizardStepNumber = 1 | 2 | 3;
   type HardwareOption = 'none' | 'romi' | 'xrp';
@@ -73,11 +75,11 @@
   };
 
   const selectSourceProject = () => {
-    postMessage({ type: 'gradle2025' });
+    vscode.postMessage({ type: 'gradle2025' });
   };
 
   const selectDestinationFolder = () => {
-    postMessage({ type: 'newproject' });
+    vscode.postMessage({ type: 'newproject' });
   };
 
   const submitImport = () => {
@@ -104,7 +106,7 @@
       teamNumber,
       toFolder: projectFolder,
     };
-    postMessage({ type: 'importproject', data: payload });
+    vscode.postMessage({ type: 'importproject', data: payload });
   };
 
   const destinationPath = $derived(
@@ -135,7 +137,7 @@
       }
     });
 
-    signalLoaded();
+    vscode.postMessage({ type: 'loaded' });
 
     return () => unsubscribe();
   });

@@ -5,12 +5,14 @@
   import Step2LanguageBase from './steps/Step2LanguageBase.svelte';
   import Step3LocationConfig from './steps/Step3LocationConfig.svelte';
   import Step4Review from './steps/Step4Review.svelte';
-  import { getResourceBase, onWebviewMessage, postMessage } from '../lib';
+  import { getResourceBase, onWebviewMessage } from '../lib';
   import {
     ProjectType,
     type BaseOption,
     type ProjectCreationData,
   } from './types';
+
+  const vscode = acquireVsCodeApi();
 
   let logoPath = $state('');
 
@@ -63,7 +65,7 @@
       teamNumber: '',
       toFolder: '',
     };
-    postMessage({ type: 'language', data: payload });
+    vscode.postMessage({ type: 'language', data: payload });
   };
 
   const requestBaseList = (type: ProjectType, language: string) => {
@@ -77,7 +79,7 @@
       teamNumber: '',
       toFolder: '',
     };
-    postMessage({ type: 'base', data: payload });
+    vscode.postMessage({ type: 'base', data: payload });
   };
 
   const validateProjectName = (value: string): string | null => {
@@ -167,7 +169,7 @@
       teamNumber,
       toFolder: projectFolder,
     };
-    postMessage({ type: 'newproject', data: payload });
+    vscode.postMessage({ type: 'newproject', data: payload });
   };
 
   const handleStep3Next = () => {
@@ -196,7 +198,7 @@
       teamNumber,
       toFolder: projectFolder,
     };
-    postMessage({ type: 'createproject', data: payload });
+    vscode.postMessage({ type: 'createproject', data: payload });
   };
 
   onMount(() => {

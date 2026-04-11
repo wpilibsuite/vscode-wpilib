@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { onWebviewMessage, postMessage, signalLoaded } from '../lib';
+  import { onWebviewMessage } from '../lib';
   import InstalledDependencies from './InstalledDependencies.svelte';
   import AvailableDependencies from './AvailableDependencies.svelte';
   import UrlInstallSection from './UrlInstallSection.svelte';
   import type { InstalledDependency, AvailableDependency } from './types';
+
+  const vscode = acquireVsCodeApi();
 
   interface Props {
     mode?: string;
@@ -23,23 +25,23 @@
   let urlInput = $state('');
 
   const updateAll = () => {
-    postMessage({ type: 'updateall' });
+    vscode.postMessage({ type: 'updateall' });
   };
 
   const installFromUrl = (url: string) => {
-    postMessage({ type: 'installFromUrl', url });
+    vscode.postMessage({ type: 'installFromUrl', url });
   };
 
   const installDependency = (index: number) => {
-    postMessage({ type: 'install', index });
+    vscode.postMessage({ type: 'install', index });
   };
 
   const uninstallDependency = (index: number) => {
-    postMessage({ type: 'uninstall', index });
+    vscode.postMessage({ type: 'uninstall', index });
   };
 
   const updateDependency = (index: number, version: string) => {
-    postMessage({ type: 'update', index: index.toString(), version });
+    vscode.postMessage({ type: 'update', index: index.toString(), version });
   };
 
   onMount(() => {
@@ -54,10 +56,10 @@
       }
     });
 
-    const blurListener = () => postMessage({ type: 'blur' });
+    const blurListener = () => vscode.postMessage({ type: 'blur' });
     window.addEventListener('blur', blurListener);
 
-    signalLoaded();
+    vscode.postMessage({ type: 'loaded' });
 
     return () => {
       unsubscribe();

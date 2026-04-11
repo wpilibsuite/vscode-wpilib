@@ -437,7 +437,7 @@
         "webpack": "webpack --config-node-env production",
         "webpack-dev": "webpack --config-node-env development",
         "webpack-watch": "webpack --config-node-env development --watch",
-        "build:webviews": "rollup -c --environment NODE_ENV:production",
+        "build:webviews": "gulp clean-webviews && rollup -c --environment NODE_ENV:production",
         "watch:webviews": "rollup -c -w --environment NODE_ENV:development",
         "watch": "npm-run-all --parallel webpack-watch watch:webviews",
         "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",

@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { RioLogEntry } from './types';
   import { MessageType } from '../../../riolog/shared/message';
-  import { formatRioLogTimestamp } from './time';
   import AnsiText from './AnsiText.svelte';
 
   interface Props {
@@ -11,6 +10,10 @@
   }
 
   let { entry, showTimestamps, onToggleExpanded = () => {} }: Props = $props();
+
+  const formatRioLogTimestamp = (tsSeconds: number): string => {
+    return new Date(tsSeconds * 1000).toISOString().slice(11, -1) + ': ';
+  };
 
   const isErrorOrWarning = entry.message.messageType !== MessageType.Print;
   const isWarning = entry.message.messageType === MessageType.Warning;

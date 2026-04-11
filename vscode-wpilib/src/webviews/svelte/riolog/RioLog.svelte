@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { onWebviewMessage, postMessage } from '../lib';
+  import { onWebviewMessage } from '../lib';
   import { parseAnsiString } from '../../../riolog/ansi/ansiparser';
   import type { IIPCSendMessage } from '../../../riolog/shared/interfaces';
   import { ReceiveTypes, SendTypes } from '../../../riolog/shared/interfaces';
@@ -9,6 +9,8 @@
   import RioLogToolbar from './RioLogToolbar.svelte';
   import RioLogEntryView from './RioLogEntry.svelte';
   import { messageTypeToKind, type RioLogEntry } from './types';
+
+  const vscode = acquireVsCodeApi();
 
   type ThemeColorsMessage = { type: 'themeColors'; message: Record<string, string> };
 
@@ -94,7 +96,7 @@
   }
 
   function sendReceiveMessage(message: unknown, type: ReceiveTypes) {
-    postMessage({ type, message });
+    vscode.postMessage({ type, message });
   }
 
   function togglePause() {

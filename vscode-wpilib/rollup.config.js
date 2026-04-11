@@ -121,6 +121,20 @@ const webviewInputs = Object.fromEntries(
   webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
 );
 
+function toPosixPath(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+function isSharedWebviewModule(moduleId) {
+  const modulePath = toPosixPath(moduleId);
+  return (
+    modulePath.includes('/node_modules/') ||
+    modulePath.includes('/src/webviews/svelte/lib/') ||
+    modulePath.includes('/src/webviews/svelte/components/shared/') ||
+    modulePath.endsWith('/src/formatter.ts')
+  );
+}
+
 module.exports = {
   input: webviewInputs,
   output: {
@@ -128,7 +142,13 @@ module.exports = {
     entryFileNames: '[name].js',
     chunkFileNames: 'chunks/[name]-[hash].js',
     format: 'es',
-    sourcemap: true,
+    sourcemap: !production,
+    manualChunks(id) {
+      if (isSharedWebviewModule(id)) {
+        return 'webview-shared';
+      }
+      return undefined;
+    },
   },
   onwarn(warning, handler) {
     if (
@@ -158,6 +178,7 @@ module.exports = {
     typescript({
       sourceMap: !production,
       tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
+      outDir: path.resolve(__dirname, 'resources', 'dist', '.tsbuild'),
     }),
     production && minifyWithTerser(),
     generateWebviewHtmlFiles(),

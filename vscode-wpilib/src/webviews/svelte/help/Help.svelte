@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getResourceBase, postMessage } from '../lib';
+  import { getResourceBase } from '../lib';
+
+  const vscode = acquireVsCodeApi();
 
   let logoPath = $state('');
 
@@ -9,11 +11,11 @@
   });
 
   const openCommandPalette = () => {
-    postMessage({ command: 'openCommandPalette' });
+    vscode.postMessage({ command: 'openCommandPalette' });
   };
 
   const openDocumentation = () => {
-    postMessage({ command: 'openDocumentation' });
+    vscode.postMessage({ command: 'openDocumentation' });
   };
 </script>
 
