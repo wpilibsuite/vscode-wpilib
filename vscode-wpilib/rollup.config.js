@@ -35,10 +35,12 @@ const webviews = [
     input: 'src/webviews/svelte/riolog/main.ts',
     title: 'WPILib RioLog',
   },
+];
+
+const helperEntries = [
   {
     name: 'localeloader',
     input: 'src/webviews/localeloader.ts',
-    title: 'Locale Loader',
   },
 ];
 
@@ -117,8 +119,8 @@ function minifyWithTerser() {
   };
 }
 
-const webviewInputs = Object.fromEntries(
-  webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
+const bundleEntries = Object.fromEntries(
+  [...webviews, ...helperEntries].map(({ name, input }) => [name, path.resolve(__dirname, input)])
 );
 
 function toPosixPath(filePath) {
@@ -136,7 +138,7 @@ function isSharedWebviewModule(moduleId) {
 }
 
 module.exports = {
-  input: webviewInputs,
+  input: bundleEntries,
   output: {
     dir: path.resolve(__dirname, 'resources', 'dist'),
     entryFileNames: '[name].js',

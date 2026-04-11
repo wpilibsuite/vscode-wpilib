@@ -43,10 +43,6 @@
   let newFolder = $state(true);
   let desktop = $state(false);
 
-  let projectFolderError: string | null = $state(null);
-  let projectNameError: string | null = $state(null);
-  let teamNumberError: string | null = $state(null);
-
   let showProjectFolderError = $state(false);
   let showProjectNameError = $state(false);
   let showTeamNumberError = $state(false);
@@ -177,9 +173,6 @@
     showProjectFolderError = true;
     showProjectNameError = true;
     showTeamNumberError = true;
-    projectFolderError = validateProjectFolder(projectFolder);
-    projectNameError = validateProjectName(projectName);
-    teamNumberError = validateTeamNumber(teamNumber);
     if (!projectFolderError && !projectNameError && !teamNumberError) {
       goToStep(4);
     }
@@ -245,15 +238,9 @@
     };
   });
 
-  $effect(() => {
-    projectFolderError = validateProjectFolder(projectFolder);
-  });
-  $effect(() => {
-    projectNameError = validateProjectName(projectName);
-  });
-  $effect(() => {
-    teamNumberError = validateTeamNumber(teamNumber);
-  });
+  const projectFolderError = $derived(validateProjectFolder(projectFolder));
+  const projectNameError = $derived(validateProjectName(projectName));
+  const teamNumberError = $derived(validateTeamNumber(teamNumber));
 
   const summaryLocation = $derived(
     newFolder && projectName
