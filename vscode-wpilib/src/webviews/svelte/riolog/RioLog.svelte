@@ -45,7 +45,7 @@
     })
   );
 
-  function addMessage(message: IPrintMessage | IErrorMessage) {
+  const addMessage = (message: IPrintMessage | IErrorMessage) => {
     const kind = messageTypeToKind(message.messageType);
     const baseText =
       message.messageType === MessageType.Print
@@ -74,9 +74,9 @@
     if (entries.length > maxLogEntries) {
       entries = entries.slice(entries.length - maxLogEntries);
     }
-  }
+  };
 
-  function addWelcomeMessageOnce() {
+  const addWelcomeMessageOnce = () => {
     if (entries.length > 0) return;
     const welcomeMessage: IPrintMessage = {
       messageType: MessageType.Print,
@@ -93,80 +93,80 @@
       seqNumber: 0,
     };
     addMessage(welcomeMessage);
-  }
+  };
 
-  function sendReceiveMessage(message: unknown, type: ReceiveTypes) {
+  const sendReceiveMessage = (message: unknown, type: ReceiveTypes) => {
     vscode.postMessage({ type, message });
-  }
+  };
 
-  function togglePause() {
+  const togglePause = () => {
     paused = !paused;
     if (paused) {
       pausedCount = 0;
     }
     sendReceiveMessage(paused, ReceiveTypes.Pause);
-  }
+  };
 
-  function toggleDiscard() {
+  const toggleDiscard = () => {
     discard = !discard;
     sendReceiveMessage(discard, ReceiveTypes.Discard);
-  }
+  };
 
-  function clearLog() {
+  const clearLog = () => {
     entries = [];
     pausedCount = 0;
-  }
+  };
 
-  function toggleAutoScroll() {
+  const toggleAutoScroll = () => {
     autoScroll = !autoScroll;
     if (autoScroll) {
       void tick().then(() => {
         logContainer?.scrollTo({ top: logContainer.scrollHeight });
       });
     }
-  }
+  };
 
-  function togglePrints() {
+  const togglePrints = () => {
     showPrints = !showPrints;
-  }
+  };
 
-  function toggleWarnings() {
+  const toggleWarnings = () => {
     showWarnings = !showWarnings;
-  }
+  };
 
-  function toggleTimestamps() {
+  const toggleTimestamps = () => {
     showTimestamps = !showTimestamps;
-  }
+  };
 
-  function toggleReconnect() {
+  const toggleReconnect = () => {
     autoReconnect = !autoReconnect;
     sendReceiveMessage(autoReconnect, ReceiveTypes.Reconnect);
-  }
+  };
 
-  function saveLog() {
+  const saveLog = () => {
     const logs = entries.map((entry) => JSON.stringify(entry.message));
     sendReceiveMessage(logs, ReceiveTypes.Save);
-  }
+  };
 
-  function applyTeamNumber(): boolean {
+  const applyTeamNumber = (): boolean => {
     const num = Number.parseInt(teamNumber, 10);
     if (!Number.isFinite(num) || num < 0 || num > 99999) {
       return false;
     }
     sendReceiveMessage(num, ReceiveTypes.ChangeNumber);
     return true;
-  }
+  };
 
-  function toggleExpanded(id: number) {
+  const toggleExpanded = (id: number) => {
     entries = entries.map((e) => (e.id === id ? { ...e, expanded: !e.expanded } : e));
-  }
+  };
 
-  async function updateLayout() {
+  const updateLayout = async () => {
     if (!toolbarEl || !logContainer) return;
     logContainer.style.maxHeight = `calc(100vh - ${toolbarEl.offsetHeight}px)`;
-  }
+  };
 
-  function addConnectionMessage(isConnected: boolean) {
+  const addConnectionMessage = (isConnected: boolean) => {
     const message: IPrintMessage = {
       line: isConnected
         ? '\u001b[32mRobot connection established\u001b[0m'
@@ -176,7 +176,7 @@
       timestamp: Date.now() / 1000,
     };
     addMessage(message);
-  }
+  };
 
   onMount(() => {
     addWelcomeMessageOnce();
