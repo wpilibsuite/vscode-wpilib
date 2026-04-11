@@ -45,7 +45,7 @@
     })
   );
 
-  const addMessage = (message: IPrintMessage | IErrorMessage) => {
+  const buildEntry = (message: IPrintMessage | IErrorMessage): RioLogEntry => {
     const kind = messageTypeToKind(message.messageType);
     const baseText =
       message.messageType === MessageType.Print
@@ -61,7 +61,7 @@
         ? (message as IPrintMessage).line.toLowerCase()
         : `${(message as IErrorMessage).details}\n${(message as IErrorMessage).location}\n${(message as IErrorMessage).callStack}`.toLowerCase();
 
-    const entry: RioLogEntry = {
+    return {
       id: nextId++,
       kind,
       message,
@@ -69,11 +69,24 @@
       searchText,
       expanded: false,
     };
+  };
 
-    entries = [...entries, entry];
+  const trimEntries = () => {
     if (entries.length > maxLogEntries) {
-      entries = entries.slice(entries.length - maxLogEntries);
+      entries.splice(0, entries.length - maxLogEntries);
     }
+  };
+
+  const addMessage = (message: IPrintMessage | IErrorMessage) => {
+    entries.push(buildEntry(message));
+    trimEntries();
+  };
+
+  const addMessages = (messages: (IPrintMessage | IErrorMessage)[]) => {
+    for (const message of messages) {
+      entries.push(buildEntry(message));
+    }
+    trimEntries();
   };
 
   const addWelcomeMessageOnce = () => {
@@ -113,7 +126,7 @@
   };
 
   const clearLog = () => {
-    entries = [];
+    entries.length = 0;
     pausedCount = 0;
   };
 
@@ -158,7 +171,10 @@
   };
 
   const toggleExpanded = (id: number) => {
-    entries = entries.map((e) => (e.id === id ? { ...e, expanded: !e.expanded } : e));
+    const entry = entries.find((candidate) => candidate.id === id);
+    if (entry) {
+      entry.expanded = !entry.expanded;
+    }
   };
 
   const updateLayout = async () => {
@@ -193,9 +209,7 @@
           addMessage(msg.message as IPrintMessage | IErrorMessage);
           break;
         case SendTypes.Batch:
-          for (const m of msg.message as (IPrintMessage | IErrorMessage)[]) {
-            addMessage(m);
-          }
+          addMessages(msg.message as (IPrintMessage | IErrorMessage)[]);
           break;
         case SendTypes.PauseUpdate:
           pausedCount = msg.message as number;
