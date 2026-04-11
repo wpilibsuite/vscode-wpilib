@@ -3,8 +3,6 @@ import RioLog from './RioLog.svelte';
 
 const target = document.getElementById('app') ?? document.body;
 
-const app = mount(RioLog, {
+export default mount(RioLog, {
   target,
 });
-
-export default app;

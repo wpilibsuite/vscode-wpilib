@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ValidationError } from '../../components/shared';
+  import { createTranslator } from '../../lib';
 
   interface Props {
     projectFolder?: string;
@@ -42,6 +43,7 @@
     onBack = () => {},
     onNext = () => {}
   }: Props = $props();
+  const t = createTranslator('projectcreator');
 
   let canProceed = $derived(!projectFolderError && !projectNameError);
 
@@ -75,12 +77,12 @@
 </script>
 
 <div class="step-header">
-  <h2>Step 3: Project Location &amp; Configuration</h2>
-  <p>Set where to save your project and configure basic settings.</p>
+  <h2>{t('Step 3: Project Location & Configuration')}</h2>
+  <p>{t('Set where to save your project and configure basic settings.')}</p>
 </div>
 
 <div class="project-row">
-  <div id="projectfolderdiv" class="project-label"><b>Base Folder</b></div>
+  <div id="projectfolderdiv" class="project-label"><b>{t('Base Folder')}</b></div>
   <div class="project-field-container">
     <input id="projectFolder" class="vscode-textfield" type="text" value={projectFolder} readonly />
     <ValidationError
@@ -93,12 +95,12 @@
 
 <div class="project-row">
   <button id="projectSelectButton" type="button" class="vscode-button" onclick={selectFolder}>
-    Select Folder
+    {t('Select Folder')}
   </button>
 </div>
 
 <div class="project-row">
-  <div id="projectnamediv" class="project-label"><b>Project Name</b></div>
+  <div id="projectnamediv" class="project-label"><b>{t('Project Name')}</b></div>
   <div class="project-field-container">
     <input
       id="projectName"
@@ -116,7 +118,7 @@
 </div>
 
 <div class="project-row">
-  <div class="project-label"><b>Team Number</b></div>
+  <div class="project-label"><b>{t('Team Number')}</b></div>
   <div class="project-field-container">
     <input
       id="teamNumber"
@@ -145,9 +147,9 @@
       <span class="icon">
         <i class="codicon codicon-check icon-checked"></i>
       </span>
-      <span class="text">Create a new folder</span>
+      <span class="text">{t('Create a new folder')}</span>
     </label>
-    <span class="checkbox-help">Creates a new folder at Base Folder/Project Name</span>
+    <span class="checkbox-help">{t('Creates a new folder at Base Folder/Project Name')}</span>
   </div>
 </div>
 
@@ -163,15 +165,15 @@
       <span class="icon">
         <i class="codicon codicon-check icon-checked"></i>
       </span>
-      <span class="text">Enable Desktop Support</span>
+      <span class="text">{t('Enable Desktop Support')}</span>
     </label>
-    <span class="checkbox-help">This enables unit testing and simulation support</span>
+    <span class="checkbox-help">{t('This enables unit testing and simulation support')}</span>
   </div>
 </div>
 
 <div class="wizard-navigation">
   <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={back}>
-    Back
+    {t('Back')}
   </button>
   <button
     id="next-to-step-4"
@@ -180,6 +182,6 @@
     disabled={!canProceed}
     onclick={next}
   >
-    Next
+    {t('Next')}
   </button>
 </div>

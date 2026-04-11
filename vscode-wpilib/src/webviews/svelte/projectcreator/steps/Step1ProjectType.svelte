@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createTranslator } from '../../lib';
   import { ProjectType } from '../types';
 
   interface Props {
@@ -8,6 +9,7 @@
   }
 
   let { selected = null, onSelect = () => {}, onNext = () => {} }: Props = $props();
+  const t = createTranslator('projectcreator');
 
   const select = (type: ProjectType) => {
     onSelect(type);
@@ -17,8 +19,8 @@
 </script>
 
 <div class="step-header">
-  <h2>Step 1: Select Project Type</h2>
-  <p>Choose whether to create a project from a template or an example.</p>
+  <h2>{t('Step 1: Select Project Type')}</h2>
+  <p>{t('Choose whether to create a project from a template or an example.')}</p>
 </div>
 
 <div class="selection-cards">
@@ -30,8 +32,8 @@
     onclick={() => select(ProjectType.Template)}
     aria-pressed={selected === ProjectType.Template}
   >
-    <h3>Template</h3>
-    <p>Start with a basic robot program structure</p>
+    <h3>{t('Template')}</h3>
+    <p>{t('Start with a basic robot program structure')}</p>
     <div class="card-icon">
       <i class="codicon codicon-notebook-template"></i>
     </div>
@@ -44,8 +46,8 @@
     onclick={() => select(ProjectType.Example)}
     aria-pressed={selected === ProjectType.Example}
   >
-    <h3>Example</h3>
-    <p>Start with a complete example project</p>
+    <h3>{t('Example')}</h3>
+    <p>{t('Start with a complete example project')}</p>
     <div class="card-icon">
       <i class="codicon codicon-notebook"></i>
     </div>
@@ -61,6 +63,6 @@
     disabled={selected === null}
     onclick={next}
   >
-    Next
+    {t('Next')}
   </button>
 </div>

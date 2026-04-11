@@ -4,11 +4,9 @@ import { getViewMode } from '../lib';
 
 const target = document.getElementById('app') ?? document.body;
 
-const app = mount(DependencyView, {
+export default mount(DependencyView, {
   target,
   props: {
     mode: getViewMode(),
   },
 });
-
-export default app;

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createTranslator } from '../../lib';
   import type { BaseOption } from '../types';
 
   interface Props {
@@ -22,6 +23,7 @@
     onNext = () => {},
     onBack = () => {}
   }: Props = $props();
+  const t = createTranslator('projectcreator');
 
   let languageValue = $state(selectedLanguage);
   let baseValue = $state(selectedBase);
@@ -59,12 +61,12 @@
 </script>
 
 <div class="step-header">
-  <h2>Step 2: Select Language &amp; Base</h2>
-  <p>Choose the programming language and project base to use.</p>
+  <h2>{t('Step 2: Select Language & Base')}</h2>
+  <p>{t('Choose the programming language and project base to use.')}</p>
 </div>
 
 <div class="project-row">
-  <div class="project-label"><b>Language</b></div>
+  <div class="project-label"><b>{t('Language')}</b></div>
   <div class="select-wrapper vscode-select">
     <i class="codicon codicon-chevron-right chevron-icon"></i>
     <select
@@ -74,7 +76,7 @@
       onchange={notifyLanguageChange}
       disabled={languages.length === 0}
     >
-      <option value="" disabled>Select a language</option>
+      <option value="" disabled>{t('Select a language')}</option>
       {#each languages as lang}
         <option value={lang}>{lang}</option>
       {/each}
@@ -83,7 +85,7 @@
 </div>
 
 <div class="project-row">
-  <div class="project-label"><b>Project Base</b></div>
+  <div class="project-label"><b>{t('Project Base')}</b></div>
   <div class="select-wrapper vscode-select">
     <i class="codicon codicon-chevron-right chevron-icon"></i>
     <select
@@ -93,7 +95,7 @@
       onchange={notifyBaseChange}
       disabled={bases.length === 0}
     >
-      <option value="" disabled>Select a project base</option>
+      <option value="" disabled>{t('Select a project base')}</option>
       {#each bases as base}
         <option value={base.label}>{base.label}</option>
       {/each}
@@ -103,7 +105,7 @@
 
 <div class="wizard-navigation">
   <button id="back-to-step-1" type="button" class="vscode-button secondary" onclick={back}>
-    Back
+    {t('Back')}
   </button>
   <button
     id="next-to-step-3"
@@ -112,6 +114,6 @@
     disabled={!canProceed}
     onclick={next}
   >
-    Next
+    {t('Next')}
   </button>
 </div>

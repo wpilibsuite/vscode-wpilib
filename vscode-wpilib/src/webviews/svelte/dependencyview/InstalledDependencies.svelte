@@ -9,13 +9,23 @@
 
   let { dependencies = [], onUpdate = () => {}, onUninstall = () => {} }: Props = $props();
 
-  let selectedVersions: string[] = $state([]);
+  let selectedVersions: Record<string, string> = $state({});
+
+  const getSelectedVersion = (dependency: InstalledDependency) => {
+    const selectedVersion = selectedVersions[dependency.uuid];
+    return dependency.versionInfo.some((info) => info.version === selectedVersion)
+      ? selectedVersion
+      : dependency.currentVersion;
+  };
 
   $effect(() => {
-    const nextSelected = dependencies.map((dep, index) => selectedVersions[index] ?? dep.currentVersion);
+    const nextSelected = Object.fromEntries(
+      dependencies.map((dependency) => [dependency.uuid, getSelectedVersion(dependency)])
+    );
+
     if (
-      nextSelected.length !== selectedVersions.length ||
-      nextSelected.some((value, idx) => value !== selectedVersions[idx])
+      Object.keys(nextSelected).length !== Object.keys(selectedVersions).length ||
+      Object.entries(nextSelected).some(([uuid, version]) => selectedVersions[uuid] !== version)
     ) {
       selectedVersions = nextSelected;
     }
@@ -35,7 +45,7 @@
 {#if dependencies.length === 0}
   <div class="empty-state">No dependencies installed</div>
 {:else}
-  {#each dependencies as dependency, index}
+  {#each dependencies as dependency, index (dependency.uuid)}
     <div class="installed-dependency">
       <div class="dependency-header">
         <div class="dependency-title">
@@ -47,7 +57,7 @@
       <div class="dependency-controls">
         <div class="vscode-select" style="margin: 4px 0">
           <i class="codicon codicon-chevron-right chevron-icon"></i>
-          <select bind:value={selectedVersions[index]}>
+          <select bind:value={selectedVersions[dependency.uuid]}>
             {#each dependency.versionInfo as versionInfo}
               <option value={versionInfo.version}>
                 {versionInfo.version}
@@ -58,10 +68,10 @@
 
         <button
           class="vscode-button"
-          disabled={isUpdateDisabled(dependency, selectedVersions[index])}
-          onclick={() => onUpdate(index, selectedVersions[index])}
+          disabled={isUpdateDisabled(dependency, getSelectedVersion(dependency))}
+          onclick={() => onUpdate(index, getSelectedVersion(dependency))}
         >
-          {getButtonText(dependency, selectedVersions[index])}
+          {getButtonText(dependency, getSelectedVersion(dependency))}
         </button>
 
         <button

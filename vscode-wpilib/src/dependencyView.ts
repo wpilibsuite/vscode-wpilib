@@ -18,6 +18,7 @@ export interface IJsonList {
 }
 
 export interface IDepInstalled {
+  uuid: string;
   name: string;
   currentVersion: string;
   versionInfo: { version: string; buttonText: string }[];
@@ -530,6 +531,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           versionList = this.sortVersions(versionList);
 
           installedList.push({
+            uuid: id.uuid,
             name: id.name,
             currentVersion: id.version,
             versionInfo: versionList,

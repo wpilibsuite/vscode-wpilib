@@ -1,4 +1,5 @@
 export interface InstalledDependency {
+  uuid: string;
   name: string;
   currentVersion: string;
   versionInfo: { version: string; buttonText: string }[];

@@ -5,7 +5,7 @@
   import Step2LanguageBase from './steps/Step2LanguageBase.svelte';
   import Step3LocationConfig from './steps/Step3LocationConfig.svelte';
   import Step4Review from './steps/Step4Review.svelte';
-  import { getResourceBase, onWebviewMessage } from '../lib';
+  import { createTranslator, getResourceBase, onWebviewMessage } from '../lib';
   import {
     ProjectType,
     type BaseOption,
@@ -13,6 +13,7 @@
   } from './types';
 
   const vscode = acquireVsCodeApi();
+  const t = createTranslator('projectcreator');
 
   let logoPath = $state('');
 
@@ -24,10 +25,10 @@
   type ProjectWizardStep = 1 | 2 | 3 | 4;
 
   const steps: WizardStepConfig[] = [
-    { step: 1, label: 'Project Type' },
-    { step: 2, label: 'Project Settings' },
-    { step: 3, label: 'Location & Config' },
-    { step: 4, label: 'Review & Create' },
+    { step: 1, label: t('Project Type') },
+    { step: 2, label: t('Project Settings') },
+    { step: 3, label: t('Location & Config') },
+    { step: 4, label: t('Review & Create') },
   ];
 
   let currentStep: ProjectWizardStep = $state(1);
@@ -84,7 +85,7 @@
 
   const validateProjectName = (value: string): string | null => {
     if (value.trim() === '') {
-      return 'Project name is required';
+      return t('Project name is required');
     }
     return null;
   };
@@ -92,10 +93,10 @@
   const validateProjectFolder = (value: string): string | null => {
     const trimmed = value.trim();
     if (trimmed === '') {
-      return 'Base folder is required';
+      return t('Base folder is required');
     }
     if (trimmed.includes('OneDrive')) {
-      return "Invalid Base Folder - Folder can't be in OneDrive";
+      return t("Invalid Base Folder - Folder can't be in OneDrive");
     }
     return null;
   };
@@ -106,11 +107,11 @@
       return null;
     }
     if (!/^\d+$/.test(trimmed)) {
-      return 'Invalid Team Number';
+      return t('Invalid Team Number');
     }
     const numberValue = Number.parseInt(trimmed, 10);
     if (Number.isNaN(numberValue) || numberValue < 1 || numberValue > 25599) {
-      return 'Invalid Team Number';
+      return t('Invalid Team Number');
     }
     return null;
   };
@@ -264,7 +265,7 @@
 <div class="project-container">
   <img src={logoPath} alt="WPILib" height="75" />
 
-  <h1 class="project-title">Welcome to WPILib New Project Creator</h1>
+  <h1 class="project-title">{t('Welcome to WPILib New Project Creator')}</h1>
 
   <WizardProgress {steps} currentStep={currentStep} />
 

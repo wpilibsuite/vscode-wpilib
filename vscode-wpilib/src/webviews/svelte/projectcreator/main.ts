@@ -3,8 +3,6 @@ import ProjectCreator from './ProjectCreator.svelte';
 
 const target = document.getElementById('app') ?? document.body;
 
-const app = mount(ProjectCreator, {
+export default mount(ProjectCreator, {
   target,
 });
-
-export default app;
