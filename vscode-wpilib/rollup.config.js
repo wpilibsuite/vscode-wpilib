@@ -37,13 +37,6 @@ const webviews = [
   },
 ];
 
-const helperEntries = [
-  {
-    name: 'localeloader',
-    input: 'src/webviews/localeloader.ts',
-  },
-];
-
 function createWebviewHtml(title, entryFileName) {
   return `<!doctype html>
 <html lang="en">
@@ -120,7 +113,7 @@ function minifyWithTerser() {
 }
 
 const bundleEntries = Object.fromEntries(
-  [...webviews, ...helperEntries].map(({ name, input }) => [name, path.resolve(__dirname, input)])
+  webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
 );
 
 function toPosixPath(filePath) {

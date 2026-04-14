@@ -1,36 +1,37 @@
 import { readable } from 'svelte/store';
+import formatMessage from '../../../formatter';
 
 type MessageInput = string | [string, string];
-
 type LocaleDomains = Record<string, Record<string, string>>;
 
-declare global {
-  interface Window {
-    i18nTrans?: (domain: string, message: string | string[], ...args: unknown[]) => string;
-    __I18N_LOCALE_DOMAINS?: LocaleDomains;
+let parsedDomains: LocaleDomains | null = null;
+let defaultLocaleDomain = '';
+
+function initializeLocales(): LocaleDomains {
+  if (parsedDomains) {
+    return parsedDomains;
   }
+  parsedDomains = {};
+
+  document.querySelectorAll<HTMLScriptElement>('script[data-locale]').forEach((element) => {
+    const domain = element.dataset.domain!;
+    if (element.hasAttribute('data-default-domain')) {
+      defaultLocaleDomain = domain;
+    }
+    parsedDomains![domain] = JSON.parse(element.textContent ?? '{}') as Record<string, string>;
+  });
+
+  return parsedDomains;
 }
 
-const formatMessage = (message: string, args: unknown[]): string => {
-  return message.replace(/\{(\d+)\}/g, (match, index) => {
-    const argIndex = Number.parseInt(index, 10);
-    return argIndex >= 0 && argIndex < args.length ? String(args[argIndex]) : match;
-  });
-};
-
-const fallbackLocalize = (domain: string, message: MessageInput, ...args: unknown[]): string => {
-  const [key, defaultText] = typeof message === 'string' ? [message, message] : message;
-  const localized = window.__I18N_LOCALE_DOMAINS?.[domain]?.[key] ?? defaultText;
-  return formatMessage(localized, args);
-};
-
 export function translate(domain: string, message: MessageInput, ...args: unknown[]): string {
-  if (typeof window !== 'undefined' && typeof window.i18nTrans === 'function') {
-    const [key] = typeof message === 'string' ? [message] : message;
-    return window.i18nTrans(domain, key, ...args);
-  }
+  const domains = initializeLocales();
+  const [key, defaultText] = typeof message === 'string' ? [message, message] : message;
 
-  return fallbackLocalize(domain, message, ...args);
+  const targetDomain = domain === '' ? defaultLocaleDomain : domain;
+  const localized = domains[targetDomain]?.[key] ?? defaultText;
+
+  return formatMessage(localized, args);
 }
 
 export function createTranslator(defaultDomain: string) {
@@ -38,16 +39,10 @@ export function createTranslator(defaultDomain: string) {
 }
 
 export const localeDomainsStore = readable<LocaleDomains>({}, (set) => {
-  if (typeof window !== 'undefined') {
-    set(window.__I18N_LOCALE_DOMAINS ?? {});
-  }
-
+  set(initializeLocales());
   return () => undefined;
 });
 
 export function getLocaleDomains(): LocaleDomains {
-  if (typeof window !== 'undefined' && window.__I18N_LOCALE_DOMAINS) {
-    return window.__I18N_LOCALE_DOMAINS;
-  }
-  return {};
+  return initializeLocales();
 }

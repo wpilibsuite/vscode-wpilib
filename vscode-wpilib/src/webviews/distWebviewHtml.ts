@@ -16,7 +16,6 @@ type RewriteHtmlOptions = {
   html: string;
   extraCss?: vscode.Uri[];
   appAttributes?: Record<string, string>;
-  ensureLocaleloader?: boolean;
 };
 
 function insertBeforeHeadClose(html: string, insert: string): string {
@@ -27,16 +26,6 @@ function insertBeforeHeadClose(html: string, insert: string): string {
     return html.replace('</head>', `${insert}\n</head>`);
   }
   return `${insert}\n${html}`;
-}
-
-function insertBeforeBodyClose(html: string, insert: string): string {
-  if (!insert) {
-    return html;
-  }
-  if (html.includes('</body>')) {
-    return html.replace('</body>', `${insert}\n</body>`);
-  }
-  return `${html}\n${insert}\n`;
 }
 
 function patchAppAttributes(html: string, attributes: Record<string, string>): string {
@@ -85,19 +74,6 @@ function rewriteDistScriptTags(
   );
 }
 
-function ensureScriptIncluded(
-  html: string,
-  webview: vscode.Webview,
-  distRootFsPath: string,
-  scriptFileName: string
-): string {
-  if (html.includes(scriptFileName)) {
-    return html;
-  }
-  const uri = webview.asWebviewUri(vscode.Uri.file(path.join(distRootFsPath, scriptFileName)));
-  return insertBeforeBodyClose(html, `<script type="module" src="${uri.toString()}"></script>`);
-}
-
 export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
   const distRootFsPath = path.join(options.extensionRoot.fsPath, 'resources', 'dist');
   let html = options.html;
@@ -105,9 +81,6 @@ export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
   html = patchAppAttributes(html, options.appAttributes ?? {});
 
   html = rewriteDistScriptTags(html, options.webview, distRootFsPath);
-  if (options.ensureLocaleloader !== false) {
-    html = ensureScriptIncluded(html, options.webview, distRootFsPath, 'localeloader.js');
-  }
 
   const extensionRootUri = options.webview.asWebviewUri(options.extensionRoot).toString();
   html = rewriteReplaceresourceBase(html, extensionRootUri);
