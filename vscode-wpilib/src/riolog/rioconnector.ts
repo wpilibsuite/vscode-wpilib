@@ -8,23 +8,18 @@ async function properRace<T>(promises: Promise<T>[]): Promise<T> {
     return Promise.reject("Can't start a race without promises!");
   }
 
-  // There is no way to know which promise is rejected.
-  // So we map it to a new promise to return the index when it fails
-  const indexPromises = promises.map((p, index) =>
-    p.catch(() => {
-      throw index;
-    })
-  );
-
-  try {
-    return await Promise.race(indexPromises);
-  } catch (index) {
-    // The promise has rejected, remove it from the list of promises and just continue the race.
-    logger.info('reject promise');
-    const p = promises.splice(index as number, 1)[0];
-    p.catch((e) => logger.info('A promise has been rejected, but awaiting others', e));
-    return properRace(promises);
-  }
+  return new Promise<T>((resolve, reject) => {
+    let rejections = 0;
+    promises.forEach((p) => {
+      p.then(resolve).catch((e) => {
+        rejections++;
+        logger.info('A promise has been rejected, but awaiting others', e);
+        if (rejections === promises.length) {
+          reject('All promises rejected');
+        }
+      });
+    });
+  });
 }
 
 interface IDriverStationData {
@@ -33,7 +28,7 @@ interface IDriverStationData {
 
 const constantIps: string[] = [
   '172.22.11.2',
-  //, '127.0.0.1',
+  '127.0.0.1',
   // Uncomment the above line for testing on localhost.
 ];
 
