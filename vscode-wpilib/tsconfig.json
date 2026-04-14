@@ -7,7 +7,6 @@
     "sourceMap": true,
     "rootDir": "src",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
     "types": ["node", "svelte", "mocha"],
     /* Strict Type-Checking Option */
     "strict": true /* enable all strict type-checking options */,
