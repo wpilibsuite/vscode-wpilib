@@ -149,21 +149,22 @@ export default {
       tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
       outDir: path.resolve(__dirname, 'resources', 'dist', '.tsbuild'),
     }),
-    production && terser({
-      module: true,
-      toplevel: true,
-      compress: {
+    production &&
+      terser({
         module: true,
         toplevel: true,
-        passes: 2,
-      },
-      mangle: {
-        toplevel: true,
-      },
-      format: {
-        comments: false,
-      },
-    }),
+        compress: {
+          module: true,
+          toplevel: true,
+          passes: 2,
+        },
+        mangle: {
+          toplevel: true,
+        },
+        format: {
+          comments: false,
+        },
+      }),
     generateWebviewHtmlFiles(),
   ].filter(Boolean),
   watch: {

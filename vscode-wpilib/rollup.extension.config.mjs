@@ -18,9 +18,7 @@ export default {
     sourcemap: production ? 'hidden' : 'inline',
     exports: 'named',
   },
-  external: [
-    'vscode',
-  ],
+  external: ['vscode'],
   plugins: [
     resolve({
       preferBuiltins: true,
