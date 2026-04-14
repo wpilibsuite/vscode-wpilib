@@ -1,11 +1,15 @@
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const commonjs = require('@rollup/plugin-commonjs');
-const resolve = require('@rollup/plugin-node-resolve');
-const typescript = require('@rollup/plugin-typescript');
-const svelte = require('rollup-plugin-svelte');
-const terser = require('terser');
-const svelteConfig = require('./svelte.config');
+import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
+import svelte from 'rollup-plugin-svelte';
+import terser from '@rollup/plugin-terser';
+import svelteConfig from './svelte.config.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const production = process.env.NODE_ENV === 'production';
 
@@ -80,37 +84,7 @@ function generateWebviewHtmlFiles() {
   };
 }
 
-function minifyWithTerser() {
-  return {
-    name: 'minify-with-terser',
-    async renderChunk(code) {
-      const result = await terser.minify(code, {
-        module: true,
-        toplevel: true,
-        compress: {
-          module: true,
-          toplevel: true,
-          passes: 2,
-        },
-        mangle: {
-          toplevel: true,
-        },
-        format: {
-          comments: false,
-        },
-      });
-
-      if (result.code === undefined) {
-        throw new Error('Terser failed to produce output code');
-      }
-
-      return {
-        code: result.code,
-        map: result.map || null,
-      };
-    },
-  };
-}
+// No minifyWithTerser needed, use @rollup/plugin-terser directly
 
 const bundleEntries = Object.fromEntries(
   webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
@@ -130,7 +104,7 @@ function isSharedWebviewModule(moduleId) {
   );
 }
 
-module.exports = {
+export default {
   input: bundleEntries,
   output: {
     dir: path.resolve(__dirname, 'resources', 'dist'),
@@ -175,7 +149,21 @@ module.exports = {
       tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
       outDir: path.resolve(__dirname, 'resources', 'dist', '.tsbuild'),
     }),
-    production && minifyWithTerser(),
+    production && terser({
+      module: true,
+      toplevel: true,
+      compress: {
+        module: true,
+        toplevel: true,
+        passes: 2,
+      },
+      mangle: {
+        toplevel: true,
+      },
+      format: {
+        comments: false,
+      },
+    }),
     generateWebviewHtmlFiles(),
   ].filter(Boolean),
   watch: {

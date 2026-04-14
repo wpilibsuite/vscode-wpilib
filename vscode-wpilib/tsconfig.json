@@ -5,6 +5,7 @@
     "outDir": "out",
     "lib": ["es2019", "dom"],
     "sourceMap": true,
+    "esModuleInterop": true,
     "rootDir": "src",
     "moduleResolution": "node",
     "types": ["node", "svelte", "mocha"],

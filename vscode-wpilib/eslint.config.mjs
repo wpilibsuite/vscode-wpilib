@@ -8,7 +8,7 @@ export default defineConfig([
     'out/',
     'resources/',
     '.eslintrc.js',
-    'webpack.config.js',
+    'rollup.*.config.mjs',
     'gulpfile.js',
     'dist',
   ]),

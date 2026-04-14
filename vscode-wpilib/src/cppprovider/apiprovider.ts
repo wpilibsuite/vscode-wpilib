@@ -2,7 +2,7 @@
 
 import { readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
-import mm = require('micromatch');
+import mm from 'micromatch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {
