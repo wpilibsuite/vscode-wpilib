@@ -4,26 +4,26 @@
   type HardwareOption = 'none' | 'romi' | 'xrp';
 
   interface Props {
-    projectFolder?: string;
-    projectFolderError?: string | null;
-    projectName?: string;
-    projectNameError?: string | null;
-    teamNumber?: string;
-    teamNumberError?: string | null;
-    newFolder?: boolean;
-    desktop?: boolean;
-    hardware?: HardwareOption;
-    showProjectFolderError?: boolean;
-    showProjectNameError?: boolean;
-    showTeamNumberError?: boolean;
-    onSelectFolder?: () => void;
-    onProjectNameChange?: (value: string) => void;
-    onTeamNumberChange?: (value: string) => void;
-    onNewFolderChange?: (value: boolean) => void;
-    onDesktopChange?: (value: boolean) => void;
-    onHardwareChange?: (value: HardwareOption) => void;
-    onBack?: () => void;
-    onNext?: () => void;
+    projectFolder: string;
+    projectFolderError: string | null;
+    projectName: string;
+    projectNameError: string | null;
+    teamNumber: string;
+    teamNumberError: string | null;
+    newFolder: boolean;
+    desktop: boolean;
+    hardware: HardwareOption;
+    showProjectFolderError: boolean;
+    showProjectNameError: boolean;
+    showTeamNumberError: boolean;
+    onSelectFolder: () => void;
+    onProjectNameChange: (value: string) => void;
+    onTeamNumberChange: (value: string) => void;
+    onNewFolderChange: (value: boolean) => void;
+    onDesktopChange: (value: boolean) => void;
+    onHardwareChange: (value: HardwareOption) => void;
+    onBack: () => void;
+    onNext: () => void;
   }
 
   let {
@@ -46,7 +46,7 @@
     onDesktopChange = () => {},
     onHardwareChange = () => {},
     onBack = () => {},
-    onNext = () => {}
+    onNext = () => {},
   }: Props = $props();
 
   let canProceed = $derived(!projectFolderError && !projectNameError);

@@ -9,7 +9,7 @@
   const vscode = acquireVsCodeApi();
 
   interface Props {
-    mode?: string;
+    mode: string;
   }
 
   let { mode = 'ready' }: Props = $props();

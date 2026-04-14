@@ -7,8 +7,8 @@
 
 <script lang="ts">
   interface Props {
-    title?: string | undefined;
-    items?: SummaryItem[];
+    title: string | undefined;
+    items: SummaryItem[];
     children?: import('svelte').Snippet;
   }
 
@@ -29,4 +29,3 @@
     {/each}
   {/if}
 </div>
-

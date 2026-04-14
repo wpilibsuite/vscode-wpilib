@@ -2,8 +2,8 @@
   import type { AvailableDependency } from './types';
 
   interface Props {
-    dependencies?: AvailableDependency[];
-    onInstall?: (index: number) => void;
+    dependencies: AvailableDependency[];
+    onInstall: (index: number) => void;
   }
 
   let { dependencies = [], onInstall = () => {} }: Props = $props();

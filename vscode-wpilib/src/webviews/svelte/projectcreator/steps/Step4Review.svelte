@@ -4,13 +4,13 @@
   import { ProjectType } from '../types';
 
   interface Props {
-    projectType?: ProjectType;
-    language?: string;
-    base?: string;
-    location?: string;
-    teamNumber?: string;
-    onBack?: () => void;
-    onCreate?: () => void;
+    projectType: ProjectType;
+    language: string;
+    base: string;
+    location: string;
+    teamNumber: string;
+    onBack: () => void;
+    onCreate: () => void;
   }
 
   let {
@@ -20,7 +20,7 @@
     location = '',
     teamNumber = '',
     onBack = () => {},
-    onCreate = () => {}
+    onCreate = () => {},
   }: Props = $props();
   const t = createTranslator('projectcreator');
 

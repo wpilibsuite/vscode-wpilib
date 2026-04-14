@@ -2,11 +2,11 @@
   import { SummaryBox } from '../../components/shared';
 
   interface Props {
-    sourcePath?: string;
-    destinationPath?: string;
-    teamNumber?: string;
-    onBack?: () => void;
-    onImport?: () => void;
+    sourcePath: string;
+    destinationPath: string;
+    teamNumber: string;
+    onBack: () => void;
+    onImport: () => void;
   }
 
   let {
@@ -14,7 +14,7 @@
     destinationPath = '',
     teamNumber = '',
     onBack = () => {},
-    onImport = () => {}
+    onImport = () => {},
   }: Props = $props();
 
   const back = () => onBack();

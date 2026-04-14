@@ -1,8 +1,8 @@
 <script lang="ts">
   interface Props {
-    sourcePath?: string;
-    onSelectSource?: () => void;
-    onNext?: () => void;
+    sourcePath: string;
+    onSelectSource: () => void;
+    onNext: () => void;
   }
 
   let { sourcePath = '', onSelectSource = () => {}, onNext = () => {} }: Props = $props();

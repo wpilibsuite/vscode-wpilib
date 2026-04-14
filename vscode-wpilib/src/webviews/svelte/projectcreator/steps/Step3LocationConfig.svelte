@@ -3,24 +3,24 @@
   import { createTranslator } from '../../lib';
 
   interface Props {
-    projectFolder?: string;
-    projectFolderError?: string | null;
-    projectName?: string;
-    projectNameError?: string | null;
-    teamNumber?: string;
-    teamNumberError?: string | null;
-    newFolder?: boolean;
-    desktop?: boolean;
-    showProjectFolderError?: boolean;
-    showProjectNameError?: boolean;
-    showTeamNumberError?: boolean;
-    onSelectFolder?: () => void;
-    onProjectNameChange?: (value: string) => void;
-    onTeamNumberChange?: (value: string) => void;
-    onNewFolderChange?: (value: boolean) => void;
-    onDesktopChange?: (value: boolean) => void;
-    onBack?: () => void;
-    onNext?: () => void;
+    projectFolder: string;
+    projectFolderError: string | null;
+    projectName: string;
+    projectNameError: string | null;
+    teamNumber: string;
+    teamNumberError: string | null;
+    newFolder: boolean;
+    desktop: boolean;
+    showProjectFolderError: boolean;
+    showProjectNameError: boolean;
+    showTeamNumberError: boolean;
+    onSelectFolder: () => void;
+    onProjectNameChange: (value: string) => void;
+    onTeamNumberChange: (value: string) => void;
+    onNewFolderChange: (value: boolean) => void;
+    onDesktopChange: (value: boolean) => void;
+    onBack: () => void;
+    onNext: () => void;
   }
 
   let {
@@ -41,7 +41,7 @@
     onNewFolderChange = () => {},
     onDesktopChange = () => {},
     onBack = () => {},
-    onNext = () => {}
+    onNext = () => {},
   }: Props = $props();
   const t = createTranslator('projectcreator');
 

@@ -1,9 +1,9 @@
 <script lang="ts">
   interface Props {
-    message?: string | undefined;
-    visible?: boolean;
-    id?: string | undefined;
-    className?: string;
+    message: string | undefined;
+    visible: boolean;
+    id: string | undefined;
+    className: string;
     children?: import('svelte').Snippet;
   }
 
@@ -12,7 +12,7 @@
     visible = false,
     id = undefined,
     className = 'project-error-text',
-    children
+    children,
   }: Props = $props();
 </script>
 
@@ -29,4 +29,3 @@
     {/if}
   {/if}
 </div>
-

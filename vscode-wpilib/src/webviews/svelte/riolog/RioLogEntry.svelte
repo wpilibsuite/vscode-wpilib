@@ -6,7 +6,7 @@
   interface Props {
     entry: RioLogEntry;
     showTimestamps: boolean;
-    onToggleExpanded?: (id: number) => void;
+    onToggleExpanded: (id: number) => void;
   }
 
   let { entry, showTimestamps, onToggleExpanded = () => {} }: Props = $props();
@@ -15,9 +15,9 @@
     return new Date(tsSeconds * 1000).toISOString().slice(11, -1) + ': ';
   };
 
-  const isErrorOrWarning = entry.message.messageType !== MessageType.Print;
-  const isWarning = entry.message.messageType === MessageType.Warning;
-  const isExpanded = entry.expanded === true;
+  const isErrorOrWarning = $derived(entry.message.messageType !== MessageType.Print);
+  const isWarning = $derived(entry.message.messageType === MessageType.Warning);
+  const isExpanded = $derived(entry.expanded === true);
 
   const rowClass = $derived(
     entry.kind === 'error'

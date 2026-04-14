@@ -1,9 +1,9 @@
 <script lang="ts">
   interface Props {
-    active?: boolean;
-    step?: number | string | undefined;
-    element?: 'section' | 'div';
-    ariaLabelledBy?: string | undefined;
+    active: boolean;
+    step: number | string | undefined;
+    element: 'section' | 'div';
+    ariaLabelledBy: string | undefined;
     children?: import('svelte').Snippet;
   }
 
@@ -12,7 +12,7 @@
     step = undefined,
     element = 'div',
     ariaLabelledBy = undefined,
-    children
+    children,
   }: Props = $props();
 
   let classes = $derived(['wizard-step', active ? 'active' : ''].filter(Boolean).join(' '));
@@ -36,4 +36,3 @@
     {@render children?.()}
   </div>
 {/if}
-

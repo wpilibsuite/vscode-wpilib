@@ -3,9 +3,9 @@
   import { ProjectType } from '../types';
 
   interface Props {
-    selected?: ProjectType | null;
-    onSelect?: (type: ProjectType) => void;
-    onNext?: () => void;
+    selected: ProjectType | null;
+    onSelect: (type: ProjectType) => void;
+    onNext: () => void;
   }
 
   let { selected = null, onSelect = () => {}, onNext = () => {} }: Props = $props();

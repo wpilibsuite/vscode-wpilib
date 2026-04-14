@@ -32,7 +32,6 @@
   const maxLogEntries = 2000;
 
   let logContainer: HTMLDivElement | null = null;
-  let toolbarEl: HTMLElement | null = null;
 
   const effectiveFilter = $derived(filterText.trim().toLowerCase());
 
@@ -177,11 +176,6 @@
     }
   };
 
-  const updateLayout = async () => {
-    if (!toolbarEl || !logContainer) return;
-    logContainer.style.maxHeight = `calc(100vh - ${toolbarEl.offsetHeight}px)`;
-  };
-
   const addConnectionMessage = (isConnected: boolean) => {
     const message: IPrintMessage = {
       line: isConnected
@@ -225,29 +219,20 @@
       }
     });
 
-    const resizeListener = () => void updateLayout();
-    window.addEventListener('resize', resizeListener);
-
-    const ro = new ResizeObserver(() => void updateLayout());
-    if (toolbarEl) ro.observe(toolbarEl);
-
-    void updateLayout();
-
     return () => {
       unsubscribe();
-      window.removeEventListener('resize', resizeListener);
-      ro.disconnect();
     };
   });
 
   let lastVisibleCount = $state(0);
-  $effect(async () => {
+  $effect(() => {
     const count = visibleEntries.length;
     if (count !== lastVisibleCount) {
       lastVisibleCount = count;
       if (autoScroll) {
-        await tick();
-        logContainer?.scrollTo({ top: logContainer.scrollHeight });
+        void tick().then(() => {
+          logContainer?.scrollTo({ top: logContainer.scrollHeight });
+        });
       }
     }
   });
@@ -260,31 +245,29 @@
     {/each}
   </div>
 
-  <div bind:this={toolbarEl}>
-    <RioLogToolbar
-      {connected}
-      {paused}
-      {pausedCount}
-      {discard}
-      {autoScroll}
-      {showPrints}
-      {showWarnings}
-      {showTimestamps}
-      {autoReconnect}
-      {teamNumber}
-      {filterText}
-      onPause={togglePause}
-      onDiscard={toggleDiscard}
-      onClear={clearLog}
-      onToggleAutoScroll={toggleAutoScroll}
-      onTogglePrints={togglePrints}
-      onToggleWarnings={toggleWarnings}
-      onToggleTimestamps={toggleTimestamps}
-      onToggleReconnect={toggleReconnect}
-      onSave={saveLog}
-      onApplyTeamNumber={applyTeamNumber}
-      onTeamNumberInput={(value) => (teamNumber = value)}
-      onFilterInput={(value) => (filterText = value)}
-    />
-  </div>
+  <RioLogToolbar
+    {connected}
+    {paused}
+    {pausedCount}
+    {discard}
+    {autoScroll}
+    {showPrints}
+    {showWarnings}
+    {showTimestamps}
+    {autoReconnect}
+    {teamNumber}
+    {filterText}
+    onPause={togglePause}
+    onDiscard={toggleDiscard}
+    onClear={clearLog}
+    onToggleAutoScroll={toggleAutoScroll}
+    onTogglePrints={togglePrints}
+    onToggleWarnings={toggleWarnings}
+    onToggleTimestamps={toggleTimestamps}
+    onToggleReconnect={toggleReconnect}
+    onSave={saveLog}
+    onApplyTeamNumber={applyTeamNumber}
+    onTeamNumberInput={(value) => (teamNumber = value)}
+    onFilterInput={(value) => (filterText = value)}
+  />
 </div>

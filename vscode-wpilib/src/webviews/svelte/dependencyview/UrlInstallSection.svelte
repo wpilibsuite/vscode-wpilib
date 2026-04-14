@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Props {
-    url?: string;
-    onInstall?: (url: string) => void;
+    url: string;
+    onInstall: (url: string) => void;
   }
 
   let { url = $bindable(''), onInstall = () => {} }: Props = $props();

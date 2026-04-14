@@ -3,14 +3,14 @@
   import type { BaseOption } from '../types';
 
   interface Props {
-    languages?: string[];
-    selectedLanguage?: string;
-    bases?: BaseOption[];
-    selectedBase?: string;
-    onLanguageChange?: (language: string) => void;
-    onBaseChange?: (base: string) => void;
-    onNext?: () => void;
-    onBack?: () => void;
+    languages: string[];
+    selectedLanguage: string;
+    bases: BaseOption[];
+    selectedBase: string;
+    onLanguageChange: (language: string) => void;
+    onBaseChange: (base: string) => void;
+    onNext: () => void;
+    onBack: () => void;
   }
 
   let {
@@ -21,7 +21,7 @@
     onLanguageChange = () => {},
     onBaseChange = () => {},
     onNext = () => {},
-    onBack = () => {}
+    onBack = () => {},
   }: Props = $props();
   const t = createTranslator('projectcreator');
 
@@ -46,8 +46,6 @@
       baseValue = selectedBase;
     }
   });
-
-
   const notifyLanguageChange = () => {
     onLanguageChange(languageValue);
   };

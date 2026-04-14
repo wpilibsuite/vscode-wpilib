@@ -2,9 +2,9 @@
   import type { InstalledDependency } from './types';
 
   interface Props {
-    dependencies?: InstalledDependency[];
-    onUpdate?: (index: number, version: string) => void;
-    onUninstall?: (index: number) => void;
+    dependencies: InstalledDependency[];
+    onUpdate: (index: number, version: string) => void;
+    onUninstall: (index: number) => void;
   }
 
   let { dependencies = [], onUpdate = () => {}, onUninstall = () => {} }: Props = $props();

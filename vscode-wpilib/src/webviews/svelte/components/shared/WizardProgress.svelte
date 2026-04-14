@@ -7,8 +7,8 @@
 
 <script lang="ts">
   interface Props {
-    steps?: WizardProgressStep[];
-    currentStep?: number;
+    steps: WizardProgressStep[];
+    currentStep: number;
   }
 
   let { steps = [], currentStep = 1 }: Props = $props();
@@ -25,4 +25,3 @@
     </div>
   {/each}
 </div>
-
