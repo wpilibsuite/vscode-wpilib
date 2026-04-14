@@ -6,8 +6,5 @@
     "outDir": "./out/.tsbuild",
     "esModuleInterop": true
   },
-  "exclude": [
-    "resources",
-    "src/webviews/svelte/**/*.svelte"
-  ]
+  "exclude": ["resources", "src/webviews/svelte/**/*.svelte"]
 }
