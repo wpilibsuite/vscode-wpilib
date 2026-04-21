@@ -13,6 +13,7 @@ export default defineConfig([
     'dist',
     'node_modules/',
     '.vscode-test/',
+    '.vscode-test.mjs',
   ]),
   {
     files: ['**/*.ts'],
