@@ -96,7 +96,7 @@ export class Preferences implements IPreferences {
     // This is intentionally sync to avoid updating vscode-wpilibapi
     // This can happen if the file watcher missed an update.
     try {
-      const configFilePath = Preferences.getPrefrencesFilePath(this.workspace.uri.fsPath);
+      const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
       if (fs.existsSync(configFilePath)) {
         vscode.commands.executeCommand('setContext', 'isWPILibProject', true);
         this.isWPILibProject = true;
