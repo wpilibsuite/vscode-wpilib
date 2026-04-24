@@ -27,7 +27,9 @@
   const back = () => onBack();
   const createProject = () => onCreate();
 
-  const projectTypeLabel = projectType === ProjectType.Template ? t('Template') : t('Example');
+  const projectTypeLabel = $derived(
+    projectType === ProjectType.Template ? t('Template') : t('Example')
+  );
 </script>
 
 <div class="step-header">

@@ -25,33 +25,14 @@
   }: Props = $props();
   const t = createTranslator('projectcreator');
 
-  let languageValue = $state(selectedLanguage);
-  let baseValue = $state(selectedBase);
+  const canProceed = $derived(selectedLanguage !== '' && selectedBase !== '');
 
-  let previousSelectedLanguage = selectedLanguage;
-  let previousSelectedBase = selectedBase;
-
-  const canProceed = $derived(languageValue !== '' && baseValue !== '');
-
-  $effect(() => {
-    if (selectedLanguage !== previousSelectedLanguage) {
-      previousSelectedLanguage = selectedLanguage;
-      languageValue = selectedLanguage;
-    }
-  });
-
-  $effect(() => {
-    if (selectedBase !== previousSelectedBase) {
-      previousSelectedBase = selectedBase;
-      baseValue = selectedBase;
-    }
-  });
-  const notifyLanguageChange = () => {
-    onLanguageChange(languageValue);
+  const notifyLanguageChange = (event: Event) => {
+    onLanguageChange((event.currentTarget as HTMLSelectElement).value);
   };
 
-  const notifyBaseChange = () => {
-    onBaseChange(baseValue);
+  const notifyBaseChange = (event: Event) => {
+    onBaseChange((event.currentTarget as HTMLSelectElement).value);
   };
 
   const next = () => onNext();
@@ -70,7 +51,7 @@
     <select
       id="language-select"
       class="project-select"
-      bind:value={languageValue}
+      value={selectedLanguage}
       onchange={notifyLanguageChange}
       disabled={languages.length === 0}
     >
@@ -89,7 +70,7 @@
     <select
       id="base-select"
       class="project-select"
-      bind:value={baseValue}
+      value={selectedBase}
       onchange={notifyBaseChange}
       disabled={bases.length === 0}
     >

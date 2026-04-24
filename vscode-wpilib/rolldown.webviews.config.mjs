@@ -1,11 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import commonjs from '@rollup/plugin-commonjs';
-import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
 import svelte from 'rollup-plugin-svelte';
-import terser from '@rollup/plugin-terser';
 import svelteConfig from './svelte.config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -84,8 +80,6 @@ function generateWebviewHtmlFiles() {
   };
 }
 
-// No minifyWithTerser needed, use @rollup/plugin-terser directly
-
 const bundleEntries = Object.fromEntries(
   webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
 );
@@ -106,11 +100,25 @@ function isSharedWebviewModule(moduleId) {
 
 export default {
   input: bundleEntries,
+  platform: 'browser',
+  tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
+  resolve: {
+    conditionNames: production ? ['production'] : ['development'],
+    extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
+  },
   output: {
     dir: path.resolve(__dirname, 'resources', 'dist'),
     entryFileNames: '[name].js',
     format: 'es',
     sourcemap: !production,
+    minify: production
+      ? {
+          compress: {
+            passes: 2,
+          },
+          mangle: true,
+        }
+      : false,
     manualChunks(id) {
       if (isSharedWebviewModule(id)) {
         return 'webview-shared';
@@ -136,34 +144,6 @@ export default {
       emitCss: false,
       preprocess: svelteConfig.preprocess,
     }),
-    resolve({
-      browser: true,
-      exportConditions: production ? ['production'] : ['development'],
-      dedupe: ['svelte'],
-      extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
-    }),
-    commonjs(),
-    typescript({
-      sourceMap: !production,
-      tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
-      outDir: path.resolve(__dirname, 'resources', 'dist', '.tsbuild'),
-    }),
-    production &&
-      terser({
-        module: true,
-        toplevel: true,
-        compress: {
-          module: true,
-          toplevel: true,
-          passes: 2,
-        },
-        mangle: {
-          toplevel: true,
-        },
-        format: {
-          comments: false,
-        },
-      }),
     generateWebviewHtmlFiles(),
   ].filter(Boolean),
   watch: {

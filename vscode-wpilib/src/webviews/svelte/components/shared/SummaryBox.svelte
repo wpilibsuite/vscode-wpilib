@@ -7,7 +7,7 @@
 
 <script lang="ts">
   interface Props {
-    title: string | undefined;
+    title?: string;
     items: SummaryItem[];
     children?: import('svelte').Snippet;
   }
