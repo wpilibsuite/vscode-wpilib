@@ -54,7 +54,9 @@
     const lines = baseText
       .split('\n')
       .filter((line) => line.trim() !== '')
-      .map((line) => (line.includes('\u001b[') ? parseAnsiString(line) : [{ text: line, state: {} }]));
+      .map((line) =>
+        line.includes('\u001b[') ? parseAnsiString(line) : [{ text: line, state: {} }]
+      );
     const searchText =
       message.messageType === MessageType.Print
         ? (message as IPrintMessage).line.toLowerCase()
@@ -92,15 +94,14 @@
     if (entries.length > 0) return;
     const welcomeMessage: IPrintMessage = {
       messageType: MessageType.Print,
-      line:
-        '\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m\n' +
-        '\u001b[32mWaiting for robot connection...\u001b[0m\n' +
-        '\u001b[33mTIPS:\u001b[0m\n' +
-        '• \u001b[0mUse \u001b[1mSet\u001b[0m button to change team number\n' +
-        '• \u001b[0mClick on errors/warnings to expand details\n' +
-        '• \u001b[0mUse search box to filter messages\n' +
-        '• \u001b[0mToggle auto-scrolling for viewing older logs\n' +
-        '• \u001b[0mSave logs to file for later analysis',
+      line: `\u001b[1m\u001b[36m=== WPILib RioLog Started ===\u001b[0m
+\u001b[32mWaiting for robot connection...\u001b[0m
+\u001b[33mTIPS:\u001b[0m
+• \u001b[0mUse \u001b[1mSet\u001b[0m button to change team number
+• \u001b[0mClick on errors/warnings to expand details
+• \u001b[0mUse search box to filter messages
+• \u001b[0mToggle auto-scrolling for viewing older logs
+• \u001b[0mSave logs to file for later analysis`,
       timestamp: Date.now() / 1000,
       seqNumber: 0,
     };
@@ -241,7 +242,7 @@
 <div id="mainDiv">
   <div id="log-container" bind:this={logContainer}>
     {#each visibleEntries as entry (entry.id)}
-      <RioLogEntryView entry={entry} showTimestamps={showTimestamps} onToggleExpanded={toggleExpanded} />
+      <RioLogEntryView {entry} {showTimestamps} onToggleExpanded={toggleExpanded} />
     {/each}
   </div>
 

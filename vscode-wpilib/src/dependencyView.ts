@@ -718,6 +718,24 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _getHtmlForWebview(webview: vscode.Webview, viewMode: string): string {
+    if (viewMode === 'no-workspace') {
+      return this._getUnavailableHtml(
+        webview,
+        'No workspace is open.',
+        'Vendor dependency management is only available inside a workspace folder.',
+        'Open a folder containing a WPILib project.'
+      );
+    }
+
+    if (viewMode === 'not-wpilib') {
+      return this._getUnavailableHtml(
+        webview,
+        'This is not a WPILib project.',
+        'Vendor dependency management is only available for WPILib projects.',
+        'To use vendor dependencies, open a WPILib project or create a new one from the WPILib extension.'
+      );
+    }
+
     return loadDistWebviewHtml({
       webview,
       extensionRoot: this._extensionUri,
@@ -727,9 +745,45 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'),
         vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'),
       ],
-      appAttributes: {
-        'data-view-mode': viewMode,
-      },
     });
+  }
+
+  private _getUnavailableHtml(
+    webview: vscode.Webview,
+    title: string,
+    description: string,
+    action: string
+  ): string {
+    const iconsCss = webview
+      .asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'))
+      .toString();
+    const vscodeElementsCss = webview
+      .asWebviewUri(
+        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'vscode-elements.css')
+      )
+      .toString();
+    const mainCss = webview
+      .asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'))
+      .toString();
+
+    return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="${iconsCss}">
+  <link rel="stylesheet" href="${vscodeElementsCss}">
+  <link rel="stylesheet" href="${mainCss}">
+</head>
+<body>
+  <div class="error-content" style="max-width: 500px; margin: 48px auto; text-align: center;">
+    <span class="codicon codicon-warning" style="font-size: 32px; display: block; margin-bottom: 16px;"></span>
+    <b>${title}</b><br>
+    ${description}<br>
+    <br>
+    ${action}
+  </div>
+</body>
+</html>`;
   }
 }

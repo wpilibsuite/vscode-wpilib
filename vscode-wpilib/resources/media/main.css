@@ -318,22 +318,13 @@
 }
 
 .selection-card p {
-  /* color: var(--vscode-descriptionForeground); */
   font-size: 13px;
   margin-bottom: 16px;
 }
 
-/* .card-icon {
-  color: var(--vscode-descriptionForeground);
-} */
-
 .card-icon i.codicon {
   font-size: 48px;
 }
-
-/* .selection-card.selected .card-icon {
-  color: var(--vscode-button-background);
-} */
 
 .select-wrapper {
   position: relative;

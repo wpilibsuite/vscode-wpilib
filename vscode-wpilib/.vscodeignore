@@ -9,6 +9,7 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 eslint.config.mjs
+rollup.*.config.mjs
 **/*.map
 **/*.ts
 **/.vscode-test.*

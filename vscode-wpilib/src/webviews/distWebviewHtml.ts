@@ -7,7 +7,6 @@ type DistHtmlOptions = {
   extensionRoot: vscode.Uri;
   distHtmlFileName: string;
   extraCss?: vscode.Uri[];
-  appAttributes?: Record<string, string>;
 };
 
 type RewriteHtmlOptions = {
@@ -15,7 +14,6 @@ type RewriteHtmlOptions = {
   extensionRoot: vscode.Uri;
   html: string;
   extraCss?: vscode.Uri[];
-  appAttributes?: Record<string, string>;
 };
 
 function insertBeforeHeadClose(html: string, insert: string): string {
@@ -26,34 +24,6 @@ function insertBeforeHeadClose(html: string, insert: string): string {
     return html.replace('</head>', `${insert}\n</head>`);
   }
   return `${insert}\n${html}`;
-}
-
-function patchAppAttributes(html: string, attributes: Record<string, string>): string {
-  if (!attributes || Object.keys(attributes).length === 0) {
-    return html;
-  }
-
-  // Prefer the known rollup template shape.
-  const appDivPattern = /<div\s+id="app"([^>]*)>/i;
-  const match = html.match(appDivPattern);
-  if (!match) {
-    return html;
-  }
-
-  const existingAttrs = match[1] ?? '';
-  const toInject = Object.entries(attributes)
-    .map(([key, value]) => ` ${key}="${escapeHtmlAttribute(value)}"`)
-    .join('');
-
-  return html.replace(appDivPattern, `<div id="app"${existingAttrs}${toInject}>`);
-}
-
-function escapeHtmlAttribute(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
 }
 
 function rewriteReplaceresourceBase(html: string, extensionRootUri: string): string {
@@ -77,8 +47,6 @@ function rewriteDistScriptTags(
 export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
   const distRootFsPath = path.join(options.extensionRoot.fsPath, 'resources', 'dist');
   let html = options.html;
-
-  html = patchAppAttributes(html, options.appAttributes ?? {});
 
   html = rewriteDistScriptTags(html, options.webview, distRootFsPath);
 
@@ -106,6 +74,5 @@ export function loadDistWebviewHtml(options: DistHtmlOptions): string {
     extensionRoot: options.extensionRoot,
     html,
     extraCss: options.extraCss,
-    appAttributes: options.appAttributes,
   });
 }

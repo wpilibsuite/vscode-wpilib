@@ -109,7 +109,6 @@ export default {
   output: {
     dir: path.resolve(__dirname, 'resources', 'dist'),
     entryFileNames: '[name].js',
-    chunkFileNames: 'chunks/[name]-[hash].js',
     format: 'es',
     sourcemap: !production,
     manualChunks(id) {

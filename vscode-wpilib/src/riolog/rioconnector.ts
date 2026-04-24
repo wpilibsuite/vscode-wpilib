@@ -3,33 +3,14 @@
 import * as net from 'net';
 import { logger } from '../logger';
 
-async function properRace<T>(promises: Promise<T>[]): Promise<T> {
-  if (promises.length < 1) {
-    return Promise.reject("Can't start a race without promises!");
-  }
-
-  return new Promise<T>((resolve, reject) => {
-    let rejections = 0;
-    promises.forEach((p) => {
-      p.then(resolve).catch((e) => {
-        rejections++;
-        logger.info('A promise has been rejected, but awaiting others', e);
-        if (rejections === promises.length) {
-          reject('All promises rejected');
-        }
-      });
-    });
-  });
-}
-
 interface IDriverStationData {
   robotIP: number;
 }
 
 const constantIps: string[] = [
   '172.22.11.2',
-  '127.0.0.1',
   // Uncomment the above line for testing on localhost.
+  // '127.0.0.1',
 ];
 
 const teamIps: string[] = [
@@ -235,7 +216,7 @@ export async function connectToRobot(
   }
   const timer = timerPromise(timeout);
   connectors.push(timer.promise);
-  const firstDone: net.Socket | undefined = await properRace(connectors);
+  const firstDone: net.Socket | undefined = await Promise.any(connectors);
   if (firstDone === undefined) {
     // Kill all
     for (const p of pairs) {
