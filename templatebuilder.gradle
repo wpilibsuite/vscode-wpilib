@@ -109,17 +109,16 @@ ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
 
 task generateTemplatesFolder {
     def outputDir = new File(project.buildDir, "templates")
+    def buildDir = project.buildDir
 
     outputs.dir outputDir
 
     outputs.upToDateWhen {false}
 
     doLast {
-        project.buildDir.mkdirs()
+        buildDir.mkdirs()
 
-        project.delete {
-            delete outputDir
-        }
+        outputDir.deleteDir()
 
         // Load all java templates
         def templateFile = new File(templateJavaFolder, 'templates.json').text
@@ -139,17 +138,15 @@ task generateTemplatesZip(type: Zip) {
 
 task generateExamplesFolder {
     def outputDir = new File(project.buildDir, "examples")
+    def buildDir = project.buildDir
 
     outputs.dir outputDir
 
     outputs.upToDateWhen {false}
 
     doLast {
-        project.buildDir.mkdirs()
-
-        project.delete {
-            delete outputDir
-        }
+        buildDir.mkdirs()
+        outputDir.deleteDir()
 
         // Load all java templates
         def templateFile = new File(examplesJavaFolder, 'examples.json').text
