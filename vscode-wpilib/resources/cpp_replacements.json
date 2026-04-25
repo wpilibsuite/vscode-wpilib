@@ -808,7 +808,23 @@
       { "from": "frc2::", "to": "wpi::cmd::" },
       { "from": "frc::", "to": "wpi::" },
       { "from": "hal::", "to": "wpi::hal::" },
-      { "from": "FRC_ReportError", "to": "WPILIB_ReportError" }
+      { "from": "FRC_ReportError", "to": "WPILIB_ReportError" },
+      { "from": "GradientType::kContinuous", "to": "GradientType::CONTINUOUS" },
+      { "from": "GradientType::kDiscrete", "to": "GradientType::DISCRETE" },
+      { "from": "CTREPCM", "to": "CTRE_PCM" },
+      { "from": "REVPH", "to": "REV_PH" },
+      { "from": "DoubleSolenoid::kOff", "to": "DoubleSolenoid::OFF" },
+      { "from": "DoubleSolenoid::kForward", "to": "DoubleSolenoid::FORWARD" },
+      { "from": "DoubleSolenoid::kReverse", "to": "DoubleSolenoid::REVERSE" },
+      { "from": "ColorOrder::kRGB", "to": "ColorOrder::RGB" },
+      { "from": "ColorOrder::kBGR", "to": "ColorOrder::BGR" },
+      { "from": "ColorOrder::kGRB", "to": "ColorOrder::GRB" },
+      { "from": "ColorOrder::kBRG", "to": "ColorOrder::BRG" },
+      { "from": "ColorOrder::kRBG", "to": "ColorOrder::RBG" },
+      { "from": "ColorOrder::kGBR", "to": "ColorOrder::GBR" },
+      { "from": "OnboardIMU::kFlat", "to": "OnboardIMU::FLAT" },
+      { "from": "OnboardIMU::kLandscape", "to": "OnboardIMU::LANDSCAPE" },
+      { "from": "OnboardIMU::kPortrait", "to": "OnboardIMU::PORTRAIT" }
     ]
   }
 ]
