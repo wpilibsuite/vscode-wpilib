@@ -220,18 +220,27 @@ export class Gradle2025Import extends WebViewBase {
     const gradleFile = path.join(oldProjectPath, 'build.gradle');
 
     let javaRobotPackage: string = '';
+    let mainClassPackage: string = '';
     if (!cpp) {
       try {
         const gradleContents = await readFile(gradleFile, 'utf8');
         const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
         const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
         if (regexRes !== null && regexRes.length === 2) {
-          javaRobotPackage = regexRes[1];
+          mainClassPackage = regexRes[1].replace(/\./g, path.sep) + '.java';
+        }
+        const mainClassPath = path.join(oldProjectPath, 'src', 'main', 'java', mainClassPackage);
+        const mainClassContents = await readFile(mainClassPath, 'utf8');
+        const packageRegex = 'package\\s+([a-zA-Z0-9_.]+);';
+        const packageRes = new RegExp(packageRegex, 'g').exec(mainClassContents);
+        if (packageRes !== null && packageRes.length === 2) {
+          javaRobotPackage = packageRes[1] + '.Robot';
         }
       } catch {
         // File doesn't exist
       }
     }
+
     if (javaRobotPackage === '') {
       const res = await vscode.window.showInformationMessage(
         i18n('message', 'Failed to determine robot class. Enter it manually?'),

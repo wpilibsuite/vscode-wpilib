@@ -1,6 +1,6 @@
 'use strict';
 
-import { cp } from 'fs/promises';
+import { cp, rm } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
@@ -115,6 +115,12 @@ export async function generateCopyJava(
     await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
       await cp(fromTemplateTestFolder, testPath, { recursive: true });
+    }
+
+    // delete imported main, replaced by template main
+    const mainSrcFile = path.join(toFolder, 'src', 'main', 'java', 'frc', 'robot', 'Main.java');
+    if (directGradleImport) {
+      await rm(mainSrcFile);
     }
 
     // Find files that need template processing
