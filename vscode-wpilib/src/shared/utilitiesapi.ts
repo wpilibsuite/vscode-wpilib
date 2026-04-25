@@ -8,14 +8,14 @@ import { getIsWindows } from '../utilities';
 export class UtilitiesAPI implements IUtilitiesAPI {
   private wpilibHome: string | undefined;
 
-  public getFrcYear(): string {
+  public getWPILibYear(): string {
     return '2027_alpha4';
   }
   public getWPILibHomeDir(): string {
     if (this.wpilibHome) {
       return this.wpilibHome;
     }
-    const year = this.getFrcYear();
+    const year = this.getWPILibYear();
     if (getIsWindows()) {
       let publicFolder = process.env.PUBLIC;
       if (!publicFolder) {
