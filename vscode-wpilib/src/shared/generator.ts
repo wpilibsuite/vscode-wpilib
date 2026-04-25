@@ -106,8 +106,9 @@ export async function generateCopyJava(
     const mainDestFile = path.join(toFolder, 'src', 'main', 'java', 'first', 'Main.java');
     await cp(mainFile, mainDestFile);
     await fileUtils.updateFileContents(mainDestFile, (content) =>
-      content.replace('package org.wpilib;', 'package first;')
-             .replace('org.wpilib.templates.timed.Robot.class', `${robotClass}.class`)
+      content
+        .replace('package org.wpilib;', 'package first;')
+        .replace('org.wpilib.templates.timed.Robot.class', `${robotClass}.class`)
     );
 
     // Copy template folders
