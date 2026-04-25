@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "org.wpilib.GradleRIO" version "###GRADLERIOREPLACE###"
+    id "com.gradleup.shadow" version "9.3.0"
 }
 
 java {
@@ -84,11 +85,11 @@ test {
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
-// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
-// in order to make them all available at runtime. Also adding the manifest so WPILib
-// knows where to look for our Robot Class.
-jar {
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat/shaded jar')
+// in order to make them all available at runtime and merging service files to make JSON work.
+// Also adding the manifest so WPILib knows where to look for our Robot Class.
+shadowJar {
+    mergeServiceFiles()
     from('src') { into 'backup/src' }
     from('vendordeps') { into 'backup/vendordeps' }
     from('build.gradle') { into 'backup' }
@@ -97,8 +98,8 @@ jar {
 }
 
 // Configure jar and deploy tasks
-deployArtifact.jarTask = jar
-wpi.java.configureExecutableTasks(jar)
+deployArtifact.jarTask = shadowJar
+wpi.java.configureExecutableTasks(shadowJar)
 wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
