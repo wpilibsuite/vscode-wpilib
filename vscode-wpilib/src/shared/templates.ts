@@ -27,11 +27,8 @@ export class Templates {
     const templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
     const resourceFile = path.join(templatesFolder, this.exampleResourceName);
     const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
-    fs.readFile(resourceFile, 'utf8', (err, data) => {
-      if (err) {
-        logger.log('Template error: ', err);
-        return;
-      }
+    try {
+      let data = fs.readFileSync(resourceFile, 'utf8');
       const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
       for (const e of templates) {
         const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
@@ -75,6 +72,7 @@ export class Templates {
                   vscode.window.showErrorMessage(
                     i18n('message', 'Cannot create into non empty folder')
                   );
+                  logger.warn('FOLDER');
                   return false;
                 }
               } else {
@@ -104,7 +102,10 @@ export class Templates {
         };
         core.addTemplateProvider(provider);
       }
-    });
+    } catch (e) {
+      logger.log('Template error: ', e);
+      return;
+    }
   }
 
   public dispose() {}
