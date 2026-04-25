@@ -2,8 +2,8 @@
 
 import { access, mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises';
 import * as path from 'path';
-import { IUtilitiesAPI } from '../api';
 import { logger } from '../logger';
+import { getWPILibHomeDir } from './utilitiesapi';
 
 export interface IJsonDependency {
   name: string;
@@ -11,8 +11,8 @@ export interface IJsonDependency {
   uuid: string;
   jsonUrl: string;
   fileName: string;
-  conflictsWith: IJsonConflicts[] | undefined;
-  requires: IJsonRequires[] | undefined;
+  conflictsWith?: IJsonConflicts[];
+  requires?: IJsonRequires[];
 }
 
 export interface IJsonRequires {
@@ -39,121 +39,111 @@ export function isJsonDependency(arg: unknown): arg is IJsonDependency {
   );
 }
 
-export class VendorLibrariesBase {
-  private utilities: IUtilitiesAPI;
+export async function findForUUIDs(uuid: string[]): Promise<IJsonDependency[]> {
+  const homeDirDeps = await getHomeDirDeps();
+  const foundDeps = homeDirDeps.filter((value) => {
+    return uuid.indexOf(value.uuid) >= 0;
+  });
+  return foundDeps;
+}
 
-  public constructor(utilities: IUtilitiesAPI) {
-    this.utilities = utilities;
-  }
-
-  public async findForUUIDs(uuid: string[]): Promise<IJsonDependency[]> {
-    const homeDirDeps = await this.getHomeDirDeps();
-    const foundDeps = homeDirDeps.filter((value) => {
-      return uuid.indexOf(value.uuid) >= 0;
-    });
-    return foundDeps;
-  }
-
-  public async installDependency(
-    dep: IJsonDependency,
-    url: string,
-    override: boolean
-  ): Promise<boolean> {
+export async function installDependency(
+  dep: IJsonDependency,
+  url: string,
+  override: boolean
+): Promise<boolean> {
+  try {
     try {
-      try {
-        await access(url);
-      } catch {
-        // File doesn't exist, directly write file
-        await mkdir(url, { recursive: true });
-        await writeFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
-        return true;
-      }
-      const files = await readdir(url);
-
-      for (const file of files) {
-        const fullPath = path.join(url, file);
-        const result = await this.readFile(fullPath);
-        if (result !== undefined) {
-          if (result.uuid === dep.uuid) {
-            if (override) {
-              await unlink(fullPath);
-              break;
-            } else {
-              return false;
-            }
-          }
-        }
-      }
-
+      await access(url);
+    } catch {
+      // File doesn't exist, directly write file
+      await mkdir(url, { recursive: true });
       await writeFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
       return true;
-    } catch (error) {
-      logger.error(`Failed to install dependency ${dep.name}:`, error);
-      return false;
     }
-  }
+    const files = await readdir(url);
 
-  public getHomeDirDeps(): Promise<IJsonDependency[]> {
-    return this.getDependencies(path.join(this.utilities.getWPILibHomeDir(), 'vendordeps'));
-  }
-
-  protected async readFile(file: string): Promise<IJsonDependency | undefined> {
-    try {
-      const jsonContents = await readFile(file, 'utf8');
-      const dep = JSON.parse(jsonContents);
-
-      if (isJsonDependency(dep)) {
-        return dep;
-      }
-
-      return undefined;
-    } catch (err) {
-      logger.warn('JSON parse error', err);
-      return undefined;
-    }
-  }
-
-  protected async getDependencies(dir: string): Promise<IJsonDependency[]> {
-    try {
-      const files = await readdir(dir);
-
-      const promises: Promise<IJsonDependency | undefined>[] = [];
-
-      for (const file of files) {
-        promises.push(this.readFile(path.join(dir, file)));
-      }
-
-      const results = await Promise.all(promises);
-
-      return results.filter((x) => x !== undefined) as IJsonDependency[];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  protected async loadFileFromUrl(url: string): Promise<IJsonDependency> {
-    try {
-      const response = await fetch(url, {
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (response === undefined) {
-        throw new Error('Failed to fetch file');
-      }
-
-      if (response.ok) {
-        const json = await response.json();
-        if (isJsonDependency(json)) {
-          return json;
+    for (const file of files) {
+      const fullPath = path.join(url, file);
+      const result = await parseVendordepJson(fullPath);
+      if (result && result.uuid === dep.uuid) {
+        if (override) {
+          await unlink(fullPath);
+          break;
         } else {
-          throw new Error('Incorrect JSON format');
+          return false;
         }
-      } else {
-        throw new Error(`Bad status ${response.status}`);
       }
-    } catch (error) {
-      logger.error(`Failed to load file from URL: ${url}`, error);
-      throw error;
     }
+
+    await writeFile(path.join(url, dep.fileName), JSON.stringify(dep, null, 4));
+    return true;
+  } catch (error) {
+    logger.error(`Failed to install dependency ${dep.name}:`, error);
+    return false;
+  }
+}
+
+export function getHomeDirDeps(): Promise<IJsonDependency[]> {
+  return getDependencies(path.join(getWPILibHomeDir(), 'vendordeps'));
+}
+
+export async function parseVendordepJson(file: string): Promise<IJsonDependency | undefined> {
+  try {
+    const jsonContents = await readFile(file, 'utf8');
+    const dep = JSON.parse(jsonContents);
+
+    if (isJsonDependency(dep)) {
+      return dep;
+    }
+
+    return undefined;
+  } catch (err) {
+    logger.warn('JSON parse error', err);
+    return undefined;
+  }
+}
+
+export async function getDependencies(dir: string): Promise<IJsonDependency[]> {
+  try {
+    const files = await readdir(dir);
+
+    const promises: Promise<IJsonDependency | undefined>[] = [];
+
+    for (const file of files) {
+      promises.push(parseVendordepJson(path.join(dir, file)));
+    }
+
+    const results = await Promise.all(promises);
+
+    return results.filter((x) => x !== undefined) as IJsonDependency[];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function loadFileFromUrl(url: string): Promise<IJsonDependency> {
+  try {
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (response === undefined) {
+      throw new Error('Failed to fetch file');
+    }
+
+    if (response.ok) {
+      const json = await response.json();
+      if (isJsonDependency(json)) {
+        return json;
+      } else {
+        throw new Error('Incorrect JSON format');
+      }
+    } else {
+      throw new Error(`Bad status ${response.status}`);
+    }
+  } catch (error) {
+    logger.error(`Failed to load file from URL: ${url}`, error);
+    throw error;
   }
 }

@@ -6,11 +6,11 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from '../api';
 import { activateCppProvider } from '../cppprovider/cppprovider';
 import { localize as i18n } from '../locale';
-import { Examples } from '../shared/examples';
-import { Templates } from '../shared/templates';
-import { BuildTest } from './buildtest';
-import { Commands } from './commands';
-import { DeployDebug } from './deploydebug';
+import { registerExamples } from '../shared/examples';
+import { registerProjectTemplates } from '../shared/templates';
+import { registerCodeBuilderAndTester } from './buildtest';
+import { registerCommandTemplates } from './commands';
+import { registerCodeDeployerAndDebugger } from './deploydebug';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -37,21 +37,13 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   await activateCppProvider(context, coreExports);
 
   // Setup build and test
-
-  const buildTest = new BuildTest(coreExports);
-
-  context.subscriptions.push(buildTest);
-
-  const deployDebug = new DeployDebug(coreExports, allowDebug);
-  context.subscriptions.push(deployDebug);
+  registerCodeBuilderAndTester(coreExports);
+  registerCodeDeployerAndDebugger(coreExports, allowDebug);
 
   // Setup commands
-  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
-  context.subscriptions.push(commands);
+  registerCommandTemplates(extensionResourceLocation, commandApi, preferences);
 
   // Setup examples and template
-  const examples: Examples = new Examples(extensionResourceLocation, false, exampleTemplate);
-  context.subscriptions.push(examples);
-  const templates: Templates = new Templates(extensionResourceLocation, false, exampleTemplate);
-  context.subscriptions.push(templates);
+  registerExamples(extensionResourceLocation, false, exampleTemplate);
+  registerProjectTemplates(extensionResourceLocation, false, exampleTemplate);
 }

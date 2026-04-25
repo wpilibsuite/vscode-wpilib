@@ -9,7 +9,7 @@ import { logger } from '../logger';
 
 export abstract class WebViewBase {
   protected html: string = '';
-  protected webview: vscode.WebviewPanel | undefined;
+  protected webview?: vscode.WebviewPanel;
   protected disposables: vscode.Disposable[] = [];
   protected viewType: string;
   protected title: string;
@@ -129,9 +129,7 @@ export abstract class WebViewBase {
   }
 
   public dispose() {
-    if (this.webview !== undefined) {
-      this.webview.dispose();
-    }
+    this.webview?.dispose();
     for (const d of this.disposables) {
       d.dispose();
     }

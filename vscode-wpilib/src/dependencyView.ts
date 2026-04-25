@@ -3,7 +3,7 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { IJsonDependency } from './shared/vendorlibrariesbase';
+import { getHomeDirDeps, IJsonDependency, installDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 
@@ -30,11 +30,13 @@ export interface IJSMessage {
   url?: string;
 }
 
+const sort = (a: { name: string }, b: { name: string }) => Intl.Collator().compare(a.name, b.name);
+
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
   private projectInfo: ProjectInfoGatherer;
   private vendorLibraries: VendorLibraries;
-  private viewInfo: IProjectInfo | undefined;
+  private viewInfo?: IProjectInfo;
   private disposables: vscode.Disposable[] = [];
   private installedDeps: IJsonDependency[] = []; // The actual dep information that is installed
   private availableDeps: IJsonList[] = []; // All available deps
@@ -44,7 +46,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
   private externalApi: IExternalAPI;
   private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
-  private wp: vscode.WorkspaceFolder | undefined;
+  private wp?: vscode.WorkspaceFolder;
   private changed = 0;
   private refreshInProgress = false;
   private showingInstructions = false;
@@ -263,7 +265,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
         // If no conflict is found install otherwise show dialog
         if (!conflictdep) {
-          const success = await this.vendorLibraries.installDependency(
+          const success = await installDependency(
             dep,
             this.vendorLibraries.getWpVendorFolder(this.wp),
             true
@@ -292,7 +294,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 );
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  await this.vendorLibraries.installDependency(
+                  await installDependency(
                     newDep,
                     this.vendorLibraries.getWpVendorFolder(this.wp),
                     true
@@ -403,7 +405,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
       // If no conflict is found, proceed with installation
       if (!conflictDep) {
-        const success = await this.vendorLibraries.installDependency(
+        const success = await installDependency(
           file,
           this.vendorLibraries.getWpVendorFolder(this.wp),
           true
@@ -417,7 +419,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             for (const required of file.requires) {
               try {
                 const requiredDep = await this.vendorLibraries.getJsonDepURL(required.onlineUrl);
-                await this.vendorLibraries.installDependency(
+                await installDependency(
                   requiredDep,
                   this.vendorLibraries.getWpVendorFolder(this.wp),
                   true
@@ -451,20 +453,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public addDependency() {
-    if (this._view) {
-      this._view.webview.postMessage({ type: 'addDependency' });
-    }
-  }
-
   public updateDependencies() {
-    if (this._view) {
-      this._view.webview.postMessage({
-        type: 'updateDependencies',
-        installed: this.installedList,
-        available: this.availableDepsList,
-      });
-    }
+    this._view?.webview.postMessage({
+      type: 'updateDependencies',
+      installed: this.installedList,
+      available: this.availableDepsList,
+    });
   }
 
   public dispose() {
@@ -489,36 +483,34 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.availableDeps = await this.getAvailableDependencies();
       if (this.availableDeps.length !== 0) {
         // Check Github for the VendorDep list
-        if (this.installedDeps.length !== 0) {
-          for (const id of this.installedDeps) {
-            let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-            for (const ad of this.availableDeps) {
-              if (id.uuid === ad.uuid) {
-                // Populate version array with version and button text
-                if (id.version !== ad.version) {
-                  if (isNewerVersion(ad.version, id.version)) {
-                    versionList.push({
-                      version: ad.version,
-                      buttonText: i18n('ui', 'Update'),
-                    });
-                  } else {
-                    versionList.push({
-                      version: ad.version,
-                      buttonText: i18n('ui', 'Downgrade'),
-                    });
-                  }
+        for (const id of this.installedDeps) {
+          let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
+          for (const ad of this.availableDeps) {
+            if (id.uuid === ad.uuid) {
+              // Populate version array with version and button text
+              if (id.version !== ad.version) {
+                if (isNewerVersion(ad.version, id.version)) {
+                  versionList.push({
+                    version: ad.version,
+                    buttonText: i18n('ui', 'Update'),
+                  });
+                } else {
+                  versionList.push({
+                    version: ad.version,
+                    buttonText: i18n('ui', 'Downgrade'),
+                  });
                 }
               }
             }
-            // Now we need to sort the version list newest to oldest
-            versionList = this.sortVersions(versionList);
-
-            this.installedList.push({
-              name: id.name,
-              currentVersion: id.version,
-              versionInfo: versionList,
-            });
           }
+          // Now we need to sort the version list newest to oldest
+          versionList = this.sortVersions(versionList);
+
+          this.installedList.push({
+            name: id.name,
+            currentVersion: id.version,
+            versionInfo: versionList,
+          });
         }
 
         // We need to group the available deps and filter out the installed ones
@@ -550,7 +542,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async refresh() {
     if (this.wp) {
-      void this._refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
@@ -570,39 +562,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private sortInstalled() {
-    this.installedList.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.installedList.sort(sort);
   }
 
   private sortInstalledDeps() {
-    this.installedDeps.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.installedDeps.sort(sort);
   }
 
   private sortAvailable() {
-    this.availableDepsList.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.availableDepsList.sort(sort);
   }
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
@@ -622,7 +590,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         this.onlineDeps = [];
       }
     }
-    this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
+    this.homeDeps = await getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
         path: i18n('ui', homedep.jsonUrl),
@@ -663,16 +631,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private isJsonList(jsonDepList: IJsonList[]): jsonDepList is IJsonList[] {
-    return jsonDepList.every((jsonDep) => {
-      return (
+    return jsonDepList.every(
+      (jsonDep) =>
         jsonDep.path !== undefined &&
         jsonDep.name !== undefined &&
         jsonDep.uuid !== undefined &&
         jsonDep.version !== undefined &&
         jsonDep.description !== undefined &&
         jsonDep.website !== undefined
-      );
-    });
+    );
   }
 
   private _getHtmlForWebview(webview: vscode.Webview): string {

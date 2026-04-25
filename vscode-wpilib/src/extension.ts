@@ -11,7 +11,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
-import { BuiltinTools } from './builtintools';
+import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
@@ -26,7 +26,7 @@ import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
 import { ProjectInfoGatherer } from './projectinfo';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
-import { UtilitiesAPI } from './shared/utilitiesapi';
+import { getWPILibHomeDir, UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
@@ -35,7 +35,7 @@ import { createVsCommands } from './vscommands';
 import { Gradle2025Import } from './webviews/gradle2025import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
-import { WPILibUpdates } from './wpilibupdates';
+import { checkForInitialUpdate, checkForUpdates } from './wpilibupdates';
 import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
@@ -43,7 +43,7 @@ class ExternalAPI implements IExternalAPI {
   // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
-    const deployDebugApi = await DeployDebugAPI.Create(resourceFolder, preferencesApi);
+    const deployDebugApi = new DeployDebugAPI(resourceFolder, preferencesApi);
     const buildTestApi = new BuildTestAPI(preferencesApi);
     const externalApi = new ExternalAPI(preferencesApi, deployDebugApi, buildTestApi);
     return externalApi;
@@ -113,7 +113,7 @@ async function handleAfterTrusted(
 
   let jdkLoc = await findJdkPath(externalApi);
 
-  if (jdkLoc !== undefined) {
+  if (jdkLoc) {
     if (jdkLoc.endsWith('\\') || jdkLoc.endsWith('/')) {
       jdkLoc = jdkLoc.substring(0, jdkLoc.length - 1);
     }
@@ -131,9 +131,9 @@ async function handleAfterTrusted(
 
   try {
     // Add built in tools
-    context.subscriptions.push(await BuiltinTools.Create(externalApi));
+    await registerBuiltinTools(externalApi);
   } catch (err) {
-    logger.error('error creating built in tool handler', err);
+    logger.error('error registering built in tool handler', err);
     creationError = true;
   }
 
@@ -142,22 +142,20 @@ async function handleAfterTrusted(
   try {
     vendorLibs = new VendorLibraries(externalApi);
     context.subscriptions.push(vendorLibs);
-    await addVendorExamples(
-      extensionResourceLocation,
-      externalApi.getExampleTemplateAPI(),
-      externalApi.getUtilitiesAPI(),
-      vendorLibs
-    );
+    await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI());
   } catch (err) {
     logger.error('error creating vendor lib utilities', err);
     creationError = true;
   }
 
-  let wpilibUpdate: WPILibUpdates | undefined;
-
   try {
-    wpilibUpdate = new WPILibUpdates(externalApi);
-    context.subscriptions.push(wpilibUpdate);
+    context.subscriptions.push(
+      vscode.commands.registerCommand('wpilibcore.checkForUpdates', async () => {
+        if (!(await checkForUpdates(externalApi))) {
+          logger.log('no update installed');
+        }
+      })
+    );
   } catch (err) {
     logger.error('error creating wpilib updater', err);
     creationError = true;
@@ -166,8 +164,8 @@ async function handleAfterTrusted(
   let projectInfo: ProjectInfoGatherer | undefined;
 
   try {
-    if (wpilibUpdate !== undefined && vendorLibs !== undefined) {
-      projectInfo = new ProjectInfoGatherer(vendorLibs, wpilibUpdate, externalApi);
+    if (vendorLibs) {
+      projectInfo = new ProjectInfoGatherer(vendorLibs, externalApi);
       context.subscriptions.push(projectInfo);
     }
   } catch (err) {
@@ -175,11 +173,9 @@ async function handleAfterTrusted(
     creationError = true;
   }
 
-  let depProvider: DependencyViewProvider | undefined;
-
   try {
-    if (projectInfo !== undefined && vendorLibs !== undefined) {
-      depProvider = new DependencyViewProvider(
+    if (projectInfo && vendorLibs) {
+      const depProvider = new DependencyViewProvider(
         context.extensionUri,
         projectInfo,
         vendorLibs,
@@ -190,29 +186,12 @@ async function handleAfterTrusted(
         vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider)
       );
 
-      if (depProvider !== undefined) {
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.addDependency', () => {
-            depProvider?.addDependency();
-          })
-        );
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.refreshVendordeps', async () => {
-            await depProvider?.refresh();
-          })
-        );
-
-        /*         context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.removeDependency', () => {
-            depProvider?.removeDependency();
-          })) */
-
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.updateDependencies', () => {
-            depProvider?.updateDependencies();
-          })
-        );
-      }
+      context.subscriptions.push(
+        vscode.commands.registerCommand(
+          'wpilib.refreshVendordeps',
+          async () => await depProvider.refresh()
+        )
+      );
 
       context.subscriptions.push(depProvider);
     }
@@ -237,11 +216,8 @@ async function handleAfterTrusted(
         );
         const vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
         context.subscriptions.push(vendorDepsWatcher);
-        const localW = w;
 
-        const fireEvent = () => {
-          fireVendorDepsChanged(localW);
-        };
+        const fireEvent = () => fireVendorDepsChanged(w);
 
         vendorDepsWatcher.onDidChange(fireEvent, null, context.subscriptions);
 
@@ -265,7 +241,7 @@ async function handleAfterTrusted(
             false,
             w.uri.fsPath
           );
-          if (importPersistentState.Value === false) {
+          if (!importPersistentState.Value) {
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
@@ -290,10 +266,7 @@ async function handleAfterTrusted(
         }
 
         if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
-          let didUpdate: boolean = false;
-          if (wpilibUpdate) {
-            didUpdate = await wpilibUpdate.checkForInitialUpdate(w);
-          }
+          const didUpdate: boolean = await checkForInitialUpdate(w);
 
           let runBuild: boolean;
           try {
@@ -348,7 +321,7 @@ async function handleAfterTrusted(
           false,
           w.uri.fsPath
         );
-        if (persistentState.Value === false) {
+        if (!persistentState.Value) {
           persistentState.Value = true;
           if (help) {
             help.displayHelp();
@@ -361,7 +334,7 @@ async function handleAfterTrusted(
           false,
           w.uri.fsPath
         );
-        if (persistentState.Value === false) {
+        if (!persistentState.Value) {
           // Check if wpilib project might be in a subfolder
           // Only go 1 subfolder deep
           const pattern = new vscode.RelativePattern(
@@ -418,7 +391,7 @@ async function handleAfterTrusted(
               const picked = await vscode.window.showQuickPick(list, {
                 canPickMany: false,
               });
-              if (picked !== undefined) {
+              if (picked) {
                 await vscode.commands.executeCommand('vscode.openFolder', picked.fullFolder, false);
               }
             } else if (openResult?.title === i18n('ui', "No, Don't ask again for this folder")) {
@@ -457,7 +430,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
-  const wpilibHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeDir = getWPILibHomeDir();
 
   const logPath = path.join(wpilibHomeDir, 'logs');
   try {

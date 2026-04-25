@@ -41,7 +41,7 @@ interface ICppDebugCommand {
   target: string;
   launchfile: string;
   gdb: string;
-  sysroot: string | undefined;
+  sysroot?: string;
   srcpaths: string[];
   headerpaths: string[];
   libpaths: string[];
@@ -50,9 +50,9 @@ interface ICppDebugCommand {
 
 class CppQuickPick<T> implements vscode.QuickPickItem {
   public label: string;
-  public description?: string | undefined;
-  public detail?: string | undefined;
-  public picked?: boolean | undefined;
+  public description?: string;
+  public detail?: string;
+  public picked?: boolean;
 
   public debugInfo: T;
 
@@ -340,7 +340,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
           canPickMany: true,
           placeHolder: 'Pick extensions to run',
         });
-        if (quickPick !== undefined) {
+        if (quickPick) {
           for (const qp of quickPick) {
             extensions += qp.path;
             extensions += path.delimiter;
@@ -396,28 +396,14 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
 }
 
-export class DeployDebug {
-  private deployDebuger: DebugCodeDeployer;
-  private deployDeployer: DeployCodeDeployer;
-  private simulator: SimulateCodeDeployer;
+export function registerCodeDeployerAndDebugger(externalApi: IExternalAPI, allowDebug: boolean) {
+  const deployDebugApi = externalApi.getDeployDebugAPI();
+  deployDebugApi.addLanguageChoice('cpp');
 
-  constructor(externalApi: IExternalAPI, allowDebug: boolean) {
-    const deployDebugApi = externalApi.getDeployDebugAPI();
-    deployDebugApi.addLanguageChoice('cpp');
+  deployDebugApi.registerCodeDeploy(new DebugCodeDeployer(externalApi));
 
-    this.deployDebuger = new DebugCodeDeployer(externalApi);
-    this.deployDeployer = new DeployCodeDeployer(externalApi);
-    this.simulator = new SimulateCodeDeployer(externalApi);
-
-    deployDebugApi.registerCodeDeploy(this.deployDeployer);
-
-    if (allowDebug) {
-      deployDebugApi.registerCodeDebug(this.deployDebuger);
-      deployDebugApi.registerCodeSimulate(this.simulator);
-    }
-  }
-
-  public dispose() {
-    //
+  if (allowDebug) {
+    deployDebugApi.registerCodeDebug(new DeployCodeDeployer(externalApi));
+    deployDebugApi.registerCodeSimulate(new SimulateCodeDeployer(externalApi));
   }
 }

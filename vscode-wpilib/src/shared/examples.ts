@@ -19,22 +19,21 @@ export interface IExampleJsonLayout {
   hasunittests?: boolean;
 }
 
-export class Examples {
-  private readonly exampleResourceName = 'examples.json';
+const exampleResourceName = 'examples.json';
 
-  constructor(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
-    const examplesFolder = path.join(resourceRoot, 'src', 'examples');
-    const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
-    const resourceFile = path.join(examplesFolder, this.exampleResourceName);
-    const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
-    fs.readFile(resourceFile, 'utf8', (err, data) => {
-      if (err) {
-        logger.log('Example Error error: ', err);
-        return;
-      }
-      const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
-      for (const e of examples) {
-        const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
+export function registerExamples(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
+  const examplesFolder = path.join(resourceRoot, 'src', 'examples');
+  const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
+  const resourceFile = path.join(examplesFolder, exampleResourceName);
+  const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
+  fs.readFile(resourceFile, 'utf8', (err, data) => {
+    if (err) {
+      logger.log('Example Error error: ', err);
+      return;
+    }
+    const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
+    for (const e of examples) {
+      const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
         const commandVersion: string =
           e.commandversion !== undefined ? e.commandversion.toString() : '2';
         if (commandVersion === '3') {
@@ -42,70 +41,67 @@ export class Examples {
         } else {
           vendordeps.push('commandsv2');
         }
-        const provider: IExampleTemplateCreator = {
-          getLanguage(): string {
-            return java ? 'java' : 'cpp';
-          },
-          getDescription(): string {
-            return e.description;
-          },
-          getDisplayName(): string {
-            return e.name;
-          },
-          async generate(folderInto: vscode.Uri): Promise<boolean> {
-            try {
-              let testFolder;
-              if (e.hasunittests === true) {
-                testFolder = path.join(examplesTestFolder, e.foldername);
-              }
-              if (java) {
-                if (
-                  !(await generateCopyJava(
-                    resourceRoot,
-                    path.join(examplesFolder, e.foldername),
-                    testFolder,
-                    path.join(gradleBasePath, e.gradlebase),
-                    folderInto.fsPath,
-                    'frc.robot.Main',
-                    path.join('frc', 'robot'),
-                    false,
-                    vendordeps
-                  ))
-                ) {
-                  vscode.window.showErrorMessage(
-                    i18n('message', 'Cannot create into non empty folder')
-                  );
-                  return false;
-                }
-              } else {
-                if (
-                  !(await generateCopyCpp(
-                    resourceRoot,
-                    path.join(examplesFolder, e.foldername),
-                    testFolder,
-                    path.join(gradleBasePath, e.gradlebase),
-                    folderInto.fsPath,
-                    false,
-                    vendordeps
-                  ))
-                ) {
-                  vscode.window.showErrorMessage(
-                    i18n('message', 'Cannot create into non empty folder')
-                  );
-                  return false;
-                }
-              }
-            } catch (err) {
-              logger.error('Example generation error: ', err);
-              return false;
+      const provider: IExampleTemplateCreator = {
+        getLanguage(): string {
+          return java ? 'java' : 'cpp';
+        },
+        getDescription(): string {
+          return e.description;
+        },
+        getDisplayName(): string {
+          return e.name;
+        },
+        async generate(folderInto: vscode.Uri): Promise<boolean> {
+          try {
+            let testFolder;
+            if (e.hasunittests) {
+              testFolder = path.join(examplesTestFolder, e.foldername);
             }
-            return true;
-          },
-        };
-        core.addExampleProvider(provider);
-      }
-    });
-  }
-
-  public dispose() {}
+            if (java) {
+              if (
+                !(await generateCopyJava(
+                  resourceRoot,
+                  path.join(examplesFolder, e.foldername),
+                  testFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
+                  'frc.robot.Main',
+                  path.join('frc', 'robot'),
+                  false,
+                  vendordeps
+                ))
+              ) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            } else {
+              if (
+                !(await generateCopyCpp(
+                  resourceRoot,
+                  path.join(examplesFolder, e.foldername),
+                  testFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
+                  false,
+                  vendordeps
+                ))
+              ) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            }
+          } catch (err) {
+            logger.error('Example generation error: ', err);
+            return false;
+          }
+          return true;
+        },
+      };
+      core.addExampleProvider(provider);
+    }
+  });
 }

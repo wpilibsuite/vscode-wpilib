@@ -53,71 +53,69 @@ async function performCopy(
   }
 }
 
-export class Commands {
-  private readonly commandResourceName = 'commands.json';
+const commandResourceName = 'commands.json';
 
-  constructor(resourceRoot: string, core: ICommandAPI, preferences: IPreferencesAPI) {
-    const commandFolder = path.join(resourceRoot, 'src', 'commands');
-    const resourceFile = path.join(commandFolder, this.commandResourceName);
-    readFile(resourceFile, 'utf8', (err, data) => {
-      if (err) {
-        logger.error('Command file error: ', err);
-        return;
-      }
-      const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];
-      for (const c of commands) {
-        const provider: ICommandCreator = {
-          getLanguage(): string {
-            return 'java';
-          },
-          getDescription(): string {
-            return c.description;
-          },
-          getDisplayName(): string {
-            return c.name;
-          },
-          async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-            const prefs = preferences.getPreferences(workspace);
-            const currentLanguage = prefs.getCurrentLanguage();
-            return currentLanguage === 'none' || currentLanguage === 'java';
-          },
-          async generate(folder: vscode.Uri): Promise<boolean> {
-            // root is src/main/java
-            const folderpath = folder.path;
-            const searchString = '/src/main/java';
-            const rootIndex = folderpath.lastIndexOf(searchString);
+export function registerCommandTemplates(
+  resourceRoot: string,
+  core: ICommandAPI,
+  preferences: IPreferencesAPI
+) {
+  const commandFolder = path.join(resourceRoot, 'src', 'commands');
+  const resourceFile = path.join(commandFolder, commandResourceName);
+  readFile(resourceFile, 'utf8', (err, data) => {
+    if (err) {
+      logger.error('Command file error: ', err);
+      return;
+    }
+    const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];
+    for (const c of commands) {
+      const provider: ICommandCreator = {
+        getLanguage(): string {
+          return 'java';
+        },
+        getDescription(): string {
+          return c.description;
+        },
+        getDisplayName(): string {
+          return c.name;
+        },
+        async getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean> {
+          const prefs = preferences.getPreferences(workspace);
+          const currentLanguage = prefs.getCurrentLanguage();
+          return currentLanguage === 'none' || currentLanguage === 'java';
+        },
+        async generate(folder: vscode.Uri): Promise<boolean> {
+          // root is src/main/java
+          const folderpath = folder.path;
+          const searchString = '/src/main/java';
+          const rootIndex = folderpath.lastIndexOf(searchString);
 
-            let javaPackage = '';
+          let javaPackage = '';
 
-            if (rootIndex !== -1) {
-              const packageslash = folderpath.substring(rootIndex + searchString.length);
-              if (packageslash.length !== 0) {
-                javaPackage = packageslash.substring(1).replace(/\//g, '.');
-              }
-              logger.log(packageslash);
-            } else {
-              // Could not root path, ask for one
-              const res = await getPackageName();
-              if (res === undefined) {
-                return false;
-              }
-              javaPackage = res;
+          if (rootIndex !== -1) {
+            const packageslash = folderpath.substring(rootIndex + searchString.length);
+            if (packageslash.length !== 0) {
+              javaPackage = packageslash.substring(1).replace(/\//g, '.');
             }
-
-            const className = await getClassName();
-
-            if (className === undefined || className === '') {
+            logger.log(packageslash);
+          } else {
+            // Could not root path, ask for one
+            const res = await getPackageName();
+            if (res === undefined) {
               return false;
             }
-            return performCopy(commandFolder, c, folder, className, javaPackage);
-          },
-        };
-        core.addCommandProvider(provider);
-      }
-    });
-  }
+            javaPackage = res;
+          }
 
-  public dispose() {
-    //
-  }
+          const className = await getClassName();
+
+          if (className === undefined || className === '') {
+            return false;
+          }
+          return performCopy(commandFolder, c, folder, className, javaPackage);
+        },
+      };
+      core.addCommandProvider(provider);
+    }
+  });
 }

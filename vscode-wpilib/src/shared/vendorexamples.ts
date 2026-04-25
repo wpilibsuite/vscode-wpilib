@@ -4,12 +4,13 @@ import { readdir, readFile, stat } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExampleTemplateAPI, IExampleTemplateCreator, IUtilitiesAPI } from '../api';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import { extensionContext } from '../utilities';
 import { generateCopyCpp, generateCopyJava } from './generator';
-import { VendorLibrariesBase } from './vendorlibrariesbase';
+import { getWPILibHomeDir } from './utilitiesapi';
+import { findForUUIDs, installDependency } from './vendorlibrariesbase';
 
 interface IJsonExample {
   name: string;
@@ -18,8 +19,8 @@ interface IJsonExample {
   gradlebase: string;
   language: 'java' | 'cpp';
   commandversion: number;
-  mainclass?: string | undefined;
-  packagetoreplace?: string | undefined;
+  mainclass?: string;
+  packagetoreplace?: string;
   dependencies: string[];
   foldername: string;
   extravendordeps?: string[];
@@ -40,9 +41,7 @@ function isJsonExample(arg: unknown): arg is IJsonExample {
 
 export async function addVendorExamples(
   resourceRoot: string,
-  core: IExampleTemplateAPI,
-  utilities: IUtilitiesAPI,
-  vendorlibs: VendorLibrariesBase
+  core: IExampleTemplateAPI
 ): Promise<void> {
   const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
   const storagePath = extensionContext.storagePath;
@@ -50,7 +49,7 @@ export async function addVendorExamples(
     return;
   }
 
-  const exampleDir = path.join(utilities.getWPILibHomeDir(), 'vendorexamples');
+  const exampleDir = path.join(getWPILibHomeDir(), 'vendorexamples');
   const gradleBasePath = path.join(resourceRoot, 'gradle');
 
   try {
@@ -142,11 +141,11 @@ export async function addVendorExamples(
                 }
 
                 // Install vendor dependencies
-                const vendorFiles = await vendorlibs.findForUUIDs(ex.dependencies);
+                const vendorFiles = await findForUUIDs(ex.dependencies);
                 const vendorFolder = path.join(folderInto.fsPath, 'vendordeps');
 
                 for (const vendorFile of vendorFiles) {
-                  await vendorlibs.installDependency(vendorFile, vendorFolder, true);
+                  await installDependency(vendorFile, vendorFolder, true);
                 }
               } catch (err) {
                 logger.error('Example generation error: ', err);

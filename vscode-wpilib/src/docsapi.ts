@@ -31,24 +31,17 @@ export async function downloadDocs(
 
     if (answer?.title === i18n('ui', 'Yes')) {
       disposable = vscode.window.setStatusBarMessage(i18n('message', 'Downloading Maven MetaData'));
-
       const metaDataFile = await getMavenMetadataContents(repoRoot);
-
       const metaData = await getMavenMetadata(metaDataFile);
-
       const versions = getMavenVersions(metaData);
-
       const newestVersion = getNewestMavenVersion(versions);
-
       if (newestVersion === undefined) {
         throw new Error('No version found');
       }
 
       const downloadUrl = constructDownloadUrl(metaData, repoRoot, newestVersion, ext);
       const tmpFolder = path.join(rootFolder, 'tmp');
-
       await mkdir(tmpFolder, { recursive: true });
-
       const outputFile = path.join(tmpFolder, 'download' + ext);
 
       try {
@@ -63,7 +56,6 @@ export async function downloadDocs(
       await downloadFileToStream(downloadUrl, outputFile);
 
       const outputDir = path.join(rootFolder, innerFolder);
-
       await mkdir(outputDir, { recursive: true });
 
       disposable.dispose();
@@ -76,14 +68,10 @@ export async function downloadDocs(
     }
     return undefined;
   } catch (err) {
-    if (disposable !== undefined) {
-      disposable.dispose();
-    }
+    disposable?.dispose();
     vscode.window.setStatusBarMessage(i18n('message', 'Error Downloading Docs'), 5000);
     throw err;
   } finally {
-    if (disposable !== undefined) {
-      disposable.dispose();
-    }
+    disposable?.dispose();
   }
 }

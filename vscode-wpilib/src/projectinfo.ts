@@ -9,7 +9,7 @@ import { findJdkPath, getJavaVersion } from './jdkdetector';
 import { logger } from './logger';
 import { extensionContext } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
-import { WPILibUpdates } from './wpilibupdates';
+import { getGradleRIOVersion } from './wpilibupdates';
 
 export interface IVendorLibraryPair {
   name: string;
@@ -37,18 +37,12 @@ async function extensionVersion(extension: vscode.Extension<unknown> | undefined
 
 export class ProjectInfoGatherer {
   private vendorLibraries: VendorLibraries;
-  private wpilibUpdates: WPILibUpdates;
   private externalApi: IExternalAPI;
   private disposables: vscode.Disposable[] = [];
   private statusBar: vscode.StatusBarItem;
 
-  public constructor(
-    vendorLibraries: VendorLibraries,
-    wpilibUpdates: WPILibUpdates,
-    externalApi: IExternalAPI
-  ) {
+  public constructor(vendorLibraries: VendorLibraries, externalApi: IExternalAPI) {
     this.vendorLibraries = vendorLibraries;
-    this.wpilibUpdates = wpilibUpdates;
     this.externalApi = externalApi;
 
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
@@ -58,7 +52,7 @@ export class ProjectInfoGatherer {
     this.disposables.push(this.statusBar);
 
     const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
+    if (workspaces) {
       for (const wp of workspaces) {
         const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
         if (prefs.getIsWPILibProject()) {
@@ -137,7 +131,7 @@ Vendor Libraries:
     const vendorLibs = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
     const prefs = this.externalApi.getPreferencesAPI().getPreferences(workspace);
 
-    let currentGradleVersion = await this.wpilibUpdates.getGradleRIOVersion(workspace);
+    let currentGradleVersion = await getGradleRIOVersion(workspace);
 
     if (currentGradleVersion === undefined) {
       currentGradleVersion = 'unknown';

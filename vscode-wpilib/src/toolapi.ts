@@ -33,7 +33,7 @@ export class ToolAPI implements IToolAPI {
         i18n('ui', 'Yes'),
         i18n('ui', 'No')
       );
-      if (result !== undefined && result === i18n('ui', 'Yes')) {
+      if (result === i18n('ui', 'Yes')) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
     } else {
@@ -59,7 +59,7 @@ export class ToolAPI implements IToolAPI {
         i18n('ui', 'Yes'),
         i18n('ui', 'No')
       );
-      if (grResult !== undefined && grResult === i18n('ui', 'Yes')) {
+      if (grResult === i18n('ui', 'Yes')) {
         const preferencesApi = this.externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
         if (
