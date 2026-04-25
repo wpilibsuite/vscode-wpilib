@@ -94,7 +94,7 @@ export interface IPreferencesAPI {
 }
 
 export interface IUtilitiesAPI {
-  getFrcYear(): string;
+  getWPILibYear(): string;
   getWPILibHomeDir(): string;
 }
 

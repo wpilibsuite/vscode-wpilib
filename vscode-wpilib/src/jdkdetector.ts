@@ -65,11 +65,11 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   if (await checkJavaPath(vscodeOldJavaHome, 'java.home')) {
     return vscodeOldJavaHome;
   }
-  // Then check the FRC home directory for the FRC jdk
-  const frcHome = api.getUtilitiesAPI().getWPILibHomeDir();
-  const frcHomeJava = path.join(frcHome, 'jdk');
-  if (await checkJavaPath(frcHomeJava, 'FRC Home JDK')) {
-    return frcHomeJava;
+  // Then check the WPILib home directory for the WPILib jdk
+  const wpilibHome = api.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeJava = path.join(wpilibHome, 'jdk');
+  if (await checkJavaPath(wpilibHomeJava, 'WPILib Home JDK')) {
+    return wpilibHomeJava;
   }
   // Check for java home
   const javaHome = process.env.JAVA_HOME;

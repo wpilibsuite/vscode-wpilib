@@ -60,6 +60,7 @@ task extractCppDependencies(type: Copy) {
         configurations.cppSource.collect { zipTree(it) }
     }
     into 'vscode-wpilib/resources/cpp/src'
+    outputs.dir 'vscode-wpilib/resources/cpp/src'
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
@@ -71,6 +72,7 @@ task extractJavaDependencies(type: Copy) {
         configurations.javaSource.collect { zipTree(it) }
     }
     into 'vscode-wpilib/resources/java/src'
+    outputs.dir 'vscode-wpilib/resources/java/src'
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
@@ -78,24 +80,28 @@ task extractJavaDependencies(type: Copy) {
 def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv2/CommandsV2.json'
   dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadCommandsV3 = tasks.register('downloadCommandsV3', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv3/CommandsV3.json'
   dest 'vscode-wpilib/resources/vendordeps/CommandsV3.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadRomiVendordep = tasks.register('downloadRomiVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/romiVendordep/RomiVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/RomiVendordep.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/xrpVendordep/XRPVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/XRPVendordep.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
@@ -105,6 +111,12 @@ build.dependsOn downloadCommandsV2
 build.dependsOn downloadCommandsV3
 build.dependsOn downloadRomiVendordep
 build.dependsOn downloadXRPVendordep
+
+clean {
+    delete 'vscode-wpilib/resources/java/src'
+    delete 'vscode-wpilib/resources/cpp/src'
+    delete 'vscode-wpilib/resources/vendordeps'
+}
 
 apply from: 'templatebuilder.gradle'
 

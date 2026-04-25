@@ -2,7 +2,7 @@
 
 ## Features
 
-This extension provides the WPILib support for FRC teams in VS Code. For documentation on how to program FRC robots using the WPILib libraries, see the [WPILib documentation website](https://docs.wpilib.org/en/stable/).
+This extension provides the WPILib support for FIRST teams in VS Code. For documentation on how to program FIRST robots using the WPILib libraries, see the [WPILib documentation website](https://docs.wpilib.org/en/stable/).
 
 ## Requirements
 

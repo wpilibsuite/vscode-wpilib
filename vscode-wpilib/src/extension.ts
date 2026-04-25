@@ -457,9 +457,9 @@ export async function activate(context: vscode.ExtensionContext) {
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
-  const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
 
-  const logPath = path.join(frcHomeDir, 'logs');
+  const logPath = path.join(wpilibHomeDir, 'logs');
   try {
     await mkdir(logPath, { recursive: true });
     setLoggerDirectory(logPath);

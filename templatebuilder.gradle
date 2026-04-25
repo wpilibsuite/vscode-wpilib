@@ -126,6 +126,7 @@ def fileSystemOperations = objects.newInstance(FileSystemOperationsProvider).fil
 task generateTemplatesFolder {
     def outputDir = new File(project.buildDir, "templates")
 
+
     outputs.dir outputDir
 
     outputs.upToDateWhen {false}
@@ -157,6 +158,7 @@ task generateTemplatesZip(type: Zip) {
 
 task generateExamplesFolder {
     def outputDir = new File(project.buildDir, "examples")
+
 
     outputs.dir outputDir
 
