@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
 import { IPreferencesJson } from './preferencesjson';
+import { logger } from '../logger';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
   private templates: ICreatorQuickPick[] = [];
@@ -89,6 +90,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
     vscode.window.showErrorMessage(
       i18n('message', 'Please select project type, language, and base.')
     );
+    logger.warn('found nothing :(');
     return false;
   }
 
@@ -115,6 +117,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
     const success = await creator.generate(toFolderUri);
 
     if (!success) {
+      logger.warn('Creation failed');
       return false;
     }
 

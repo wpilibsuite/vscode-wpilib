@@ -11,6 +11,8 @@ export default defineConfig([
     'webpack.config.js',
     'gulpfile.js',
     'dist',
+    'node_modules/',
+    '.vscode-test/',
   ]),
   {
     files: ['**/*.ts'],
