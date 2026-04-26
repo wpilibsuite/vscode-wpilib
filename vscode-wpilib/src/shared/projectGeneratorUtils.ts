@@ -123,12 +123,12 @@ export async function setupDeployDirectory(
 
     const hintKey = isJava ? 'generateJavaDeployHint' : 'generateCppDeployHint';
     const hintText = isJava
-      ? `Files placed in this directory will be deployed to the RoboRIO into the
+      ? `Files placed in this directory will be deployed to the Systemcore into the
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.`
-      : `Files placed in this directory will be deployed to the RoboRIO into the
-'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
-function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
+      : `Files placed in this directory will be deployed to the Systemcore into the
+'deploy' directory in the home folder. Use the 'wpi::filesystem::GetDeployDirectory'
+function from the 'wpi/system/Filesystem.hpp' header to get a proper path relative to the deploy
 directory.`;
 
     await writeFile(path.join(deployDir, 'example.txt'), i18n('generator', [hintKey, hintText]));
