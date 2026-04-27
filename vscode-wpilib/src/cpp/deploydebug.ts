@@ -339,13 +339,14 @@ class SimulateCodeDeployer implements ICodeDeployer {
           canPickMany: true,
           placeHolder: 'Pick extensions to run',
         });
-        if (quickPick !== undefined) {
-          for (const qp of quickPick) {
-            extensions += qp.path;
-            extensions += path.delimiter;
-          }
+        if (quickPick === undefined) {
+          vscode.window.showInformationMessage('Simulation cancelled');
+          return false;
         }
-      }
+        for (const qp of quickPick) {
+          extensions += qp.path;
+          extensions += path.delimiter;
+        }
     }
 
     if (!getIsWindows()) {
