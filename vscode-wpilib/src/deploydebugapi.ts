@@ -26,7 +26,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     config: vscode.DebugConfiguration,
     __?: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.DebugConfiguration> {
-    if (workspace === undefined) {
+    if (!workspace) {
       return undefined;
     }
     let desktop = false;
@@ -217,7 +217,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
       const selection = await vscode.window.showQuickPick(validDeployers, {
         placeHolder: i18n('ui', 'Pick a language'),
       });
-      if (selection === undefined) {
+      if (!selection) {
         vscode.window.showInformationMessage(i18n('message', 'Selection exited. Cancelling'));
         return false;
       }

@@ -11,8 +11,8 @@ export interface IJsonDependency {
   uuid: string;
   jsonUrl: string;
   fileName: string;
-  conflictsWith: IJsonConflicts[] | undefined;
-  requires: IJsonRequires[] | undefined;
+  conflictsWith?: IJsonConflicts[];
+  requires?: IJsonRequires[];
 }
 
 export interface IJsonRequires {
@@ -73,14 +73,12 @@ export class VendorLibrariesBase {
       for (const file of files) {
         const fullPath = path.join(url, file);
         const result = await this.readFile(fullPath);
-        if (result !== undefined) {
-          if (result.uuid === dep.uuid) {
-            if (override) {
-              await unlink(fullPath);
-              break;
-            } else {
-              return false;
-            }
+        if (result && result.uuid === dep.uuid) {
+          if (override) {
+            await unlink(fullPath);
+            break;
+          } else {
+            return false;
           }
         }
       }
@@ -136,11 +134,6 @@ export class VendorLibrariesBase {
       const response = await fetch(url, {
         signal: AbortSignal.timeout(5000),
       });
-
-      if (response === undefined) {
-        throw new Error('Failed to fetch file');
-      }
-
       if (response.ok) {
         const json = await response.json();
         if (isJsonDependency(json)) {

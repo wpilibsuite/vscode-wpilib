@@ -29,7 +29,7 @@ export interface IProjectInfo {
 }
 
 async function extensionVersion(extension: vscode.Extension<unknown> | undefined): Promise<string> {
-  if (extension === undefined) {
+  if (!extension) {
     return 'Not Installed';
   }
   return extension.packageJSON.version;
@@ -58,7 +58,7 @@ export class ProjectInfoGatherer {
     this.disposables.push(this.statusBar);
 
     const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
+    if (workspaces) {
       for (const wp of workspaces) {
         const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
         if (prefs.getIsWPILibProject()) {
@@ -83,13 +83,13 @@ export class ProjectInfoGatherer {
 
   public async displayProjectInfo(): Promise<void> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       logger.warn('no workspace');
       return;
     }
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
-    const jdkVer = jdkLoc === undefined ? 'unknown' : await getJavaVersion(jdkLoc);
+    const jdkVer = !jdkLoc ? 'unknown' : await getJavaVersion(jdkLoc);
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 VS Code Version: ${vscode.version}
@@ -127,7 +127,7 @@ Vendor Libraries:
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       return wp;
     }
     return this.getProjectInfo(wp);

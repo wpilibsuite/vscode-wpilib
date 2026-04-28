@@ -38,16 +38,13 @@ export class PreferencesAPI implements IPreferencesAPI {
   // Get the first workspace if there is only one, or ask for a workspace and provide it.
   public async getFirstOrSelectedWorkspace(): Promise<vscode.WorkspaceFolder | undefined> {
     const wp = vscode.workspace.workspaceFolders;
-    if (wp === undefined) {
+    if (!wp) {
       return undefined;
     }
 
     if (wp.length > 1) {
       const res = await vscode.window.showWorkspaceFolderPick();
-      if (res !== undefined) {
-        return res;
-      }
-      return undefined;
+      return res;
     } else if (wp.length === 1) {
       return wp[0];
     } else {
@@ -63,7 +60,7 @@ export class PreferencesAPI implements IPreferencesAPI {
 
   private async asyncInitialize() {
     const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
+    if (workspaces) {
       for (const w of workspaces) {
         const preferences = await Preferences.Create(w);
         this.preferences.push(preferences);
@@ -81,7 +78,7 @@ export class PreferencesAPI implements IPreferencesAPI {
 
         const wp = vscode.workspace.workspaceFolders;
 
-        if (wp === undefined) {
+        if (!wp) {
           return;
         }
 

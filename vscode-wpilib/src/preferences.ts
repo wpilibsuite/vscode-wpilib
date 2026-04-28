@@ -115,7 +115,7 @@ export class Preferences implements IPreferences {
   public async getTeamNumber(): Promise<number> {
     // If always ask, get it.
     const alwaysAsk = this.getConfiguration().get<boolean>('alwaysAskForTeamNumber');
-    if (alwaysAsk !== undefined && alwaysAsk === true) {
+    if (alwaysAsk) {
       return requestTeamNumber();
     }
     if (this.preferencesJson.teamNumber < 0) {
@@ -157,67 +157,39 @@ export class Preferences implements IPreferences {
   }
 
   public getAutoStartRioLog(): boolean {
-    const res = this.getConfiguration().get<boolean>('autoStartRioLog');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('autoStartRioLog');
   }
 
   public getAutoSaveOnDeploy(): boolean {
-    const res = this.getConfiguration().get<boolean>('autoSaveOnDeploy');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('autoSaveOnDeploy');
   }
 
   public getAdditionalGradleArguments(): string {
     const res = this.getConfiguration().get<string>('additionalGradleArguments');
-    if (res === undefined) {
+    if (!res) {
       return '';
     }
     return res;
   }
 
   public getOffline(): boolean {
-    const res = this.getConfiguration().get<boolean>('offline');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('offline');
   }
 
   public getSkipTests(): boolean {
-    const res = this.getConfiguration().get<boolean>('skipTests');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('skipTests');
   }
 
   public getSkipSelectSimulateExtension(): boolean {
-    const res = this.getConfiguration().get<boolean>('skipSelectSimulateExtension');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('skipSelectSimulateExtension');
   }
 
   public getStopSimulationOnEntry(): boolean {
-    const res = this.getConfiguration().get<boolean>('stopSimulationOnEntry');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('stopSimulationOnEntry');
   }
 
   public getDeployOffline(): boolean {
-    const res = this.getConfiguration().get<boolean>('deployOffline');
-    if (res === undefined) {
-      return false;
-    }
-    return res;
+    return !!this.getConfiguration().get<boolean>('deployOffline');
   }
 
   public dispose() {
@@ -247,7 +219,7 @@ export class Preferences implements IPreferences {
   }
 
   private async updatePreferences() {
-    if (this.preferencesFile === undefined) {
+    if (!this.preferencesFile) {
       this.preferencesJson = defaultPreferences;
       return;
     }
@@ -257,7 +229,7 @@ export class Preferences implements IPreferences {
   }
 
   private async writePreferences(): Promise<void> {
-    if (this.preferencesFile === undefined) {
+    if (!this.preferencesFile) {
       const configFilePath = Preferences.getPreferencesFilePath(this.workspace.uri.fsPath);
       this.preferencesFile = vscode.Uri.file(configFilePath);
       await mkdir(path.dirname(this.preferencesFile.fsPath));

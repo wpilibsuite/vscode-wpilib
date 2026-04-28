@@ -19,7 +19,7 @@ interface IJsonExample {
   language: 'java' | 'cpp';
   commandversion: number;
   robotclass: string;
-  packagetoreplace?: string | undefined;
+  packagetoreplace?: string;
   dependencies: string[];
   foldername: string;
   extravendordeps?: string[];

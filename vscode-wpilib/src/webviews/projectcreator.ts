@@ -160,7 +160,7 @@ export class ProjectCreator extends WebViewBase {
     };
     const result = await vscode.window.showOpenDialog(open);
 
-    if (result === undefined) {
+    if (!result) {
       return;
     }
 
