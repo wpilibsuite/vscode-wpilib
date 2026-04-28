@@ -3,6 +3,7 @@ import java.util.regex.Pattern
 
 def gradleBaseFolder = project.file('vscode-wpilib/resources/gradle')
 def sharedGradleBase = new File(gradleBaseFolder, 'shared')
+def javaMainFile = project.file('vscode-wpilib/resources/java/src/Main.java')
 def templateJavaFolder = project.file('vscode-wpilib/resources/java/src/templates')
 def examplesJavaFolder = project.file('vscode-wpilib/resources/java/src/examples')
 def templateCppFolder = project.file('vscode-wpilib/resources/cpp/src/templates')
@@ -11,8 +12,6 @@ def examplesCppFolder = project.file('vscode-wpilib/resources/cpp/src/examples')
 ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
     def jsonSlurper = new JsonSlurper()
     def obj = jsonSlurper.parseText(templateFile)
-
-    def gradleVersion = new File(gradleBaseFolder, 'version.txt').text.trim()
 
     obj.each { template ->
 
@@ -30,15 +29,28 @@ ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
             from sharedGradleBase
             into outputFolder
         }
-        def srcFolder = new File(outputFolder, 'src/main/java/frc/robot')
+        // Copy main
+        project.copy {
+            from javaMainFile
+            into new File(outputFolder, 'src/main/java/first')
+        }
+        // Replace the proper replacements in main
+        def mainFile = new File(outputFolder, 'src/main/java/first/Main.java')
+        def mainText = mainFile.text
+        mainText = mainText.replaceAll("package org.wpilib;", "package first;")
+        mainText = mainText.replaceAll("org.wpilib.templates.timed.Robot.class", "first.robot.${template.robotclass}.class")
+        mainFile.text = mainText
+
+
+        def srcFolder = new File(outputFolder, 'src/main/java/first/robot')
         // Copy source
         project.copy {
             from templateFolder
             into srcFolder
         }
 
-        def replacePackageFrom = "edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)";
-        def replacePackageTo = 'frc.robot';
+        def replacePackageFrom = "org\\.wpilib\\.(?:examples|templates)\\..+?(?=;|\\.)";
+        def replacePackageTo = 'first.robot';
 
         project.fileTree(outputFolder).matching {
             include '**/*.java'
@@ -52,7 +64,7 @@ ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
         def buildGradle = project.file(new File(outputFolder, 'build.gradle'))
         buildGradle.text =
             buildGradle.text
-                .replace('###ROBOTCLASSREPLACE###', "frc.robot.${template.mainclass}")
+                .replace('###ROBOTCLASSREPLACE###', "first.Main")
                 .replace('###GRADLERIOREPLACE###', gradleVersion)
 
     }
@@ -61,8 +73,6 @@ ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
 ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
     def jsonSlurper = new JsonSlurper()
     def obj = jsonSlurper.parseText(templateFile)
-
-    def gradleVersion = new File(gradleBaseFolder, 'version.txt').text.trim()
 
     obj.each { template ->
 
@@ -87,8 +97,8 @@ ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
             into srcFolder
         }
 
-        def replacePackageFrom = "edu\\.wpi\\.first\\.wpilibj\\.(?:examples|templates)\\..+?(?=;|\\.)";
-        def replacePackageTo = 'frc.robot';
+        def replacePackageFrom = "org\\.wpilib\\.(?:examples|templates)\\..+?(?=;|\\.)";
+        def replacePackageTo = 'first.robot';
 
         project.fileTree(outputFolder).matching {
             include '**/*.java'
@@ -107,18 +117,28 @@ ext.generateCpp = { templateFile, outputDir, templateFolderRaw ->
     }
 }
 
+interface FileSystemOperationsProvider {
+   @javax.inject.Inject
+   FileSystemOperations getFileSystemOperations()
+}
+def fileSystemOperations = objects.newInstance(FileSystemOperationsProvider).fileSystemOperations
+
 task generateTemplatesFolder {
     def outputDir = new File(project.buildDir, "templates")
-    def buildDir = project.buildDir
+
 
     outputs.dir outputDir
 
     outputs.upToDateWhen {false}
 
-    doLast {
-        buildDir.mkdirs()
+    def projectBuildDir = project.buildDir
 
-        outputDir.deleteDir()
+    doLast {
+        projectBuildDir.mkdirs()
+
+        fileSystemOperations.delete {
+            delete outputDir
+        }
 
         // Load all java templates
         def templateFile = new File(templateJavaFolder, 'templates.json').text
@@ -138,15 +158,20 @@ task generateTemplatesZip(type: Zip) {
 
 task generateExamplesFolder {
     def outputDir = new File(project.buildDir, "examples")
-    def buildDir = project.buildDir
+
 
     outputs.dir outputDir
 
     outputs.upToDateWhen {false}
 
+    def projectBuildDir = project.buildDir
+
     doLast {
-        buildDir.mkdirs()
-        outputDir.deleteDir()
+        projectBuildDir.mkdirs()
+
+        fileSystemOperations.delete {
+            delete outputDir
+        }
 
         // Load all java templates
         def templateFile = new File(examplesJavaFolder, 'examples.json').text
@@ -163,4 +188,3 @@ task generateExamplesZip(type: Zip) {
     archiveFileName = 'examples.zip'
     build.dependsOn it
 }
-
