@@ -35,6 +35,7 @@ class CodeBuilder implements ICodeBuilder {
       this.executeApi,
       prefs
     );
+    vscode.commands.executeCommand('java.projectConfiguration.update');
     logger.log(result.toString());
     return true;
   }
@@ -78,7 +79,7 @@ class CodeTester implements ICodeBuilder {
       this.executeApi,
       prefs
     );
-
+    vscode.commands.executeCommand('java.projectConfiguration.update');
     logger.log(result.toString());
     return true;
   }
