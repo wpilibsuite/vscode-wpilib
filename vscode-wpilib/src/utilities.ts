@@ -7,7 +7,7 @@ import * as util from 'util';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from 'vscode-wpilibapi';
 import { localize as i18n } from './locale';
-import { setExecutePermissions } from './shared/permissions';
+import { setExecutePermissions, setWritableRecursive } from './shared/permissions';
 
 // General utilites usable by multiple classes
 
@@ -69,18 +69,25 @@ export const deleteFileAsync = util.promisify(fs.unlink);
 
 export const mkdirpAsync = mkdirp;
 
-export function ncpAsync(source: string, dest: string, options: ncp.Options = {}): Promise<void> {
-  return mkdirpAsync(dest).then(() => {
-    return new Promise<void>((resolve, reject) => {
-      ncp.ncp(source, dest, options, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+export async function ncpAsync(
+  source: string,
+  dest: string,
+  options: ncp.Options = {}
+): Promise<void> {
+  await mkdirpAsync(dest);
+  await new Promise<void>((resolve, reject) => {
+    ncp.ncp(source, dest, options, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
     });
   });
+  // Ensure copied files are writable. This is necessary when the source
+  // resides on a read-only filesystem (e.g. the Nix store on NixOS),
+  // because ncp preserves the source's file permissions.
+  await setWritableRecursive(dest);
 }
 
 export const readdirAsync = util.promisify(fs.readdir);
