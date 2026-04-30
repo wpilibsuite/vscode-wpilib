@@ -352,7 +352,23 @@
       { "from": "edu.wpi.first.wpilibj.examples", "to": "org.wpilib.examples" },
       { "from": "edu.wpi.first.wpilibj.snippets", "to": "org.wpilib.snippets" },
       { "from": "edu.wpi.first.wpilibj.templates", "to": "org.wpilib.templates" },
-      { "from": "edu.wpi.first.wpilibj", "to": "org.wpilib" }
+      { "from": "edu.wpi.first.wpilibj", "to": "org.wpilib" },
+      { "from": "GradientType.kContinuous", "to": "GradientType.CONTINUOUS" },
+      { "from": "GradientType.kDiscrete", "to": "GradientType.DISCRETE" },
+      { "from": "CTREPCM", "to": "CTRE_PCM" },
+      { "from": "REVPH", "to": "REV_PH" },
+      { "from": "DoubleSolenoid.Value.kOff", "to": "DoubleSolenoid.Value.OFF" },
+      { "from": "DoubleSolenoid.Value.kForward", "to": "DoubleSolenoid.Value.FORWARD" },
+      { "from": "DoubleSolenoid.Value.kReverse", "to": "DoubleSolenoid.Value.REVERSE" },
+      { "from": "ColorOrder.kRGB", "to": "ColorOrder.RGB" },
+      { "from": "ColorOrder.kBGR", "to": "ColorOrder.BGR" },
+      { "from": "ColorOrder.kGRB", "to": "ColorOrder.GRB" },
+      { "from": "ColorOrder.kBRG", "to": "ColorOrder.BRG" },
+      { "from": "ColorOrder.kRBG", "to": "ColorOrder.RBG" },
+      { "from": "ColorOrder.kGBR", "to": "ColorOrder.GBR" },
+      { "from": "MountOrientation.kFlat", "to": "MountOrientation.FLAT" },
+      { "from": "MountOrientation.kLandscape", "to": "MountOrientation.LANDSCAPE" },
+      { "from": "MountOrientation.kPortrait", "to": "MountOrientation.PORTRAIT" }
     ]
   }
 ]

@@ -72,7 +72,7 @@
       </li>
       <li>Run RioLog: Click on the Command Palette and type "WPILib: Start RioLog"</li>
       <li>
-        Import a project: Click on the Command Palette and type "WPILib: Import a WPILib 2025
+        Import a project: Click on the Command Palette and type "WPILib: Import a WPILib 2025-2026
         Gradle project"
       </li>
     </ul>

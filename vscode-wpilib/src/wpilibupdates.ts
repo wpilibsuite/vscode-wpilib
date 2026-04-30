@@ -11,7 +11,7 @@ import { PersistentFolderState } from './persistentState';
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
-  return /(id\s*?["|']edu\.wpi\.first\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
+  return /(id\s*?["|']org\.wpilib\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
 }
 
 interface IOnlineTuple {
@@ -243,9 +243,9 @@ export class WPILibUpdates {
           return undefined;
         }
         let newestVersion = '0';
-        const frcYear = this.externalApi.getUtilitiesAPI().getFrcYear();
+        const wpilibYear = this.externalApi.getUtilitiesAPI().getWPILibYear();
         for (const v of versions) {
-          if (v.startsWith(frcYear) && isNewerVersion(v, newestVersion)) {
+          if (v.startsWith(wpilibYear) && isNewerVersion(v, newestVersion)) {
             newestVersion = v;
           }
         }
@@ -264,8 +264,8 @@ export class WPILibUpdates {
   }
 
   private async checkForLocalGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-    const frcHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
-    const gradleRioPath = path.join(frcHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
+    const wpilibHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
+    const gradleRioPath = path.join(wpilibHome, 'maven', 'org', 'wpilib', 'GradleRIO');
     try {
       const files = await readdir(gradleRioPath);
       const versions = [];

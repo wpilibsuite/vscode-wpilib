@@ -18,7 +18,7 @@ interface IJsonExample {
   gradlebase: string;
   language: 'java' | 'cpp';
   commandversion: number;
-  mainclass?: string | undefined;
+  robotclass: string;
   packagetoreplace?: string | undefined;
   dependencies: string[];
   foldername: string;
@@ -103,6 +103,7 @@ export async function addVendorExamples(
                 const gradlePath = path.join(gradleBasePath, ex.gradlebase);
 
                 if (ex.language === 'java') {
+                  const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
                   if (
                     !(await generateCopyJava(
                       shimmedResourceRoot,
@@ -110,8 +111,9 @@ export async function addVendorExamples(
                       undefined,
                       gradlePath,
                       folderInto.fsPath,
-                      'frc.robot.' + ex.mainclass,
-                      path.join('frc', 'robot'),
+                      mainJavaFile,
+                      'first.robot.' + ex.robotclass,
+                      path.join('first', 'robot'),
                       false,
                       vendordeps,
                       ex.packagetoreplace

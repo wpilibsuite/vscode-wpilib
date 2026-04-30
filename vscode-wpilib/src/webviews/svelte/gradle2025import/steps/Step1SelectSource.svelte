@@ -15,7 +15,7 @@
 
 <div class="step-header">
   <h2>Step 1: Select Source Project</h2>
-  <p>Select the build.gradle file of your 2025 WPILib project that you want to import.</p>
+  <p>Select the build.gradle file of your 2025-2026 WPILib project that you want to import.</p>
 </div>
 
 <div class="project-row">

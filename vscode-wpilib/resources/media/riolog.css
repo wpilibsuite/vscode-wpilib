@@ -8,22 +8,20 @@ body {
 body {
   scrollbar-gutter: stable;
   padding: 0;
-  display: flex;
-  flex-direction: column;
 }
 
-#app {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-}
-
+body,
+#app,
 #mainDiv {
   display: flex;
   flex-direction: column;
+}
+
+#app,
+#mainDiv {
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 .toolbar {

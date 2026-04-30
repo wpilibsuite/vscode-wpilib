@@ -156,7 +156,7 @@
 <div class="project-container">
   <img src={logoPath} alt="WPILib" height="75" />
 
-  <h1 class="project-title">Import WPILib 2025 Project</h1>
+  <h1 class="project-title">Import WPILib 2025-2026 Project</h1>
 
   <WizardProgress {steps} currentStep={currentStep} />
 

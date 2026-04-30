@@ -9,7 +9,7 @@ const production = process.env.NODE_ENV === 'production';
 export default {
   input: path.resolve(__dirname, 'src/extension.ts'),
   platform: 'node',
-  tsconfig: path.resolve(__dirname, 'tsconfig.rolldown.extension.json'),
+  tsconfig: path.resolve(__dirname, 'tsconfig.json'),
   resolve: {
     extensions: ['.mjs', '.js', '.json', '.ts'],
     mainFields: ['module', 'main'],

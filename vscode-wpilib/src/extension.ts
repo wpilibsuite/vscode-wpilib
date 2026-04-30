@@ -259,9 +259,9 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2027_alpha1') {
+        if (prefs.getProjectYear() !== '2027_alpha5') {
           const importPersistentState = new PersistentFolderState(
-            'wpilib.2027_alpha1persist',
+            'wpilib.2027_alpha5persist',
             false,
             w.uri.fsPath
           );
@@ -269,7 +269,7 @@ async function handleAfterTrusted(
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
-                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha1?'
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha5?'
               ),
               {
                 modal: true,
@@ -457,9 +457,9 @@ export async function activate(context: vscode.ExtensionContext) {
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
-  const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
 
-  const logPath = path.join(frcHomeDir, 'logs');
+  const logPath = path.join(wpilibHomeDir, 'logs');
   try {
     await mkdir(logPath, { recursive: true });
     setLoggerDirectory(logPath);

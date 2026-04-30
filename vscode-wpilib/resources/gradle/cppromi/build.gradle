@@ -1,7 +1,7 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO2027" version "###GRADLERIOREPLACE###"
+    id "org.wpilib.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -15,7 +15,7 @@ wpi.sim.addWebsocketsClient().defaultEnabled = true
 
 model {
     components {
-        frcUserProgram(NativeExecutableSpec) {
+        wpilibUserProgram(NativeExecutableSpec) {
             targetPlatform wpi.platforms.desktop
 
             sources.cpp {
@@ -38,8 +38,8 @@ model {
         }
     }
     testSuites {
-        frcUserProgramTest(GoogleTestTestSuiteSpec) {
-            testing $.components.frcUserProgram
+        wpilibUserProgramTest(GoogleTestTestSuiteSpec) {
+            testing $.components.wpilibUserProgram
 
             sources.cpp {
                 source {

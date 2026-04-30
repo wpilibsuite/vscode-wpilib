@@ -23,7 +23,7 @@ const webviews = [
   {
     name: 'gradle2025import',
     input: 'src/webviews/svelte/gradle2025import/main.ts',
-    title: 'WPILib Gradle 2025 Import',
+    title: 'WPILib 2025-2026 Project Import',
   },
   {
     name: 'dependencyview',
@@ -101,7 +101,7 @@ function isSharedWebviewModule(moduleId) {
 export default {
   input: bundleEntries,
   platform: 'browser',
-  tsconfig: path.resolve(__dirname, 'tsconfig.webviews.json'),
+  tsconfig: path.resolve(__dirname, 'tsconfig.json'),
   resolve: {
     conditionNames: production ? ['production'] : ['development'],
     extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
