@@ -12,7 +12,7 @@
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/vscode-wpilib"],
       "outFiles": ["${workspaceFolder}/vscode-wpilib/out/**/*.js"],
-      "preLaunchTask": "vscode-web-watch"
+      "preLaunchTask": "npm: build:dev"
     },
     {
       "name": "Extension Tests",
@@ -24,7 +24,7 @@
         "--extensionTestsPath=${workspaceFolder}/vscode-wpilib/out/test"
       ],
       "outFiles": ["${workspaceFolder}/vscode-wpilib/out/test/**/*.js"],
-      "preLaunchTask": "vscode-web-watch"
+      "preLaunchTask": "npm: build:dev"
     }
   ]
 }

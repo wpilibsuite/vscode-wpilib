@@ -2,7 +2,6 @@
 .vscode-test/**
 node_modules
 .gitignore
-webpack.config.js
 gulpfile.js
 i18n/**/package.i18n.json
 locale/**
@@ -10,6 +9,7 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 eslint.config.mjs
+rolldown.*.config.mjs
 **/*.map
 **/*.ts
 **/.vscode-test.*
