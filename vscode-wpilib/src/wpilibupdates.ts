@@ -11,7 +11,7 @@ import { PersistentFolderState } from './persistentState';
 import { isNewerVersion } from './versions';
 
 function getGradleRioRegex() {
-  return /(id\s*?["|']edu\.wpi\.first\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
+  return /(id\s*?["|']org\.wpilib\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
 }
 
 interface IOnlineTuple {
@@ -265,7 +265,7 @@ export class WPILibUpdates {
 
   private async checkForLocalGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
     const wpilibHome = this.externalApi.getUtilitiesAPI().getWPILibHomeDir();
-    const gradleRioPath = path.join(wpilibHome, 'maven', 'edu', 'wpi', 'first', 'GradleRIO');
+    const gradleRioPath = path.join(wpilibHome, 'maven', 'org', 'wpilib', 'GradleRIO');
     try {
       const files = await readdir(gradleRioPath);
       const versions = [];
