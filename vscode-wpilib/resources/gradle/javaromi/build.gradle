@@ -10,9 +10,6 @@ java {
 
 def ROBOT_MAIN_CLASS = "###ROBOTCLASSREPLACE###"
 
-// Set this to true to enable desktop support.
-def includeDesktopSupport = true
-
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
