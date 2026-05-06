@@ -78,28 +78,28 @@ task extractJavaDependencies(type: Copy) {
 }
 
 def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv2/CommandsV2.json'
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/commandsv2/CommandsV2.json'
   dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadCommandsV3 = tasks.register('downloadCommandsV3', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/commandsv3/CommandsV3.json'
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/commandsv3/CommandsV3.json'
   dest 'vscode-wpilib/resources/vendordeps/CommandsV3.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadRomiVendordep = tasks.register('downloadRomiVendordep', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/romiVendordep/RomiVendordep.json'
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/romiVendordep/RomiVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/RomiVendordep.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/2027/xrpVendordep/XRPVendordep.json'
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/xrpVendordep/XRPVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/XRPVendordep.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
