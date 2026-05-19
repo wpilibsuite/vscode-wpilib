@@ -1,12 +1,12 @@
-'use scrict';
+'use strict';
 
+import { readdir, unlink } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { logger } from './logger';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
+import { logger } from './logger';
 import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
-import { deleteFileAsync, readdirAsync } from './utilities';
 import { isNewerVersion } from './versions';
 
 class OptionQuickPick implements vscode.QuickPickItem {
@@ -154,17 +154,26 @@ export class VendorLibraries extends VendorLibrariesBase {
     workspace: vscode.WorkspaceFolder
   ): Promise<boolean> {
     let anySucceeded = false;
-    if (toRemove !== undefined) {
+    if (toRemove !== undefined && toRemove.length > 0) {
       const url = this.getWpVendorFolder(workspace);
-      const files = await readdirAsync(url);
+      const files = await readdir(url);
       for (const file of files) {
         const fullPath = path.join(url, file);
         const result = await this.readFile(fullPath);
         if (result !== undefined) {
           for (const ti of toRemove) {
-            if (ti.uuid === result.uuid) {
-              await deleteFileAsync(fullPath);
-              anySucceeded = true;
+            if (result.uuid === ti.uuid) {
+              try {
+                await unlink(fullPath);
+                anySucceeded = true;
+                // Found and deleted, break from inner loop
+                break;
+              } catch (err) {
+                logger.error('Failed to delete vendor dependency file', {
+                  file: fullPath,
+                  error: err,
+                });
+              }
             }
           }
         }
@@ -359,7 +368,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public getWpVendorFolder(workspace: vscode.WorkspaceFolder): string {
-    return this.getVendorFolder(workspace.uri.fsPath);
+    return path.join(workspace.uri.fsPath, 'vendordeps');
   }
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {

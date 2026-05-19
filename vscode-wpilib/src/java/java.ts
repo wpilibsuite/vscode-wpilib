@@ -1,13 +1,13 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import { access } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
-import { logger } from '../logger';
+import { IExternalAPI } from '../api';
+import { localize as i18n } from '../locale';
 import { Examples } from '../shared/examples';
 import { Templates } from '../shared/templates';
-import { existsAsync } from '../utilities';
 import { onVendorDepsChanged } from '../vendorlibraries';
 import { BuildTest } from './buildtest';
 import { Commands } from './commands';
@@ -26,8 +26,10 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
 
   const javaDebugExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
   if (javaDebugExtension === undefined) {
-    // TODO: Make this a visible warning message when project detected is java
-    logger.log('Could not find java extension. Debugging is disabled.');
+    vscode.window.showWarningMessage(
+      i18n('message', 'Could not find Debugger for Java extension. Debugging is disabled.')
+    );
+
     allowDebug = false;
   }
 
@@ -60,7 +62,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
         if (prefs.getIsWPILibProject()) {
           const localW = w;
           const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
-          if (await existsAsync(buildGradle)) {
+          try {
+            await access(buildGradle);
             const buildGradleUri = vscode.Uri.file(buildGradle);
             onVendorDepsChanged(
               async (workspace) => {
@@ -74,6 +77,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
               null,
               context.subscriptions
             );
+          } catch {
+            // Ignore
           }
         }
       }

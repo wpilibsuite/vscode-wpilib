@@ -2,10 +2,10 @@
 import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
+import * as vscode from 'vscode';
+import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import * as vscode from '../vscodeshim';
-import { IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
 import { generateCopyCpp, generateCopyJava } from './generator';
 
 export interface IExampleJsonLayout {
@@ -14,6 +14,7 @@ export interface IExampleJsonLayout {
   tags: string[];
   foldername: string;
   gradlebase: string;
+  robotclass: string;
   commandversion: number;
   extravendordeps?: string[];
   hasunittests?: boolean;
@@ -34,7 +35,14 @@ export class Examples {
       }
       const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
       for (const e of examples) {
-        const extraVendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
+        const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
+        const commandVersion: string =
+          e.commandversion !== undefined ? e.commandversion.toString() : '2';
+        if (commandVersion === '3') {
+          vendordeps.push('commandsv3');
+        } else {
+          vendordeps.push('commandsv2');
+        }
         const provider: IExampleTemplateCreator = {
           getLanguage(): string {
             return java ? 'java' : 'cpp';
@@ -52,6 +60,7 @@ export class Examples {
                 testFolder = path.join(examplesTestFolder, e.foldername);
               }
               if (java) {
+                const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
                 if (
                   !(await generateCopyJava(
                     resourceRoot,
@@ -59,10 +68,11 @@ export class Examples {
                     testFolder,
                     path.join(gradleBasePath, e.gradlebase),
                     folderInto.fsPath,
-                    'frc.robot.Main',
-                    path.join('frc', 'robot'),
+                    mainJavaFile,
+                    'first.robot.' + e.robotclass,
+                    path.join('first', 'robot'),
                     false,
-                    extraVendordeps
+                    vendordeps
                   ))
                 ) {
                   vscode.window.showErrorMessage(
@@ -79,7 +89,7 @@ export class Examples {
                     path.join(gradleBasePath, e.gradlebase),
                     folderInto.fsPath,
                     false,
-                    extraVendordeps
+                    vendordeps
                   ))
                 ) {
                   vscode.window.showErrorMessage(

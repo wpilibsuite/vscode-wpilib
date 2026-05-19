@@ -1,57 +1,17 @@
 'use strict';
 
+import { access } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { downloadDocs } from './docsapi';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
-import { existsAsync, getDesktopEnabled, gradleRun, javaHome } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
 import { WPILibUpdates } from './wpilibupdates';
-
-interface IUpdatePair {
-  yes: boolean;
-  global: boolean;
-}
-
-class UpdatePair implements IUpdatePair, vscode.MessageItem {
-  public title: string;
-  public isCloseAffordance: boolean;
-  public yes: boolean;
-  public global: boolean;
-
-  public constructor(title: string, yes: boolean, global: boolean, close: boolean) {
-    this.title = title;
-    this.yes = yes;
-    this.global = global;
-    this.isCloseAffordance = close;
-  }
-}
-
-async function globalProjectSettingUpdate(message: string): Promise<IUpdatePair | undefined> {
-  const opts: UpdatePair[] = [
-    new UpdatePair(i18n('ui', 'Yes (Project)'), true, false, false),
-    new UpdatePair(i18n('ui', 'Yes (Global)'), true, true, false),
-    new UpdatePair(i18n('ui', 'No (Project)'), false, false, false),
-    new UpdatePair(i18n('ui', 'No (Global)'), false, true, false),
-    new UpdatePair(i18n('ui', 'Cancel'), false, false, true),
-  ];
-
-  const result = await vscode.window.showInformationMessage<UpdatePair>(
-    message,
-    { modal: true },
-    ...opts
-  );
-
-  if (result !== undefined && result.title === i18n('ui', 'Cancel')) {
-    return undefined;
-  }
-
-  return result;
-}
 
 // Most of our commands are created here.
 // To create a command, use vscode.commands.registerCommand with the name of the command
@@ -284,300 +244,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setSkipTests', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set skip tests since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n('message', 'Skip tests on deploy? Currently {0}', preferences.getSkipTests())
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for setting skip tests');
-        return;
-      }
-
-      await preferences.setSkipTests(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setSkipSelectSimulateExtension', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n(
-            'message',
-            'Cannot set skip select simulate extension since this is not a WPILib project'
-          )
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Enable skipping of selection of simulation extensions? Currently {0}',
-          preferences.getSelectDefaultSimulateExtension()
-        )
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for skipping of selection of simulation extensions');
-        return;
-      }
-
-      await preferences.setSkipSelectSimulateExtension(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setSelectDefaultSimulateExtension', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n(
-            'message',
-            'Cannot set select default simulate extension since this is not a WPILib project'
-          )
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Enable selecting of all simulation extensions by default? Currently {0}',
-          preferences.getSelectDefaultSimulateExtension()
-        )
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for selection of all simulation extensions by default');
-        return;
-      }
-
-      await preferences.setSelectDefaultSimulateExtension(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setOffline', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set offline since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Run commands other then deploy in offline mode? Currently {0}',
-          preferences.getOffline()
-        )
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for setting offline');
-        return;
-      }
-
-      await preferences.setOffline(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setDeployOffline', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set deploy offline since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Run deploy command in offline mode? Currently {0}',
-          preferences.getDeployOffline()
-        )
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for setting deploy offline');
-        return;
-      }
-
-      await preferences.setDeployOffline(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setStopSimulationOnEntry', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set stop simulation since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Stop simulation debugging on entry? Currently {0}',
-          preferences.getStopSimulationOnEntry()
-        )
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for setting stop simulation on entry');
-        return;
-      }
-
-      await preferences.setStopSimulationOnEntry(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setUseWinDbgX', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set windbgx since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const wpConfiguration = vscode.workspace.getConfiguration('wpilib', workspace.uri);
-      let res = wpConfiguration.get<boolean>('useWindbgX');
-      if (res === undefined) {
-        res = false;
-      }
-
-      const result = await globalProjectSettingUpdate(
-        i18n('message', 'Use WinDbg Preview (from store) for windows debugging? Currently {0}', res)
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for setting Use WinDbg Preview');
-        return;
-      }
-
-      let target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global;
-      if (!result.global) {
-        target = vscode.ConfigurationTarget.WorkspaceFolder;
-      }
-      return wpConfiguration.update('useWindbgX', result.yes, target);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setAutoSave', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set auto save since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Automatically save on deploy? Currently {0}',
-          preferences.getAutoSaveOnDeploy()
-        )
-      );
-      if (result === undefined) {
-        logger.log('failed to set automatically save on deploy');
-        return;
-      }
-
-      await preferences.setAutoSaveOnDeploy(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.setStartRioLog', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (
-        workspace === undefined ||
-        !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-      ) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot set start RioLog since this is not a WPILib project')
-        );
-        return;
-      }
-
-      const preferences = preferencesApi.getPreferences(workspace);
-
-      const result = await globalProjectSettingUpdate(
-        i18n(
-          'message',
-          'Automatically start RioLog on deploy? Currently {0}',
-          preferences.getAutoStartRioLog()
-        )
-      );
-      if (result === undefined) {
-        logger.log('Invalid selection for riolog on deploy');
-        return;
-      }
-
-      await preferences.setAutoStartRioLog(result.yes, result.global);
-    })
-  );
-
-  context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.cancelTasks', async () => {
       await externalApi.getExecuteAPI().cancelCommands();
     })
@@ -683,7 +349,9 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
       const buildgradle = path.join(workspace.uri.fsPath, 'build.gradle');
 
-      if (!(await existsAsync(buildgradle))) {
+      try {
+        await access(buildgradle);
+      } catch {
         logger.log('build.gradle not found at: ', buildgradle);
         return;
       }
@@ -722,10 +390,11 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const homeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
       if (pick === 'Java') {
         const indexFile = path.join(homeDir, 'documentation', 'java', 'index.html');
-        if (await existsAsync(indexFile)) {
+        try {
+          await access(indexFile);
           await vscode.env.openExternal(vscode.Uri.file(indexFile));
           return;
-        } else {
+        } catch {
           try {
             const downloadDir = await downloadDocs(
               'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/documentation/',
@@ -743,10 +412,11 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         }
       } else if (pick === 'C++') {
         const indexFile = path.join(homeDir, 'documentation', 'cpp', 'index.html');
-        if (await existsAsync(indexFile)) {
+        try {
+          await access(indexFile);
           await vscode.env.openExternal(vscode.Uri.file(indexFile));
           return;
-        } else {
+        } catch {
           try {
             const downloadDir = await downloadDocs(
               'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibc/documentation/',

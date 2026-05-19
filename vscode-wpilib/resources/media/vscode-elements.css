@@ -1,0 +1,519 @@
+/* Styles taken from https://github.com/vscode-elements/elements-lite/tree/main/lib/components */
+/* Licensed under the MIT License: https://github.com/vscode-elements/elements-lite/blob/main/lib/LICENSE */
+/* select styles */
+.vscode-select {
+  position: relative;
+  width: 320px;
+}
+
+.vscode-select select {
+  appearance: none;
+  background-color: var(--vscode-settings-dropdownBackground);
+  border-color: var(--vscode-settings-dropdownBorder);
+  border-radius: 2px;
+  border-style: solid;
+  border-width: 1px;
+  color: var(--vscode-settings-dropdownForeground);
+  cursor: pointer;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+  line-height: 18px;
+  margin: 0;
+  padding: 3px 4px;
+  width: 100%;
+}
+
+.vscode-select select:focus {
+  border-color: var(--vscode-focusBorder);
+  outline: none;
+}
+
+.vscode-select.invalid select,
+.vscode-select select:invalid {
+  background-color: var(--vscode-inputValidation-errorBackground);
+  border-color: var(--vscode-inputValidation-errorBorder, #be1100);
+}
+
+.vscode-select option {
+  cursor: pointer;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+}
+
+.vscode-select .chevron-icon {
+  color: var(--vscode-foreground);
+  display: block;
+  height: 14px;
+  pointer-events: none;
+  position: absolute;
+  right: 8px;
+  top: 5px;
+  width: 14px;
+  transform: rotate(90deg);
+}
+
+.vscode-select select[multiple] {
+  padding: 0;
+}
+
+.vscode-select select[multiple] + .chevron-icon {
+  display: none;
+}
+
+.vscode-select select[multiple] option {
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+  line-height: 18px;
+  padding: 2px 3px;
+}
+
+.vscode-select select[multiple] option:hover {
+  background-color: var(--vscode-list-hoverBackground);
+  color: var(--vscode-list-hoverForeground);
+}
+
+.vscode-select select[multiple] option:checked {
+  background-color: var(--vscode-list-hoverBackground) !important;
+  color: var(--vscode-list-hoverForeground) !important;
+}
+
+.vscode-select select[multiple]:focus option:checked {
+  background-color: var(--vscode-list-activeSelectionBackground) !important;
+  color: var(--vscode-list-activeSelectionForeground) !important;
+}
+
+/* button styles */
+.vscode-button {
+  align-items: center;
+  background-color: var(--vscode-button-background);
+  border-color: var(--vscode-button-border, var(--vscode-button-background));
+  border-style: solid;
+  border-radius: 2px;
+  border-width: 1px;
+  color: var(--vscode-button-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+  line-height: 22px;
+  overflow: hidden;
+  padding: 1px 13px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.vscode-button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.vscode-button:focus,
+.vscode-button:active {
+  outline: none;
+}
+
+.vscode-button:focus {
+  background-color: var(--vscode-button-hoverBackground);
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+
+.vscode-button.secondary {
+  color: var(--vscode-button-secondaryForeground);
+  background-color: var(--vscode-button-secondaryBackground);
+  border-color: var(--vscode-button-border, var(--vscode-button-secondaryBackground));
+}
+
+.vscode-button.secondary:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.vscode-button.secondary:focus {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.vscode-button:disabled {
+  cursor: default;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.vscode-button:disabled:hover {
+  background-color: var(--vscode-button-background);
+}
+
+.vscode-button:disabled {
+  background-color: var(--vscode-button-background);
+  outline: 0;
+}
+
+.vscode-button.secondary:disabled {
+  background-color: var(--vscode-button-secondaryBackground);
+}
+
+.vscode-button.secondary:disabled:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.vscode-button.block {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  width: 100%;
+}
+
+.vscode-button svg {
+  display: block;
+}
+
+.vscode-button .codicon,
+.vscode-button svg {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.vscode-button .codicon:first-child,
+.vscode-button svg:first-child {
+  margin-left: 0;
+}
+
+.vscode-button .codicon:last-child,
+.vscode-button svg:last-child {
+  margin-right: 0;
+}
+
+/* collapsible */
+
+.vscode-collapsible + .vscode-collapsible {
+  border-top: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+.vscode-collapsible summary {
+  align-items: center;
+  background-color: var(--vscode-sideBarSectionHeader-background);
+  cursor: pointer;
+  display: flex;
+  height: 22px;
+  line-height: 22px;
+  user-select: none;
+}
+
+.vscode-collapsible summary:focus {
+  opacity: 1;
+  outline-offset: -1px;
+  outline-style: solid;
+  outline-width: 1px;
+  outline-color: var(--vscode-focusBorder);
+}
+
+.vscode-collapsible .icon-arrow {
+  display: block;
+  margin: 0 3px;
+}
+
+.vscode-collapsible[open] .icon-arrow {
+  transform: rotate(90deg);
+}
+
+.vscode-collapsible .title {
+  color: var(--vscode-sideBarSectionHeader-foreground);
+  display: block;
+  font-family: var(--vscode-font-family);
+  font-size: 11px;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.vscode-collapsible .title .description {
+  display: none;
+  font-weight: 400;
+  margin-left: 10px;
+  text-transform: none;
+  opacity: 0.6;
+}
+
+.vscode-collapsible[open] .title .description {
+  display: inline;
+}
+
+.vscode-collapsible .actions {
+  align-items: center;
+  display: none;
+  height: 22px;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.vscode-collapsible.always-show-actions[open] summary .actions,
+.vscode-collapsible[open]:hover summary .actions {
+  display: flex;
+}
+
+.vscode-badge {
+  background-color: var(--vscode-badge-background);
+  border: 1px solid var(--vscode-contrastBorder, transparent);
+  border-radius: 2px;
+  box-sizing: border-box;
+  color: var(--vscode-badge-foreground);
+  display: inline-block;
+  font-family: var(--vscode-font-family);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 14px;
+  min-width: 18px;
+  padding: 2px 3px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.vscode-badge.counter {
+  border-radius: 11px;
+  box-sizing: border-box;
+  height: 18px;
+  line-height: 1;
+  padding: 3px 5px;
+}
+
+.vscode-badge.activity-bar-counter {
+  background-color: var(--vscode-activityBarBadge-background);
+  border-radius: 20px;
+  color: var(--vscode-activityBarBadge-foreground);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 0 4px;
+}
+/* input styles */
+input.vscode-textfield,
+div.vscode-textfield {
+  background-color: var(--vscode-settings-textInputBackground);
+  border-color: var(--vscode-settings-textInputBorder, var(--vscode-settings-textInputBackground));
+  border-radius: 2px;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
+  color: var(--vscode-settings-textInputForeground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+  line-height: 18px;
+  max-width: 100%;
+  outline: none;
+  position: relative;
+  width: 320px;
+}
+
+input.vscode-textfield {
+  display: inline-block;
+  padding-bottom: 3px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 3px;
+}
+
+div.vscode-textfield {
+  align-items: center;
+  display: inline-flex;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+div.vscode-textfield input {
+  background-color: transparent;
+  border: 0;
+  color: var(--vscode-settings-textInputForeground);
+  display: block;
+  line-height: 18px;
+  margin: 0;
+  outline: 0;
+  padding-bottom: 3px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 3px;
+  width: 100%;
+}
+
+input.vscode-textfield:read-only:not([type='file']) {
+  cursor: not-allowed;
+}
+
+input.vscode-textfield::placeholder {
+  color: var(--vscode-input-placeholderForeground);
+  opacity: 1;
+}
+
+input.vscode-textfield:invalid,
+input.vscode-textfield.invalid,
+div.vscode-textfield:has(:invalid),
+div.vscode-textfield.invalid {
+  background-color: var(--vscode-inputValidation-errorBackground);
+  border-color: var(--vscode-inputValidation-errorBorder, #be1100);
+}
+
+input.vscode-textfield:focus,
+input.vscode-textfield:focus:invalid,
+div.vscode-textfield:focus-within {
+  outline: none;
+  border-color: var(--vscode-focusBorder);
+}
+
+input.vscode-textfield[type='file'] {
+  line-height: 24px;
+  padding-bottom: 0;
+  padding-left: 2px;
+  padding-top: 0;
+}
+
+.vscode-textfield:has(input[type='file']) {
+  box-sizing: border-box;
+  height: 26px;
+  overflow: hidden;
+  padding-left: 0;
+}
+
+input.vscode-textfield[type='file']::file-selector-button,
+.vscode-textfield input[type='file']::file-selector-button {
+  background-color: var(--vscode-button-background);
+  border: 0;
+  border-radius: 2px;
+  color: var(--vscode-button-foreground);
+  cursor: pointer;
+  display: inline-block;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  font-weight: var(--vscode-font-weight);
+  line-height: 20px;
+  margin-right: 4px;
+  padding: 0 14px;
+}
+
+input.vscode-textfield[type='file']::file-selector-button:hover,
+.vscode-textfield input[type='file']::file-selector-button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+.vscode-textfield input[type='file'] {
+  line-height: 24px;
+  margin-top: 1px;
+  padding-bottom: 0;
+  padding-left: 2px;
+  padding-top: 0;
+}
+
+.vscode-textfield:has(input[type='file']) > .codicon:not(:last-child),
+.vscode-textfield:has(input[type='file']) > .vscode-action-button:not(:last-child),
+.vscode-textfield:has(input[type='file']) > .vscode-badge:not(:last-child) {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+/* Checkbox styles */
+.vscode-checkbox {
+  display: inline-flex;
+  position: relative;
+  user-select: none;
+}
+
+.vscode-checkbox input[type='checkbox'] {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.vscode-checkbox .icon-checked,
+.vscode-checkbox .icon-indeterminate {
+  display: none;
+  height: 16px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 16px;
+}
+
+.vscode-checkbox .icon-checked,
+.vscode-checkbox .icon-indeterminate {
+  display: none;
+}
+
+.vscode-checkbox input[type='checkbox']:checked + label .icon-checked {
+  display: block;
+}
+
+.vscode-checkbox input[type='checkbox']:indeterminate + label .icon-indeterminate {
+  display: block;
+}
+
+.vscode-checkbox .icon {
+  align-items: center;
+  background-color: var(--vscode-settings-checkboxBackground);
+  background-size: 16px;
+  border: 1px solid var(--vscode-settings-checkboxBorder);
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: var(--vscode-settings-checkboxForeground);
+  display: flex;
+  height: 18px;
+  justify-content: center;
+  margin-left: 0;
+  margin-right: 9px;
+  padding: 0;
+  pointer-events: none;
+  position: relative;
+  width: 18px;
+}
+
+.vscode-checkbox input[type='checkbox']:invalid + label .icon,
+.vscode-checkbox input[type='checkbox'].invalid + label .icon {
+  background-color: var(--vscode-inputValidation-errorBackground);
+  border-color: var(--vscode-inputValidation-errorBorder, #be1100);
+}
+
+.vscode-checkbox input[type='checkbox']:focus + label .icon {
+  border-color: var(--vscode-focusBorder);
+}
+
+.vscode-checkbox label {
+  cursor: pointer;
+  display: inline-flex;
+  line-height: 18px;
+}
+
+.vscode-checkbox .text {
+  opacity: 0.9;
+}
+
+.vscode-checkbox-group {
+  display: flex;
+}
+
+.vscode-checkbox-group .vscode-checkbox {
+  display: block;
+}
+
+.vscode-checkbox-group .vscode-checkbox:not(:last-child) {
+  margin-right: 20px;
+}
+
+.vscode-checkbox-group.vertical {
+  flex-direction: column;
+}
+
+.vscode-checkbox-group .vscode-checkbox {
+  margin-right: 0;
+  margin-bottom: 15px;
+}

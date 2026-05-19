@@ -1,4 +1,4 @@
-def versionFiles = [new File('vscode-wpilib/package.json'), new File('wpilib-utility-standalone/package.json')]
+def versionFiles = [new File('vscode-wpilib/package.json')]
 def oldVersionFile = new File("$buildDir/existingVersions.json")
 
 task updateVersions(type: Task) {

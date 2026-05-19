@@ -1,11 +1,11 @@
-'use scrict';
+'use strict';
 
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import * as path from 'path';
-import { mkdirpAsync, readFileAsync, writeFileAsync } from '../utilities';
-import * as vscode from '../vscodeshim';
-import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../wpilibapishim';
-import { IPreferencesJson } from './preferencesjson';
+import * as vscode from 'vscode';
+import { ICreatorQuickPick, IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
+import { IPreferencesJson } from './preferencesjson';
 
 export class ExampleTemplateAPI implements IExampleTemplateAPI {
   private templates: ICreatorQuickPick[] = [];
@@ -106,7 +106,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
     }
 
     try {
-      await mkdirpAsync(toFolder);
+      await mkdir(toFolder, { recursive: true });
     } catch {
       //
     }
@@ -120,9 +120,9 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
 
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
 
-    const parsed = JSON.parse(await readFileAsync(jsonFilePath, 'utf8')) as IPreferencesJson;
+    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson;
     parsed.teamNumber = teamNumber;
-    await writeFileAsync(jsonFilePath, JSON.stringify(parsed, null, 4));
+    await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     return true;
   }

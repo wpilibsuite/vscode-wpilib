@@ -9,79 +9,88 @@ declare global {
 }
 
 export function validateProject(): boolean {
-  const elem = document.getElementById('projectName') as HTMLButtonElement;
-  const s = elem.value;
-  // logger.log('Project Name: ' + s);
-  const match = s.match(/\w[\w-]*$/gm);
-  const pdiv = document.getElementById('projectnamediv') as HTMLDivElement;
-  if (match === null || match.length === 0) {
-    pdiv.innerText = window.i18nTrans('ui', 'Invalid project name');
-    pdiv.classList.add('error');
-    elem.classList.add('error');
+  const projectName = document.getElementById('projectName') as HTMLInputElement;
+  const error = document.getElementById('projectNameError') as HTMLElement;
+
+  if (projectName.value.trim() === '') {
+    projectName.classList.add('invalid');
+    error.style.display = 'block';
     return false;
   } else {
-    pdiv.innerText = window.i18nTrans('ui', 'Project Name');
-    pdiv.classList.remove('error');
-    elem.classList.remove('error');
+    projectName.classList.remove('invalid');
+    error.style.display = 'none';
     return true;
   }
 }
 
 export function validateProjectFolder(): boolean {
-  const elem = document.getElementById('projectFolder') as HTMLInputElement;
-  const s = elem.value;
-  // logger.log('Validate Project Folder: ' + s);
-  const oneDrive = s.includes('OneDrive');
-  const pdiv = document.getElementById('projectfolderdiv') as HTMLDivElement;
-  if (oneDrive === true || s.length === 0) {
-    pdiv.innerText =
-      oneDrive === true
+  const projectFolder = document.getElementById('projectFolder') as HTMLInputElement;
+  const error = document.getElementById('projectFolderError') as HTMLElement;
+  const folderPath = projectFolder.value.trim();
+
+  if (folderPath === '' || folderPath.includes('OneDrive')) {
+    projectFolder.classList.add('invalid');
+    if (error) {
+      error.style.display = 'block';
+      error.innerText = folderPath.includes('OneDrive')
         ? window.i18nTrans('ui', "Invalid Base Folder - Folder can't be in OneDrive")
         : window.i18nTrans('ui', 'Invalid Base Folder');
-    pdiv.classList.add('error');
-    elem.classList.add('error');
+    }
     return false;
   } else {
-    pdiv.innerText = window.i18nTrans('ui', 'Base Folder');
-    pdiv.classList.remove('error');
-    elem.classList.remove('error');
+    projectFolder.classList.remove('invalid');
+    if (error) {
+      error.style.display = 'none';
+    }
     return true;
   }
 }
 
 export function validateXrpRomi(): boolean {
-  const romiCB = document.getElementById('romiCB') as HTMLInputElement;
-  const romiCBValue = romiCB.checked;
-  const xrpCB = document.getElementById('xrpCB') as HTMLInputElement;
-  const xrpCBValue = xrpCB.checked;
-
   const romiDiv = document.getElementById('romidiv') as HTMLDivElement;
   const xrpDiv = document.getElementById('xrpdiv') as HTMLDivElement;
-  if (romiCBValue === true && xrpCBValue === true) {
-    romiDiv.classList.add('error');
-    xrpDiv.classList.add('error');
-    return false;
-  } else {
+
+  if (romiDiv) {
     romiDiv.classList.remove('error');
-    xrpDiv.classList.remove('error');
-    return true;
   }
+  if (xrpDiv) {
+    xrpDiv.classList.remove('error');
+  }
+
+  return true;
 }
 
 export function validateTeamNumber(): boolean {
-  const elem = document.getElementById('teamNumber') as HTMLInputElement;
-  const s = elem.value;
-  const match = s.match(/^\d{1,5}$/gm);
-  const pdiv = document.getElementById('teamnumberdiv') as HTMLDivElement;
-  if (match === null || match.length === 0) {
-    pdiv.innerText = window.i18nTrans('ui', 'Invalid team number');
-    pdiv.classList.add('error');
-    elem.classList.add('error');
+  const teamNumber = document.getElementById('teamNumber') as HTMLInputElement;
+  const error = document.getElementById('teamNumberError') as HTMLElement;
+
+  if (teamNumber.value.trim() === '') {
+    // Empty is valid (optional)
+    teamNumber.classList.remove('invalid');
+    if (error) {
+      error.style.display = 'none';
+    }
+    return true;
+  }
+
+  const num = Number.parseInt(teamNumber.value, 10);
+  if (
+    Number.isNaN(num) ||
+    teamNumber.value.includes('.') ||
+    teamNumber.value.includes('e') ||
+    num < 1 ||
+    num > 25599
+  ) {
+    teamNumber.classList.add('invalid');
+    if (error) {
+      error.style.display = 'block';
+    }
     return false;
   } else {
-    pdiv.innerText = window.i18nTrans('ui', 'Team Number');
-    pdiv.classList.remove('error');
-    elem.classList.remove('error');
+    teamNumber.classList.remove('invalid');
+    if (error) {
+      error.style.display = 'none';
+    }
     return true;
   }
 }

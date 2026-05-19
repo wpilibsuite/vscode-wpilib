@@ -1,0 +1,159 @@
+body {
+  scrollbar-gutter: stable;
+  padding: 0;
+}
+
+.toolbar {
+  background-color: var(--vscode-editor-background);
+  border-top: 1px solid var(--vscode-panel-border);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.connection-status {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.connection-status.connected {
+  background-color: var(--vscode-testing-iconPassed, #4caf50);
+  box-shadow: 0 0 5px var(--vscode-testing-iconPassed, #4caf50);
+}
+
+.connection-status.disconnected {
+  background-color: var(--vscode-testing-iconFailed, #f44336);
+  box-shadow: 0 0 5px var(--vscode-testing-iconFailed, #f44336);
+}
+
+.team-number-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.vscode-textfield[id*='team-number'] {
+  width: 80px;
+}
+
+.search-container {
+  margin-bottom: 8px;
+}
+
+.vscode-textfield[id*='search-input'] {
+  width: 98%; /* Needed to prevent clipping */
+}
+
+.buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+#log-container {
+  padding: 8px;
+  overflow-y: auto;
+  max-height: calc(100vh - 60px);
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: var(--vscode-editor-font-size, 13px);
+  line-height: 1.4;
+}
+
+.log-entry {
+  display: flex;
+  margin-bottom: 4px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  position: relative;
+}
+
+.log-entry:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.error-log {
+  border-left: 3px solid var(--vscode-testing-iconFailed, #f44336);
+}
+
+.warning-log {
+  border-left: 3px solid var(--vscode-warningForeground, #ff9800);
+}
+
+.print-log {
+  border-left: 3px solid transparent;
+}
+
+.log-message {
+  display: flex;
+  align-items: flex-start;
+}
+
+.timestamp {
+  color: var(--vscode-descriptionForeground);
+  margin-right: 8px;
+  font-size: 12px;
+  user-select: none;
+}
+
+.message-content {
+  flex: 1;
+  word-break: break-word;
+}
+
+.toggle-button {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  position: relative;
+}
+
+.toggle-button.collapsed::before {
+  content: '►';
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.toggle-button.expanded::before {
+  content: '▼';
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.error-content {
+  margin-left: 12px;
+}
+
+/* Rules to properly handle error collapsing in RioLog */
+.error-content.collapsed .stack-trace,
+.error-content.collapsed .location-info {
+  display: none;
+}
+
+.stack-trace,
+.location-info {
+  margin-left: 12px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+}

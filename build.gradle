@@ -1,7 +1,7 @@
 plugins {
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2024.0.0'
-    id "de.undercouch.download" version "4.1.2"
+    id 'org.wpilib.WPILibRepositoriesPlugin' version '2027.0.0'
+    id 'org.wpilib.WPILibVersioningPlugin' version '2027.0.1'
+    id "de.undercouch.download" version "5.6.0"
     id "base"
 }
 
@@ -11,6 +11,7 @@ if (project.hasProperty('buildServer')) {
 
 ext.addedRelease = false
 wpilibVersioning.useAllTags = true
+wpilibRepositories.use2027Repos()
 
 def azureRelease = System.getenv('GITHUB_REF')
 if (azureRelease != null) {
@@ -32,17 +33,24 @@ configurations {
     javaSource
 }
 
-dependencies {
-    cppSource 'edu.wpi.first.wpilibc:examples:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:examples:+:@zip'
+ext.gradleVersion = project.file('vscode-wpilib/resources/gradle/version.txt').text.trim()
 
-    cppSource 'edu.wpi.first.wpilibc:templates:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:templates:+:@zip'
 
-    cppSource 'edu.wpi.first.wpilibc:commands:+:@zip'
-    javaSource 'edu.wpi.first.wpilibj:commands:+:@zip'
+def wpilibVersion = '+'
+if (ext.addedRelease) {
+    wpilibVersion = ext.gradleVersion
 }
 
+dependencies {
+    cppSource "org.wpilib.wpilibc:examples:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:examples:${wpilibVersion}:@zip"
+
+    cppSource "org.wpilib.wpilibc:templates:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:templates:${wpilibVersion}:@zip"
+
+    cppSource "org.wpilib.wpilibc:commands:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:commands:${wpilibVersion}:@zip"
+}
 
 task extractCppDependencies(type: Copy) {
     dependsOn configurations.cppSource
@@ -52,6 +60,7 @@ task extractCppDependencies(type: Copy) {
         configurations.cppSource.collect { zipTree(it) }
     }
     into 'vscode-wpilib/resources/cpp/src'
+    outputs.dir 'vscode-wpilib/resources/cpp/src'
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
@@ -63,66 +72,53 @@ task extractJavaDependencies(type: Copy) {
         configurations.javaSource.collect { zipTree(it) }
     }
     into 'vscode-wpilib/resources/java/src'
+    outputs.dir 'vscode-wpilib/resources/java/src'
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-def downloadNewCommands = tasks.register('downloadNewCommands', Download) {
-  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibNewCommands/WPILibNewCommands.json'
-  dest 'vscode-wpilib/resources/vendordeps/WPILibNewCommands.json'
+def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/commandsv2/CommandsV2.json'
+  dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
+  overwrite true
+}
+
+def downloadCommandsV3 = tasks.register('downloadCommandsV3', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/commandsv3/CommandsV3.json'
+  dest 'vscode-wpilib/resources/vendordeps/CommandsV3.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadRomiVendordep = tasks.register('downloadRomiVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/romiVendordep/RomiVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/RomiVendordep.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/xrpVendordep/XRPVendordep.json'
   dest 'vscode-wpilib/resources/vendordeps/XRPVendordep.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
-task copyFromVsCodeToStandaloneResources(type: Copy) {
-    dependsOn extractCppDependencies
-    dependsOn extractJavaDependencies
-    dependsOn downloadNewCommands
-    dependsOn downloadRomiVendordep
-    dependsOn downloadXRPVendordep
-    from ('vscode-wpilib/resources/java') {
-        into 'java'
-    }
-    from ('vscode-wpilib/resources/cpp') {
-        into 'cpp'
-    }
-    from ('vscode-wpilib/resources/gradle') {
-        into 'gradle'
-    }
-    from ('vscode-wpilib/resources/vendordeps') {
-        into 'vendordeps'
-    }
-    into 'wpilib-utility-standalone/resources'
-}
+build.dependsOn extractCppDependencies
+build.dependsOn extractJavaDependencies
+build.dependsOn downloadCommandsV2
+build.dependsOn downloadCommandsV3
+build.dependsOn downloadRomiVendordep
+build.dependsOn downloadXRPVendordep
 
-task copyFromVsCodeToStandaloneSrc(type: Copy) {
-    from ('vscode-wpilib/src/riolog/shared') {
-        into 'riolog/shared'
-    }
-    from ('vscode-wpilib/src/shared') {
-        into 'shared'
-    }
-    into 'wpilib-utility-standalone/src'
+clean {
+    delete 'vscode-wpilib/resources/java/src'
+    delete 'vscode-wpilib/resources/cpp/src'
+    delete 'vscode-wpilib/resources/vendordeps'
 }
 
 apply from: 'templatebuilder.gradle'
-
-
-task updateAllDependencies() {
-    dependsOn copyFromVsCodeToStandaloneResources
-    dependsOn copyFromVsCodeToStandaloneSrc
-}
 
 if (project.hasProperty("publishVersion")) {
     wpilibVersioning.version.set(project.publishVersion)
@@ -132,7 +128,6 @@ wpilibVersioning.version.finalizeValue()
 
 ext.pubVersion = wpilibVersioning.version.get()
 
-
 if (pubVersion == '') {
     pubVersion = '0.0.1-unknown'
 }
@@ -140,5 +135,5 @@ if (pubVersion == '') {
 apply from: 'versions.gradle'
 
 wrapper {
-    gradleVersion = '8.11'
+    gradleVersion = '9.2.0'
 }

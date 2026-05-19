@@ -30,15 +30,7 @@ export function getMavenMetadataContents(repoRoot: string): Promise<string> {
 }
 
 export function getMavenMetadata(xmlFile: string): Promise<IMavenMetaData> {
-  return new Promise<IMavenMetaData>((resolve, reject) => {
-    xml2js.parseString(xmlFile, (err, result) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(result as IMavenMetaData);
-    });
-  });
+  return xml2js.parseStringPromise(xmlFile);
 }
 
 export function getMavenVersions(metadata: IMavenMetaData): string[] {

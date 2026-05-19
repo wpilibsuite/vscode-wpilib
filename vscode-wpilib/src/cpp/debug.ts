@@ -37,7 +37,6 @@ export async function startDebugging(commands: IDebugCommands): Promise<void> {
   };
 
   for (const a of commands.srcPaths) {
-    /* tslint:disable-next-line:no-unsafe-any */
     config.setupCommands.push({
       text: 'dir ' + a,
     });

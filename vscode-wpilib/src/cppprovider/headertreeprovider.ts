@@ -6,68 +6,31 @@ import * as vscode from 'vscode';
 import { logger } from '../logger';
 import { IEnabledBuildTypes } from './apiprovider';
 import { IToolChain } from './jsonformats';
+import { readdir, stat } from 'fs/promises';
 
 //#region Utilities
 
-function handleResult<T>(
-  resolve: (result: T) => void,
-  reject: (error: Error) => void,
-  error: Error | null | undefined,
-  result: T
-): void {
-  if (error) {
-    reject(massageError(error));
-  } else {
-    resolve(result);
-  }
-}
-
 function massageError(error: Error & { code?: string }): Error {
-  if (error.code === 'ENOENT') {
-    return vscode.FileSystemError.FileNotFound();
+  switch (error.code) {
+    case 'ENOENT':
+      return vscode.FileSystemError.FileNotFound();
+    case 'EISDIR':
+      return vscode.FileSystemError.FileIsADirectory();
+    case 'EEXIST':
+      return vscode.FileSystemError.FileExists();
+    case 'EPERM':
+    case 'EACCESS':
+      return vscode.FileSystemError.NoPermissions();
+    default:
+      return error;
   }
-
-  if (error.code === 'EISDIR') {
-    return vscode.FileSystemError.FileIsADirectory();
-  }
-
-  if (error.code === 'EEXIST') {
-    return vscode.FileSystemError.FileExists();
-  }
-
-  if (error.code === 'EPERM' || error.code === 'EACCESS') {
-    return vscode.FileSystemError.NoPermissions();
-  }
-
-  return error;
 }
 
-function normalizeNFC(items: string): string;
-function normalizeNFC(items: string[]): string[];
-function normalizeNFC(items: string | string[]): string | string[] {
+function normalizeNFC(items: string[]): string[] {
   if (process.platform !== 'darwin') {
     return items;
   }
-
-  if (Array.isArray(items)) {
-    return items.map((item) => item.normalize('NFC'));
-  }
-
-  return items.normalize('NFC');
-}
-
-function readdir(pth: string): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
-    fs.readdir(pth, (error, children) =>
-      handleResult(resolve, reject, error, normalizeNFC(children))
-    );
-  });
-}
-
-function stat(pth: string): Promise<fs.Stats> {
-  return new Promise<fs.Stats>((resolve, reject) => {
-    fs.stat(pth, (error, st) => handleResult(resolve, reject, error, st));
-  });
+  return items.map((item) => item.normalize('NFC'));
 }
 
 export class FileStat implements vscode.FileStat {
@@ -276,7 +239,11 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
   }
 
   private async _stat(pth: string): Promise<vscode.FileStat> {
-    return new FileStat(await stat(pth));
+    try {
+      return new FileStat(await stat(pth));
+    } catch (e: any) {
+      throw massageError(e);
+    }
   }
 
   private readDirectory(
@@ -288,9 +255,9 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
   private async _readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
     let children: string[] = [];
     try {
-      children = await readdir(uri.fsPath);
-    } catch (err) {
-      logger.log('Directory Warning', err);
+      children = normalizeNFC(await readdir(uri.fsPath));
+    } catch (err: any) {
+      logger.log('Directory Warning', massageError(err));
     }
 
     const result: [string, vscode.FileType][] = [];

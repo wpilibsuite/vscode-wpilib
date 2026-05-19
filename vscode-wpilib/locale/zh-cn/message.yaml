@@ -1,4 +1,4 @@
-Java 17 required, but not found. Might have compilation errors.: 没有找到需要的 Java 17，可能会产生编译错误。
+Java 21 required, but not found. Might have compilation errors.: 没有找到需要的 Java 21，可能会产生编译错误。
 # This project is not compatible with this version of the extension. Please create a new project.
 # It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. Would you like to do this now?
 # It is recommended to run a "Build" and update tools after a WPILib update to ensure dependencies are installed correctly. Would you like to do this now?
@@ -18,17 +18,11 @@ No dependencies installed: 没有安装任何依赖
 # Check offline or online?
 # Cannot deploy code in an empty workspace
 # Cannot debug code in an empty workspace
-# Cannot simulate number in an empty workspace
+# Cannot simulate code in an empty workspace
 # Cannot start tests in an empty workspace
 # Cannot create command in an empty workspace
 # Cannot set team number in an empty workspace
 # Cannot set language in an empty workspace
-# Cannot set skip tests in an empty workspace
-# Cannot set offline in an empty workspace
-# Cannot set deploy offline in an empty workspace
-# Cannot set stop simulation in an empty workspace
-# Cannot set auto save in an empty workspace
-# Cannot set team number in an empty workspace
 # Cannot run command on empty workspace
 # Cannot reset auto update with an empty workspace
 # Cannot install gradle tools with an empty workspace
@@ -36,13 +30,6 @@ No dependencies installed: 没有安装任何依赖
 # Cannot create into non empty folder
 # Must select a folder to create a command
 # No languages available to set
-# Skip tests on deploy? Currently {0}
-# Run commands other then deploy in offline mode? Currently {0}
-# Run deploy command in offline mode? Currently {0}
-# Stop simulation debugging on entry? Currently {0}
-Automatically save on deploy? Currently {0}: 部署时自动保存吗？当前为 {0}
-# Cannot set start RioLog in an empty workspace
-# Automatically start RioLog on deploy? Currently {0}
 # Successfully set java.home
 # Enable Desktop Support for Project? Currently ${isEnabled}
 # Invalid project format to add or remove desktop support.
@@ -77,3 +64,5 @@ Failed to start tool: 工具运行失败
 No tools found. Would you like to use Gradle to grab some?: 没找到工具，要使用 Gradle 来装一些吗？
 # Can only extract to absolute path
 # Please select project type, language, and base.
+# Could not find cpptools C++ extension. Debugging is disabled.
+# Could not find Debugger for Java extension. Debugging is disabled.

@@ -1,26 +1,14 @@
 'use strict';
 
-import * as fs from 'fs';
+import { S_IXGRP, S_IXOTH, S_IXUSR } from 'constants';
+import { chmod, stat } from 'fs/promises';
 
-export function setExecutePermissions(file: string): Promise<void> {
+export async function setExecutePermissions(file: string): Promise<void> {
   if (process.platform === 'win32') {
-    return Promise.resolve();
+    return;
   }
-  return new Promise<void>((resolve, reject) => {
-    fs.stat(file, (err, stat) => {
-      if (err) {
-        reject(err);
-      } else {
-        let mode = stat.mode & 0xffff;
-        mode |= fs.constants.S_IXUSR | fs.constants.S_IXGRP | fs.constants.S_IXOTH;
-        fs.chmod(file, mode, (err2) => {
-          if (err2) {
-            reject(err2);
-          } else {
-            resolve();
-          }
-        });
-      }
-    });
-  });
+  const stats = await stat(file);
+  let mode = stats.mode & 0xffff;
+  mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+  await chmod(file, mode);
 }

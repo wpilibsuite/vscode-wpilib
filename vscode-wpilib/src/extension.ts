@@ -6,9 +6,10 @@
 // const config = JSON.parse(process.env.VSCODE_NLS_CONFIG as string);
 // const localize = nls.config(config as nls.Options)();
 
+import { access, mkdir } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from 'vscode-wpilibapi';
+import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
 import { BuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
@@ -28,10 +29,10 @@ import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
-import { existsAsync, mkdirpAsync, setExtensionContext, setJavaHome } from './utilities';
+import { setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
-import { Gradle2020Import } from './webviews/gradle2020import';
+import { Gradle2025Import } from './webviews/gradle2025import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { WPILibUpdates } from './wpilibupdates';
@@ -105,7 +106,7 @@ async function handleAfterTrusted(
   context: vscode.ExtensionContext,
   creationError: boolean,
   extensionResourceLocation: string,
-  gradle2020import: Gradle2020Import | undefined,
+  gradle2025import: Gradle2025Import | undefined,
   help: Help | undefined
 ) {
   // Only trusted workspace code can occur below here
@@ -119,7 +120,7 @@ async function handleAfterTrusted(
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(
-      i18n('message', 'Java 17 required, but not found. Might have compilation errors.')
+      i18n('message', 'Java 21 required, but not found. Might have compilation errors.')
     );
   }
 
@@ -258,17 +259,17 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2026') {
-          const importPersistantState = new PersistentFolderState(
-            'wpilib.2026persist',
+        if (prefs.getProjectYear() !== '2027_alpha5') {
+          const importPersistentState = new PersistentFolderState(
+            'wpilib.2027_alpha5persist',
             false,
             w.uri.fsPath
           );
-          if (importPersistantState.Value === false) {
+          if (importPersistentState.Value === false) {
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
-                'This project is not compatible with this version of the extension. Would you like to import this project into 2026?'
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha5?'
               ),
               {
                 modal: true,
@@ -278,11 +279,11 @@ async function handleAfterTrusted(
               { title: "No, Don't ask again" }
             );
             if (upgradeResult?.title === 'Yes') {
-              if (gradle2020import) {
-                await gradle2020import.startWithProject(w.uri);
+              if (gradle2025import) {
+                await gradle2025import.startWithProject(w.uri);
               }
             } else if (upgradeResult?.title === "No, Don't ask again") {
-              importPersistantState.Value = true;
+              importPersistentState.Value = true;
             }
           }
           continue;
@@ -294,7 +295,15 @@ async function handleAfterTrusted(
             didUpdate = await wpilibUpdate.checkForInitialUpdate(w);
           }
 
-          let runBuild: boolean = !(await existsAsync(path.join(w.uri.fsPath, 'build')));
+          let runBuild: boolean;
+          try {
+            await access(path.join(w.uri.fsPath, 'build'));
+            logger.info('Build folder detected! Will not trigger build');
+            runBuild = false;
+          } catch {
+            runBuild = true;
+            logger.info('Build folder not detected! Triggering build');
+          }
 
           if (didUpdate) {
             const result = await vscode.window.showInformationMessage(
@@ -448,11 +457,11 @@ export async function activate(context: vscode.ExtensionContext) {
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
-  const frcHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
 
-  const logPath = path.join(frcHomeDir, 'logs');
+  const logPath = path.join(wpilibHomeDir, 'logs');
   try {
-    await mkdirpAsync(logPath);
+    await mkdir(logPath, { recursive: true });
     setLoggerDirectory(logPath);
   } catch (err) {
     logger.error('Error creating logger', err);
@@ -471,14 +480,14 @@ export async function activate(context: vscode.ExtensionContext) {
     creationError = true;
   }
 
-  let gradle2020import: Gradle2020Import | undefined;
+  let gradle2025import: Gradle2025Import | undefined;
 
   try {
-    // Create the gradle 2020 import provider
-    gradle2020import = await Gradle2020Import.Create(extensionResourceLocation);
-    context.subscriptions.push(gradle2020import);
+    // Create the gradle 2025 import provider
+    gradle2025import = await Gradle2025Import.Create(extensionResourceLocation);
+    context.subscriptions.push(gradle2025import);
   } catch (err) {
-    logger.error('error creating gradle 2020 importer', err);
+    logger.error('error creating gradle 2025 importer', err);
     creationError = true;
   }
 
@@ -497,7 +506,9 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.showLogFolder', async () => {
       let mainLog = getMainLogFile();
-      if (!(await existsAsync(mainLog))) {
+      try {
+        await access(mainLog);
+      } catch {
         mainLog = path.dirname(mainLog);
       }
       await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(mainLog));
@@ -523,7 +534,7 @@ export async function activate(context: vscode.ExtensionContext) {
         context,
         creationError,
         extensionResourceLocation,
-        gradle2020import,
+        gradle2025import,
         help
       );
     });
@@ -535,80 +546,13 @@ export async function activate(context: vscode.ExtensionContext) {
     context,
     creationError,
     extensionResourceLocation,
-    gradle2020import,
+    gradle2025import,
     help
   );
-
-  // Register the command with arguments
-  let disposable = vscode.commands.registerCommand(
-    'extension.showWebsite',
-    (url: string, tabTitle: string) => {
-      // If no arguments were passed, you can prompt the user (optional):
-      if (!url) {
-        vscode.window.showErrorMessage('URL not provided!');
-        return;
-      }
-      try {
-        new URL(url);
-      } catch (e) {
-        vscode.window.showErrorMessage(`Could not display website! Invalid URL: "${url}"`);
-        return;
-      }
-      if (!tabTitle) {
-        tabTitle = 'My Website'; // fallback title if not provided
-      }
-
-      // Create and show a new webview panel
-      const panel = vscode.window.createWebviewPanel(
-        'myWebview', // internal identifier
-        tabTitle, // use the dynamic title
-        vscode.ViewColumn.One,
-        {
-          enableScripts: true,
-          retainContextWhenHidden: true,
-        }
-      );
-
-      // Set the HTML content of the webview
-      panel.webview.html = getWebviewContent(url);
-    }
-  );
-
-  context.subscriptions.push(disposable);
-
   return externalApi;
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
   closeLogger();
-}
-
-function getWebviewContent(url: string): string {
-  // Basic HTML that includes an iframe to your target website.
-  // NOTE: This will only work if the site allows iframes.
-  return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body, html {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        overflow: hidden;
-        background: #fff;
-      }
-      iframe {
-        border: none;
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <iframe src="${url}" sandbox="allow-scripts allow-same-origin"></iframe>
-  </body>
-  </html>`;
 }

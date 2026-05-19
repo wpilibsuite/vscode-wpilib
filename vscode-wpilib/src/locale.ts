@@ -41,7 +41,7 @@ function initializeSettings() {
       let language: string | undefined;
       if (vscodeOptions.availableLanguages) {
         const value = vscodeOptions.availableLanguages['*'];
-        if (typeof value == 'string') {
+        if (typeof value === 'string') {
           language = value;
         }
       }

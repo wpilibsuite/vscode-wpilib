@@ -1,6 +1,6 @@
-'use scrict';
+'use strict';
 import * as vscode from 'vscode';
-import { ICodeDeployer, IDeployDebugAPI } from 'vscode-wpilibapi';
+import { ICodeDeployer, IDeployDebugAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';
@@ -40,9 +40,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     if ('hwsim' in config) {
       hwsim = config.hwsim as boolean;
     }
-
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise<undefined>(async (resolve) => {
+    return (async () => {
       if (desktop) {
         if (hwsim) {
           await this.deployDebugAPI.simulateCode(workspace, undefined, '-PhwSim');
@@ -52,8 +50,8 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
       } else {
         await this.deployDebugAPI.debugCode(workspace, undefined);
       }
-      resolve(undefined);
-    });
+      return undefined;
+    })();
   }
 
   public provideDebugConfigurations(

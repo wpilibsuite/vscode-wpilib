@@ -2,20 +2,20 @@
 
 import * as os from 'os';
 import * as path from 'path';
+import { IUtilitiesAPI } from '../api';
 import { getIsWindows } from '../utilities';
-import { IUtilitiesAPI } from '../wpilibapishim';
 
 export class UtilitiesAPI implements IUtilitiesAPI {
   private wpilibHome: string | undefined;
 
-  public getFrcYear(): string {
-    return '2026';
+  public getWPILibYear(): string {
+    return '2027_alpha5';
   }
   public getWPILibHomeDir(): string {
     if (this.wpilibHome) {
       return this.wpilibHome;
     }
-    const year = this.getFrcYear();
+    const year = this.getWPILibYear();
     if (getIsWindows()) {
       let publicFolder = process.env.PUBLIC;
       if (!publicFolder) {

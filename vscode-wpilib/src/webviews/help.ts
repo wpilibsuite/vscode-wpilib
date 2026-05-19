@@ -22,7 +22,28 @@ export class Help extends WebViewBase {
   }
 
   public displayHelp() {
-    this.displayWebView(vscode.ViewColumn.Active);
+    this.displayWebView(vscode.ViewColumn.Active, true);
+
+    // Set up message handler for button clicks if webview exists
+    if (this.webview) {
+      this.webview.webview.onDidReceiveMessage(
+        (message) => {
+          switch (message.command) {
+            case 'openCommandPalette':
+              vscode.commands.executeCommand('workbench.action.quickOpen', '>WPILib ');
+              break;
+            case 'openDocumentation':
+              vscode.commands.executeCommand(
+                'vscode.open',
+                vscode.Uri.parse('https://docs.wpilib.org/en/2027')
+              );
+              break;
+          }
+        },
+        undefined,
+        this.disposables
+      );
+    }
   }
 
   private async asyncInitialize() {

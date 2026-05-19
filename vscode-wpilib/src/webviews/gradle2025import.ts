@@ -1,0 +1,368 @@
+'use strict';
+
+import * as fs from 'fs';
+import { mkdir, readFile, writeFile } from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { localize as i18n } from '../locale';
+import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
+import { ImportUpdate } from '../shared/importupdater';
+import { IPreferencesJson } from '../shared/preferencesjson';
+import { extensionContext, promptForProjectOpen } from '../utilities';
+import {
+  IGradle2025IPCData,
+  IGradle2025IPCReceive,
+  IGradle2025IPCSend,
+} from './pages/gradle2025importpagetypes';
+import { WebViewBase } from './webviewbase';
+import { VendorDepFiles } from '../shared/projectGeneratorUtils';
+
+export class Gradle2025Import extends WebViewBase {
+  public static async Create(resourceRoot: string): Promise<Gradle2025Import> {
+    const cimport = new Gradle2025Import(resourceRoot);
+    await cimport.asyncInitialize();
+    return cimport;
+  }
+
+  private onLoad?: () => Promise<void>;
+
+  private constructor(resourceRoot: string) {
+    super('wpilibgradle2025import', 'WPILib Gradle 2025 Import', resourceRoot);
+
+    this.disposables.push(
+      vscode.commands.registerCommand('wpilibcore.importGradle2025Project', () => {
+        return this.startWebpage();
+      })
+    );
+  }
+
+  public async startWithProject(projectRoot: vscode.Uri) {
+    await this.startWebpage();
+    const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
+    return this.handleProject(project, true);
+  }
+
+  private async startWebpage() {
+    this.displayWebView(vscode.ViewColumn.Active, true, {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+    });
+    if (this.webview) {
+      this.webview.webview.onDidReceiveMessage(
+        async (data: IGradle2025IPCReceive) => {
+          switch (data.type) {
+            case 'loaded':
+              const copy = this.onLoad;
+              this.onLoad = undefined;
+              if (copy) {
+                await copy();
+              }
+              break;
+            case 'gradle2025':
+              await this.handleGradle2025Button();
+              break;
+            case 'newproject':
+              await this.handleNewProjectLoc();
+              break;
+            case 'importproject':
+              if (data.data) {
+                await this.handleImport(data.data);
+              }
+              break;
+            default:
+              break;
+          }
+        },
+        undefined,
+        this.disposables
+      );
+    }
+  }
+
+  private async postMessage(data: IGradle2025IPCSend): Promise<boolean> {
+    if (this.webview) {
+      return this.webview.webview.postMessage(data);
+    } else {
+      return false;
+    }
+  }
+
+  private async handleProject(oldProject: vscode.Uri, occursBeforeLoad: boolean) {
+    const oldProjectPath = path.dirname(oldProject.fsPath);
+
+    const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
+
+    let teamNumber: string | undefined;
+
+    try {
+      const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
+      const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
+      teamNumber = wpilibJsonFileParsed.teamNumber.toString(10);
+    } catch {
+      // File doesn't exist, ignore
+    }
+
+    this.onLoad = async () => {
+      await this.postMessage({
+        data: oldProject.fsPath,
+        type: 'gradle2025',
+      });
+      await this.postMessage({
+        data: path.dirname(path.dirname(oldProject.fsPath)),
+        type: 'newproject',
+      });
+      await this.postMessage({
+        data: path.basename(oldProjectPath) + '-Imported',
+        type: 'projectname',
+      });
+      if (teamNumber !== undefined) {
+        await this.postMessage({
+          data: teamNumber,
+          type: 'teamnumber',
+        });
+      }
+    };
+
+    if (!occursBeforeLoad) {
+      const copy = this.onLoad;
+      this.onLoad = undefined;
+      await copy();
+    }
+  }
+
+  private async handleGradle2025Button() {
+    // Find old project
+    const oldProject = await vscode.window.showOpenDialog({
+      canSelectFiles: true,
+      canSelectFolders: false,
+      canSelectMany: false,
+      defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
+      filters: {
+        'Gradle 2025 Project': ['gradle'],
+      },
+      openLabel: 'Select a Project',
+    });
+
+    if (oldProject === undefined || oldProject.length !== 1) {
+      return;
+    }
+
+    return this.handleProject(oldProject[0], false);
+  }
+
+  private async handleNewProjectLoc() {
+    const open: vscode.OpenDialogOptions = {
+      canSelectFiles: false,
+      canSelectFolders: true,
+      canSelectMany: false,
+      defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
+      openLabel: 'Select Folder',
+    };
+    const result = await vscode.window.showOpenDialog(open);
+
+    if (result === undefined) {
+      return;
+    }
+
+    if (this.webview) {
+      await this.postMessage({
+        data: result[0].fsPath,
+        type: 'newproject',
+      });
+    }
+  }
+
+  private async handleImport(data: IGradle2025IPCData) {
+    if (!path.isAbsolute(data.toFolder)) {
+      vscode.window.showErrorMessage('Can only extract to absolute path');
+      return;
+    }
+    const oldProjectPath = path.dirname(data.fromProps);
+
+    // Detect C++ or Java project
+    const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
+
+    let cpp = true;
+    try {
+      const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
+      const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
+      if (wpilibJsonFileParsed.currentLanguage === 'cpp') {
+        cpp = true;
+      } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
+        cpp = false;
+      } else {
+        await vscode.window.showErrorMessage(
+          i18n(
+            'message',
+            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java" or "cpp".'
+          ),
+          {
+            modal: true,
+          }
+        );
+        return;
+      }
+    } catch {
+      // Error
+      await vscode.window.showErrorMessage(
+        i18n(
+          'message',
+          'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+        ),
+        {
+          modal: true,
+        }
+      );
+      return;
+    }
+
+    const gradleFile = path.join(oldProjectPath, 'build.gradle');
+
+    let javaRobotPackage: string = '';
+    let mainClassPackage: string = '';
+    if (!cpp) {
+      try {
+        const gradleContents = await readFile(gradleFile, 'utf8');
+        const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
+        const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
+        if (regexRes !== null && regexRes.length === 2) {
+          mainClassPackage = regexRes[1].replace(/\./g, path.sep) + '.java';
+        }
+        const mainClassPath = path.join(oldProjectPath, 'src', 'main', 'java', mainClassPackage);
+        const mainClassContents = await readFile(mainClassPath, 'utf8');
+        const packageRegex = 'package\\s+([a-zA-Z0-9_.]+);';
+        const packageRes = new RegExp(packageRegex, 'g').exec(mainClassContents);
+        if (packageRes !== null && packageRes.length === 2) {
+          javaRobotPackage = packageRes[1] + '.Robot';
+        }
+      } catch {
+        // File doesn't exist
+      }
+    }
+
+    if (javaRobotPackage === '') {
+      const res = await vscode.window.showInformationMessage(
+        i18n('message', 'Failed to determine robot class. Enter it manually?'),
+        {
+          modal: true,
+        },
+        { title: 'Yes' },
+        { title: 'No', isCloseAffordance: true }
+      );
+      if (res?.title !== 'Yes') {
+        await vscode.window.showErrorMessage('Project Import Failed');
+        return;
+      }
+    }
+
+    let toFolder = data.toFolder;
+
+    if (data.newFolder) {
+      toFolder = path.join(data.toFolder, data.projectName);
+    }
+
+    try {
+      await mkdir(toFolder, { recursive: true });
+    } catch {
+      //
+    }
+
+    const gradleBasePath = path.join(extensionContext.extensionPath, 'resources', 'gradle');
+    const resourceRoot = path.join(extensionContext.extensionPath, 'resources');
+    const commandsV2JsonPath = path.join(oldProjectPath, 'vendordeps', VendorDepFiles.COMMANDSV2);
+    const commandsV2OldJsonPath = path.join(
+      oldProjectPath,
+      'vendordeps',
+      VendorDepFiles.COMMANDSV2_OLD
+    );
+    const commandsV3JsonPath = path.join(oldProjectPath, 'vendordeps', VendorDepFiles.COMMANDSV3);
+
+    const vendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
+
+    if (fs.existsSync(commandsV2JsonPath)) {
+      vendordeps.push('commandsv2');
+    } else if (fs.existsSync(commandsV2OldJsonPath)) {
+      vendordeps.push('commandsv2');
+    } else if (fs.existsSync(commandsV3JsonPath)) {
+      vendordeps.push('commandsv3');
+    } else {
+      vendordeps.push('commandsv2');
+    }
+
+    let success = false;
+    if (cpp) {
+      const gradlePath = path.join(
+        gradleBasePath,
+        data.romi ? 'cppromi' : data.xrp ? 'cppxrp' : 'cpp'
+      );
+      success = await generateCopyCpp(
+        path.join(resourceRoot, 'cpp'),
+        path.join(oldProjectPath, 'src'),
+        undefined,
+        gradlePath,
+        toFolder,
+        true,
+        vendordeps
+      );
+    } else {
+      const mainJavaFile = path.join(resourceRoot, 'java', 'src', 'Main.java');
+      const gradlePath = path.join(
+        gradleBasePath,
+        data.romi ? 'javaromi' : data.xrp ? 'javaxrp' : 'java'
+      );
+      success = await generateCopyJava(
+        path.join(resourceRoot, 'java'),
+        path.join(oldProjectPath, 'src'),
+        undefined,
+        gradlePath,
+        toFolder,
+        mainJavaFile,
+        javaRobotPackage,
+        '',
+        true,
+        vendordeps
+      );
+    }
+
+    if (!success) {
+      vscode.window.showErrorMessage(
+        i18n(
+          'message',
+          'Failed to update. Did you attempt to extract to the existing project folder?'
+        ),
+        {
+          modal: true,
+        }
+      );
+      return;
+    }
+
+    if (data.desktop) {
+      const buildgradle = path.join(toFolder, 'build.gradle');
+
+      await setDesktopEnabled(buildgradle, true);
+    }
+
+    const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
+
+    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson;
+    parsed.teamNumber = parseInt(data.teamNumber, 10);
+    await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));
+
+    let replacementFile = path.join(resourceRoot, 'java_replacements.json');
+    if (cpp) {
+      replacementFile = path.join(resourceRoot, 'cpp_replacements.json');
+    }
+    await ImportUpdate(toFolder, replacementFile);
+
+    await promptForProjectOpen(vscode.Uri.file(toFolder));
+  }
+
+  private async asyncInitialize() {
+    await this.loadWebpage(
+      path.join(extensionContext.extensionPath, 'resources', 'webviews', 'gradle2025import.html'),
+      path.join(extensionContext.extensionPath, 'resources', 'dist', 'gradle2025importpage.js')
+    );
+  }
+}

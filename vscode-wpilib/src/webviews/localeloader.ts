@@ -11,7 +11,7 @@ let defaultDomain: string;
 
 function localize(domain: string, message: string | string[], ...args: unknown[]) {
   let key: string;
-  if (typeof message == 'string') {
+  if (typeof message === 'string') {
     key = message;
   } else if (message.length === 2) {
     key = message[0];
@@ -58,7 +58,6 @@ window.addEventListener('load', () => {
   });
 });
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-(window as any).i18nTrans = localize;
-/* eslint-disable @typescript-eslint/no-explicit-any */
-(window as any).__I18N_LOCALE_DOMAINS = localeDomains;
+window.i18nTrans = localize;
+// @ts-expect-error Force window object to accept locale domains
+window.__I18N_LOCALE_DOMAINS = localeDomains;

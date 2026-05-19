@@ -1,4 +1,4 @@
-#include <hal/HAL.h>
+#include <wpi/hal/HAL.h>
 
 #include "gtest/gtest.h"
 

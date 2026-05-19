@@ -6,57 +6,16 @@
     "version": "0.1.0",
     "publisher": "wpilibsuite",
     "license": "BSD-3-Clause",
-    "icon": "wpilib-icon-128.png",
+    "icon": "resources/wpilib-icon-128.png",
     "engines": {
-        "vscode": "^1.57.0"
+        "vscode": "^1.105.0"
     },
     "categories": [
         "Other"
     ],
     "activationEvents": [
         "workspaceContains:.wpilib/wpilib_preferences.json",
-        "workspaceContains:build/vscodeconfig.json",
-        "onCommand:wpilibcore.startRioLog",
-        "onCommand:wpilibcore.setTeamNumber",
-        "onCommand:wpilibcore.startTool",
-        "onCommand:wpilibcore.buildCode",
-        "onCommand:wpilibcore.testCode",
-        "onCommand:wpilibcore.deployCode",
-        "onCommand:wpilibcore.debugCode",
-        "onCommand:wpilibcore.simulateCode",
-        "onCommand:wpilibcore.simulateHwCode",
-        "onCommand:wpilibcore.setLanguage",
-        "onCommand:wpilibcore.setAutoSave",
-        "onCommand:wpilibcore.setSkipTests",
-        "onCommand:wpilibcore.setSelectDefaultSimulateExtension",
-        "onCommand:wpilibcore.setSkipSelectSimulateExtension",
-        "onCommand:wpilibcore.setOffline",
-        "onCommand:wpilibcore.setStopSimulationOnEntry",
-        "onCommand:wpilibcore.setUseWinDbgX",
-        "onCommand:wpilibcore.setStartRioLog",
-        "onCommand:wpilibcore.setDeployOffline",
-        "onCommand:wpilibcore.createCommand",
-        "onCommand:wpilibcore.cancelTasks",
-        "onCommand:wpilibcore.help",
-        "onCommand:wpilibcore.openCommandPalette",
-        "onCommand:wpilibcore.refreshCppProperties",
-        "onCommand:wpilibcore.selectCppToolchain",
-        "onCommand:wpilibcore.selectCppBinaryTypes",
-        "onCommand:wpilibcore.importGradle2020Project",
-        "onCommand:wpilibcore.createNewProject",
-        "onCommand:wpilibcore.manageVendorLibs",
-        "onCommand:wpilibcore.setJavaHome",
-        "onCommand:wpilibcore.checkForUpdates",
-        "onCommand:wpilibcore.installGradleTools",
-        "onCommand:wpilibcore.showLogFolder",
-        "onCommand:wpilibcore.runGradleCommand",
-        "onCommand:wpilibcore.resetAutoUpdate",
-        "onCommand:wpilibcore.changeDesktop",
-        "onCommand:wpilibcore.openApiDocumentation",
-        "onCommand:wpilibcore.getProjectInformation",
-        "onCommand:wpilibcore.runGradleClean",
-        "onCommand:wpilib.refreshVendordeps",
-        "onCommand:extension.showWebsite"
+        "workspaceContains:build/vscodeconfig.json"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -65,7 +24,7 @@
                 {
                     "id": "wpilib-vendordeps",
                     "title": "WPILib Vendor Dependencies",
-                    "icon": "media/wpilib.png"
+                    "icon": "resources/wpilib-icon-128.png"
                 }
             ]
         },
@@ -114,7 +73,7 @@
                 "wpilib.additionalGradleArguments": {
                     "type": "string",
                     "default": "",
-                    "description": "For debugging only, passes extra arguments to gradle invocations",
+                    "description": "For debugging only, passes extra arguments to Gradle invocations",
                     "scope": "resource"
                 },
                 "wpilib.autoSaveOnDeploy": {
@@ -138,43 +97,37 @@
                 "wpilib.offline": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Perform gradle commands other then deploy/debug with offline flag",
+                    "description": "Perform Gradle commands other then deploy/debug in offline mode (will not attempt to automatically pull missing dependencies from the Internet)",
                     "scope": "resource"
                 },
                 "wpilib.deployOffline": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Perform gradle deploy command with offline flag",
+                    "description": "Perform Gradle deploy command in offline mode (will not attempt to automatically pull missing dependencies from the Internet)",
                     "scope": "resource"
                 },
                 "wpilib.skipTests": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to skip running tests on build",
+                    "description": "Skip running tests on build",
                     "scope": "resource"
                 },
                 "wpilib.skipSelectSimulateExtension": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to skip selection of simulation extensions",
-                    "scope": "resource"
-                },
-                "wpilib.selectDefaultSimulateExtension": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Set to select all simulation extensions by default",
+                    "description": "Skip selection of simulation extensions",
                     "scope": "resource"
                 },
                 "wpilib.stopSimulationOnEntry": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Set to make simulation code stop automatically on entry",
+                    "description": "Make simulation code stop automatically on entry",
                     "scope": "resource"
                 },
                 "wpilib.useWindbgX": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Use WinDbg Preview (from store) as C++ debugger (Windows only)",
+                    "description": "Use WinDbg Preview (from the Microsoft Store) as C++ debugger (Windows only)",
                     "scope": "resource"
                 }
             }
@@ -243,60 +196,6 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
-                "command": "wpilibcore.setAutoSave",
-                "title": "%wpilibcore.setAutoSave.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSkipTests",
-                "title": "%wpilibcore.setSkipTests.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSelectDefaultSimulateExtension",
-                "title": "%wpilibcore.setSelectDefaultSimulateExtension.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setSkipSelectSimulateExtension",
-                "title": "%wpilibcore.setSkipSelectSimulateExtension.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setOffline",
-                "title": "%wpilibcore.setOffline.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setStopSimulationOnEntry",
-                "title": "%wpilibcore.setStopSimulationOnEntry.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setUseWinDbgX",
-                "title": "%wpilibcore.setUseWinDbgX.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setStartRioLog",
-                "title": "%wpilibcore.setStartRioLog.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
-                "command": "wpilibcore.setDeployOffline",
-                "title": "%wpilibcore.setDeployOffline.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
                 "command": "wpilibcore.createCommand",
                 "title": "%wpilibcore.createCommand.title%",
                 "category": "WPILib",
@@ -341,8 +240,8 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
-                "command": "wpilibcore.importGradle2020Project",
-                "title": "%wpilibcore.importGradle2020Project.title%",
+                "command": "wpilibcore.importGradle2025Project",
+                "title": "%wpilibcore.importGradle2025Project.title%",
                 "category": "WPILib"
             },
             {
@@ -419,12 +318,7 @@
                 "command": "wpilib.refreshVendordeps",
                 "title": "Refresh",
                 "icon": "$(refresh)"
-            },
-            {                
-                "command": "extension.showWebsite",
-                "title": "Show Website"
             }
-
         ],
         "views": {
             "explorer": [
@@ -439,7 +333,7 @@
                     "type": "webview",
                     "id": "wpilib.dependencyView",
                     "name": "WPILib Vendor Dependencies",
-                    "icon": "media/wpilib.png"
+                    "icon": "resources/wpilib-icon-128.png"
                 }
             ]
         },
@@ -535,75 +429,50 @@
     "repository": "https://github.com/wpilibsuite/vscode-wpilib",
     "homepage": "https://github.com/wpilibsuite/vscode-wpilib",
     "scripts": {
-        "vscode:prepublish": "gulp build && npm run lint && webpack --mode production",
-        "clean": "rmdir-cli out",
+        "vscode:prepublish": "gulp build && eslint . && webpack --config-node-env production",
+        "clean": "gulp clean",
         "lint": "eslint .",
-        "webpack": "webpack --mode development",
-        "webpack-watch": "webpack --mode development --watch",
+        "webpack": "webpack --config-node-env production",
+        "webpack-watch": "webpack --config-node-env development --watch",
         "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
         "gulp": "gulp",
-        "test": "npm run webpack && node ./node_modules/vscode/bin/test",
+        "test": "webpack --config-node-env production && node ./node_modules/vscode/bin/test",
         "updateActivation": "gulp update-activation",
-        "vscePackage": "vsce package"
+        "vscePackage": "vsce package --no-dependencies"
     },
     "devDependencies": {
-        "@types/glob": "^7.1.3",
-        "@types/micromatch": "^4.0.1",
-        "@types/mkdirp": "^1.0.1",
-        "@types/mocha": "^8.0.3",
-        "@types/ncp": "^2.0.4",
-        "@types/node": "^10.2.0",
-        "@types/node-fetch": "^2.5.7",
-        "@types/triple-beam": "^1.3.1",
-        "@types/vscode": "1.57.0",
-        "@types/xml2js": "^0.4.5",
-        "@typescript-eslint/eslint-plugin": "^6.15.0",
-        "@typescript-eslint/parser": "^6.15.0",
-        "@vscode/vsce": "^2.20.1",
-        "copy-webpack-plugin": "^6.1.1",
-        "del": "^6.0.0",
-        "eslint": "^8.56.0",
-        "event-stream": "^4.0.1",
-        "gulp": "^4.0.2",
-        "gulp-filter": "^6.0.0",
-        "gulp-json-transform": "^0.4.7",
-        "gulp-sourcemaps": "^2.6.5",
-        "gulp-typescript": "^5.0.1",
+        "@eslint/js": "^9.29.0",
+        "@types/micromatch": "^4.0.9",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^22.19.0",
+        "@types/vscode": "1.105.0",
+        "@types/xml2js": "^0.4.14",
+        "@vscode/vsce": "^3.5.0",
+        "eslint": "^9.34.0",
+        "gulp": "^5.0.1",
+        "gulp-filter": "^9.0.1",
         "gulp-yaml": "^2.0.4",
-        "mocha": "^10.2.0",
-        "rmdir-cli": "^2.0.6",
-        "run-sequence": "^2.2.1",
-        "ts-loader": "^8.4.0",
-        "ts-node": "^9.1.1",
-        "typescript": "^3.9.5",
+        "mocha": "^11.5.0",
+        "prettier": "3.5.3",
+        "terser-webpack-plugin": "^5.3.14",
+        "ts-loader": "^9.5.4",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.2",
+        "typescript-eslint": "^8.43.0",
         "vscode-nls-dev": "^4.0.4",
-        "webpack": "4.47.0",
-        "webpack-cli": "^3.3.12"
+        "webpack": "^5.101.3",
+        "webpack-cli": "^6.0.1",
+        "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@vscode-elements/elements": "^1.9.0",
         "extract-zip": "^2.0.1",
-        "glob": "^7.1.6",
-        "java-properties": "^1.0.2",
-        "jsonc-parser": "^2.3.1",
-        "logform": "^2.2.0",
-        "micromatch": "^4.0.2",
-        "mkdirp": "^1.0.4",
-        "ncp": "^2.0.0",
-        "node-fetch": "^2.6.1",
-        "raw-loader": "^4.0.2",
-        "triple-beam": "^1.3.0",
-        "vscode-cpptools": "^6.1.0",
-        "vscode-jsonrpc": "^8.1.0",
+        "glob": "^11.0.2",
+        "jsonc-parser": "^3.3.1",
+        "micromatch": "^4.0.8",
+        "vscode-cpptools": "^6.3.0",
         "vscode-nls": "^5.2.0",
-        "vscode-wpilibapi": "^2021.1.1",
-        "winston": "^3.3.3",
-        "winston-transport": "^4.4.0",
+        "winston": "^3.17.0",
+        "winston-transport": "^4.9.0",
         "xml2js": "^0.6.2"
-    },
-    "overrides": {
-        "webpack@4.47.0": {
-            "terser-webpack-plugin": "^4.2.3"
-        }
     }
 }
