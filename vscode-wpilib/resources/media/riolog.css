@@ -1,6 +1,27 @@
+html,
+body {
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
 body {
   scrollbar-gutter: stable;
   padding: 0;
+}
+
+body,
+#app,
+#mainDiv {
+  display: flex;
+  flex-direction: column;
+}
+
+#app,
+#mainDiv {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .toolbar {
@@ -10,11 +31,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
+  flex-shrink: 0;
 }
 
 .status-container {
@@ -74,7 +91,7 @@ body {
 #log-container {
   padding: 8px;
   overflow-y: auto;
-  max-height: calc(100vh - 60px);
+  flex: 1;
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: var(--vscode-editor-font-size, 13px);
   line-height: 1.4;

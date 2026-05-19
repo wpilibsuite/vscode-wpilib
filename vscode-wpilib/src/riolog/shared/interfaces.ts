@@ -1,7 +1,7 @@
 'use strict';
 
-import { EventEmitter } from 'events';
-import { IErrorMessage, IPrintMessage } from './message';
+import type { EventEmitter } from 'events';
+import type { IErrorMessage, IPrintMessage } from './message';
 
 export enum SendTypes {
   Batch,

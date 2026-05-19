@@ -143,9 +143,14 @@ export class ProjectCreator extends WebViewBase {
       data.language
     );
 
-    // Return the complete base objects to the UI
+    // Only send the fields the webview needs to avoid structured clone issues
+    const baseOptions = bases.map((base) => ({
+      label: base.label,
+      description: base.description ?? '',
+    }));
+
     await this.postMessage({
-      data: bases,
+      data: baseOptions,
       type: 'base',
     });
   }
@@ -176,17 +181,11 @@ export class ProjectCreator extends WebViewBase {
     const htmlPath = path.join(
       extensionContext.extensionPath,
       'resources',
-      'webviews',
-      'projectcreator.html'
-    );
-    const scriptPath = path.join(
-      extensionContext.extensionPath,
-      'resources',
       'dist',
-      'projectcreatorpage.js'
+      'projectcreator.html'
     );
 
     // Include the 'projectcreator' domain for localization
-    await this.loadWebpage(htmlPath, scriptPath, ['projectcreator']);
+    await this.loadWebpage(htmlPath, ['projectcreator']);
   }
 }
