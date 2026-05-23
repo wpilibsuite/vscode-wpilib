@@ -11,7 +11,13 @@ import * as vscode from 'vscode';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(_context: vscode.ExtensionContext) {
-  vscode.window.showErrorMessage('This extension is not supported from the VS Code Marketplace. Please use the WPILib Installer', {
+  const openReleasesPage = "Visit WPILib Releases Page"
+  vscode.window.showErrorMessage('The WPILib extension is not supported from the VS Code Marketplace. Please use the WPILib Installer from the WPILib Releases page.', {
     modal: true
+  },
+  openReleasesPage).then(choice=>{
+    if (choice === openReleasesPage) {
+      vscode.env.openExternal("https://github.com/wpilibsuite/allwpilib/releases");
+    }
   });
 }
