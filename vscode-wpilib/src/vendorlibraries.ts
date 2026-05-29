@@ -27,7 +27,7 @@ class LibraryQuickPick implements vscode.QuickPickItem {
   constructor(dep: IJsonDependency, oldVersion?: string) {
     this.label = dep.name;
     this.description = dep.version;
-    if (oldVersion !== undefined) {
+    if (oldVersion) {
       this.description += ` (${i18n('ui', 'Old Version: {0}', oldVersion)})`;
     }
     this.dep = dep;
@@ -62,14 +62,14 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   public async manageVendorLibraries(uri: vscode.Uri | undefined): Promise<void> {
     let workspace: vscode.WorkspaceFolder | undefined;
-    if (uri !== undefined) {
+    if (uri) {
       workspace = vscode.workspace.getWorkspaceFolder(uri);
     }
 
-    if (workspace === undefined) {
+    if (!workspace) {
       const prefsApi = this.externalApi.getPreferencesAPI();
       workspace = await prefsApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined || !prefsApi.getPreferences(workspace).getIsWPILibProject()) {
+      if (!workspace || !prefsApi.getPreferences(workspace).getIsWPILibProject()) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot install vendor libraries since this is not a WPILib project')
         );
@@ -137,7 +137,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         placeHolder: i18n('message', 'Check to uninstall libraries'),
       });
 
-      if (toRemove !== undefined) {
+      if (toRemove) {
         for (const ti of toRemove) {
           deps.push(ti.dep);
         }
@@ -154,13 +154,13 @@ export class VendorLibraries extends VendorLibrariesBase {
     workspace: vscode.WorkspaceFolder
   ): Promise<boolean> {
     let anySucceeded = false;
-    if (toRemove !== undefined && toRemove.length > 0) {
+    if (toRemove && toRemove.length > 0) {
       const url = this.getWpVendorFolder(workspace);
       const files = await readdir(url);
       for (const file of files) {
         const fullPath = path.join(url, file);
         const result = await this.readFile(fullPath);
-        if (result !== undefined) {
+        if (result) {
           for (const ti of toRemove) {
             if (result.uuid === ti.uuid) {
               try {
@@ -205,7 +205,7 @@ export class VendorLibraries extends VendorLibrariesBase {
           placeHolder: i18n('message', 'Check to update libraries'),
         });
 
-        if (toUpdate !== undefined) {
+        if (toUpdate) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
             const success = await this.installDependency(
@@ -236,7 +236,7 @@ export class VendorLibraries extends VendorLibrariesBase {
 
     if (installedDeps.length !== 0) {
       const promises = installedDeps.map(async (dep) => {
-        if (dep.jsonUrl === undefined || dep.jsonUrl.length === 0) {
+        if (!dep.jsonUrl) {
           return undefined;
         }
         try {
@@ -267,7 +267,7 @@ export class VendorLibraries extends VendorLibrariesBase {
           placeHolder: i18n('message', 'Check to update libraries'),
         });
 
-        if (toUpdate !== undefined) {
+        if (toUpdate) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
             const success = await this.installDependency(
@@ -316,7 +316,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         placeHolder: i18n('message', 'Check to install libraries'),
       });
 
-      if (toInstall !== undefined) {
+      if (toInstall) {
         let anySucceeded = false;
         for (const ti of toInstall) {
           const success = await this.installDependency(

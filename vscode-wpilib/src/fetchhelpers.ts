@@ -11,10 +11,6 @@ export async function downloadTextFile(uri: string): Promise<string> {
     signal: AbortSignal.timeout(5000),
   });
 
-  if (response === undefined) {
-    throw new Error('Failed to fetch URI: ' + uri);
-  }
-
   if (!response.ok) {
     throw new Error(`${response.status.toString(10)}: ${response.statusText}`);
   }

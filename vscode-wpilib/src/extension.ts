@@ -113,7 +113,7 @@ async function handleAfterTrusted(
 
   let jdkLoc = await findJdkPath(externalApi);
 
-  if (jdkLoc !== undefined) {
+  if (jdkLoc) {
     if (jdkLoc.endsWith('\\') || jdkLoc.endsWith('/')) {
       jdkLoc = jdkLoc.substring(0, jdkLoc.length - 1);
     }
@@ -166,7 +166,7 @@ async function handleAfterTrusted(
   let projectInfo: ProjectInfoGatherer | undefined;
 
   try {
-    if (wpilibUpdate !== undefined && vendorLibs !== undefined) {
+    if (wpilibUpdate && vendorLibs) {
       projectInfo = new ProjectInfoGatherer(vendorLibs, wpilibUpdate, externalApi);
       context.subscriptions.push(projectInfo);
     }
@@ -175,11 +175,9 @@ async function handleAfterTrusted(
     creationError = true;
   }
 
-  let depProvider: DependencyViewProvider | undefined;
-
   try {
-    if (projectInfo !== undefined && vendorLibs !== undefined) {
-      depProvider = new DependencyViewProvider(
+    if (projectInfo && vendorLibs) {
+      const depProvider = new DependencyViewProvider(
         context.extensionUri,
         projectInfo,
         vendorLibs,
@@ -190,29 +188,12 @@ async function handleAfterTrusted(
         vscode.window.registerWebviewViewProvider(DependencyViewProvider.viewType, depProvider)
       );
 
-      if (depProvider !== undefined) {
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.addDependency', () => {
-            depProvider?.addDependency();
-          })
-        );
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.refreshVendordeps', async () => {
-            await depProvider?.refresh();
-          })
-        );
-
-        /*         context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.removeDependency', () => {
-            depProvider?.removeDependency();
-          })) */
-
-        context.subscriptions.push(
-          vscode.commands.registerCommand('wpilib.updateDependencies', () => {
-            depProvider?.updateDependencies();
-          })
-        );
-      }
+      context.subscriptions.push(
+        vscode.commands.registerCommand(
+          'wpilib.refreshVendordeps',
+          async () => await depProvider.refresh()
+        )
+      );
 
       context.subscriptions.push(depProvider);
     }
@@ -237,11 +218,8 @@ async function handleAfterTrusted(
         );
         const vendorDepsWatcher = vscode.workspace.createFileSystemWatcher(vendorDepsPattern);
         context.subscriptions.push(vendorDepsWatcher);
-        const localW = w;
 
-        const fireEvent = () => {
-          fireVendorDepsChanged(localW);
-        };
+        const fireEvent = () => fireVendorDepsChanged(w);
 
         vendorDepsWatcher.onDidChange(fireEvent, null, context.subscriptions);
 
@@ -265,7 +243,7 @@ async function handleAfterTrusted(
             false,
             w.uri.fsPath
           );
-          if (importPersistentState.Value === false) {
+          if (!importPersistentState.Value) {
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
@@ -348,7 +326,7 @@ async function handleAfterTrusted(
           false,
           w.uri.fsPath
         );
-        if (persistentState.Value === false) {
+        if (!persistentState.Value) {
           persistentState.Value = true;
           if (help) {
             help.displayHelp();
@@ -361,7 +339,7 @@ async function handleAfterTrusted(
           false,
           w.uri.fsPath
         );
-        if (persistentState.Value === false) {
+        if (!persistentState.Value) {
           // Check if wpilib project might be in a subfolder
           // Only go 1 subfolder deep
           const pattern = new vscode.RelativePattern(
@@ -418,7 +396,7 @@ async function handleAfterTrusted(
               const picked = await vscode.window.showQuickPick(list, {
                 canPickMany: false,
               });
-              if (picked !== undefined) {
+              if (picked) {
                 await vscode.commands.executeCommand('vscode.openFolder', picked.fullFolder, false);
               }
             } else if (openResult?.title === i18n('ui', "No, Don't ask again for this folder")) {

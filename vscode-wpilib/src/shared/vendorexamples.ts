@@ -19,7 +19,7 @@ interface IJsonExample {
   language: 'java' | 'cpp';
   commandversion: number;
   robotclass: string;
-  packagetoreplace?: string | undefined;
+  packagetoreplace?: string;
   dependencies: string[];
   foldername: string;
   extravendordeps?: string[];
@@ -46,7 +46,7 @@ export async function addVendorExamples(
 ): Promise<void> {
   const shimmedResourceRoot = path.join(resourceRoot, 'vendordeps');
   const storagePath = extensionContext.storagePath;
-  if (storagePath === undefined) {
+  if (!storagePath) {
     return;
   }
 
@@ -79,9 +79,8 @@ export async function addVendorExamples(
             continue;
           }
 
-          const vendordeps: string[] = ex.extravendordeps !== undefined ? ex.extravendordeps : [];
-          const commandVersion: string =
-            ex.commandversion !== undefined ? ex.commandversion.toString() : '2';
+          const vendordeps: string[] = ex.extravendordeps ?? [];
+          const commandVersion: string = ex.commandversion ? ex.commandversion.toString() : '2';
           if (commandVersion === '3') {
             vendordeps.push('commandsv3');
           } else {

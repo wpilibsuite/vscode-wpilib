@@ -34,8 +34,7 @@ window.addEventListener('load', () => {
       return;
     }
     const domain = domainAttr.value;
-    /* eslint-disable no-extra-boolean-cast */
-    if (!!e.attributes.getNamedItem('data-default-domain')) {
+    if (e.attributes.getNamedItem('data-default-domain')) {
       defaultDomain = domain;
     }
 

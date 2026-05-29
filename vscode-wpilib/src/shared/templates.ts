@@ -35,9 +35,8 @@ export class Templates {
       }
       const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
       for (const e of templates) {
-        const vendordeps: string[] = e.extravendordeps !== undefined ? e.extravendordeps : [];
-        const commandVersion: string =
-          e.commandversion !== undefined ? e.commandversion.toString() : '2';
+        const vendordeps: string[] = e.extravendordeps ?? [];
+        const commandVersion: string = e.commandversion ? e.commandversion.toString() : '2';
         if (commandVersion === '3') {
           vendordeps.push('commandsv3');
         } else {
@@ -56,7 +55,7 @@ export class Templates {
           async generate(folderInto: vscode.Uri): Promise<boolean> {
             try {
               let testFolder;
-              if (e.hasunittests === true) {
+              if (e.hasunittests) {
                 testFolder = path.join(templatesTestFolder, e.foldername);
               }
               if (java) {

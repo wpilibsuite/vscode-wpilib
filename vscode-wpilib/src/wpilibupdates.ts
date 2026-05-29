@@ -16,7 +16,7 @@ function getGradleRioRegex() {
 
 interface IOnlineTuple {
   online: boolean;
-  newVersion: string | undefined;
+  newVersion?: string;
 }
 
 export class WPILibUpdates {
@@ -47,12 +47,12 @@ export class WPILibUpdates {
 
   public async checkForInitialUpdate(wp: vscode.WorkspaceFolder): Promise<boolean> {
     const grVersion = await this.getGradleRIOVersion(wp);
-    if (grVersion === undefined) {
+    if (!grVersion) {
       return false;
     }
     const newVersion = await this.checkForLocalGradleRIOUpdate(grVersion);
     const persistentState = WPILibUpdates.getUpdatePersistentState(wp);
-    if (newVersion !== undefined && persistentState.Value === false) {
+    if (newVersion && !persistentState.Value) {
       const result = await vscode.window.showInformationMessage(
         i18n(
           'message',
@@ -68,10 +68,10 @@ export class WPILibUpdates {
         i18n('ui', 'No'),
         i18n('ui', "No, Don't ask again")
       );
-      if (result !== undefined && result === i18n('ui', 'Yes')) {
+      if (result === i18n('ui', 'Yes')) {
         await this.setGradleRIOVersion(newVersion, wp);
         return true;
-      } else if (result !== undefined && result === i18n('ui', "No, Don't ask again")) {
+      } else if (result === i18n('ui', "No, Don't ask again")) {
         persistentState.Value = true;
       }
     }
@@ -80,16 +80,16 @@ export class WPILibUpdates {
 
   public async checkForUpdates(): Promise<boolean> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       logger.warn('no workspace');
       return false;
     }
     const grVersion = await this.getGradleRIOVersion(wp);
-    if (grVersion === undefined) {
+    if (!grVersion) {
       return false;
     }
     const newVersion = await this.checkForGradleRIOUpdate(grVersion);
-    if (newVersion === undefined || newVersion.newVersion === undefined) {
+    if (!newVersion || !newVersion.newVersion) {
       logger.log('no update found');
       vscode.window.showInformationMessage(i18n('message', 'No WPILib Update Found'));
       return false;
@@ -108,7 +108,7 @@ export class WPILibUpdates {
         i18n('ui', 'Yes'),
         i18n('ui', 'No')
       );
-      if (result !== undefined && result === i18n('ui', 'Yes')) {
+      if (result === i18n('ui', 'Yes')) {
         await this.setGradleRIOVersion(newVersion.newVersion, wp);
         if (newVersion.online) {
           const buildRes = await vscode.window.showInformationMessage(
@@ -124,12 +124,10 @@ export class WPILibUpdates {
             i18n('ui', 'Yes (Build Only)'),
             i18n('ui', 'No')
           );
-          if (buildRes !== undefined) {
-            if (buildRes === i18n('ui', 'Yes')) {
-              await this.externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
-            } else if (buildRes === i18n('ui', 'Yes (Build Only)')) {
-              await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
-            }
+          if (buildRes === i18n('ui', 'Yes')) {
+            await this.externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
+          } else if (buildRes === i18n('ui', 'Yes (Build Only)')) {
+            await this.externalApi.getBuildTestAPI().buildCode(wp, undefined);
           }
         } else {
           const buildRes = await vscode.window.showInformationMessage(
@@ -163,7 +161,6 @@ export class WPILibUpdates {
   public async getGradleRIOVersion(wp: vscode.WorkspaceFolder): Promise<string | undefined> {
     try {
       const gradleBuildFile = await readFile(path.join(wp.uri.fsPath, 'build.gradle'), 'utf8');
-
       const matchRes = getGradleRioRegex().exec(gradleBuildFile);
 
       if (matchRes === null) {
@@ -206,7 +203,7 @@ export class WPILibUpdates {
       i18n('ui', 'Online'),
       i18n('ui', 'Offline')
     );
-    if (qResult === undefined) {
+    if (!qResult) {
       return undefined;
     } else if (qResult === i18n('ui', 'Online')) {
       return {
@@ -227,19 +224,12 @@ export class WPILibUpdates {
       const response = await fetch(metaDataUrl, {
         signal: AbortSignal.timeout(5000),
       });
-      if (response === undefined) {
-        logger.warn('failed to fetch URL: ' + metaDataUrl);
-        return undefined;
-      }
       if (response.ok) {
         const text = await response.text();
         const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
           .version;
-        if (versions === undefined) {
+        if (!versions) {
           logger.warn('parse failure');
-          return undefined;
-        }
-        if (versions.length === 0) {
           return undefined;
         }
         let newestVersion = '0';

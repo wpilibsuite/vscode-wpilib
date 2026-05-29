@@ -144,7 +144,7 @@ export class Gradle2025Import extends WebViewBase {
       openLabel: 'Select a Project',
     });
 
-    if (oldProject === undefined || oldProject.length !== 1) {
+    if (!oldProject || oldProject.length !== 1) {
       return;
     }
 
@@ -161,7 +161,7 @@ export class Gradle2025Import extends WebViewBase {
     };
     const result = await vscode.window.showOpenDialog(open);
 
-    if (result === undefined) {
+    if (!result) {
       return;
     }
 

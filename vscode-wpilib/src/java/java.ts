@@ -25,7 +25,7 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   let allowDebug = true;
 
   const javaDebugExtension = vscode.extensions.getExtension('vscjava.vscode-java-debug');
-  if (javaDebugExtension === undefined) {
+  if (!javaDebugExtension) {
     vscode.window.showWarningMessage(
       i18n('message', 'Could not find Debugger for Java extension. Debugging is disabled.')
     );
@@ -53,21 +53,20 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   const templates: Templates = new Templates(extensionResourceLocation, true, exampleTemplate);
   context.subscriptions.push(templates);
 
-  if (vscode.extensions.getExtension('redhat.java') !== undefined) {
+  if (vscode.extensions.getExtension('redhat.java')) {
     // Add handlers for each workspace if java is installed
     const wp = vscode.workspace.workspaceFolders;
     if (wp) {
       for (const w of wp) {
         const prefs = coreExports.getPreferencesAPI().getPreferences(w);
         if (prefs.getIsWPILibProject()) {
-          const localW = w;
-          const buildGradle = path.join(localW.uri.fsPath, 'build.gradle');
+          const buildGradle = path.join(w.uri.fsPath, 'build.gradle');
           try {
             await access(buildGradle);
             const buildGradleUri = vscode.Uri.file(buildGradle);
             onVendorDepsChanged(
               async (workspace) => {
-                if (workspace.index === localW.index) {
+                if (workspace.index === w.index) {
                   await vscode.commands.executeCommand(
                     'java.projectConfiguration.update',
                     buildGradleUri
