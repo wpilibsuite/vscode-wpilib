@@ -11,7 +11,7 @@ import { PersistentFolderState } from './persistentState';
 import { isNewerVersion } from './versions';
 import { getWPILibHomeDir, getWPILibYear } from './shared/utilitiesapi';
 
-const gradleRioRegex = /(id\s*?["|']org\.wpilib\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/g;
+const gradleRioRegex = /(id\s*?["|']org\.wpilib\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/;
 
 interface IOnlineTuple {
   online: boolean;
