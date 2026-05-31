@@ -11,7 +11,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
-import { BuiltinTools } from './builtintools';
+import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
 import { activateCpp } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
@@ -26,7 +26,7 @@ import { Preferences } from './preferences';
 import { PreferencesAPI } from './preferencesapi';
 import { ProjectInfoGatherer } from './projectinfo';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
-import { UtilitiesAPI } from './shared/utilitiesapi';
+import { getWPILibHomeDir, UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
 import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
@@ -35,7 +35,7 @@ import { createVsCommands } from './vscommands';
 import { Gradle2025Import } from './webviews/gradle2025import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
-import { WPILibUpdates } from './wpilibupdates';
+import { checkForInitialUpdate, checkForUpdates } from './wpilibupdates';
 import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
@@ -43,7 +43,7 @@ class ExternalAPI implements IExternalAPI {
   // Create method is used because constructors cannot be async.
   public static async Create(resourceFolder: string): Promise<ExternalAPI> {
     const preferencesApi = await PreferencesAPI.Create();
-    const deployDebugApi = await DeployDebugAPI.Create(resourceFolder, preferencesApi);
+    const deployDebugApi = new DeployDebugAPI(resourceFolder, preferencesApi);
     const buildTestApi = new BuildTestAPI(preferencesApi);
     const externalApi = new ExternalAPI(preferencesApi, deployDebugApi, buildTestApi);
     return externalApi;
@@ -131,9 +131,9 @@ async function handleAfterTrusted(
 
   try {
     // Add built in tools
-    context.subscriptions.push(await BuiltinTools.Create(externalApi));
+    await registerBuiltinTools(externalApi);
   } catch (err) {
-    logger.error('error creating built in tool handler', err);
+    logger.error('error registering built in tool handler', err);
     creationError = true;
   }
 
@@ -142,22 +142,20 @@ async function handleAfterTrusted(
   try {
     vendorLibs = new VendorLibraries(externalApi);
     context.subscriptions.push(vendorLibs);
-    await addVendorExamples(
-      extensionResourceLocation,
-      externalApi.getExampleTemplateAPI(),
-      externalApi.getUtilitiesAPI(),
-      vendorLibs
-    );
+    await addVendorExamples(extensionResourceLocation, externalApi.getExampleTemplateAPI());
   } catch (err) {
     logger.error('error creating vendor lib utilities', err);
     creationError = true;
   }
 
-  let wpilibUpdate: WPILibUpdates | undefined;
-
   try {
-    wpilibUpdate = new WPILibUpdates(externalApi);
-    context.subscriptions.push(wpilibUpdate);
+    context.subscriptions.push(
+      vscode.commands.registerCommand('wpilibcore.checkForUpdates', async () => {
+        if (!(await checkForUpdates(externalApi))) {
+          logger.log('no update installed');
+        }
+      })
+    );
   } catch (err) {
     logger.error('error creating wpilib updater', err);
     creationError = true;
@@ -166,8 +164,8 @@ async function handleAfterTrusted(
   let projectInfo: ProjectInfoGatherer | undefined;
 
   try {
-    if (wpilibUpdate && vendorLibs) {
-      projectInfo = new ProjectInfoGatherer(vendorLibs, wpilibUpdate, externalApi);
+    if (vendorLibs) {
+      projectInfo = new ProjectInfoGatherer(vendorLibs, externalApi);
       context.subscriptions.push(projectInfo);
     }
   } catch (err) {
@@ -268,10 +266,7 @@ async function handleAfterTrusted(
         }
 
         if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
-          let didUpdate: boolean = false;
-          if (wpilibUpdate) {
-            didUpdate = await wpilibUpdate.checkForInitialUpdate(w);
-          }
+          const didUpdate: boolean = await checkForInitialUpdate(w);
 
           let runBuild: boolean;
           try {
@@ -435,7 +430,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // That file can be copied to another project.
   const externalApi = await ExternalAPI.Create(extensionResourceLocation);
 
-  const wpilibHomeDir = externalApi.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeDir = getWPILibHomeDir();
 
   const logPath = path.join(wpilibHomeDir, 'logs');
   try {

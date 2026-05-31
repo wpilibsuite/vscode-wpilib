@@ -5,7 +5,6 @@ import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PreferencesAPI } from './preferencesapi';
 import { RioLogWindow } from './riolog/riologwindow';
-import { LiveRioConsoleProvider, RioLogWebviewProvider } from './riolog/vscodeimpl';
 
 interface ICodeDeployerQuickPick extends vscode.QuickPickItem {
   deployer: ICodeDeployer;
@@ -81,16 +80,6 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
 }
 
 export class DeployDebugAPI implements IDeployDebugAPI {
-  public static async Create(
-    resourceFolder: string,
-    preferences: PreferencesAPI
-  ): Promise<DeployDebugAPI> {
-    const dda = new DeployDebugAPI(preferences);
-    dda.rioLogWebViewProvider = await RioLogWebviewProvider.Create(resourceFolder);
-    dda.liveWindow = new RioLogWindow(dda.rioLogWebViewProvider, dda.rioLogConsoleProvider);
-    dda.disposables.push(dda.liveWindow);
-    return dda;
-  }
   private languageChoices: string[] = [];
   private deployers: ICodeDeployerQuickPick[] = [];
   private debuggers: ICodeDeployerQuickPick[] = [];
@@ -99,15 +88,13 @@ export class DeployDebugAPI implements IDeployDebugAPI {
   private preferences: PreferencesAPI;
   private debugConfigurationProvider: WPILibDebugConfigurationProvider;
 
-  private rioLogWebViewProvider: RioLogWebviewProvider | undefined;
-  private rioLogConsoleProvider: LiveRioConsoleProvider;
   private liveWindow: RioLogWindow | undefined;
 
-  private constructor(preferences: PreferencesAPI) {
+  public constructor(resourceFolder: string, preferences: PreferencesAPI) {
     this.preferences = preferences;
 
-    this.rioLogConsoleProvider = new LiveRioConsoleProvider();
-
+    this.liveWindow = new RioLogWindow(resourceFolder);
+    this.disposables.push(this.liveWindow);
     this.debugConfigurationProvider = new WPILibDebugConfigurationProvider(this);
     this.disposables.push(this.debugConfigurationProvider);
   }
