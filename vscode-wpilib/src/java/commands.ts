@@ -1,6 +1,5 @@
 'use strict';
-import { readFile } from 'fs';
-import { copyFile } from 'fs/promises';
+import { copyFile, readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -55,18 +54,15 @@ async function performCopy(
 
 const commandResourceName = 'commands.json';
 
-export function registerCommandTemplates(
+export async function registerCommandTemplates(
   resourceRoot: string,
   core: ICommandAPI,
   preferences: IPreferencesAPI
 ) {
   const commandFolder = path.join(resourceRoot, 'src', 'commands');
   const resourceFile = path.join(commandFolder, commandResourceName);
-  readFile(resourceFile, 'utf8', (err, data) => {
-    if (err) {
-      logger.error('Command file error: ', err);
-      return;
-    }
+  try {
+    const data = await readFile(resourceFile, 'utf8');
     const commands: IJavaJsonLayout[] = jsonc.parse(data) as IJavaJsonLayout[];
     for (const c of commands) {
       const provider: ICommandCreator = {
@@ -117,5 +113,7 @@ export function registerCommandTemplates(
       };
       core.addCommandProvider(provider);
     }
-  });
+  } catch (err) {
+    logger.error('Command file error: ', err);
+  }
 }

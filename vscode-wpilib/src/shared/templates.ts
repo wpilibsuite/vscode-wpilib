@@ -1,5 +1,5 @@
 'use strict';
-import * as fs from 'fs';
+import { readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -22,7 +22,7 @@ export interface ITemplateJsonLayout {
 
 const exampleResourceName = 'templates.json';
 
-export function registerProjectTemplates(
+export async function registerProjectTemplates(
   resourceRoot: string,
   java: boolean,
   core: IExampleTemplateAPI
@@ -31,11 +31,8 @@ export function registerProjectTemplates(
   const templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
   const resourceFile = path.join(templatesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
-  fs.readFile(resourceFile, 'utf8', (err, data) => {
-    if (err) {
-      logger.log('Template error: ', err);
-      return;
-    }
+  try {
+    const data = await readFile(resourceFile, 'utf8');
     const templates: ITemplateJsonLayout[] = jsonc.parse(data) as ITemplateJsonLayout[];
     for (const e of templates) {
       const vendordeps: string[] = e.extravendordeps ?? [];
@@ -109,5 +106,7 @@ export function registerProjectTemplates(
       };
       core.addTemplateProvider(provider);
     }
-  });
+  } catch (err) {
+    logger.log('Template error: ', err);
+  }
 }

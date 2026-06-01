@@ -1,5 +1,5 @@
 'use strict';
-import * as fs from 'fs';
+import { readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -22,16 +22,17 @@ export interface IExampleJsonLayout {
 
 const exampleResourceName = 'examples.json';
 
-export function registerExamples(resourceRoot: string, java: boolean, core: IExampleTemplateAPI) {
+export async function registerExamples(
+  resourceRoot: string,
+  java: boolean,
+  core: IExampleTemplateAPI
+) {
   const examplesFolder = path.join(resourceRoot, 'src', 'examples');
   const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
   const resourceFile = path.join(examplesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
-  fs.readFile(resourceFile, 'utf8', (err, data) => {
-    if (err) {
-      logger.log('Example Error error: ', err);
-      return;
-    }
+  try {
+    const data = await readFile(resourceFile, 'utf8');
     const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
     for (const e of examples) {
       const vendordeps: string[] = e.extravendordeps ?? [];
@@ -105,5 +106,7 @@ export function registerExamples(resourceRoot: string, java: boolean, core: IExa
       };
       core.addExampleProvider(provider);
     }
-  });
+  } catch (err) {
+    logger.log('Example error: ', err);
+  }
 }
