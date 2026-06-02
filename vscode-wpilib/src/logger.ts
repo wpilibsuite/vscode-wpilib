@@ -15,14 +15,14 @@ class VsCodeOutputTransport extends TransportStream {
     setImmediate(() => this.emit('logged', info));
     switch (info.level) {
       case 'error':
-        outputChannel.error(info.message, info.meta);
+        outputChannel.error(info.message, ...info.meta);
         break;
       case 'warn':
-        outputChannel.warn(info.message, info.meta);
+        outputChannel.warn(info.message, ...info.meta);
         break;
       // Log everything info and below as info
       default:
-        outputChannel.info(info.message, info.meta);
+        outputChannel.info(info.message, ...info.meta);
         break;
     }
     next();
