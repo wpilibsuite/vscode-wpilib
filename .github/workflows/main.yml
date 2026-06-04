@@ -15,7 +15,7 @@ jobs:
           node-version: "22.x"
       - uses: actions/setup-java@v5
         with:
-          java-version: 21
+          java-version: 25
           distribution: "temurin"
       - run: ./gradlew build updateVersions -PbuildServer
         name: Build with Gradle
@@ -57,7 +57,7 @@ jobs:
           node-version: "22.x"
       - uses: actions/setup-java@v5
         with:
-          java-version: 21
+          java-version: 25
           distribution: "temurin"
       - run: ./gradlew build updateVersions -PbuildServer
         name: Build with Gradle
