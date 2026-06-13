@@ -3,29 +3,42 @@
 import * as os from 'os';
 import * as path from 'path';
 import { IUtilitiesAPI } from '../api';
-import { getIsWindows } from '../utilities';
 
 export function getWPILibYear(): string {
-  return '2027_alpha5';
+  return '2027_alpha7';
 }
 
 let wpilibHome: string | undefined;
+
+export function getWPILibHomeDirForPlatform(
+  platform: NodeJS.Platform,
+  homeDir: string,
+  env: NodeJS.ProcessEnv
+): string {
+  const year = getWPILibYear();
+  if (platform === 'win32') {
+    let publicFolder = env.PUBLIC;
+    if (!publicFolder) {
+      publicFolder = 'C:\\Users\\Public';
+    }
+    return path.join(publicFolder, 'wpilib', year);
+  }
+
+  if (platform === 'linux') {
+    const dataHome = env.XDG_DATA_HOME;
+    if (dataHome && dataHome.trim().length > 0) {
+      return path.join(dataHome, '.wpilib', year);
+    }
+  }
+
+  return path.join(homeDir, '.wpilib', year);
+}
 
 export function getWPILibHomeDir(): string {
   if (wpilibHome) {
     return wpilibHome;
   }
-  const year = getWPILibYear();
-  if (getIsWindows()) {
-    let publicFolder = process.env.PUBLIC;
-    if (!publicFolder) {
-      publicFolder = 'C:\\Users\\Public';
-    }
-    wpilibHome = path.join(publicFolder, 'wpilib', year);
-  } else {
-    const dir = os.homedir();
-    wpilibHome = path.join(dir, 'wpilib', year);
-  }
+  wpilibHome = getWPILibHomeDirForPlatform(process.platform, os.homedir(), process.env);
   return wpilibHome;
 }
 
