@@ -19,21 +19,21 @@ suite('Utilities API Tests', () => {
   test('Linux WPILib home uses XDG_DATA_HOME when set', () => {
     assert.strictEqual(
       getWPILibHomeDirForPlatform('linux', homeDir, { XDG_DATA_HOME: xdgDataHome }),
-      path.join(xdgDataHome, '.wpilib', year)
+      path.join(xdgDataHome, 'wpilib', year)
     );
   });
 
   test('Linux WPILib home falls back to XDG default data folder', () => {
     assert.strictEqual(
       getWPILibHomeDirForPlatform('linux', homeDir, {}),
-      path.join(homeDir, '.local', 'share', '.wpilib', year)
+      path.join(homeDir, '.local', 'share', 'wpilib', year)
     );
   });
 
   test('Linux WPILib home ignores empty XDG_DATA_HOME', () => {
     assert.strictEqual(
       getWPILibHomeDirForPlatform('linux', homeDir, { XDG_DATA_HOME: '' }),
-      path.join(homeDir, '.local', 'share', '.wpilib', year)
+      path.join(homeDir, '.local', 'share', 'wpilib', year)
     );
   });
 

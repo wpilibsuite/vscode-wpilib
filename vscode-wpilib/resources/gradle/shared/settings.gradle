@@ -17,7 +17,7 @@ pluginManagement {
             if (xdgDataHome == null || xdgDataHome.trim().isEmpty()) {
                 xdgDataHome = new File(System.getProperty("user.home"), ".local/share").getPath()
             }
-            def homeRoot = new File(xdgDataHome, ".wpilib")
+            def homeRoot = new File(xdgDataHome, "wpilib")
             wpilibHome = new File(homeRoot, wpilibYear)
         } else {
             def userFolder = System.getProperty("user.home")
