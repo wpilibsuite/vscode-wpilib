@@ -23,17 +23,17 @@ suite('Utilities API Tests', () => {
     );
   });
 
-  test('Linux WPILib home falls back to hidden home folder', () => {
+  test('Linux WPILib home falls back to XDG default data folder', () => {
     assert.strictEqual(
       getWPILibHomeDirForPlatform('linux', homeDir, {}),
-      path.join(homeDir, '.wpilib', year)
+      path.join(homeDir, '.local', 'share', '.wpilib', year)
     );
   });
 
   test('Linux WPILib home ignores empty XDG_DATA_HOME', () => {
     assert.strictEqual(
       getWPILibHomeDirForPlatform('linux', homeDir, { XDG_DATA_HOME: '' }),
-      path.join(homeDir, '.wpilib', year)
+      path.join(homeDir, '.local', 'share', '.wpilib', year)
     );
   });
 
