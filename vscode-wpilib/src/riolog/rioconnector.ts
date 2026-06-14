@@ -41,12 +41,6 @@ const constantIps: string[] = [
 
 const constantHosts: string[] = ['robot.local'];
 
-const teamIps: string[] = [
-  'roboRIO-TEAM-FRC.local',
-  'roboRIO-TEAM-FRC.lan',
-  'roboRIO-TEAM-FRC.frc-field.local',
-];
-
 interface ISocketPromisePair {
   socket: net.Socket;
   promise: Promise<net.Socket>;
@@ -212,7 +206,9 @@ function getSocketFromDSTcp(port: number, dsPort: number): ISocketPromisePair {
 
         const pendingMessage = dsBuffer.trim();
         if (pendingMessage.endsWith('}')) {
-          tryConnectToRobot(dsBuffer);
+          if (!tryConnectToRobot(dsBuffer)) {
+            dsBuffer = '';
+          }
         }
       });
       ds.on('error', () => {
@@ -332,9 +328,6 @@ export async function connectToRobot(
   }
   for (const c of constantHosts) {
     pairs.push(getSocketFromIP(port, c));
-  }
-  for (const c of teamIps) {
-    pairs.push(getSocketFromIP(port, c.replace('TEAM', teamNumber.toString())));
   }
   pairs.push(getSocketFromIP(port, `10.${Math.trunc(teamNumber / 100)}.${teamNumber % 100}.2`));
   pairs.push(getSocketFromDSWebSocket(port));
