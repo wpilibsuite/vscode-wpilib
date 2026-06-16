@@ -55,6 +55,54 @@ export async function generateCopyCpp(
   }
 }
 
+export async function generateCopyPython(
+  resourcesFolder: string,
+  fromTemplateFolder: string,
+  fromTemplateTestFolder: string | undefined,
+  fromGradleFolder: string,
+  toFolder: string,
+  directGradleImport: boolean,
+  vendordeps: string[]
+): Promise<boolean> {
+  try {
+    // Check if destination folder is empty
+    if (!(await pathUtils.isFolderEmpty(toFolder))) {
+      logger.warn('Destination folder is not empty');
+      return false;
+    }
+
+    // Get project paths
+    const { codePath, testPath } = pathUtils.getProjectPaths(toFolder, '', directGradleImport); //TODO: change for python
+
+    // Get the GradleRIO version
+    const grRoot = path.dirname(fromGradleFolder);
+    const gradleRioVersion = await genUtils.getGradleRioVersion(grRoot);
+
+    // Copy template folders
+    await cp(fromTemplateFolder, codePath, { recursive: true });
+    if (fromTemplateTestFolder !== undefined) {
+      await cp(fromTemplateTestFolder, testPath, { recursive: true });
+    }
+
+    // Setup project structure
+    await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot);
+
+    // Update gradle file with correct version
+    await genUtils.updateGradleRioVersion(path.join(toFolder, 'build.gradle'), gradleRioVersion);
+
+    // Setup deploy directory
+    await genUtils.setupDeployDirectory(toFolder, directGradleImport, false);
+
+    // Setup vendor dependencies
+    await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
+
+    return true;
+  } catch (e) {
+    logger.error('Python project creation failure', e);
+    return false;
+  }
+}
+
 /**
  * Generates a Java project.
  * @param resourcesFolder The folder where the extension resources for a language are.

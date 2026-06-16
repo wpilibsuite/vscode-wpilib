@@ -19,6 +19,7 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
+import { activatePython } from './python/python';
 import { localize as i18n } from './locale';
 import { closeLogger, getMainLogFile, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
@@ -128,6 +129,8 @@ async function handleAfterTrusted(
   await activateCpp(context, externalApi);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
+  // Activate the python parts of the extension
+  await activatePython(context, externalApi);
 
   try {
     // Add built in tools

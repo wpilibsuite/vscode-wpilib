@@ -6,7 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
-import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
+import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator'; //TODO: add generateCopyPython
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { extensionContext, promptForProjectOpen } from '../utilities';
@@ -183,19 +183,22 @@ export class Gradle2025Import extends WebViewBase {
     // Detect C++ or Java project
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
-    let cpp = true;
+    let language = 'cpp';
     try {
       const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
       if (wpilibJsonFileParsed.currentLanguage === 'cpp') {
-        cpp = true;
+        language = 'cpp';
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
-        cpp = false;
+        language = 'java';
+      } else if(wpilibJsonFileParsed.currentLanguage === 'python') {
+        language = 'python';
+        vscode.window.showInformationMessage("Language is python");
       } else {
         await vscode.window.showErrorMessage(
           i18n(
             'message',
-            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java" or "cpp".'
+            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java", "cpp", or "python".'
           ),
           {
             modal: true,
@@ -221,7 +224,7 @@ export class Gradle2025Import extends WebViewBase {
 
     let javaRobotPackage: string = '';
     let mainClassPackage: string = '';
-    if (!cpp) {
+    if (language === 'java') {
       try {
         const gradleContents = await readFile(gradleFile, 'utf8');
         const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
@@ -291,7 +294,7 @@ export class Gradle2025Import extends WebViewBase {
     }
 
     let success = false;
-    if (cpp) {
+    if (language === 'cpp') {
       const gradlePath = path.join(
         gradleBasePath,
         data.romi ? 'cppromi' : data.xrp ? 'cppxrp' : 'cpp'
@@ -305,7 +308,7 @@ export class Gradle2025Import extends WebViewBase {
         true,
         vendordeps
       );
-    } else {
+    } else if (language === 'java') {
       const mainJavaFile = path.join(resourceRoot, 'java', 'src', 'Main.java');
       const gradlePath = path.join(
         gradleBasePath,
@@ -323,6 +326,10 @@ export class Gradle2025Import extends WebViewBase {
         true,
         vendordeps
       );
+    } else {
+      const robot = oldProjectPath;
+      const pyproject = oldProjectPath;
+      //TODO: see what's needed for generatePythonCopy
     }
 
     if (!success) {
@@ -351,8 +358,11 @@ export class Gradle2025Import extends WebViewBase {
     await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     let replacementFile = path.join(resourceRoot, 'java_replacements.json');
-    if (cpp) {
+    if (language === 'cpp') {
       replacementFile = path.join(resourceRoot, 'cpp_replacements.json');
+    } else if (language === 'python') {
+      replacementFile = path.join(resourceRoot, 'python_replacements.json')
+      //TODO: see what replacement file looks like for python
     }
     await ImportUpdate(toFolder, replacementFile);
 

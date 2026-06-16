@@ -1,0 +1,11 @@
+[
+  {
+    "fileMatcher": "**/*.py",
+    "flags": "g", 
+    "replacements": [
+      {
+        
+      }
+    ]
+  }
+]
