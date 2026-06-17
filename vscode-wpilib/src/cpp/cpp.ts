@@ -44,6 +44,6 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   await registerCommandTemplates(extensionResourceLocation, commandApi, preferences);
 
   // Setup examples and template
-  await registerExamples(extensionResourceLocation, false, exampleTemplate);
-  await registerProjectTemplates(extensionResourceLocation, false, exampleTemplate);
+  await registerExamples(extensionResourceLocation, 'cpp', exampleTemplate);
+  await registerProjectTemplates(extensionResourceLocation, 'cpp', exampleTemplate);
 }

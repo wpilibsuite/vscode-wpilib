@@ -62,7 +62,8 @@ export async function findMatchingFiles(
 export async function setupProjectStructure(
   fromGradleFolder: string,
   toFolder: string,
-  grRoot: string
+  grRoot: string,
+  python?: boolean
 ): Promise<boolean> {
   try {
     // Copy gradle files
@@ -70,7 +71,7 @@ export async function setupProjectStructure(
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
       recursive: true,
     });
-
+    if(python) return true; //RobotPy does not use build.gradle, skip over shared folder
     // Copy shared gradle files
     await cp(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),

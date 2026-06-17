@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { generateCopyCpp, generateCopyJava } from './generator';
+import { generateCopyCpp, generateCopyJava, generateCopyPython } from './generator';
 
 export interface IExampleJsonLayout {
   name: string;
@@ -24,10 +24,11 @@ const exampleResourceName = 'examples.json';
 
 export async function registerExamples(
   resourceRoot: string,
-  java: boolean,
+  language: string,
   core: IExampleTemplateAPI
 ) {
-  const examplesFolder = path.join(resourceRoot, 'src', 'examples');
+  let examplesFolder = path.join(resourceRoot, 'src', 'examples'); 
+  if(language === 'python') examplesFolder = path.join(resourceRoot, 'examples');
   const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
   const resourceFile = path.join(examplesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
@@ -44,7 +45,7 @@ export async function registerExamples(
       }
       const provider: IExampleTemplateCreator = {
         getLanguage(): string {
-          return java ? 'java' : 'cpp';
+          return language;
         },
         getDescription(): string {
           return e.description;
@@ -58,7 +59,7 @@ export async function registerExamples(
             if (e.hasunittests) {
               testFolder = path.join(examplesTestFolder, e.foldername);
             }
-            if (java) {
+            if (language == 'java') {
               const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
               if (
                 !(await generateCopyJava(
@@ -79,7 +80,8 @@ export async function registerExamples(
                 );
                 return false;
               }
-            } else {
+            } else if(language == 'cpp') {
+              vscode.window.showInformationMessage("cpp: " + language);
               if (
                 !(await generateCopyCpp(
                   resourceRoot,
@@ -91,6 +93,21 @@ export async function registerExamples(
                   vendordeps
                 ))
               ) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            } else {
+              if(!(await generateCopyPython(
+                resourceRoot, 
+                path.join(examplesFolder, e.foldername),
+                testFolder,
+                path.join(gradleBasePath, e.gradlebase),
+                folderInto.fsPath,
+                false,
+                vendordeps
+              ))) {
                 vscode.window.showErrorMessage(
                   i18n('message', 'Cannot create into non empty folder')
                 );

@@ -11,7 +11,7 @@ import { registerCodeBuilderAndTester } from './buildtest';
 import { registerCommandTemplates } from './commands';
 import { registerCodeDeploy } from './deploy';
 
-export async function activatePython(context:vscode.ExtensionContext, coreExports: IExternalAPI) {
+export async function activatePython(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
     const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'python');
     
     const preferences = coreExports.getPreferencesAPI()
@@ -45,6 +45,6 @@ export async function activatePython(context:vscode.ExtensionContext, coreExport
     await registerCommandTemplates(extensionResourceLocation, commandApi, preferences);
     
     //Setup examples and template
-    await registerExamples(extensionResourceLocation, true, exampleTemplate);
-    await registerProjectTemplates(extensionResourceLocation, true, exampleTemplate);
+    await registerExamples(extensionResourceLocation, 'python', exampleTemplate);
+    await registerProjectTemplates(extensionResourceLocation, 'python', exampleTemplate);
 }

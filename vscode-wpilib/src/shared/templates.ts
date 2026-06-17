@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { logger } from '../logger';
 import { localize as i18n } from '../locale';
-import { generateCopyCpp, generateCopyJava } from './generator';
+import { generateCopyCpp, generateCopyJava, generateCopyPython } from './generator';
 
 export interface ITemplateJsonLayout {
   name: string;
@@ -24,10 +24,11 @@ const exampleResourceName = 'templates.json';
 
 export async function registerProjectTemplates(
   resourceRoot: string,
-  java: boolean,
+  language: string,
   core: IExampleTemplateAPI
 ) {
-  const templatesFolder = path.join(resourceRoot, 'src', 'templates');
+  let templatesFolder = path.join(resourceRoot, 'src', 'templates');
+  if(language === 'python') templatesFolder = path.join(resourceRoot, 'templates');
   const templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
   const resourceFile = path.join(templatesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
@@ -44,7 +45,7 @@ export async function registerProjectTemplates(
       }
       const provider: IExampleTemplateCreator = {
         getLanguage(): string {
-          return java ? 'java' : 'cpp';
+          return language;
         },
         getDescription(): string {
           return e.description;
@@ -58,7 +59,7 @@ export async function registerProjectTemplates(
             if (e.hasunittests) {
               testFolder = path.join(templatesTestFolder, e.foldername);
             }
-            if (java) {
+            if (language === 'java') {
               const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
               if (
                 !(await generateCopyJava(
@@ -79,7 +80,7 @@ export async function registerProjectTemplates(
                 );
                 return false;
               }
-            } else {
+            } else if(language === 'cpp') {
               if (
                 !(await generateCopyCpp(
                   resourceRoot,
@@ -93,6 +94,21 @@ export async function registerProjectTemplates(
               ) {
                 vscode.window.showErrorMessage(
                   i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            } else{
+              if(!(generateCopyPython(
+                resourceRoot,
+                path.join(templatesFolder, e.foldername),
+                testFolder,
+                path.join(gradleBasePath, e.gradlebase),
+                folderInto.fsPath,
+                false,
+                vendordeps
+              ))) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')  
                 );
                 return false;
               }

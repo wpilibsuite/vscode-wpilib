@@ -6,6 +6,7 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
+import * as vscode from 'vscode';
 
 export async function generateCopyCpp(
   resourcesFolder: string,
@@ -72,12 +73,11 @@ export async function generateCopyPython(
     }
 
     // Get project paths
-    const { codePath, testPath } = pathUtils.getProjectPaths(toFolder, '', directGradleImport); //TODO: change for python
-
+    const codePath = toFolder;
+    const testPath = path.join(toFolder, 'test');
     // Get the GradleRIO version
     const grRoot = path.dirname(fromGradleFolder);
-    const gradleRioVersion = await genUtils.getGradleRioVersion(grRoot);
-
+    
     // Copy template folders
     await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
@@ -85,17 +85,9 @@ export async function generateCopyPython(
     }
 
     // Setup project structure
-    await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot);
+    await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot, true);
 
-    // Update gradle file with correct version
-    await genUtils.updateGradleRioVersion(path.join(toFolder, 'build.gradle'), gradleRioVersion);
-
-    // Setup deploy directory
-    await genUtils.setupDeployDirectory(toFolder, directGradleImport, false);
-
-    // Setup vendor dependencies
-    await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
-
+    //TODO: add set-up vendordeps
     return true;
   } catch (e) {
     logger.error('Python project creation failure', e);
