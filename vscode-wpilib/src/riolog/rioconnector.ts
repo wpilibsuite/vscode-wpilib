@@ -31,9 +31,10 @@ interface IDriverStationData {
   robotIP?: number | string;
 }
 
+
+
 const constantIps: string[] = [
-  '172.28.0.1',
-  '172.29.0.1',
+  process.platform == 'win32' ? '172.26.0.1' : '172.27.0.1',
   '172.30.0.1',
   //, '127.0.0.1',
   // Uncomment the above line for testing on localhost.
