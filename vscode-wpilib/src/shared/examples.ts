@@ -29,7 +29,8 @@ export async function registerExamples(
 ) {
   let examplesFolder = path.join(resourceRoot, 'src', 'examples'); 
   if(language === 'python') examplesFolder = path.join(resourceRoot, 'examples');
-  const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
+  let examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
+  if(language === 'python') examplesTestFolder = path.join(resourceRoot, 'examples_test');;
   const resourceFile = path.join(examplesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
   try {
@@ -102,7 +103,7 @@ export async function registerExamples(
                 !(await generateCopyPython(
                 resourceRoot, 
                 path.join(examplesFolder, e.foldername),
-                testFolder,
+                examplesTestFolder,
                 path.join(gradleBasePath, e.gradlebase),
                 folderInto.fsPath,
                 false,

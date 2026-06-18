@@ -74,7 +74,7 @@ export async function generateCopyPython(
 
     // Get project paths
     const codePath = toFolder;
-    const testPath = path.join(toFolder, 'test');
+    const testPath = path.join(toFolder, 'tests');
     // Get the GradleRIO version
     const grRoot = path.dirname(fromGradleFolder);
     

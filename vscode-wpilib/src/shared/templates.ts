@@ -29,7 +29,8 @@ export async function registerProjectTemplates(
 ) {
   let templatesFolder = path.join(resourceRoot, 'src', 'templates');
   if(language === 'python') templatesFolder = path.join(resourceRoot, 'templates');
-  const templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
+  let templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
+  if(language === 'python') templatesTestFolder = path.join(resourceRoot, 'templates_test')
   const resourceFile = path.join(templatesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
   try {
