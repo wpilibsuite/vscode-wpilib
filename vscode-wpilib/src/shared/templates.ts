@@ -102,7 +102,7 @@ export async function registerProjectTemplates(
               if(!(await generateCopyPython(
                 resourceRoot,
                 path.join(templatesFolder, e.foldername),
-                testFolder,
+                templatesTestFolder,
                 path.join(gradleBasePath, e.gradlebase),
                 folderInto.fsPath,
                 false,
