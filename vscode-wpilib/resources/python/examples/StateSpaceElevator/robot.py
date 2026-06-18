@@ -9,7 +9,7 @@ import math
 import wpilib
 import wpimath
 import wpimath.units
-import wpimath.system.plant
+from wpimath import DCMotor
 
 kMotorPort = 0
 kEncoderAChannel = 0
@@ -34,7 +34,8 @@ class MyRobot(wpilib.TimedRobot):
     elevator.
     """
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
+        super().__init__()
         self.profile = wpimath.TrapezoidProfile(
             wpimath.TrapezoidProfile.Constraints(
                 wpimath.units.feetToMeters(3.0),
@@ -51,15 +52,15 @@ class MyRobot(wpilib.TimedRobot):
         # Outputs (what we can measure): [position], in meters.
 
         # This elevator is driven by two NEO motors.
-        self.elevatorPlant = wpimath.system.plant.LinearSystemId.elevatorSystem(
-            wpimath.system.plant.DCMotor.NEO(2),
+        self.elevatorPlant = wpimath.Models.elevatorFromPhysicalConstants(
+            DCMotor.NEO(2),
             kCarriageMass,
             kDrumRadius,
             kElevatorGearing,
         )
 
         # The observer fuses our encoder data and voltage inputs to reject noise.
-        self.observer = wpimath.KalmanFilter_2_1_1(
+        self.observer = wpimath.KalmanFilter_2_1_2(
             self.elevatorPlant,
             (
                 wpimath.units.inchesToMeters(2),
@@ -67,6 +68,7 @@ class MyRobot(wpilib.TimedRobot):
             ),  # How accurate we think our model is, in meters and meters/second.
             (
                 0.001,
+                0.001
             ),  # How accurate we think our encoder position data is. In this case we very highly trust our encoder position reading.
             0.020,
         )
@@ -90,7 +92,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # The state-space loop combines a controller, observer, feedforward and plant for easy control.
-        self.loop = wpimath.LinearSystemLoop_2_1_1(
+        self.loop = wpimath.LinearSystemLoop_2_1_2(
             self.elevatorPlant, self.controller, self.observer, 12.0, 0.020
         )
 
@@ -137,7 +139,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # Correct our Kalman filter's state vector estimate with encoder data.
-        self.loop.correct([self.encoder.getDistance()])
+        self.loop.correct([self.lastProfiledReference.position, self.lastProfiledReference.velocity])
 
         # Update our LQR to generate new voltage commands and use the voltages to predict the next
         # state with out Kalman filter.

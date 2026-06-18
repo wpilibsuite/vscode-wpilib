@@ -86,7 +86,6 @@ export async function generateCopyPython(
 
     // Setup project structure
     await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot, true);
-
     //TODO: add set-up vendordeps
     return true;
   } catch (e) {
@@ -206,7 +205,6 @@ export async function generateCopyJava(
 
     // Setup vendor dependencies
     await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
-
     return true;
   } catch (e) {
     logger.error('Java project creation failure', e);

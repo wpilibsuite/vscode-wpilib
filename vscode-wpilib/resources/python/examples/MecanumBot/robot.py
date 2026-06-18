@@ -12,8 +12,9 @@ from drivetrain import Drivetrain
 
 
 class MyRobot(wpilib.TimedRobot):
-    def robotInit(self):
-        self.controller = wpilib.XboxController(0)
+    def __init__(self):
+        super().__init__()
+        self.controller = wpilib.NiDsXboxController(0)
         self.mecanum = Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.

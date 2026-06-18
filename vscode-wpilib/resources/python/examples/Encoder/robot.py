@@ -24,10 +24,10 @@ class MyRobot(wpilib.TimedRobot):
     autonomous mode.
     """
 
-    def robotInit(self):
+    def __init__(self):
         """Robot initialization function"""
-
-        self.encoder = wpilib.Encoder(1, 2, False, wpilib.Encoder.EncodingType.k4X)
+        super().__init__()
+        self.encoder = wpilib.Encoder(1, 2, False, wpilib.Encoder.EncodingType.X4)
 
         # Defines the number of samples to average when determining the rate.
         # On a quadrature encoder, values range from 1-255;

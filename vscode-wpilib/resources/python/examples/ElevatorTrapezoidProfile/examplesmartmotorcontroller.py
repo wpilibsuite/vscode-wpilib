@@ -8,7 +8,7 @@ import wpilib
 import enum
 
 
-class ExampleSmartMotorController(wpilib.interfaces.MotorController):
+class ExampleSmartMotorController(wpilib.MotorController):
     """A simplified stub class that simulates the API of a common "smart" motor controller.
     Has no actual functionality.
     """

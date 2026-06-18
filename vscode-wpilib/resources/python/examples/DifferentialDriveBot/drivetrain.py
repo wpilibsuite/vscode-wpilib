@@ -4,8 +4,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib.drive
+import wpilib
 import wpimath
+import wpiutil
 import wpimath.units
 
 import math

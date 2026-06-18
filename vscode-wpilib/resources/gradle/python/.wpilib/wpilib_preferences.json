@@ -1,6 +1,6 @@
 {
-    "enableCppIntellisense": false,
     "currentLanguage": "python",
-    "projectYear": "2027_alpha5",
-    "teamNumber": -1
+    "teamNumber": -1,
+    "enableCppIntellisense": false,
+    "projectYear": "2027_alpha5"
 }

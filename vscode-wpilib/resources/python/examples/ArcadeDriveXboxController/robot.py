@@ -16,9 +16,9 @@ class MyRobot(wpilib.TimedRobot):
     Runs the motors with split arcade steering and an Xbox controller.
     """
 
-    def robotInit(self):
+    def __init__(self):
         """Robot initialization function"""
-
+        super().__init__()
         leftMotor = wpilib.PWMSparkMax(0)
         rightMotor = wpilib.PWMSparkMax(1)
         self.robotDrive = DifferentialDrive(leftMotor, rightMotor)

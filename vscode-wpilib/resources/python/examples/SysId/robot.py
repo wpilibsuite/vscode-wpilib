@@ -17,10 +17,11 @@ class MyRobot(TimedCommandRobot):
     project.
     """
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
         """This function is run when the robot is first started up and should be used for any
         initialization code.
         """
+        super().__init__()
         self.robot = SysIdRoutineBot()
 
         self.robot.configureBindings()

@@ -81,7 +81,6 @@ export async function registerExamples(
                 return false;
               }
             } else if(language == 'cpp') {
-              vscode.window.showInformationMessage("cpp: " + language);
               if (
                 !(await generateCopyCpp(
                   resourceRoot,
@@ -99,7 +98,8 @@ export async function registerExamples(
                 return false;
               }
             } else {
-              if(!(await generateCopyPython(
+              if(
+                !(await generateCopyPython(
                 resourceRoot, 
                 path.join(examplesFolder, e.foldername),
                 testFolder,

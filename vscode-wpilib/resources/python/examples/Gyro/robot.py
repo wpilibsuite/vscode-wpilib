@@ -7,6 +7,7 @@
 
 import wpilib
 from wpilib import DifferentialDrive
+import wpimath
 from wpilib import AnalogGyro #TODO: look into right import
 
 

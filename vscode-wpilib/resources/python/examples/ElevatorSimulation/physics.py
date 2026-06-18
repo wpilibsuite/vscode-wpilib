@@ -21,7 +21,6 @@
 import wpilib
 import wpilib.simulation
 
-import wpimath.system.plant
 from pyfrc.physics.core import PhysicsInterface
 
 import typing

@@ -6,7 +6,7 @@
 
 import commands2
 import wpilib
-import wpilib.drive
+from wpilib import DifferentialDrive
 
 import constants
 
@@ -29,7 +29,7 @@ class DriveSubsystem(commands2.Subsystem):
         self.right1.setInverted(True)
 
         # The robot's drive
-        self.drive = wpilib.drive.DifferentialDrive(self.left1, self.right1)
+        self.drive = DifferentialDrive(self.left1, self.right1)
 
         # The left-side drive encoder
         self.leftEncoder = wpilib.Encoder(

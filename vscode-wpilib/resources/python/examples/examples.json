@@ -47,7 +47,7 @@
       "Profiled PID",
       "Joystick"
     ],
-    "foldername": "ElevatorProfilePID",
+    "foldername": "ElevatorProfiledPID",
     "gradlebase": "python",
     "robotclass": "Robot",
     "commandversion": 2
@@ -248,7 +248,10 @@
     "foldername": "StateSpaceFlywheel",
     "gradlebase": "python",
     "robotclass": "robot",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "numpy"
+    ]
   },
   {
     "name": "StateSpaceFlywheelSysId",
@@ -265,7 +268,10 @@
     "foldername": "StateSpaceFlywheelSysId",
     "gradlebase": "python",
     "robotclass": "robot",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "numpy"
+    ]
   },
   {
     "name": "StateSpaceElevator",
@@ -281,7 +287,10 @@
     "foldername": "StateSpaceElevator",
     "gradlebase": "python",
     "robotclass": "robot",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "numpy"
+    ]
   },
   {
     "name": "StateSpaceArm",
@@ -297,7 +306,10 @@
     "foldername": "StateSpaceArm",
     "gradlebase": "python",
     "robotclass": "robot",
-    "commandversion": 2
+    "commandversion": 2,
+    "extravendordeps": [
+      "numpy"
+    ]
   },
   {
     "name": "ElevatorSimulation",
@@ -313,8 +325,7 @@
     "foldername": "ElevatorSimulation",
     "gradlebase": "python",
     "robotclass": "robot",
-    "commandversion": 2,
-    "hasunittests": true
+    "commandversion": 2
   },
   {
     "name": "RomiReference",

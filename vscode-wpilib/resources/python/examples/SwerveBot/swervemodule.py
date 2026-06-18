@@ -7,9 +7,8 @@
 import math
 
 import wpilib
-import wpimath.geometry
+import wpimath
 import wpimath.kinematics
-import wpimath.trajectory
 
 kWheelRadius = 0.0508
 kEncoderResolution = 4096
@@ -52,7 +51,7 @@ class SwerveModule:
             1,
             0,
             0,
-            wpimath.trajectory.TrapezoidProfile.Constraints(
+            wpimath.TrapezoidProfile.Constraints(
                 kModuleMaxAngularVelocity,
                 kModuleMaxAngularAcceleration,
             ),
@@ -88,12 +87,12 @@ class SwerveModule:
             wpimath.Rotation2d(self.turningEncoder.getDistance()),
         )
 
-    def getPosition(self) -> wpimath.kinematics.SwerveModulePosition:
+    def getPosition(self) -> wpimath.SwerveModulePosition:
         """Returns the current position of the module.
 
         :returns: The current position of the module.
         """
-        return wpimath.kinematics.SwerveModulePosition(
+        return wpimath.SwerveModulePosition(
             self.driveEncoder.getDistance(),
             wpimath.Rotation2d(self.turningEncoder.getDistance()),
         )

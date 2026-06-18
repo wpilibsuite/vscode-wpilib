@@ -7,7 +7,6 @@
 
 import typing
 
-import wpilib
 import commands2
 import commands2.cmd
 
@@ -27,11 +26,12 @@ class MyRobot(commands2.TimedCommandRobot):
     has an implementation of robotPeriodic which runs the scheduler for you
     """
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
         """
         This function is run when the robot is first started up and should be used for any
         initialization code.
         """
+        super().__init__()
         self.autonomousCommand: typing.Optional[commands2.Command] = None
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our

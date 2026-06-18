@@ -98,7 +98,7 @@ export async function registerProjectTemplates(
                 return false;
               }
             } else{
-              if(!(generateCopyPython(
+              if(!(await generateCopyPython(
                 resourceRoot,
                 path.join(templatesFolder, e.foldername),
                 testFolder,

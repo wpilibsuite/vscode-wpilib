@@ -28,8 +28,9 @@ class MyRobot(wpilib.TimedRobot):
     #  = (Pi * D) / ppr
     kElevatorEncoderDistPerPulse = 2.0 * math.pi * kElevatorDrumRadius / 4096.0
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
         # standard classes for controlling our elevator
+        super().__init__()
         self.controller = wpimath.PIDController(self.kElevatorKp, 0, 0)
         self.encoder = wpilib.Encoder(self.kEncoderAChannel, self.kEncoderBChannel)
         self.motor = wpilib.PWMSparkMax(self.kMotorPort)
@@ -44,8 +45,8 @@ class MyRobot(wpilib.TimedRobot):
             self.motor.setVoltage(pidOutput)
         else:
             # Otherwise we disable the motor
-            self.motor.set(0.0)
+            self.motor.setVoltage(0.0)
 
     def disabledInit(self) -> None:
         # This just makes sure that our simulation code knows that the motor is off
-        self.motor.set(0)
+        self.motor.setVoltage(0)

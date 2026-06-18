@@ -111,16 +111,14 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
       //
     }
     const toFolderUri = vscode.Uri.file(toFolder);
-
     const success = await creator.generate(toFolderUri);
 
     if (!success) {
       return false;
     }
-
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
+    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson; 
 
-    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson;
     parsed.teamNumber = teamNumber;
     await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 

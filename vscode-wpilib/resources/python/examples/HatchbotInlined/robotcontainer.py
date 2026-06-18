@@ -5,7 +5,7 @@
 #
 
 import wpilib
-from wpilib.interfaces import GenericHID
+from wpilib import GenericHID
 
 import commands2
 import commands2.button
@@ -43,7 +43,7 @@ class RobotContainer:
         )
 
         # The driver's controller
-        self.driverController = commands2.button.CommandPS4Controller(
+        self.driverController = commands2.button.CommandNiDsPS4Controller(
             constants.kDriverControllerPort
         )
 

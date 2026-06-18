@@ -9,9 +9,7 @@ import math
 
 import wpilib
 import wpimath
-import wpimath
-import wpimath
-import wpimath.system.plant
+from wpimath import DCMotor
 import wpimath.units
 
 kMotorPort = 0
@@ -32,7 +30,8 @@ class MyRobot(wpilib.TimedRobot):
     flywheel.
     """
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
+        super().__init__()
         self.kSpinUpRadPerSec = wpimath.units.rotationsPerMinuteToRadiansPerSecond(500)
 
         # The plant holds a state-space model of our flywheel. This system has the following properties:
@@ -40,8 +39,8 @@ class MyRobot(wpilib.TimedRobot):
         # States: [velocity], in radians per second.
         # Inputs (what we can "put in"): [voltage], in volts.
         # Outputs (what we can measure): [velocity], in radians per second.
-        self.flywheelPlant = wpimath.plant.LinearSystemId.flywheelSystem(
-            wpimath.system.plant.DCMotor.NEO(2),
+        self.flywheelPlant = wpimath.Models.flywheelFromPhysicalConstants(
+            DCMotor.NEO(2),
             kFlywheelMomentOfInertia,
             kFlywheelGearing,
         )
@@ -90,7 +89,7 @@ class MyRobot(wpilib.TimedRobot):
         # PID controller.
         if self.joystick.getTriggerPressed():
             # We just pressed the trigger, so let's set our next reference
-            self.loop.setNextR([kSpinUpRadPerSec])
+            self.loop.setNextR([self.kSpinUpRadPerSec])
 
         elif self.joystick.getTriggerReleased():
             # We just released the trigger, so let's spin down

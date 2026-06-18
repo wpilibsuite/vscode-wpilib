@@ -13,7 +13,8 @@ import math
 class MyRobot(wpilib.TimedRobot):
     kDt = 0.02
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
+        super().__init__()
         self.joystick = wpilib.Joystick(1)
         self.encoder = wpilib.Encoder(1, 2)
         self.motor = wpilib.PWMSparkMax(1)
@@ -34,4 +35,4 @@ class MyRobot(wpilib.TimedRobot):
             self.controller.setGoal(0)
 
         # Run controller and update motor output
-        self.motor.set(self.controller.calculate(self.encoder.getDistance()))
+        self.motor.setVoltage(self.controller.calculate(self.encoder.getDistance()))

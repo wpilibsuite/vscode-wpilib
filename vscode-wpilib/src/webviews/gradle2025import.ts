@@ -6,7 +6,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
-import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator'; //TODO: add generateCopyPython
+import { generateCopyCpp, generateCopyJava, generateCopyPython, setDesktopEnabled } from '../shared/generator';
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { extensionContext, promptForProjectOpen } from '../utilities';
@@ -193,7 +193,6 @@ export class Gradle2025Import extends WebViewBase {
         language = 'java';
       } else if(wpilibJsonFileParsed.currentLanguage === 'python') {
         language = 'python';
-        vscode.window.showInformationMessage("Language is python");
       } else {
         await vscode.window.showErrorMessage(
           i18n(

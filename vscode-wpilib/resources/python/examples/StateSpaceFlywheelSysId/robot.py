@@ -9,9 +9,6 @@ import math
 import wpilib
 import wpimath
 import wpimath.units
-import wpimath.system
-import wpimath.system.plant
-
 kMotorPort = 0
 kEncoderAChannel = 0
 kEncoderBChannel = 1
@@ -31,7 +28,7 @@ class MyRobot(wpilib.TimedRobot):
     flywheel.
     """
 
-    def robotInit(self) -> None:
+    def __init__(self) -> None:
         # The plant holds a state-space model of our flywheel. This system has the following properties:
         #
         # States: [velocity], in radians per second.
@@ -39,10 +36,9 @@ class MyRobot(wpilib.TimedRobot):
         # Outputs (what we can measure): [velocity], in radians per second.
         #
         # The Kv and Ka constants are found using the FRC Characterization toolsuite.
-        self.flywheelPlant = (
-            wpimath.LinearSystemId.identifyVelocitySystemRadians(
-                kFlywheelKv, kFlywheelKa
-            )
+        super().__init__()
+        self.flywheelPlant = wpimath.Models.flywheelFromSysId(
+            kFlywheelKv, kFlywheelKa
         )
 
         # The observer fuses our encoder data and voltage inputs to reject noise.
@@ -85,7 +81,7 @@ class MyRobot(wpilib.TimedRobot):
         # PID controller.
         if self.joystick.getTriggerPressed():
             # We just pressed the trigger, so let's set our next reference
-            self.loop.setNextR([kSpinUpRadPerSec])
+            self.loop.setNextR([kSpinupRadPerSec])
 
         elif self.joystick.getTriggerReleased():
             # We just released the trigger, so let's spin down
