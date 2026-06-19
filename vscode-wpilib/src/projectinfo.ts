@@ -6,6 +6,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { findJdkPath, getJavaVersion } from './jdkdetector';
+import { findPythonPath, getPythonVersion } from './pythondetector';
 import { logger } from './logger';
 import { extensionContext } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
@@ -84,6 +85,8 @@ export class ProjectInfoGatherer {
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
     const jdkVer = !jdkLoc ? 'unknown' : await getJavaVersion(jdkLoc);
+    const pyPath = await findPythonPath();
+    const pyVer = !pyPath ? 'unknown' : await getPythonVersion();
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 VS Code Version: ${vscode.version}
@@ -96,6 +99,8 @@ Java Debug Extension Version: ${projectInfo.javaDebugExtensionVersion}
 Java Dependencies Extension Version ${projectInfo.javaDependenciesExtensionVersion}
 Java Version: ${jdkVer}
 Java Location: ${jdkLoc}
+Python Version: ${pyVer}
+Python Location: ${pyPath}
 Vendor Libraries:
 `;
 

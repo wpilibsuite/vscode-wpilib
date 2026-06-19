@@ -1,24 +1,29 @@
 'use strict';
 
 import * as cp from 'child_process';
-import * as path from 'path';
 import * as vscode from 'vscode';
-import { IExternalAPI } from './api';
 import { logger } from './logger';
+import { getIsWindows } from './utilities';
 
-export async function parseMajorVersion(params:type) {
-    
-}
-
-export function getPythonVersion(pythonPath: string): Promise<number> {
-    
+export async function getPythonVersion(): Promise<string | undefined> {
+    try {
+        const version = cp.execSync('python --version').toString();
+        const match: RegExpMatchArray | null = version.match(/\d+/g);
+        const versionNum = match?.join('.');
+        return versionNum;
+    } catch (error) {
+        logger.log("Error getting python version");
+    }
+    return undefined;
 }
 
 async function checkPythonPath(path: string | undefined, source: string) {
     if (path) {
         try {
-            const pyVersion = await getPythonVersion(path);
-            if(pyVersion >= 3.1) {
+            const pyVersion = await getPythonVersion();
+            const regexp = /1[2-6]/g;
+            const version = pyVersion?.match(regexp);
+            if(version && version.toString() >= '11') {
                 logger.log(`Found ${source} Version: ${pyVersion} at ${path}`);
                 return true;
             } else {
@@ -31,9 +36,13 @@ async function checkPythonPath(path: string | undefined, source: string) {
     return false;
 }
 
-export async function findPythonPath(api: IExternalAPI): Promise<string | undefined> {
-    const vscodePythonPath = vscode.workspace.getConfiguration('python').get<string>('defaultInterpreterPath');
-    if (await checkPythonPath(vscodePythonPath, 'defaultInterpreterPath')) {
+export async function findPythonPath(): Promise<string | undefined> {
+    let cmd = 'python';
+    if(getIsWindows()) cmd = 'where ' + cmd;
+    else cmd = 'which ' + cmd;
+    const vscodePythonPath = cp.execSync(cmd, {encoding: 'utf-8'});
+    if (await checkPythonPath(vscodePythonPath, 'Execute Command Output')) {
         return vscodePythonPath;
     }
+    return undefined;
 }
