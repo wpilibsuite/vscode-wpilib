@@ -233,11 +233,10 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java') {
+        if (prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java' && prefs.getCurrentLanguage() !== 'python') {
           logger.log('Project with Unknown Language: ' + prefs.getCurrentLanguage());
           continue;
         }
-
         if (prefs.getProjectYear() !== '2027_alpha5') {
           const importPersistentState = new PersistentFolderState(
             'wpilib.2027_alpha5persist',
@@ -259,7 +258,7 @@ async function handleAfterTrusted(
             );
             if (upgradeResult?.title === 'Yes') {
               if (gradle2025import) {
-                await gradle2025import.startWithProject(w.uri);
+                await gradle2025import.startWithProject(w.uri, prefs.getCurrentLanguage());
               }
             } else if (upgradeResult?.title === "No, Don't ask again") {
               importPersistentState.Value = true;
@@ -268,7 +267,7 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
+        if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java' || prefs.getCurrentLanguage() === 'python') {
           const didUpdate: boolean = await checkForInitialUpdate(w);
 
           let runBuild: boolean;

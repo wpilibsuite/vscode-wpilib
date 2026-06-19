@@ -19,38 +19,38 @@ class DriveSubsystem(commands2.Subsystem):
         super().__init__()
 
         # The motors on the left side of the drive.
-        self.leftLeader = examplesmartmotorcontroller.ExampleSmartMotorController(
+        self.left_leader = examplesmartmotorcontroller.ExampleSmartMotorController(
             constants.DriveConstants.kLeftMotor1Port
         )
 
-        self.leftFollower = examplesmartmotorcontroller.ExampleSmartMotorController(
+        self.left_follower = examplesmartmotorcontroller.ExampleSmartMotorController(
             constants.DriveConstants.kLeftMotor2Port
         )
 
         # The motors on the right side of the drive.
-        self.rightLeader = examplesmartmotorcontroller.ExampleSmartMotorController(
+        self.right_leader = examplesmartmotorcontroller.ExampleSmartMotorController(
             constants.DriveConstants.kRightMotor1Port
         )
 
-        self.rightFollower = examplesmartmotorcontroller.ExampleSmartMotorController(
+        self.right_follower = examplesmartmotorcontroller.ExampleSmartMotorController(
             constants.DriveConstants.kRightMotor1Port
         )
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightLeader.setInverted(True)
+        self.right_leader.setInverted(True)
 
         # You might need to not do this depending on the specific motor controller
         # that you are using -- contact the respective vendor's documentation for
         # more details.
-        self.rightFollower.setInverted(True)
+        self.right_follower.setInverted(True)
 
-        self.leftFollower.follow(self.leftLeader)
-        self.rightFollower.follow(self.rightLeader)
+        self.left_follower.follow(self.left_leader)
+        self.right_follower.follow(self.right_leader)
 
-        self.leftLeader.setPID(constants.DriveConstants.kp, 0, 0)
-        self.rightLeader.setPID(constants.DriveConstants.kp, 0, 0)
+        self.left_leader.setPID(constants.DriveConstants.kp, 0, 0)
+        self.right_leader.setPID(constants.DriveConstants.kp, 0, 0)
 
         # The feedforward controller (note that these are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!)
         # check DriveConstants for more information.
@@ -61,7 +61,7 @@ class DriveSubsystem(commands2.Subsystem):
         )
 
         # The robot's drive
-        self.drive = DifferentialDrive(self.leftLeader, self.rightLeader)
+        self.drive = DifferentialDrive(self.left_leader, self.right_leader)
 
     def arcadeDrive(self, fwd: float, rot: float):
         """
@@ -83,13 +83,13 @@ class DriveSubsystem(commands2.Subsystem):
         :param left:  The left wheel state.
         :param right: The right wheel state.
         """
-        self.leftLeader.setSetPoint(
+        self.left_leader.setSetPoint(
             examplesmartmotorcontroller.ExampleSmartMotorController.PIDMode.kPosition,
             left.position,
             self.feedforward.calculate(left.velocity),
         )
 
-        self.rightLeader.setSetPoint(
+        self.right_leader.setSetPoint(
             examplesmartmotorcontroller.ExampleSmartMotorController.PIDMode.kPosition,
             right.position,
             self.feedforward.calculate(right.velocity),
@@ -101,7 +101,7 @@ class DriveSubsystem(commands2.Subsystem):
 
         :returns: the left drive encoder distance
         """
-        return self.leftLeader.getEncoderDistance()
+        return self.left_leader.getEncoderDistance()
 
     def getRightEncoderDistance(self) -> float:
         """
@@ -109,17 +109,17 @@ class DriveSubsystem(commands2.Subsystem):
 
         :returns: the right drive encoder distance
         """
-        return self.rightLeader.getEncoderDistance()
+        return self.right_leader.getEncoderDistance()
 
     def resetEncoders(self):
         """Resets the drive encoders"""
-        self.leftLeader.resetEncoder()
-        self.rightLeader.resetEncoder()
+        self.left_leader.resetEncoder()
+        self.right_leader.resetEncoder()
 
-    def setMaxOutput(self, maxOutput: float):
+    def setMaxOutput(self, max_output: float):
         """
         Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
 
         :param maxOutput: the maximum output to which the drive will be constrained
         """
-        self.drive.setMaxOutput(maxOutput)
+        self.drive.setMaxOutput(max_output)

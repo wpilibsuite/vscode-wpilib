@@ -37,9 +37,10 @@ export class Gradle2025Import extends WebViewBase {
     );
   }
 
-  public async startWithProject(projectRoot: vscode.Uri) {
+  public async startWithProject(projectRoot: vscode.Uri, language: string) {
     await this.startWebpage();
-    const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
+    let project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
+    if (language === 'python') project = vscode.Uri.file(path.join(projectRoot.fsPath, 'pyproject.toml'));
     return this.handleProject(project, true);
   }
 
@@ -140,6 +141,7 @@ export class Gradle2025Import extends WebViewBase {
       defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
       filters: {
         'Gradle 2025 Project': ['gradle'],
+        'PyProject TOML file': ['toml']
       },
       openLabel: 'Select a Project',
     });
@@ -191,7 +193,7 @@ export class Gradle2025Import extends WebViewBase {
         language = 'cpp';
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
         language = 'java';
-      } else if(wpilibJsonFileParsed.currentLanguage === 'python') {
+      } else if(wpilibJsonFileParsed.currentLanguage === 'python' || await readFile(path.join(oldProjectPath, 'pyproject.toml'))) {
         language = 'python';
       } else {
         await vscode.window.showErrorMessage(
@@ -210,7 +212,7 @@ export class Gradle2025Import extends WebViewBase {
       await vscode.window.showErrorMessage(
         i18n(
           'message',
-          'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+          'Failed to detect project type. Did you select the build.gradle (or pyproject.toml) file of a wpilib project?'
         ),
         {
           modal: true,
@@ -243,7 +245,7 @@ export class Gradle2025Import extends WebViewBase {
       }
     }
 
-    if (javaRobotPackage === '') {
+    if (javaRobotPackage === '' && language !== 'python') {
       const res = await vscode.window.showInformationMessage(
         i18n('message', 'Failed to determine robot class. Enter it manually?'),
         {
@@ -326,9 +328,15 @@ export class Gradle2025Import extends WebViewBase {
         vendordeps
       );
     } else {
-      const robot = oldProjectPath;
-      const pyproject = oldProjectPath;
-      //TODO: see what's needed for generatePythonCopy
+      success = await generateCopyPython(
+        path.join(resourceRoot, 'python'),
+        oldProjectPath, 
+        undefined,
+        path.join(gradleBasePath, 'python'),
+        toFolder,
+        false,
+        vendordeps
+      );
     }
 
     if (!success) {
@@ -361,7 +369,6 @@ export class Gradle2025Import extends WebViewBase {
       replacementFile = path.join(resourceRoot, 'cpp_replacements.json');
     } else if (language === 'python') {
       replacementFile = path.join(resourceRoot, 'python_replacements.json')
-      //TODO: see what replacement file looks like for python
     }
     await ImportUpdate(toFolder, replacementFile);
 

@@ -32,7 +32,7 @@ class DriveDistanceProfiled(commands2.TrapezoidProfileCommand):
                 )
             ),
             # Pipe the profile state to the drive
-            lambda setpointState: drive.setDriveStates(setpointState, setpointState),
+            lambda setpoint_state: drive.setDriveStates(setpoint_state, setpoint_state),
             # End at desired position in meters; implicitly starts at 0
             lambda: wpimath.TrapezoidProfile.State(meters, 0),
             # Current position

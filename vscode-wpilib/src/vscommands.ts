@@ -325,7 +325,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
 
   context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.openApiDocumentation', async () => {
-      const pick = await vscode.window.showQuickPick(['Java', 'C++'], {
+      const pick = await vscode.window.showQuickPick(['Java', 'C++', 'Python'], {
         placeHolder: i18n('ui', 'Pick a language'),
       });
       const homeDir = getWPILibHomeDir();
@@ -361,6 +361,29 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           try {
             const downloadDir = await downloadDocs(
               'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibc/documentation/',
+              '.zip',
+              path.join(homeDir, 'documentation'),
+              'cpp'
+            );
+            if (!downloadDir) {
+              return;
+            }
+            await vscode.env.openExternal(vscode.Uri.file(indexFile));
+          } catch (err) {
+            logger.error('Error downloading item', err);
+          }
+        }
+      } else if (pick === 'Python') {
+        const indexFile = path.join(homeDir, 'documentation', 'python', 'index.html');
+        try {
+          await access(indexFile);
+          await vscode.env.openExternal(vscode.Uri.file(indexFile));
+          return;
+        } catch {
+          try {
+            vscode.window.showInformationMessage("Trying to dir download docs for py");
+            const downloadDir = await downloadDocs(
+              'https://pypi.org/pypi/robotpy/json',
               '.zip',
               path.join(homeDir, 'documentation'),
               'cpp'

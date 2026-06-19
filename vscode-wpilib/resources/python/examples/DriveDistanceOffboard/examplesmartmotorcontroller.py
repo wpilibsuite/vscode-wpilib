@@ -14,9 +14,9 @@ class ExampleSmartMotorController(wpilib.MotorController):
     """
 
     class PIDMode(enum.Enum):
-        kPosition = enum.auto()
-        kVelocity = enum.auto()
-        kMovementWitchcraft = enum.auto()
+        k_position = enum.auto()
+        k_velocity = enum.auto()
+        k_movement_witchcraft = enum.auto()
 
     def __init__(self, port: int) -> None:
         """Creates a new ExampleSmartMotorController.

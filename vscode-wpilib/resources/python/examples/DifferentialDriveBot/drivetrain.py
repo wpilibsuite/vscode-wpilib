@@ -23,27 +23,27 @@ class Drivetrain:
     ENCODER_RESOLUTION = 4096  # counts per revolution
 
     def __init__(self):
-        self.leftLeader = wpilib.PWMSparkMax(1)
-        self.leftFollower = wpilib.PWMSparkMax(2)
-        self.rightLeader = wpilib.PWMSparkMax(3)
-        self.rightFollower = wpilib.PWMSparkMax(4)
+        self.left_leader = wpilib.PWMSparkMax(1)
+        self.left_follower = wpilib.PWMSparkMax(2)
+        self.right_leader = wpilib.PWMSparkMax(3)
+        self.right_follower = wpilib.PWMSparkMax(4)
 
         # Make sure both motors for each side are in the same group
-        self.leftLeader.addFollower(self.leftFollower)
-        self.rightLeader.addFollower(self.rightFollower)
+        self.left_leader.addFollower(self.leftFollower)
+        self.right_leader.addFollower(self.rightFollower)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightLeader.setInverted(True)
+        self.right_leader.setInverted(True)
 
-        self.leftEncoder = wpilib.Encoder(0, 1)
-        self.rightEncoder = wpilib.Encoder(2, 3)
+        self.left_encoder = wpilib.Encoder(0, 1)
+        self.right_encoder = wpilib.Encoder(2, 3)
 
         self.gyro = wpilib.AnalogGyro(0) #TODO: figure out python gyro class
 
-        self.leftPIDController = wpimath.PIDController(1.0, 0.0, 0.0)
-        self.rightPIDController = wpimath.PIDController(1.0, 0.0, 0.0)
+        self.left_PID_controller = wpimath.PIDController(1.0, 0.0, 0.0)
+        self.right_PID_controller = wpimath.PIDController(1.0, 0.0, 0.0)
 
         self.kinematics = wpimath.DifferentialDriveKinematics(
             self.TRACK_WIDTH
@@ -57,49 +57,49 @@ class Drivetrain:
         # Set the distance per pulse for the drive encoders. We can simply use the
         # distance traveled for one rotation of the wheel divided by the encoder
         # resolution.
-        self.leftEncoder.setDistancePerPulse(
+        self.left_encoder.setDistancePerPulse(
             2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
         )
-        self.rightEncoder.setDistancePerPulse(
+        self.right_encoder.setDistancePerPulse(
             2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
         )
 
-        self.leftEncoder.reset()
-        self.rightEncoder.reset()
+        self.left_encoder.reset()
+        self.right_encoder.reset()
 
         self.odometry = wpimath.DifferentialDriveOdometry(
             self.gyro.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
+            self.left_encoder.getDistance(),
+            self.right_encoder.getDistance(),
         )
 
     def setSpeeds(self, speeds: wpimath.DifferentialDriveWheelVelocities):
         """Sets the desired wheel speeds."""
-        leftFeedforward = self.feedforward.calculate(speeds.left)
-        rightFeedforward = self.feedforward.calculate(speeds.right)
+        left_feedforward = self.feedforward.calculate(speeds.left)
+        right_feedforward = self.feedforward.calculate(speeds.right)
 
-        leftOutput = self.leftPIDController.calculate(
-            self.leftEncoder.getRate(), speeds.left
+        left_output = self.left_PID_controller.calculate(
+            self.left_encoder.getRate(), speeds.left
         )
-        rightOutput = self.rightPIDController.calculate(
-            self.rightEncoder.getRate(), speeds.right
+        right_output = self.right_PID_controller.calculate(
+            self.right_encoder.getRate(), speeds.right
         )
 
         # Controls the left and right sides of the robot using the calculated outputs
-        self.leftLeader.setVoltage(leftOutput + leftFeedforward)
-        self.rightLeader.setVoltage(rightOutput + rightFeedforward)
+        self.left_leader.setVoltage(left_output + left_feedforward)
+        self.right_leader.setVoltage(right_output + right_feedforward)
 
     def drive(self, xSpeed, rot):
         """Drives the robot with the given linear velocity and angular velocity."""
-        wheelSpeeds = self.kinematics.toWheelVelocities(
+        wheel_speeds = self.kinematics.toWheelVelocities(
             wpimath.ChassisVelocities(xSpeed, 0, rot)
         )
-        self.setSpeeds(wheelSpeeds)
+        self.setSpeeds(wheel_speeds)
 
     def updateOdometry(self):
         """Updates the field-relative position."""
         self.odometry.update(
             self.gyro.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
+            self.left_encoder.getDistance(),
+            self.right_encoder.getDistance(),
         )

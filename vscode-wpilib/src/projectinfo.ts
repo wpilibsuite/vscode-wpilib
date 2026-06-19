@@ -134,6 +134,9 @@ Vendor Libraries:
     let currentGradleVersion = await getGradleRIOVersion(workspace);
 
     if (!currentGradleVersion) {
+      if(prefs.getCurrentLanguage() === 'python') {
+        //TODO: how to get the project version from something else -- robotpy version?
+      }
       currentGradleVersion = 'unknown';
     }
 
@@ -145,6 +148,7 @@ Vendor Libraries:
     );
     const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
     const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
+    const pythonExt = await extensionVersion(vscode.extensions.getExtension('ms-python.python'))
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFile(extensionPackageJson, 'utf8');

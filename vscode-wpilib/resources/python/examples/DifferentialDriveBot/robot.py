@@ -18,8 +18,8 @@ class MyRobot(wpilib.TimedRobot):
         self.drive = Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-        self.speedLimiter = wpimath.SlewRateLimiter(3)
-        self.rotLimiter = wpimath.SlewRateLimiter(3)
+        self.speed_limiter = wpimath.SlewRateLimiter(3)
+        self.rot_limiter = wpimath.SlewRateLimiter(3)
 
     def autonomousPeriodic(self):
         self.teleopPeriodic()
@@ -29,7 +29,7 @@ class MyRobot(wpilib.TimedRobot):
         # Get the x speed. We are inverting this because Xbox controllers return
         # negative values when we push forward.
         xSpeed = (
-            -self.speedLimiter.calculate(self.controller.getLeftY())
+            -self.speed_limiter.calculate(self.controller.getLeftY())
             * Drivetrain.MAX_SPEED
         )
 
@@ -38,7 +38,7 @@ class MyRobot(wpilib.TimedRobot):
         # mathematics). Xbox controllers return positive values when you pull to
         # the right by default.
         rot = (
-            -self.rotLimiter.calculate(self.controller.getRightX())
+            -self.rot_limiter.calculate(self.controller.getRightX())
             * Drivetrain.MAX_ANGULAR_SPEED
         )
 

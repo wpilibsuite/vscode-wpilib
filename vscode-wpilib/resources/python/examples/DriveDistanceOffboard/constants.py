@@ -14,10 +14,10 @@ import math
 
 
 class DriveConstants:
-    kLeftMotor1Port = 0
-    kLeftMotor2Port = 1
-    kRightMotor1Port = 2
-    kRightMotor2Port = 3
+    k_left_motor1_port = 0
+    k_left_motor2_port = 1
+    k_right_motor1_port = 2
+    k_right_motor2_port = 3
 
     """
     These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
@@ -25,15 +25,15 @@ class DriveConstants:
     for *your* robot's drive.
     The SysId tool provides a convenient method for obtaining these values for your robot.
     """
-    ksVolts = 1
-    kvVoltSecondsPerMeter = 0.8
-    kaVoltSecondsSquaredPerMeter = 0.15
+    ks_volts = 1
+    kv_volt_seconds_per_meter = 0.8
+    ka_volt_seconds_squared_per_meter = 0.15
 
     kp = 1
 
-    kMaxSpeedMetersPerSecond = 3
-    kMaxAccelerationMetersPerSecondSquared = 3
+    k_max_speed_meters_per_second = 3
+    k_max_acceleration_meters_per_second_squared = 3
 
 
 class OIConstants:
-    kDriverControllerPort = 0
+    k_driver_controller_port = 0

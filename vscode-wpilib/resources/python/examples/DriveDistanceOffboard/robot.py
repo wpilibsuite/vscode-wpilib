@@ -32,7 +32,7 @@ class MyRobot(commands2.TimedCommandRobot):
         initialization code.
         """
         super().__init__()
-        self.autonomousCommand: typing.Optional[commands2.Command] = None
+        self.autonomous_command: typing.Optional[commands2.Command] = None
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
@@ -46,11 +46,11 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def autonomousInit(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.autonomousCommand = self.container.getAutonomousCommand()
+        self.autonomous_command = self.container.getAutonomousCommand()
 
         # schedule the autonomous command (example)
-        if self.autonomousCommand is not None:
-            self.autonomousCommand.schedule()
+        if self.autonomous_command is not None:
+            self.autonomous_command.schedule()
         else:
             print("no auto command?")
 
@@ -62,8 +62,8 @@ class MyRobot(commands2.TimedCommandRobot):
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
         # this line or comment it out.
-        if self.autonomousCommand is not None:
-            self.autonomousCommand.cancel()
+        if self.autonomous_command is not None:
+            self.autonomous_command.cancel()
 
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
