@@ -120,7 +120,7 @@ async function handleAfterTrusted(
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(
-      i18n('message', 'Java 21 required, but not found. Might have compilation errors.')
+      i18n('message', 'Java 25 required, but not found. Might have compilation errors.')
     );
   }
 

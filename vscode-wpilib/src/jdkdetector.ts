@@ -41,7 +41,7 @@ async function checkJavaPath(path: string | undefined, source: string) {
   if (path) {
     try {
       const javaVersion = await getJavaVersion(path);
-      if (javaVersion >= 21) {
+      if (javaVersion >= 25) {
         logger.log(`Found ${source} Version: ${javaVersion} at ${path}`);
         return true;
       } else {
