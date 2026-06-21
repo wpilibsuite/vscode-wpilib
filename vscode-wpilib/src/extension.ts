@@ -13,7 +13,7 @@ import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
 import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
-import { activateCpp } from './cpp/cpp';
+import { activateCpp, warnIfMissingCppExtension } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
 import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
@@ -125,7 +125,7 @@ async function handleAfterTrusted(
   }
 
   // Activate the C++ parts of the extension
-  await activateCpp(context, externalApi);
+  await activateCpp(context, externalApi, false);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
 
@@ -224,6 +224,10 @@ async function handleAfterTrusted(
         vendorDepsWatcher.onDidCreate(fireEvent, null, context.subscriptions);
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
+
+        if (prefs.getEnableCppIntellisense()) {
+          await warnIfMissingCppExtension();
+        }
 
         if (prefs.getProjectYear() === 'intellisense') {
           logger.log('Intellisense only build project found');
