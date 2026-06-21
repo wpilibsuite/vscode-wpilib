@@ -16,7 +16,10 @@ export function warnIfMissingCppExtension() {
   const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
   if (!cppExtension) {
     vscode.window.showWarningMessage(
-      i18n('message', 'Could not find cpptools C++ extension. Intellisense and Debugging will not work.')
+      i18n(
+        'message',
+        'Could not find cpptools C++ extension. Intellisense and Debugging will not work.'
+      )
     );
   }
 }
