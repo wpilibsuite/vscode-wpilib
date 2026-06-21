@@ -125,7 +125,7 @@ async function handleAfterTrusted(
   }
 
   // Activate the C++ parts of the extension
-  await activateCpp(context, externalApi, false);
+  await activateCpp(context, externalApi);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
 

@@ -23,7 +23,7 @@ export function warnIfMissingCppExtension() {
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export async function activateCpp(context: vscode.ExtensionContext, coreExports: IExternalAPI, projectRequestingIntellisense: boolean) {
+export async function activateCpp(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
   // Use the console to output diagnostic information (logger.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
 
