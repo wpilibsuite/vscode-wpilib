@@ -31,8 +31,6 @@ interface IDriverStationData {
   robotIP?: number | string;
 }
 
-
-
 const constantIps: string[] = [
   process.platform == 'win32' ? '172.26.0.1' : '172.27.0.1',
   '172.30.0.1',
