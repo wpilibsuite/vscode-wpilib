@@ -226,7 +226,7 @@ async function handleAfterTrusted(
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
         if (prefs.getEnableCppIntellisense()) {
-          await warnIfMissingCppExtension();
+          warnIfMissingCppExtension();
         }
 
         if (prefs.getProjectYear() === 'intellisense') {

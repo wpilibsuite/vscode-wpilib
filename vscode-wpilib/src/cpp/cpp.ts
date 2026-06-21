@@ -13,8 +13,7 @@ import { registerCommandTemplates } from './commands';
 import { registerCodeDeployerAndDebugger } from './deploydebug';
 
 export function warnIfMissingCppExtension() {
-  const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
-  if (!cppExtension) {
+  if (!vscode.extensions.getExtension('ms-vscode.cpptools')) {
     vscode.window.showWarningMessage(
       i18n(
         'message',
@@ -36,12 +35,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
 
-  let allowDebug = true;
-
-  const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
-  if (!cppExtension) {
-    allowDebug = false;
-  }
+  const allowDebug = !!vscode.extensions.getExtension('ms-vscode.cpptools');
 
   await activateCppProvider(context, coreExports);
 
