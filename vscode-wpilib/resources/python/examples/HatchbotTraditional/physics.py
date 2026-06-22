@@ -49,7 +49,7 @@ class PhysicsEngine:
             robot.container.drive.right1.getChannel()
         )
 
-        self.system = LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3) # TODO: fix this section
+        self.system = LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3)
         self.drivesim = wpilib.simulation.DifferentialDrivetrainSim(
             self.system,
             constants.kTrackWidth,

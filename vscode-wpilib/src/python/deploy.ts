@@ -5,7 +5,7 @@ import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../api';
-import { getIsWindows, gradleRun, robotpyRun } from '../utilities';
+import { robotpyRun } from '../utilities';
 import { DeployDebugAPI } from '../deploydebugapi';
 
 

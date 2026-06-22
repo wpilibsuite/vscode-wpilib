@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
-import { gradleRun, robotpyRun } from '../utilities';
+import { robotpyRun } from '../utilities';
 
 class CodeBuilder implements ICodeBuilder {
     private preferences: IPreferencesAPI;

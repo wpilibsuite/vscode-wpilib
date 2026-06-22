@@ -26,7 +26,6 @@ class MyRobot(MagicRobot):
     def createObjects(self):
         """Initialize all wpilib motors & sensors"""
 
-        # TODO: create button example here
 
         self.component1_motor = wpilib.Talon(1)
         self.some_motor = wpilib.Talon(2)

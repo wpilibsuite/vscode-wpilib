@@ -10,7 +10,7 @@ import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
-import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome, robotpyRun } from './utilities';
 import { getWPILibHomeDir } from './shared/utilitiesapi';
 import { getUpdatePersistentState } from './wpilibupdates';
 
@@ -324,6 +324,24 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('wpilibcore.downloadPythonForSystemcore', async () => {
+      let cmd = 'installer download-python';
+      const preferencesApi = externalApi.getPreferencesAPI()
+      const workspaceFolder =  await preferencesApi.getFirstOrSelectedWorkspace();
+      const executeApi = externalApi.getExecuteAPI();
+      if (workspaceFolder) await robotpyRun(cmd, getWPILibHomeDir(), workspaceFolder, 'Download Python (Systemcore)', executeApi, preferencesApi.getPreferences(workspaceFolder));
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand('wpilibcore.installPythonForSystemcore', async () => {
+      let cmd = 'installer install-python';
+      const preferencesApi = externalApi.getPreferencesAPI()
+      const workspaceFolder =  await preferencesApi.getFirstOrSelectedWorkspace();
+      const executeApi = externalApi.getExecuteAPI();
+      if (workspaceFolder) await robotpyRun(cmd, getWPILibHomeDir(), workspaceFolder, 'Install Python (Systemcore)', executeApi, preferencesApi.getPreferences(workspaceFolder));
+    })
+  );
+  context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.openApiDocumentation', async () => {
       const pick = await vscode.window.showQuickPick(['Java', 'C++', 'Python'], {
         placeHolder: i18n('ui', 'Pick a language'),
@@ -374,28 +392,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           }
         }
       } else if (pick === 'Python') {
-        const indexFile = path.join(homeDir, 'documentation', 'python', 'index.html');
-        try {
-          await access(indexFile);
-          await vscode.env.openExternal(vscode.Uri.file(indexFile));
-          return;
-        } catch {
-          try {
-            vscode.window.showInformationMessage("Trying to dir download docs for py");
-            const downloadDir = await downloadDocs(
-              'https://pypi.org/pypi/robotpy/json',
-              '.zip',
-              path.join(homeDir, 'documentation'),
-              'cpp'
-            );
-            if (!downloadDir) {
-              return;
-            }
-            await vscode.env.openExternal(vscode.Uri.file(indexFile));
-          } catch (err) {
-            logger.error('Error downloading item', err);
-          }
-        }
+        vscode.window.showErrorMessage("Cannot download or access Python API Documentation, RobotPy Docs are available at this link: https://robotpy.readthedocs.io/en/stable/");
       }
     })
   );

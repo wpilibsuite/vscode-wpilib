@@ -37,7 +37,7 @@ class Drivetrain(commands2.Subsystem):
             self.leftMotor.set, self.rightMotor.set
         )
 
-        # TODO: these don't work
+
         # wpiutil.SendableRegistry.addChild(self.drive, self.leftMotor)
         # wpiutil.SendableRegistry.addChild(self.drive, self.rightMotor)
 

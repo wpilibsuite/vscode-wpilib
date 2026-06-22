@@ -297,6 +297,18 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
+                "command": "wpilibcore.downloadPythonForSystemcore",
+                "title": "%wpilibcore.downloadPythonForSystemcore.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.installPythonForSystemcore",
+                "title": "%wpilibcore.installPythonForSystemcore.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
                 "command": "wpilibcore.openApiDocumentation",
                 "title": "%wpilibcore.openApiDocumentation.title%",
                 "category": "WPILib",

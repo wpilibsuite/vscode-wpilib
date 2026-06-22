@@ -39,7 +39,7 @@ class Drivetrain:
         self.backLeftPIDController = wpimath.PIDController(1, 0, 0)
         self.backRightPIDController = wpimath.PIDController(1, 0, 0)
 
-        self.gyro = wpilib.AnalogGyro(0) #TODO: figure out python gyro class
+        self.gyro = wpilib.AnalogGyro(0)
 
         self.kinematics = wpimath.MecanumDriveKinematics(
             frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation

@@ -7,7 +7,6 @@ import { ICommandAPI, ICommandCreator, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
 import { getClassName } from '../utilities';
 import * as fileUtils from '../shared/fileUtils';
-import { json } from 'stream/consumers';
 
 export interface IPythonLayout {
     name: string;

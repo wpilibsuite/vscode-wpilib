@@ -1,10 +1,8 @@
 'use strict';
 
 import * as cp from 'child_process';
-import * as vscode from 'vscode';
 import { logger } from './logger';
 import { getIsWindows } from './utilities';
-import { version } from 'os';
 
 export async function getPythonVersion(): Promise<string | undefined> {
     try {

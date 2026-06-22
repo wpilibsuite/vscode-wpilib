@@ -40,7 +40,7 @@ class Drivetrain:
         self.left_encoder = wpilib.Encoder(0, 1)
         self.right_encoder = wpilib.Encoder(2, 3)
 
-        self.gyro = wpilib.AnalogGyro(0) #TODO: figure out python gyro class
+        self.gyro = wpilib.AnalogGyro(0)
 
         self.left_PID_controller = wpimath.PIDController(1.0, 0.0, 0.0)
         self.right_PID_controller = wpimath.PIDController(1.0, 0.0, 0.0)

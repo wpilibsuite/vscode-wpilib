@@ -20,7 +20,6 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
 
     let allowDebug = true;
 
-    //TODO: find python debug extension
     const pythonExtension = vscode.extensions.getExtension('ms-python.python');
     if(!pythonExtension) {
         vscode.window.showWarningMessage(
