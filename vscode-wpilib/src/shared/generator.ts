@@ -7,6 +7,7 @@ import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
 import * as vscode from 'vscode';
+import { getRobotPyVersion } from '../pythondetector';
 
 export async function generateCopyCpp(
   resourcesFolder: string,
@@ -77,6 +78,7 @@ export async function generateCopyPython(
     const testPath = path.join(toFolder, 'tests');
     // Get the GradleRIO version
     const grRoot = path.dirname(fromGradleFolder);
+    const robotpyVersion = await getRobotPyVersion();
     
     // Copy template folders
     await cp(fromTemplateFolder, codePath, { recursive: true });
@@ -86,6 +88,10 @@ export async function generateCopyPython(
 
     // Setup project structure
     await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot, true);
+    // Update robotpy version in the pyproject.toml file of the new project
+    if (robotpyVersion) {
+      await genUtils.updateRobotPyVersion(path.join(toFolder, 'pyproject.toml'), robotpyVersion);
+    }
     //TODO: add set-up vendordeps
     return true;
   } catch (e) {

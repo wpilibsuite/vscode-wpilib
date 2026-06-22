@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { findJdkPath, getJavaVersion } from './jdkdetector';
-import { findPythonPath, getPythonVersion } from './pythondetector';
+import { findPythonPath, getPythonVersion, getRobotPyVersion } from './pythondetector';
 import { logger } from './logger';
 import { extensionContext } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
@@ -139,10 +139,10 @@ Vendor Libraries:
     let currentGradleVersion = await getGradleRIOVersion(workspace);
 
     if (!currentGradleVersion) {
-      if(prefs.getCurrentLanguage() === 'python') {
-        //TODO: how to get the project version from something else -- robotpy version?
-      }
       currentGradleVersion = 'unknown';
+      if(prefs.getCurrentLanguage() === 'python') {
+        currentGradleVersion = await getRobotPyVersion() as string;
+      }
     }
 
     const debugExt = await extensionVersion(
@@ -153,7 +153,6 @@ Vendor Libraries:
     );
     const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
     const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
-    const pythonExt = await extensionVersion(vscode.extensions.getExtension('ms-python.python'))
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFile(extensionPackageJson, 'utf8');

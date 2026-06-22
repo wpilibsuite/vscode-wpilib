@@ -8,6 +8,8 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
+import * as vscode from 'vscode';
+import { error } from 'console';
 
 /**
  * Common patterns used in text replacements
@@ -103,6 +105,20 @@ export async function updateGradleRioVersion(
     logger.error('Failed to update Gradle RIO version', error);
     return false;
   }
+}
+
+export async function updateRobotPyVersion(pyprojectPath: string, robotpyVersion: string): Promise<boolean> {
+  try {
+    let file = await readFile(pyprojectPath, 'utf-8');
+    const versionString = 'robotpy_version = ';
+    file = file.replace(versionString, versionString + '\"' + robotpyVersion + '\"');
+    await writeFile(pyprojectPath, file, 'utf8');
+    return true;
+  } catch(err) {
+    logger.log("Error updating robotpy version");
+    return false;
+  }
+  
 }
 
 /**

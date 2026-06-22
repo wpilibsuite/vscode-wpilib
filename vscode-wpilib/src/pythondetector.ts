@@ -4,6 +4,7 @@ import * as cp from 'child_process';
 import * as vscode from 'vscode';
 import { logger } from './logger';
 import { getIsWindows } from './utilities';
+import { version } from 'os';
 
 export async function getPythonVersion(): Promise<string | undefined> {
     try {
@@ -15,6 +16,29 @@ export async function getPythonVersion(): Promise<string | undefined> {
         logger.log("Error getting python version");
     }
     return undefined;
+}
+
+export async function getRobotPyVersion(): Promise<string | undefined> {
+    try {
+        const regexp = /INSTALLED: .*/;
+        let cmd = 'pip index versions --pre robotpy';
+        if(getIsWindows()) cmd = 'py -m ' + cmd;
+        const out = cp.execSync(cmd).toString();
+        const match: RegExpMatchArray | null = out.match(regexp);
+        if(match) return match.toString().substring(11);
+        return undefined;
+
+    } catch {
+        return undefined;
+    }
+    
+}
+
+async function getIsPipInstalled(): Promise<boolean> {
+    let cmd = 'pip -h'
+    if(getIsWindows()) cmd = 'py -m ';
+    const response = cp.execSync(cmd).toString();
+    return response.length > 30;
 }
 
 async function checkPythonPath(path: string | undefined, source: string) {
