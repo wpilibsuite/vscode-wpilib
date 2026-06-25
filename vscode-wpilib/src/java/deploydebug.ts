@@ -245,7 +245,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     ...args: string[]
   ): Promise<boolean> {
     // TODO Support debug JNI mode simulation
-    const command = 'simulateExternalJavaRelease ' + args.join(' ');
+    const command = 'simulateExternalJava ' + args.join(' ');
     const prefs = this.preferences.getPreferences(workspace);
     const result = await gradleRun(
       command,
@@ -260,7 +260,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
     }
 
     const simulateInfo = await readFile(
-      path.join(workspace.uri.fsPath, 'build', 'sim', 'release_java.json'),
+      path.join(workspace.uri.fsPath, 'build', 'sim', 'java.json'),
       'utf8'
     );
     const parsedSimulateInfo: IJavaSimulateInfo[] = jsonc.parse(
