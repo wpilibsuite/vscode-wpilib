@@ -8,7 +8,6 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
-import * as vscode from 'vscode';
 import { error } from 'console';
 
 /**
@@ -24,11 +23,14 @@ export const ReplacementPatterns = {
  * Common vendordep file names
  */
 export const VendorDepFiles = {
-  COMMANDSV2: 'CommandsV2.json',
-  ROMI: 'RomiVendordep.json',
-  XRP: 'XRPVendordep.json',
+  COMMANDSV2: 'commands2.json',
+  ROMI: 'romi.json',
+  XRP: 'xrp.json',
   COMMANDSV3: 'CommandsV3.json',
   COMMANDSV2_OLD: 'WPILibNewCommands.json',
+  APRILTAG: 'apriltag.json',
+  CSCORE: 'cscore.json',
+  SIM: 'sim.json'
 };
 
 /**
@@ -119,6 +121,30 @@ export async function updateRobotPyVersion(pyprojectPath: string, robotpyVersion
     return false;
   }
   
+}
+
+export async function setupComponentsPy(vendors: string[], toFolder: string) {
+  let components: string[] = [];
+  for(const v of vendors) {
+    if(v === "commands2") components.push(VendorDepFiles.COMMANDSV2.substring(0, VendorDepFiles.COMMANDSV2.lastIndexOf(".")));
+    else if(v === "apriltag") components.push(VendorDepFiles.APRILTAG.substring(0, VendorDepFiles.APRILTAG.lastIndexOf(".")));
+    else if(v === "cscore") components.push(VendorDepFiles.CSCORE.substring(0, VendorDepFiles.COMMANDSV2.lastIndexOf(".")));
+    else if(v === "romi") components.push(VendorDepFiles.ROMI.substring(0, VendorDepFiles.ROMI.lastIndexOf(".")));
+    else if(v === "sim") components.push(VendorDepFiles.SIM.substring(0, VendorDepFiles.SIM.lastIndexOf(".")));
+    else if(v === "xrp") components.push(VendorDepFiles.XRP.substring(0, VendorDepFiles.XRP.lastIndexOf(".")));
+  }
+  pathUtils.copyComponets(components, toFolder);
+}
+
+export function isComponent(pkgJson: string) {
+  let component = false;
+  if(pkgJson === VendorDepFiles.APRILTAG) component = true;
+  else if(pkgJson === VendorDepFiles.COMMANDSV2) component = true;
+  else if(pkgJson === VendorDepFiles.CSCORE) component = true;
+  else if(pkgJson === VendorDepFiles.ROMI) component = true;
+  else if(pkgJson === VendorDepFiles.SIM) component = true;
+  else if(pkgJson === VendorDepFiles.XRP) component = true;
+  return component;
 }
 
 /**

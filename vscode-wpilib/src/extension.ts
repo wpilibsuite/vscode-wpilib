@@ -182,7 +182,7 @@ async function handleAfterTrusted(
         context.extensionUri,
         projectInfo,
         vendorLibs,
-        externalApi
+        externalApi,
       );
 
       context.subscriptions.push(

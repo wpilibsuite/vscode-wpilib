@@ -3,7 +3,11 @@
     "name": "Command v2 Robot",
     "description": "Command v2, with explanatory comments and example code.",
     "tags": [
-      "Commandv2"
+      "commands2"
+    ],
+    "extravendordeps" : [
+      "apriltag",
+      "xrp"
     ],
     "foldername": "commandv2",
     "gradlebase": "python",
@@ -14,7 +18,7 @@
     "name": "Command v2 Robot Skeleton (Advanced)",
     "description": "Skeleton (stub) code for Command v2, without explanatory comments and example code.",
     "tags": [
-      "commandv2",
+      "commands2",
       "Skeleton"
     ],
     "foldername": "commandv2skeleton",

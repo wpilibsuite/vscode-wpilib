@@ -4,7 +4,20 @@
     "flags": "g", 
     "replacements": [
       {
-        
+        "from": "robotInit",
+        "to": "__init__"
+      },
+      {
+        "from": "wpilib.drive.DifferentialDrive",
+        "to": "wpilib.DifferentialDrive"
+      },
+      {
+        "from": "Speeds",
+        "to": "Velocities"
+      },
+      {
+        "from": "Speed",
+        "to": "Velocity"
       }
     ]
   }

@@ -3,6 +3,7 @@
 import * as cp from 'child_process';
 import { logger } from './logger';
 import { getIsWindows } from './utilities';
+import * as vscode from 'vscode';
 
 export async function getPythonVersion(): Promise<string | undefined> {
     try {
@@ -16,20 +17,19 @@ export async function getPythonVersion(): Promise<string | undefined> {
     return undefined;
 }
 
-export async function getRobotPyVersion(): Promise<string | undefined> {
+export async function getRobotPyVersion(): Promise<string> {
     try {
         const regexp = /INSTALLED: .*/;
         let cmd = 'pip index versions --pre robotpy';
         if(getIsWindows()) cmd = 'py -m ' + cmd;
         const out = cp.execSync(cmd).toString();
         const match: RegExpMatchArray | null = out.match(regexp);
-        if(match) return match.toString().substring(11);
-        return undefined;
+        if(match) return match.toLocaleString().substring(11);
+        return "version undefined";
 
     } catch {
-        return undefined;
+        return "version undefined";
     }
-    
 }
 
 async function getIsPipInstalled(): Promise<boolean> {

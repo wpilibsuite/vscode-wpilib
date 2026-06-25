@@ -1,0 +1,64 @@
+{
+  "name": "smol-toml",
+  "version": "1.7.0",
+  "description": "A small, fast, and correct TOML parser/serializer",
+  "keywords": [
+    "parser",
+    "serializer",
+    "toml"
+  ],
+  "bugs": "https://github.com/squirrelchat/smol-toml/issues",
+  "license": "BSD-3-Clause",
+  "author": "Cynthia Rey <cynthia@cynthia.dev>",
+  "repository": {
+    "type": "git",
+    "url": "github:squirrelchat/smol-toml"
+  },
+  "funding": "https://github.com/sponsors/cyyynthia",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "src",
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "devDependencies": {
+    "@mitata/counters": "^0.0.8",
+    "@tsconfig/node-lts": "^24.0.0",
+    "@tsconfig/strictest": "^2.0.8",
+    "@types/node": "^26.0.0",
+    "mitata": "^1.0.34",
+    "pin-github-action": "^3.4.0",
+    "rolldown": "^1.1.2",
+    "typescript": "7.0.1-rc",
+    "vite": "^7.3.5",
+    "vitest": "^4.1.9"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.8.0",
+      "onFail": "error"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "^26",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": ">= 18"
+  },
+  "scripts": {
+    "test": "vitest",
+    "update-gha": "pin-github-action .github/workflows"
+  }
+}

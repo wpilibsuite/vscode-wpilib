@@ -93,6 +93,7 @@ export async function generateCopyPython(
       await genUtils.updateRobotPyVersion(path.join(toFolder, 'pyproject.toml'), robotpyVersion);
     }
     //TODO: add set-up vendordeps
+    await genUtils.setupComponentsPy(vendordeps, toFolder);
     return true;
   } catch (e) {
     logger.error('Python project creation failure', e);

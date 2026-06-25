@@ -11,10 +11,22 @@ import {
   getHomeDirDeps,
   IJsonDependency,
   installDependency,
+  getVersions,
   loadFileFromUrl,
   parseVendordepJson,
+  addPythonDep,
+  getPythonDeps,
+  parseRequirement,
+  removePythonDep,
+  getComponents,
+  IRequires,
+  getInstalledVersion,
+  getVendorPackageNames,
+  updateVersion,
+  installNewRequirement,
 } from './shared/vendorlibrariesbase';
 import { isNewerVersion } from './versions';
+import { isComponent, setupComponentsPy } from './shared/projectGeneratorUtils';
 
 class OptionQuickPick implements vscode.QuickPickItem {
   public label: string;
@@ -45,6 +57,7 @@ export class VendorLibraries {
   private disposables: vscode.Disposable[] = [];
   private externalApi: IExternalAPI;
   private lastBuildTime = 1;
+  private requirements: IRequires[] = [];
 
   constructor(externalApi: IExternalAPI) {
     this.externalApi = externalApi;
@@ -110,6 +123,11 @@ export class VendorLibraries {
         await this.onlineNew(wp);
       })
     );
+    qpArr.push(
+      new OptionQuickPick(i18n('message', 'test'), async (wp) => {
+        await this.test(wp);
+      })
+    )
 
     const result = await vscode.window.showQuickPick(qpArr, {
       placeHolder: i18n('ui', 'Select an option'),
@@ -124,6 +142,20 @@ export class VendorLibraries {
     workspace: vscode.WorkspaceFolder
   ): Promise<IJsonDependency[]> {
     return this.getInstalledDependencies(workspace);
+  }
+
+  public async getCurrentlyInstalledPythonLibraries(workspace: vscode.WorkspaceFolder) {
+    // let components = await getComponents(workspace.uri.fsPath);
+    // let requirements = await getVendorPackageNames(workspace.uri.fsPath);
+    return await getPythonDeps(workspace.uri.fsPath);
+  }
+
+  public async getPythonRequirements() {
+    let ret: string[] = [];
+    for(const r of this.requirements) {
+      ret.push(r.name);
+    }
+    return ret;
   }
 
   public async getJsonDepURL(url: string): Promise<IJsonDependency> {
@@ -186,6 +218,136 @@ export class VendorLibraries {
       }
     }
     return anySucceeded;
+  }
+
+  public async addRequirement(pkg: string, workspace: string, version?: string) {
+    let validPackage = await installNewRequirement(pkg, workspace);
+    if(!validPackage) return undefined;
+    let req = validPackage;
+    let versions = validPackage.availableVersions;
+    let installedVersion = validPackage.version;
+    for(const v of versions) {
+      if(installedVersion && v.indexOf(installedVersion) !== -1 && v.indexOf(" (prerelease)") !== -1) {
+        installedVersion += " (prerelease)";
+      }
+    }
+    if(installedVersion) req.version = installedVersion;
+    // If the requirement has a version but does not have a specifier, default to ~=
+    if(installedVersion && !req.specifier) req.specifier = "~=";
+    if(version && versions.indexOf(version) !== -1) req.version = version;
+    req.availableVersions = versions;
+    this.requirements.push(req);
+    return req;
+  }
+
+  public async updateVersion(pkg: IRequires, version: string, workspace: string) {
+    let req: IRequires | undefined;
+    for(const r of this.requirements) {
+      if(r.name === pkg.name) {
+        req = r;
+        break
+      }
+    }
+    if(req && req.version) {
+      req.version = version;
+      await updateVersion(req, workspace);
+      return req;
+    }
+    return await this.addRequirement(pkg.name, version);
+  }
+
+  public async addRequirements(pkgs: string[], workspace: string) {
+    let ret: IRequires[] = [];
+    for(const pkg of pkgs) {
+      let req = await parseRequirement(pkg);
+      let versions = getVersions(pkg);
+      let installedVersion = await getInstalledVersion(pkg, workspace);
+      if(installedVersion) req.version = installedVersion;
+      req.availableVersions = versions;
+      this.requirements.push(req);
+      ret.push(req);
+    }
+    return ret;
+  }
+
+  public async getIRequires(pkg: string, workspace: string, version?: string): Promise<IRequires | undefined> {
+    if(version) {
+      let pkgReq = await parseRequirement(pkg);
+      
+      for(const r of this.requirements) {
+        if(r.name === pkgReq.name) {
+          if(r.version === pkgReq.version) return r;
+          if(r.availableVersions) {
+            for(const v of r.availableVersions) {
+              if(v === pkgReq.version) {
+                let req = await this.updateVersion(r, workspace, pkgReq.version);
+                if(req) return req;
+              }
+            }
+          }
+        } 
+      }
+    }
+    let pkgName = (await parseRequirement(pkg)).name;
+    for(const r of this.requirements) {
+      if(r.name === pkgName) {
+        return r;
+      } 
+    }
+    let addedReq = await this.addRequirement(pkg, workspace);
+    if(addedReq) return addedReq;
+    return undefined;
+  }
+
+
+  public async uninstallPythonVendorLibraries(pkg: string[], workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    let succeed = false;
+    if(pkg.length > 0) {
+      const components = await getComponents(workspace.uri.fsPath);
+      let removeComponents: string[] = [];
+      let removeRequires: IRequires[] = [];
+      for(const p of pkg) {
+        let removed = false;
+        for(const c of components) {
+          if(c === p) {
+            removeComponents.push(p);
+            removed = true;
+            continue;
+          }
+        }
+        if(!removed) {
+          let req = await parseRequirement(p);
+          let toRemove = await this.getIRequires(req.name, workspace.uri.fsPath, req.version)
+          if(toRemove) removeRequires.push(toRemove);
+        }
+      }
+      await removePythonDep(removeComponents, removeRequires, workspace.uri.fsPath);
+    }
+    return succeed;
+  }
+
+  public async installPythonDependency(deps: string[], workspace: vscode.WorkspaceFolder): Promise<boolean> {
+    try {
+      if (deps.length > 0) {
+        let requires: IRequires[] = [];
+        let components: string[] = [];
+        for(const d of deps) {
+          if(isComponent(d + ".json")) {
+            components.push(d);
+          } else {
+            let req = await parseRequirement(d);
+            let toPush = await this.getIRequires(req.name, workspace.uri.fsPath, req.version)
+            if(toPush) requires.push(toPush);
+          }
+        }
+        // Returns true if toml file was updated without errors
+        return await addPythonDep(components, requires, workspace.uri.fsPath);
+      }
+      // No deps to install, so all were installed
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private async offlineUpdates(workspace: vscode.WorkspaceFolder): Promise<void> {
@@ -400,6 +562,10 @@ export class VendorLibraries {
 
   public getLastBuild(): number {
     return this.lastBuildTime;
+  }
+
+  public async test(wp: vscode.WorkspaceFolder): Promise<void> {
+    //await removePythonDep(["apriltag", "xrp"], ["numpy"], wp.uri.fsPath);
   }
 }
 
