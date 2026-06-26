@@ -136,8 +136,9 @@ export async function setupComponentsPy(vendors: string[], toFolder: string) {
   pathUtils.copyComponets(components, toFolder);
 }
 
-export function isComponent(pkgJson: string) {
+export function isComponent(pkg: string) {
   let component = false;
+  let pkgJson = pkg + '.json';
   if(pkgJson === VendorDepFiles.APRILTAG) component = true;
   else if(pkgJson === VendorDepFiles.COMMANDSV2) component = true;
   else if(pkgJson === VendorDepFiles.CSCORE) component = true;

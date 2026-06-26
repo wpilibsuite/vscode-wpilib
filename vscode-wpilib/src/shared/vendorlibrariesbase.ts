@@ -118,7 +118,7 @@ export async function installNewRequirement(pkg: string, workspace: string): Pro
     return {name: pkg, specifier: "~=", version: installedVersion, availableVersions: versions};
   } catch {
     //logger.log('Error installing new requirement, is the package name correct?');
-    vscode.window.showErrorMessage("Error installing new requirement, is the package name correct?");
+    vscode.window.showErrorMessage("Error installing new requirement, is the package name correct?", pkg);
     return undefined;
   }
 }

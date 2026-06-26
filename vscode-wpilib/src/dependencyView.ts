@@ -584,7 +584,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       } else if(this.availableDeps.length !== 0 && this.wp) {
         for (const id of this.installedPythonDeps) {
           let installedVersion = (await getPyProjectFile(this.wp.uri.fsPath) as IPyProject).tool.robotpy.robotpy_version; 
-          if(!isComponent(id + '.json')) {
+          if(!isComponent(id)) {
             let req = await this.vendorLibraries.getIRequires(id, this.wp.uri.fsPath);
             if(req) {
               if(req.version) installedVersion = req.version;
@@ -615,7 +615,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 });
               }
           }
-          else if (isComponent(id + '.json')) {
+          else if (isComponent(id)) {
             let versionList = [{version: installedVersion, buttonText: i18n('ui', 'To Latest')}];
             //Because this is a component, the version is tied to the version of robotpy, so there is no need for version drop-downs
             this.installedList.push({
@@ -762,7 +762,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         (onlinedep) => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version
       );
       if (!found) {
-        if(isComponent(homedep.fileName)) {
+        if(isComponent(homedep.fileName.substring(0, homedep.fileName.length - 5))) {
           depList.python = homedep.fileName.substring(0, homedep.fileName.length - 5);
           this.onlineDeps.push(depList);
         }

@@ -157,7 +157,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         );
         return;
       }
-      else if(!workspace || preferencesApi.getPreferences(workspace).getCurrentLanguage() !== 'python') {
+      else if(preferencesApi.getPreferences(workspace).getCurrentLanguage() !== 'python') {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot sync robot code since this is not a robotpy project')
         );

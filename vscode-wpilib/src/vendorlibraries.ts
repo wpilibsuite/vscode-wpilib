@@ -2,6 +2,7 @@
 
 import { readdir, unlink } from 'fs/promises';
 import * as path from 'path';
+import * as os from 'os';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
@@ -27,6 +28,8 @@ import {
 } from './shared/vendorlibrariesbase';
 import { isNewerVersion } from './versions';
 import { isComponent, setupComponentsPy } from './shared/projectGeneratorUtils';
+import { getRobotPyVersion } from './pythondetector';
+import { getIsWindows } from './utilities';
 
 class OptionQuickPick implements vscode.QuickPickItem {
   public label: string;
@@ -48,6 +51,23 @@ class LibraryQuickPick implements vscode.QuickPickItem {
     this.description = dep.version;
     if (oldVersion) {
       this.description += ` (${i18n('ui', 'Old Version: {0}', oldVersion)})`;
+    }
+    this.dep = dep;
+  }
+}
+
+class LibraryQuickPickPy implements vscode.QuickPickItem {
+  public label: string;
+  public dep: string;
+  public description: string;
+  public oldVersion?: string;
+
+  constructor(dep: string, version?: string, oldVersion?: string) {
+    this.label = dep;
+    if(version) this.description = version;
+    else this.description = "";
+    if (oldVersion) {
+      this.oldVersion = oldVersion;
     }
     this.dep = dep;
   }
@@ -123,11 +143,6 @@ export class VendorLibraries {
         await this.onlineNew(wp);
       })
     );
-    qpArr.push(
-      new OptionQuickPick(i18n('message', 'test'), async (wp) => {
-        await this.test(wp);
-      })
-    )
 
     const result = await vscode.window.showQuickPick(qpArr, {
       placeHolder: i18n('ui', 'Select an option'),
@@ -163,27 +178,52 @@ export class VendorLibraries {
   }
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      const installedDeps = await this.getCurrentlyInstalledPythonLibraries(workspace);
+      const deps: string[] = [];
+
+      if(installedDeps.length !== 0) {
+        const arr = installedDeps.map((dep) => {
+          return new LibraryQuickPickPy(dep);
+        });
+        const toRemove = await vscode.window.showQuickPick(arr, {
+          canPickMany: true,
+          placeHolder: i18n('message', 'Check to uninstall libraries'),
+        });
+
+        if (toRemove) {
+          for (const ti of toRemove) {
+            deps.push(ti.dep);
+          }
+        }
+
+        void this.uninstallPythonVendorLibraries(deps, workspace);
+      } else {
+        vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+      }
+    } else {
     const installedDeps = await this.getInstalledDependencies(workspace);
     const deps: IJsonDependency[] = [];
 
     if (installedDeps.length !== 0) {
-      const arr = installedDeps.map((jdep) => {
-        return new LibraryQuickPick(jdep);
-      });
-      const toRemove = await vscode.window.showQuickPick(arr, {
-        canPickMany: true,
-        placeHolder: i18n('message', 'Check to uninstall libraries'),
-      });
+        const arr = installedDeps.map((jdep) => {
+          return new LibraryQuickPick(jdep);
+        });
+        const toRemove = await vscode.window.showQuickPick(arr, {
+          canPickMany: true,
+          placeHolder: i18n('message', 'Check to uninstall libraries'),
+        });
 
-      if (toRemove) {
-        for (const ti of toRemove) {
-          deps.push(ti.dep);
+        if (toRemove) {
+          for (const ti of toRemove) {
+            deps.push(ti.dep);
+          }
         }
-      }
 
-      void this.uninstallVendorLibraries(deps, workspace);
-    } else {
-      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+        void this.uninstallVendorLibraries(deps, workspace);
+      } else {
+        vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+      }
     }
   }
 
@@ -220,24 +260,46 @@ export class VendorLibraries {
     return anySucceeded;
   }
 
-  public async addRequirement(pkg: string, workspace: string, version?: string) {
-    let validPackage = await installNewRequirement(pkg, workspace);
-    if(!validPackage) return undefined;
-    let req = validPackage;
-    let versions = validPackage.availableVersions;
-    let installedVersion = validPackage.version;
-    for(const v of versions) {
-      if(installedVersion && v.indexOf(installedVersion) !== -1 && v.indexOf(" (prerelease)") !== -1) {
-        installedVersion += " (prerelease)";
+  public async addRequirement(pkg: string, workspace: string, version?: string, installed?: boolean) {
+    if(!installed) {
+      let validPackage = await installNewRequirement(pkg, workspace);
+      if(!validPackage) return undefined;
+      let req = validPackage;
+      let versions = validPackage.availableVersions;
+      let installedVersion = validPackage.version;
+      for(const v of versions) {
+        if(installedVersion && v.indexOf(installedVersion) !== -1 && v.indexOf(" (prerelease)") !== -1) {
+          installedVersion += " (prerelease)";
+        }
       }
+      if(installedVersion) req.version = installedVersion;
+      // If the requirement has a version but does not have a specifier, default to ~=
+      if(installedVersion && !req.specifier) req.specifier = "~=";
+      if(version && versions.indexOf(version) !== -1) req.version = version;
+      req.availableVersions = versions;
+      this.requirements.push(req);
+      return req;
+    } else {
+      let add = true;
+      for(const r of this.requirements) {
+        if(r.name === pkg) {
+          add = false;
+          if(r.version !== version) {
+            r.version = version;
+            await updateVersion(r, workspace);
+          }
+          return r;
+        }
+      }
+      if(add) {
+        let toPush: IRequires;
+        if(version) toPush = {name: pkg, version: version, availableVersions: [version]};
+        else toPush = {name: pkg, availableVersions: []};
+        this.requirements.push(toPush);
+        await addPythonDep([], [toPush], workspace);
+      }
+      else return undefined;
     }
-    if(installedVersion) req.version = installedVersion;
-    // If the requirement has a version but does not have a specifier, default to ~=
-    if(installedVersion && !req.specifier) req.specifier = "~=";
-    if(version && versions.indexOf(version) !== -1) req.version = version;
-    req.availableVersions = versions;
-    this.requirements.push(req);
-    return req;
   }
 
   public async updateVersion(pkg: IRequires, version: string, workspace: string) {
@@ -332,7 +394,7 @@ export class VendorLibraries {
         let requires: IRequires[] = [];
         let components: string[] = [];
         for(const d of deps) {
-          if(isComponent(d + ".json")) {
+          if(isComponent(d)) {
             components.push(d);
           } else {
             let req = await parseRequirement(d);
@@ -351,86 +413,133 @@ export class VendorLibraries {
   }
 
   private async offlineUpdates(workspace: vscode.WorkspaceFolder): Promise<void> {
-    const installedDeps = await this.getInstalledDependencies(workspace);
-
-    if (installedDeps.length !== 0) {
-      const availableDeps = await getHomeDirDeps();
-      const updatableDeps = [];
-      for (const ad of availableDeps) {
-        for (const id of installedDeps) {
-          if (id.uuid === ad.uuid) {
-            // Maybe update available
-            if (isNewerVersion(ad.version, id.version)) {
-              updatableDeps.push(new LibraryQuickPick(ad));
-            }
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      const installedDeps = await this.getCurrentlyInstalledPythonLibraries(workspace);
+      if(installedDeps.length !== 0) {
+        const updatableDeps: LibraryQuickPickPy[] = [];
+        for(const dep of installedDeps) {
+          if(isComponent(dep)) { 
             continue;
+          } else {
+            for(const r of this.requirements) {
+              if(r.name === dep) {
+                if(r.version && r.availableVersions) {
+                  // Because of the way versions are added, the newest version is added first,
+                  // so as soon as the current version is found, it stops adding version options
+                  for(const v of r.availableVersions) {
+                    if(v === r.version) {
+                      break;
+                    } else if(isNewerVersion(v, r.version)) { // TODO: should we add logic to not include prereleases?
+                      updatableDeps.push(new LibraryQuickPickPy(r.name, v, r.version));
+                    }
+                  }
+                }
+              }
+            }
           }
         }
-      }
-      if (updatableDeps.length !== 0) {
-        const toUpdate = await vscode.window.showQuickPick(updatableDeps, {
-          canPickMany: true,
-          placeHolder: i18n('message', 'Check to update libraries'),
-        });
+        if (updatableDeps.length !== 0) {
+          const toUpdate = await vscode.window.showQuickPick(updatableDeps, {
+            canPickMany: true,
+            placeHolder: i18n('message', 'Check to update libraries'),
+          });
 
-        if (toUpdate) {
-          let anySucceeded = false;
-          for (const ti of toUpdate) {
-            const success = await installDependency(
-              ti.dep,
-              this.getWpVendorFolder(workspace),
-              true
-            );
-            if (!success) {
-              vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
-            } else {
-              anySucceeded = true;
+          if (toUpdate) {
+            let anySucceeded = false;
+            for (const ti of toUpdate) {
+              const success = await this.updateVersion(
+                await this.getIRequires(ti.dep, workspace.uri.fsPath, ti.description) as IRequires,
+                ti.description as string,
+                workspace.uri.fsPath
+              );
+              if (!success) {
+                vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep));
+              } else {
+                anySucceeded = true;
+              }
+            }
+            if(anySucceeded) {
+              vscode.window.showInformationMessage(i18n('message', 'Updated dependencies, make sure to connect to the internet to run sync before deploying code to your robot'));
             }
           }
-          if (anySucceeded) {
-            this.offerBuild(workspace, true);
-          }
+        } else {
+          vscode.window.showInformationMessage(i18n('message', 'No updates available'));
         }
       } else {
-        vscode.window.showInformationMessage(i18n('message', 'No updates available'));
+        vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
       }
     } else {
-      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+      const installedDeps = await this.getInstalledDependencies(workspace);
+
+      if (installedDeps.length !== 0) {
+        const availableDeps = await getHomeDirDeps();
+        const updatableDeps = [];
+        for (const ad of availableDeps) {
+          for (const id of installedDeps) {
+            if (id.uuid === ad.uuid) {
+              // Maybe update available
+              if (isNewerVersion(ad.version, id.version)) {
+                updatableDeps.push(new LibraryQuickPick(ad));
+              }
+              continue;
+            }
+          }
+        }
+        if (updatableDeps.length !== 0) {
+          const toUpdate = await vscode.window.showQuickPick(updatableDeps, {
+            canPickMany: true,
+            placeHolder: i18n('message', 'Check to update libraries'),
+          });
+
+          if (toUpdate) {
+            let anySucceeded = false;
+            for (const ti of toUpdate) {
+              const success = await installDependency(
+                ti.dep,
+                this.getWpVendorFolder(workspace),
+                true
+              );
+              if (!success) {
+                vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
+              } else {
+                anySucceeded = true;
+              }
+            }
+            if (anySucceeded) {
+              this.offerBuild(workspace, true);
+            }
+          }
+        } else {
+          vscode.window.showInformationMessage(i18n('message', 'No updates available'));
+        }
+      } else {
+        vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+      }
     }
   }
 
   private async onlineUpdates(workspace: vscode.WorkspaceFolder): Promise<void> {
-    const installedDeps = await this.getInstalledDependencies(workspace);
-
-    if (installedDeps.length !== 0) {
-      const promises = installedDeps.map(async (dep) => {
-        if (!dep.jsonUrl) {
-          return undefined;
-        }
-        try {
-          return await loadFileFromUrl(dep.jsonUrl);
-        } catch (err) {
-          logger.log('Error fetching file', err);
-          return undefined;
-        }
-      });
-      const results = (await Promise.all(promises)).filter(
-        (x) => x !== undefined
-      ) as IJsonDependency[];
-      const updatable = [];
-      for (const newDep of results) {
-        for (const oldDep of installedDeps) {
-          if (newDep.uuid === oldDep.uuid) {
-            if (isNewerVersion(newDep.version, oldDep.version)) {
-              updatable.push(new LibraryQuickPick(newDep, oldDep.version));
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      const installedDeps = await this.getCurrentlyInstalledPythonLibraries(workspace);
+      const availableUpdates: LibraryQuickPickPy[] = [];
+      for(const d of installedDeps) {
+        if(!isComponent(d)) {
+          let req = await this.getIRequires(d, workspace.uri.fsPath);
+          if(req) {
+            let versions = getVersions(req.name);
+            if(!req.version) req.version = await getInstalledVersion(req.name, workspace.uri.fsPath) as string;
+            for(let i = versions.length - 1; i >= 0; i--) {
+              if(versions[i] === req.version) continue;
+              if(isNewerVersion(versions[i], req.version)) {
+                availableUpdates.push(new LibraryQuickPickPy(req.name, versions[i]));
+                break;
+              }
             }
-            break;
           }
         }
       }
-
-      if (updatable.length !== 0) {
-        const toUpdate = await vscode.window.showQuickPick(updatable, {
+      if(availableUpdates.length > 0) {
+        const toUpdate = await vscode.window.showQuickPick(availableUpdates, {
           canPickMany: true,
           placeHolder: i18n('message', 'Check to update libraries'),
         });
@@ -438,95 +547,203 @@ export class VendorLibraries {
         if (toUpdate) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
-            const success = await installDependency(
-              ti.dep,
-              this.getWpVendorFolder(workspace),
-              true
+            const success = await this.updateVersion(
+              await this.getIRequires(ti.dep, workspace.uri.fsPath, ti.description) as IRequires,
+              ti.description as string,
+              workspace.uri.fsPath
             );
+            if (!success) {
+              vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep));
+            } else {
+              anySucceeded = true;
+            }
+          }
+          if(anySucceeded) {
+            await this.offerSync(workspace, true);
+          }
+        } else {
+          vscode.window.showInformationMessage(i18n('message', 'No updates available'));
+        }
+      } else {
+        vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+      } 
+    } else {
+      const installedDeps = await this.getInstalledDependencies(workspace);
+
+      if (installedDeps.length !== 0) {
+        const promises = installedDeps.map(async (dep) => {
+          if (!dep.jsonUrl) {
+            return undefined;
+          }
+          try {
+            return await loadFileFromUrl(dep.jsonUrl);
+          } catch (err) {
+            logger.log('Error fetching file', err);
+            return undefined;
+          }
+        });
+        const results = (await Promise.all(promises)).filter(
+          (x) => x !== undefined
+        ) as IJsonDependency[];
+        const updatable = [];
+        for (const newDep of results) {
+          for (const oldDep of installedDeps) {
+            if (newDep.uuid === oldDep.uuid) {
+              if (isNewerVersion(newDep.version, oldDep.version)) {
+                updatable.push(new LibraryQuickPick(newDep, oldDep.version));
+              }
+              break;
+            }
+          }
+        }
+
+        if (updatable.length !== 0) {
+          const toUpdate = await vscode.window.showQuickPick(updatable, {
+            canPickMany: true,
+            placeHolder: i18n('message', 'Check to update libraries'),
+          });
+
+          if (toUpdate) {
+            let anySucceeded = false;
+            for (const ti of toUpdate) {
+              const success = await installDependency(
+                ti.dep,
+                this.getWpVendorFolder(workspace),
+                true
+              );
+              if (!success) {
+                vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
+              } else {
+                anySucceeded = true;
+              }
+            }
+            if (anySucceeded) {
+              this.offerBuild(workspace, true);
+            }
+          }
+        } else {
+          vscode.window.showInformationMessage(i18n('message', 'No updates available'));
+        }
+      } else {
+        vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
+      }
+    }
+  }
+
+  private async offlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      const oldProject = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Downloads')),
+        filters: {
+          'Wheel File': ['whl']
+        },
+            openLabel: 'Select a Project',
+          });
+          if (!oldProject || oldProject.length !== 1) {
+            return;
+          }
+      try {
+        const packageFile = path.basename(oldProject[0].fsPath);
+        let pkg = path.basename(oldProject[0].fsPath, path.extname(oldProject[0].fsPath));
+        const packageName = pkg.substring(0, pkg.indexOf('-'));
+        pkg = pkg.substring(packageName.length + 1);
+        const packageVersion = pkg.substring(0, pkg.indexOf('-'));
+        let cmd = 'pip install --no-index --find-links ' + packageFile + " " + packageName;
+        if(getIsWindows()) cmd = 'py -3 -m ' + cmd;
+        let num = await this.externalApi.getExecuteAPI().executeCommand(cmd, 'Offline Install Python Package', os.homedir(), workspace);
+        if(num) {
+          await this.addRequirement(packageName, workspace.uri.fsPath, packageVersion, true);
+        }
+      } catch(err) {
+        vscode.window.showErrorMessage("Error with offline install: " + err);
+      }
+
+    } else {
+      const installedDeps = await this.getInstalledDependencies(workspace);
+
+      const availableDeps = await getHomeDirDeps();
+      const updatableDeps = [];
+      for (const ad of availableDeps) {
+        let foundDep = false;
+        for (const id of installedDeps) {
+          if (id.uuid === ad.uuid) {
+            foundDep = true;
+            continue;
+          }
+        }
+        if (!foundDep) {
+          updatableDeps.push(new LibraryQuickPick(ad));
+        }
+      }
+      if (updatableDeps.length !== 0) {
+        const toInstall = await vscode.window.showQuickPick(updatableDeps, {
+          canPickMany: true,
+          placeHolder: i18n('message', 'Check to install libraries'),
+        });
+
+        if (toInstall) {
+          let anySucceeded = false;
+          for (const ti of toInstall) {
+            const success = await installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
             if (!success) {
               vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
             } else {
               anySucceeded = true;
             }
-          }
+           }
           if (anySucceeded) {
             this.offerBuild(workspace, true);
           }
         }
       } else {
-        vscode.window.showInformationMessage(i18n('message', 'No updates available'));
+        vscode.window.showInformationMessage(i18n('message', 'No new dependencies available'));
       }
-    } else {
-      vscode.window.showInformationMessage(i18n('message', 'No dependencies installed'));
-    }
-  }
-
-  private async offlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
-    const installedDeps = await this.getInstalledDependencies(workspace);
-
-    const availableDeps = await getHomeDirDeps();
-    const updatableDeps = [];
-    for (const ad of availableDeps) {
-      let foundDep = false;
-      for (const id of installedDeps) {
-        if (id.uuid === ad.uuid) {
-          foundDep = true;
-          continue;
-        }
-      }
-      if (!foundDep) {
-        updatableDeps.push(new LibraryQuickPick(ad));
-      }
-    }
-    if (updatableDeps.length !== 0) {
-      const toInstall = await vscode.window.showQuickPick(updatableDeps, {
-        canPickMany: true,
-        placeHolder: i18n('message', 'Check to install libraries'),
-      });
-
-      if (toInstall) {
-        let anySucceeded = false;
-        for (const ti of toInstall) {
-          const success = await installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
-          if (!success) {
-            vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
-          } else {
-            anySucceeded = true;
-          }
-        }
-        if (anySucceeded) {
-          this.offerBuild(workspace, true);
-        }
-      }
-    } else {
-      vscode.window.showInformationMessage(i18n('message', 'No new dependencies available'));
     }
   }
 
   private async onlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
-    const result = await vscode.window.showInputBox({
-      ignoreFocusOut: true,
-      placeHolder: i18n('message', 'Enter a vendor file URL (get from vendor)'),
-      prompt: i18n('message', 'Enter a vendor file URL (get from vendor)'),
-    });
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      const result = await vscode.window.showInputBox({
+        ignoreFocusOut: true,
+        placeHolder: i18n('message', 'Enter a vendor Python Package name (get from vendor or pypi.org)'),
+        prompt: i18n('message', 'Enter a vendor Python Package name (get from vendor or pypi.org)'),
+      });
 
-    if (result) {
-      const file = await loadFileFromUrl(result);
-      // Load existing libraries
-      const existing = await this.getInstalledDependencies(workspace);
-
-      for (const dep of existing) {
-        if (dep.uuid === file.uuid) {
-          vscode.window.showWarningMessage(i18n('message', 'Library already installed'));
-          return;
+      if(result) {
+        const dep = await this.getIRequires(result, workspace.uri.fsPath);
+        if(dep) {
+          vscode.window.showInformationMessage(i18n('message', 'Successfully installed/updated library!'));
+          await addPythonDep([], [dep], workspace.uri.fsPath);
         }
       }
+    } else {
+      const result = await vscode.window.showInputBox({
+        ignoreFocusOut: true,
+        placeHolder: i18n('message', 'Enter a vendor file URL (get from vendor)'),
+        prompt: i18n('message', 'Enter a vendor file URL (get from vendor)'),
+      });
 
-      const success = await installDependency(file, this.getWpVendorFolder(workspace), true);
-      if (success) {
-        this.offerBuild(workspace, true);
-      } else {
-        vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
+      if (result) {
+        const file = await loadFileFromUrl(result);
+        // Load existing libraries
+        const existing = await this.getInstalledDependencies(workspace);
+
+        for (const dep of existing) {
+          if (dep.uuid === file.uuid) {
+            vscode.window.showWarningMessage(i18n('message', 'Library already installed'));
+            return;
+          }
+        }
+
+        const success = await installDependency(file, this.getWpVendorFolder(workspace), true);
+        if (success) {
+          this.offerBuild(workspace, true);
+        } else {
+          vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
+        }
       }
     }
   }
@@ -540,6 +757,7 @@ export class VendorLibraries {
   }
 
   public async offerBuild(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') return false;
     const buildRes = await vscode.window.showInformationMessage(
       i18n(
         'message',
@@ -554,6 +772,28 @@ export class VendorLibraries {
     );
     if (buildRes?.title === i18n('ui', 'Yes')) {
       await this.externalApi.getBuildTestAPI().buildCode(workspace, undefined);
+      this.lastBuildTime = Date.now();
+      return true;
+    }
+    return false;
+  }
+
+  public async offerSync(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {
+    if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() !== 'python') return false;
+    const buildRes = await vscode.window.showInformationMessage(
+      i18n(
+        'message',
+        'It is recommended to run a "Sync" after a vendor update. ' +
+          'Would you like to do this now?'
+      ),
+      {
+        modal: modal,
+      },
+      { title: i18n('ui', 'Yes') },
+      { title: i18n('ui', 'No'), isCloseAffordance: true }
+    );
+    if (buildRes?.title === i18n('ui', 'Yes')) {
+      await this.externalApi.getBuildTestAPI().syncCode(workspace, undefined);
       this.lastBuildTime = Date.now();
       return true;
     }
