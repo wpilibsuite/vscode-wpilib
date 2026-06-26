@@ -44,7 +44,7 @@ class CodeBuilder implements ICodeBuilder {
     }
 
     public getDescription(): string {
-        return 'Python Build';
+        return 'Python Sync';
     }
 }
 

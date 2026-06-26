@@ -159,6 +159,12 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
+                "command": "wpilibcore.syncCode",
+                "title": "%wpilibcore.syncCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
                 "command": "wpilibcore.testCode",
                 "title": "%wpilibcore.testCode.title%",
                 "category": "WPILib",
@@ -384,6 +390,11 @@
                 },
                 {
                     "when": "isWPILibProject",
+                    "command": "wpilibcore.syncCode",
+                    "group": "wpilib@2"
+                },
+                {
+                    "when": "isWPILibProject",
                     "command": "wpilibcore.testCode",
                     "group": "wpilib@3"
                 },
@@ -411,6 +422,11 @@
                 {
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.buildCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.syncCode",
                     "group": "wpilib"
                 },
                 {

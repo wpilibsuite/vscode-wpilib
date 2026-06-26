@@ -137,7 +137,33 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         );
         return;
       }
+      else if(!workspace || preferencesApi.getPreferences(workspace).getCurrentLanguage() === 'python') {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot build robot code since this is a robotpy project, use Sync to download required packages')
+        );
+        return;
+      }
       await externalApi.getBuildTestAPI().buildCode(workspace, source);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('wpilibcore.syncCode', async (source?: vscode.Uri) => {
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
+      if (!workspace || !preferencesApi.getPreferences(workspace).getIsWPILibProject()) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot sync robot code since this is not a WPILib project')
+        );
+        return;
+      }
+      else if(!workspace || preferencesApi.getPreferences(workspace).getCurrentLanguage() !== 'python') {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot sync robot code since this is not a robotpy project')
+        );
+        return;
+      }
+      await externalApi.getBuildTestAPI().syncCode(workspace, source);
     })
   );
 

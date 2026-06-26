@@ -3,6 +3,7 @@
   "wpilibcore.startRioLog.title": "Start RioLog",
   "wpilibcore.startTool.title": "Start Tool",
   "wpilibcore.buildCode.title": "Build Robot Code",
+  "wpilibcore.syncCode.title": "Robotpy: Sync Robot Code",
   "wpilibcore.testCode.title": "Test Robot Code",
   "wpilibcore.deployCode.title": "Deploy Robot Code",
   "wpilibcore.debugCode.title": "Debug Robot Code",
