@@ -221,18 +221,33 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private async updateall() {
     if (this.wp) {
-      for (const installed of this.installedList) {
-        if (installed.versionInfo[0].version !== installed.currentVersion && this.wp) {
-          // Match both the name and the version
-          const avail = this.availableDeps.find(
-            (available) =>
-              installed.versionInfo[0].version === available.version &&
-              installed.name === available.name
-          );
-          await this.getURLInstallDep(avail);
+      if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
+        for (const installed of this.installedList) {
+          if (installed.versionInfo[0].version !== installed.currentVersion && this.wp) {
+            // Match both the name and the version
+            const avail = (await this.getAvailablePythonDependencies()).find(
+              (available) =>
+                installed.name === available.python
+            );
+            if(avail && avail.python) {
+              await this.vendorLibraries.updateVersion(await parseRequirement(avail.python), installed.versionInfo[0].version, this.wp.uri.fsPath);
+              break;
+            } 
+          }
+        }
+      } else {
+        for (const installed of this.installedList) {
+          if (installed.versionInfo[0].version !== installed.currentVersion && this.wp) {
+            // Match both the name and the version
+            const avail = this.availableDeps.find(
+              (available) =>
+                installed.versionInfo[0].version === available.version &&
+                installed.name === available.name
+            );
+            await this.getURLInstallDep(avail);
+          }
         }
       }
-
       await this._refresh(this.wp);
     }
   }
@@ -241,9 +256,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     let prefsLanguage = "";
     if(this.wp) prefsLanguage = this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage();
     if(prefsLanguage === 'python') {
-      // vscode.window.showInformationMessage(
-      //     i18n('message', 'It may take a few minutes to install a new package') 
-      // );
       const available = this.availableDepsList[parseInt(index, 10)];
       if(available.python && this.wp) {
         await this.vendorLibraries.installPythonDependency([available.python], this.wp)
@@ -378,6 +390,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
 
     if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
+      vscode.window.showInformationMessage(
+          i18n('message', 'It may take a few minutes to install a new package'), 
+          {
+            modal: true
+          }
+      );
       let result = await this.vendorLibraries.installPythonDependency([url], this.wp);
       if(!result) {
         logger.warn('Unable to install python package');
@@ -563,6 +581,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         // We need to group the available deps and filter out the installed ones
         this.availableDeps.forEach((dep) => {
           // See if the dep is one of the installed deps if so don't add it
+          vscode.window.showInformationMessage("Available deps: " + dep.name + dep.python);
           const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
           if (installedDep < 0) {
             // Check to see if it is already in the available list
