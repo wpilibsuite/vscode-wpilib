@@ -1,4 +1,5 @@
 'use strict';
+import * as vscode from 'vscode';
 
 interface IVersion {
   major: number;
@@ -9,7 +10,13 @@ interface IVersion {
 }
 
 /** Converts a version string to its corresponding Version object. */
-function parseVersion(version: string): IVersion {
+function parseVersion(v: string): IVersion {
+  // Get the version number without the (prerelease) if it's added
+  const preIndex = v.indexOf(" (prerelease)");
+  let version = v;
+  if(preIndex >= 0 ) {
+    version = version.substring(0, preIndex);
+  }
   const dashIndex = version.indexOf('-');
   const dashParts: string[] = [];
   if (dashIndex >= 0) {

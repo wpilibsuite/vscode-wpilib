@@ -23,9 +23,9 @@ export const ReplacementPatterns = {
  * Common vendordep file names
  */
 export const VendorDepFiles = {
-  COMMANDSV2: 'commands2.json',
-  ROMI: 'romi.json',
-  XRP: 'xrp.json',
+  COMMANDSV2: 'CommandsV2.json',
+  ROMI: 'RomiVendordep.json',
+  XRP: 'XRPVendordep.json',
   COMMANDSV3: 'CommandsV3.json',
   COMMANDSV2_OLD: 'WPILibNewCommands.json',
   APRILTAG: 'apriltag.json',
@@ -126,25 +126,24 @@ export async function updateRobotPyVersion(pyprojectPath: string, robotpyVersion
 export async function setupComponentsPy(vendors: string[], toFolder: string) {
   let components: string[] = [];
   for(const v of vendors) {
-    if(v === "commands2") components.push(VendorDepFiles.COMMANDSV2.substring(0, VendorDepFiles.COMMANDSV2.lastIndexOf(".")));
-    else if(v === "apriltag") components.push(VendorDepFiles.APRILTAG.substring(0, VendorDepFiles.APRILTAG.lastIndexOf(".")));
-    else if(v === "cscore") components.push(VendorDepFiles.CSCORE.substring(0, VendorDepFiles.COMMANDSV2.lastIndexOf(".")));
-    else if(v === "romi") components.push(VendorDepFiles.ROMI.substring(0, VendorDepFiles.ROMI.lastIndexOf(".")));
-    else if(v === "sim") components.push(VendorDepFiles.SIM.substring(0, VendorDepFiles.SIM.lastIndexOf(".")));
-    else if(v === "xrp") components.push(VendorDepFiles.XRP.substring(0, VendorDepFiles.XRP.lastIndexOf(".")));
+    if(v === "commands2") components.push('commands2');
+    else if(v === "apriltag") components.push('apriltag');
+    else if(v === "cscore") components.push('cscore');
+    else if(v === "romi") components.push('romi');
+    else if(v === "sim") components.push('sim');
+    else if(v === "xrp") components.push('xrp');
   }
   pathUtils.copyComponets(components, toFolder);
 }
 
 export function isComponent(pkg: string) {
   let component = false;
-  let pkgJson = pkg + '.json';
-  if(pkgJson === VendorDepFiles.APRILTAG) component = true;
-  else if(pkgJson === VendorDepFiles.COMMANDSV2) component = true;
-  else if(pkgJson === VendorDepFiles.CSCORE) component = true;
-  else if(pkgJson === VendorDepFiles.ROMI) component = true;
-  else if(pkgJson === VendorDepFiles.SIM) component = true;
-  else if(pkgJson === VendorDepFiles.XRP) component = true;
+  if(pkg === "apriltag") component = true;
+  else if(pkg === "commands2") component = true;
+  else if(pkg === "cscore") component = true;
+  else if(pkg === "romi") component = true;
+  else if(pkg === "sim") component = true;
+  else if(pkg === 'xrp') component = true;
   return component;
 }
 

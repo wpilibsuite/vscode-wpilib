@@ -398,7 +398,7 @@ export class VendorLibraries {
             components.push(d);
           } else {
             let req = await parseRequirement(d);
-            let toPush = await this.getIRequires(req.name, workspace.uri.fsPath, req.version)
+            let toPush = await this.getIRequires(req.name, workspace.uri.fsPath, req.version);
             if(toPush) requires.push(toPush);
           }
         }

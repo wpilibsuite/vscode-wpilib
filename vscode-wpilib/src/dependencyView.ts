@@ -3,7 +3,7 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { getHomeDirDeps, getPyProjectFile, getRequires, getVersions, IJsonDependency, installDependency, IPyProject, parseRequirement } from './shared/vendorlibrariesbase';
+import { getHomeDirDeps, getPyProjectFile, IJsonDependency, installDependency, IPyProject, parseRequirement } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 import { readFile } from 'fs/promises';
@@ -761,7 +761,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         .getProjectYear();
       const manifestURL = this.vendordepMarketplaceURL + `${projectYear}.json`;
       try {
-        this.onlineDeps = JSON.parse(await readFile("C:\\Users\\awallis\\Downloads\\2027_alpha5 (2).json", 'utf8')) as IJsonList[];
+        this.onlineDeps = await this.loadFileFromUrl(manifestURL);
       } catch (err) {
         logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
         this.onlineDeps = [];

@@ -222,7 +222,9 @@ export async function removePythonDep(components: string[], requires: IRequires[
         let iString = reqDep.name;
         if(reqDep.specifier) iString += reqDep.specifier + reqDep.version;
         if(reqDep.name === r.name) {
-          file = file.substring(0, file.indexOf(iString) -1) + file.substring(file.indexOf(iString) + iString.length + 2);
+          let endIndex = file.indexOf(iString) + iString.length + 2;
+          if(file.substring(endIndex).indexOf("]") === -1) endIndex = endIndex - 1;
+          file = file.substring(0, file.indexOf(iString) -1) + file.substring(endIndex);
         }
       }
     }
