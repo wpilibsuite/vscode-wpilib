@@ -13,7 +13,7 @@ import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
 import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
-import { activateCpp } from './cpp/cpp';
+import { activateCpp, warnIfMissingCppExtension } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
 import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
@@ -121,7 +121,7 @@ async function handleAfterTrusted(
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(
-      i18n('message', 'Java 21 required, but not found. Might have compilation errors.')
+      i18n('message', 'Java 25 required, but not found. Might have compilation errors.')
     );
   }
 
@@ -227,6 +227,10 @@ async function handleAfterTrusted(
         vendorDepsWatcher.onDidCreate(fireEvent, null, context.subscriptions);
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
+
+        if (prefs.getEnableCppIntellisense()) {
+          warnIfMissingCppExtension();
+        }
 
         if (prefs.getProjectYear() === 'intellisense') {
           logger.log('Intellisense only build project found');

@@ -12,6 +12,17 @@ import { registerCodeBuilderAndTester } from './buildtest';
 import { registerCommandTemplates } from './commands';
 import { registerCodeDeployerAndDebugger } from './deploydebug';
 
+export function warnIfMissingCppExtension() {
+  if (!vscode.extensions.getExtension('ms-vscode.cpptools')) {
+    vscode.window.showWarningMessage(
+      i18n(
+        'message',
+        'Could not find cpptools C++ extension. Intellisense and Debugging will not work.'
+      )
+    );
+  }
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activateCpp(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
@@ -24,15 +35,7 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
 
-  let allowDebug = true;
-
-  const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
-  if (!cppExtension) {
-    vscode.window.showWarningMessage(
-      i18n('message', 'Could not find cpptools C++ extension. Debugging is disabled.')
-    );
-    allowDebug = false;
-  }
+  const allowDebug = !!vscode.extensions.getExtension('ms-vscode.cpptools');
 
   await activateCppProvider(context, coreExports);
 
