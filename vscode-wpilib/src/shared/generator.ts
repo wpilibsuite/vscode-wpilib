@@ -6,7 +6,6 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
-import * as vscode from 'vscode';
 import { getRobotPyVersion } from '../pythondetector';
 
 export async function generateCopyCpp(
@@ -92,8 +91,9 @@ export async function generateCopyPython(
     if (robotpyVersion) {
       await genUtils.updateRobotPyVersion(path.join(toFolder, 'pyproject.toml'), robotpyVersion);
     }
-    //TODO: add set-up vendordeps
+    
     await genUtils.setupComponentsPy(vendordeps, toFolder);
+    
     return true;
   } catch (e) {
     logger.error('Python project creation failure', e);

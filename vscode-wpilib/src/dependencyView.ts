@@ -3,11 +3,11 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { getHomeDirDeps, getPyProjectFile, IJsonDependency, installDependency, IPyProject, parseRequirement } from './shared/vendorlibrariesbase';
+import { addPythonDep, getHomeDirDeps, getPyProjectFile, IJsonDependency, installDependency, IPyProject, parseRequirement } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
-import { readFile } from 'fs/promises';
 import { isComponent } from './shared/projectGeneratorUtils';
+import { getRobotPyVersion } from './pythondetector';
 
 export interface IJsonList {
   path: string;
@@ -212,7 +212,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           this.installedList[index].name === available.name
       );
       if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
-        await this.vendorLibraries.updateVersion(await parseRequirement(this.installedList[index].name), version, this.wp.uri.fsPath);
+        await this.vendorLibraries.updateVersion(await parseRequirement(this.installedList[index].name), version, this.wp);
       }
       else await this.getURLInstallDep(avail);
       await this._refresh(this.wp);
@@ -230,7 +230,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 installed.name === available.python
             );
             if(avail && avail.python) {
-              await this.vendorLibraries.updateVersion(await parseRequirement(avail.python), installed.versionInfo[0].version, this.wp.uri.fsPath);
+              await this.vendorLibraries.updateVersion(await parseRequirement(avail.python), installed.versionInfo[0].version, this.wp);
               break;
             } 
           }
@@ -390,6 +390,10 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
 
     if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
+      if(isComponent(url)) {
+        await addPythonDep([url], [], this.wp.uri.fsPath);
+        return;
+      }
       vscode.window.showInformationMessage(
           i18n('message', 'It may take a few minutes to install a new package'), 
           {
@@ -535,6 +539,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
     try {
       if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+        await this.vendorLibraries.syncRequirements(workspace);
         this.installedPythonDeps = await this.vendorLibraries.getCurrentlyInstalledPythonLibraries(workspace);
       }
       else this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
@@ -581,7 +586,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         // We need to group the available deps and filter out the installed ones
         this.availableDeps.forEach((dep) => {
           // See if the dep is one of the installed deps if so don't add it
-          vscode.window.showInformationMessage("Available deps: " + dep.name + dep.python);
           const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
           if (installedDep < 0) {
             // Check to see if it is already in the available list
@@ -602,9 +606,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         this.updateDependencies();
       } else if(this.availableDeps.length !== 0 && this.wp) {
         for (const id of this.installedPythonDeps) {
-          let installedVersion = (await getPyProjectFile(this.wp.uri.fsPath) as IPyProject).tool.robotpy.robotpy_version; 
+          let installedVersion = await getRobotPyVersion(this.wp.uri.fsPath); 
           if(!isComponent(id)) {
-            let req = await this.vendorLibraries.getIRequires(id, this.wp.uri.fsPath);
+            let req = await this.vendorLibraries.getIRequires(id, this.wp);
             if(req) {
               if(req.version) installedVersion = req.version;
               else installedVersion = "";

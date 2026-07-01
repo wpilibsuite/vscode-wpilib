@@ -12,6 +12,7 @@ import { registerCodeBuilderAndTester } from './buildtest';
 import { registerCommandTemplates } from './commands';
 import { registerCodeDeploy } from './deploy';
 import { getIsWindows } from '../utilities';
+import { setupVenv } from '../pythondetector';
 
 export async function activatePython(context: vscode.ExtensionContext, coreExports: IExternalAPI) {
     const extensionResourceLocation = path.join(context.extensionPath, 'resources', 'python');
@@ -19,22 +20,23 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
     const preferences = coreExports.getPreferencesAPI()
     const exampleTemplate = coreExports.getExampleTemplateAPI();
     const commandApi = coreExports.getCommandAPI();
-
+    const executeApi = coreExports.getExecuteAPI();
     let allowDebug = true;
+    const wp = await preferences.getFirstOrSelectedWorkspace();
 
-    const pythonExtension = vscode.extensions.getExtension('ms-python.python');
+    const pythonExtension = vscode.extensions.getExtension('the0807.uv-toolkit');
     if(!pythonExtension) {
         vscode.window.showWarningMessage(
-            i18n('message', 'Could not find python extension')
+            i18n('message', 'Could not find python extension') // TODO: change message
         );
     }
-    const pyDebugger = vscode.extensions.getExtension('ms-python.debugpy');
+    const pyDebugger = vscode.extensions.getExtension('astral-sh.ty');
     if(!pyDebugger) {
         vscode.window.showWarningMessage(
-            i18n('message', 'Could not find Python Debugger Extension. Debugging is disabled')
+            i18n('message', 'Could not find Python Debugger Extension. Debugging is disabled') // TODO: change message
         );
         allowDebug = false;
-    }
+    } 
     let cmd = 'pip show robotpy';
     let robotpyInstalled = false;
     if(getIsWindows()) cmd = 'py -3 -m ' + cmd;
@@ -63,6 +65,7 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
             cp.execSync(installCmd);
         }
     }
+    if(wp && preferences.getPreferences(wp).getCurrentLanguage() === 'python') await setupVenv(executeApi, wp);
     
     //Setup build and test
     registerCodeBuilderAndTester(coreExports);

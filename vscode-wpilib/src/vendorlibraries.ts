@@ -1,10 +1,11 @@
 'use strict';
 
 import { readdir, unlink } from 'fs/promises';
+import * as cp from 'child_process';
 import * as path from 'path';
 import * as os from 'os';
 import * as vscode from 'vscode';
-import { IExternalAPI } from './api';
+import { IExecuteAPI, IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import {
@@ -22,14 +23,12 @@ import {
   getComponents,
   IRequires,
   getInstalledVersion,
-  getVendorPackageNames,
   updateVersion,
-  installNewRequirement,
+  installNewRequirement
 } from './shared/vendorlibrariesbase';
 import { isNewerVersion } from './versions';
-import { isComponent, setupComponentsPy } from './shared/projectGeneratorUtils';
-import { getRobotPyVersion } from './pythondetector';
-import { getIsWindows } from './utilities';
+import { isComponent } from './shared/projectGeneratorUtils';
+import { getWPILibYear } from './shared/utilitiesapi';
 
 class OptionQuickPick implements vscode.QuickPickItem {
   public label: string;
@@ -76,11 +75,13 @@ class LibraryQuickPickPy implements vscode.QuickPickItem {
 export class VendorLibraries {
   private disposables: vscode.Disposable[] = [];
   private externalApi: IExternalAPI;
+  private executeApi: IExecuteAPI;
   private lastBuildTime = 1;
   private requirements: IRequires[] = [];
 
   constructor(externalApi: IExternalAPI) {
     this.externalApi = externalApi;
+    this.executeApi = externalApi.getExecuteAPI();
 
     this.disposables.push(
       vscode.commands.registerCommand(
@@ -260,9 +261,43 @@ export class VendorLibraries {
     return anySucceeded;
   }
 
-  public async addRequirement(pkg: string, workspace: string, version?: string, installed?: boolean) {
+  public async syncRequirements(workspace: vscode.WorkspaceFolder): Promise<void> {
+    if(this.requirements.length <= 0 ) return;
+    let pipList = cp.execSync('uv pip list', {cwd: workspace.uri.fsPath, encoding: 'utf8'});
+    const installedReqs: IRequires[] = [];
+    const remove: IRequires[] = [];
+    for(const r of this.requirements) {
+      if(pipList.indexOf(r.name) !== -1) {
+        installedReqs.push(r);
+      } else {
+        remove.push(r);
+      }
+    }
+    await removePythonDep([], remove, workspace.uri.fsPath);
+    this.requirements = installedReqs;
+  }
+
+  public async addRequirement(pkg: string, workspace: vscode.WorkspaceFolder, version?: string, installed?: boolean) {
     if(!installed) {
-      let validPackage = await installNewRequirement(pkg, workspace);
+      let validPackage: IRequires | undefined;
+      if(version) {
+        let v = version.indexOf(" (prerelease)"); 
+        if(getWPILibYear().indexOf(version.substring(0, 4)) === -1) {
+          const res = await vscode.window.showInformationMessage(i18n('message', 'This package may not be compatible with the current WPILib Version, would you still like to install?'), 
+            { modal: true }, 
+            i18n('ui', 'Yes'),
+            i18n('ui', 'No')
+          );
+          if(res === i18n('ui', 'Yes')) {
+            if(v !== -1) validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version.substring(0, v));
+            else validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version);
+          }
+        } else {
+          if(v !== -1) validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version.substring(0, v));
+          else validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version);
+        }
+      }
+      else validPackage = await installNewRequirement(pkg, workspace, this.executeApi);
       if(!validPackage) return undefined;
       let req = validPackage;
       let versions = validPackage.availableVersions;
@@ -286,7 +321,7 @@ export class VendorLibraries {
           add = false;
           if(r.version !== version) {
             r.version = version;
-            await updateVersion(r, workspace);
+            await updateVersion(r, workspace.uri.fsPath);
           }
           return r;
         }
@@ -296,13 +331,14 @@ export class VendorLibraries {
         if(version) toPush = {name: pkg, version: version, availableVersions: [version]};
         else toPush = {name: pkg, availableVersions: []};
         this.requirements.push(toPush);
-        await addPythonDep([], [toPush], workspace);
+        await addPythonDep([], [toPush], workspace.uri.fsPath);
+        return toPush;
       }
       else return undefined;
     }
   }
 
-  public async updateVersion(pkg: IRequires, version: string, workspace: string) {
+  public async updateVersion(pkg: IRequires, version: string, workspace: vscode.WorkspaceFolder) {
     let req: IRequires | undefined;
     for(const r of this.requirements) {
       if(r.name === pkg.name) {
@@ -312,17 +348,17 @@ export class VendorLibraries {
     }
     if(req && req.version) {
       req.version = version;
-      await updateVersion(req, workspace);
+      await updateVersion(req, workspace.uri.fsPath);
       return req;
     }
-    return await this.addRequirement(pkg.name, version);
+    return await this.addRequirement(pkg.name, workspace, version);
   }
 
   public async addRequirements(pkgs: string[], workspace: string) {
     let ret: IRequires[] = [];
     for(const pkg of pkgs) {
       let req = await parseRequirement(pkg);
-      let versions = getVersions(pkg);
+      let versions = getVersions(pkg, workspace);
       let installedVersion = await getInstalledVersion(pkg, workspace);
       if(installedVersion) req.version = installedVersion;
       req.availableVersions = versions;
@@ -332,7 +368,8 @@ export class VendorLibraries {
     return ret;
   }
 
-  public async getIRequires(pkg: string, workspace: string, version?: string): Promise<IRequires | undefined> {
+  public async getIRequires(pkg: string, workspace: vscode.WorkspaceFolder, version?: string): Promise<IRequires | undefined> {
+    await this.syncRequirements(workspace);
     if(version) {
       let pkgReq = await parseRequirement(pkg);
       
@@ -342,7 +379,7 @@ export class VendorLibraries {
           if(r.availableVersions) {
             for(const v of r.availableVersions) {
               if(v === pkgReq.version) {
-                let req = await this.updateVersion(r, workspace, pkgReq.version);
+                let req = await this.updateVersion(r, pkgReq.version, workspace);
                 if(req) return req;
               }
             }
@@ -379,7 +416,7 @@ export class VendorLibraries {
         }
         if(!removed) {
           let req = await parseRequirement(p);
-          let toRemove = await this.getIRequires(req.name, workspace.uri.fsPath, req.version)
+          let toRemove = await this.getIRequires(req.name, workspace, req.version)
           if(toRemove) removeRequires.push(toRemove);
         }
       }
@@ -398,7 +435,7 @@ export class VendorLibraries {
             components.push(d);
           } else {
             let req = await parseRequirement(d);
-            let toPush = await this.getIRequires(req.name, workspace.uri.fsPath, req.version);
+            let toPush = await this.getIRequires(req.name, workspace, req.version);
             if(toPush) requires.push(toPush);
           }
         }
@@ -448,9 +485,9 @@ export class VendorLibraries {
             let anySucceeded = false;
             for (const ti of toUpdate) {
               const success = await this.updateVersion(
-                await this.getIRequires(ti.dep, workspace.uri.fsPath, ti.description) as IRequires,
+                await this.getIRequires(ti.dep, workspace, ti.description) as IRequires,
                 ti.description as string,
-                workspace.uri.fsPath
+                workspace
               );
               if (!success) {
                 vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep));
@@ -524,9 +561,9 @@ export class VendorLibraries {
       const availableUpdates: LibraryQuickPickPy[] = [];
       for(const d of installedDeps) {
         if(!isComponent(d)) {
-          let req = await this.getIRequires(d, workspace.uri.fsPath);
+          let req = await this.getIRequires(d, workspace);
           if(req) {
-            let versions = getVersions(req.name);
+            let versions = getVersions(req.name, workspace.uri.fsPath);
             if(!req.version) req.version = await getInstalledVersion(req.name, workspace.uri.fsPath) as string;
             for(let i = versions.length - 1; i >= 0; i--) {
               if(versions[i] === req.version) continue;
@@ -548,9 +585,9 @@ export class VendorLibraries {
           let anySucceeded = false;
           for (const ti of toUpdate) {
             const success = await this.updateVersion(
-              await this.getIRequires(ti.dep, workspace.uri.fsPath, ti.description) as IRequires,
+              await this.getIRequires(ti.dep, workspace, ti.description) as IRequires,
               ti.description as string,
-              workspace.uri.fsPath
+              workspace
             );
             if (!success) {
               vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep));
@@ -646,16 +683,32 @@ export class VendorLibraries {
             return;
           }
       try {
-        const packageFile = path.basename(oldProject[0].fsPath);
-        let pkg = path.basename(oldProject[0].fsPath, path.extname(oldProject[0].fsPath));
-        const packageName = pkg.substring(0, pkg.indexOf('-'));
+        await this.syncRequirements(workspace);
+        const packageFile = oldProject[0].fsPath;
+        let pkg = path.basename(packageFile, path.extname(packageFile));
+        let packageName = pkg.substring(0, pkg.indexOf('-'));
         pkg = pkg.substring(packageName.length + 1);
+        packageName = packageName.replace('_', '-');
         const packageVersion = pkg.substring(0, pkg.indexOf('-'));
-        let cmd = 'pip install --no-index --find-links ' + packageFile + " " + packageName;
-        if(getIsWindows()) cmd = 'py -3 -m ' + cmd;
-        let num = await this.externalApi.getExecuteAPI().executeCommand(cmd, 'Offline Install Python Package', os.homedir(), workspace);
-        if(num) {
-          await this.addRequirement(packageName, workspace.uri.fsPath, packageVersion, true);
+        if(getWPILibYear().indexOf(packageVersion.substring(0, 4)) === -1) {
+          const res = await vscode.window.showInformationMessage(i18n('message', 'This package is not compatible with the current WPILib Version, would you still like to install?'), 
+            { modal: true }, 
+            i18n('ui', 'Yes'),
+            i18n('ui', 'No')
+          );
+          if(res === i18n('ui', 'Yes')) {
+            let cmd = `uv pip install "${packageFile}" --offline --prerelease=allow`;
+            let num = await this.externalApi.getExecuteAPI().executeCommand(cmd, 'Offline Install Python Package', workspace.uri.fsPath, workspace);
+            if(num === 0) {
+              await this.addRequirement(packageName, workspace, packageVersion, true);
+            }
+          }
+        } else {
+            let cmd = `uv pip install "${packageFile}" --offline --prerelease=allow`;
+            let num = await this.externalApi.getExecuteAPI().executeCommand(cmd, 'Offline Install Python Package', workspace.uri.fsPath, workspace);
+            if(num === 0) {
+              await this.addRequirement(packageName, workspace, packageVersion, true);
+            }
         }
       } catch(err) {
         vscode.window.showErrorMessage("Error with offline install: " + err);
@@ -713,10 +766,15 @@ export class VendorLibraries {
       });
 
       if(result) {
-        const dep = await this.getIRequires(result, workspace.uri.fsPath);
-        if(dep) {
+        if(isComponent(result)) {
+          await addPythonDep([result], [], workspace.uri.fsPath);
           vscode.window.showInformationMessage(i18n('message', 'Successfully installed/updated library!'));
+          return;
+        }
+        const dep = await this.getIRequires(result, workspace);
+        if(dep) {
           await addPythonDep([], [dep], workspace.uri.fsPath);
+          vscode.window.showInformationMessage(i18n('message', 'Successfully installed/updated library!'));
         }
       }
     } else {
@@ -802,10 +860,6 @@ export class VendorLibraries {
 
   public getLastBuild(): number {
     return this.lastBuildTime;
-  }
-
-  public async test(wp: vscode.WorkspaceFolder): Promise<void> {
-    //await removePythonDep(["apriltag", "xrp"], ["numpy"], wp.uri.fsPath);
   }
 }
 

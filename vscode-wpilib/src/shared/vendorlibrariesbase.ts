@@ -5,10 +5,9 @@ import * as path from 'path';
 import { logger } from '../logger';
 import { getWPILibHomeDir, getWPILibYear } from './utilitiesapi';
 import * as cp from 'child_process';
-import { getIsWindows } from '../utilities';
 import * as TOML from 'smol-toml';
 import * as vscode from 'vscode';
-import { get } from 'http';
+import { IExecuteAPI } from '../api';
 
 export interface IJsonDependency {
   name: string;
@@ -106,16 +105,24 @@ export async function installDependency(
   }
 }
 
-export async function installNewRequirement(pkg: string, workspace: string): Promise<IRequires | undefined> {
+export async function installNewRequirement(pkg: string, workspace: vscode.WorkspaceFolder, executeApi: IExecuteAPI, version?: string): Promise<IRequires | undefined> {
   try {
-    let cmd = 'pip install ' + pkg;
-    if(getIsWindows()) cmd = 'py -3 -m ' + cmd;
+    let cmd = 'uv pip install ' + pkg + ' --prerelease=allow';
+    if(version) {
+      if(version.substring(4) !== getWPILibYear()) return;
+      cmd = `uv pip install ${pkg}==${version} --prerelease=allow`;
+    }
     //Make sure that this is a valid package name, if there's an error installing, should go to the catch
-    cp.execSync(cmd);
-    let versions = getVersions(pkg);
-    let installedVersion = await getInstalledVersion(pkg, workspace); 
-    if(!installedVersion) installedVersion = versions[0];//get the installed version or the latest available version
-    return {name: pkg, specifier: "~=", version: installedVersion, availableVersions: versions};
+    let n = await executeApi.executeCommand(cmd, 'UV Install Requirement', path.join(workspace.uri.fsPath, '.venv'), workspace);
+    // If exits with code 2, the project is offline, add offline tag and run the command again
+    if(n === 2) n = await executeApi.executeCommand(cmd + ' --offline', 'UV Install Requirement', path.join(workspace.uri.fsPath, '.venv'), workspace);
+    if(n === 0) {
+      let versions = getVersions(pkg, workspace.uri.fsPath);
+      let installedVersion = await getInstalledVersion(pkg, workspace.uri.fsPath); 
+      if(!installedVersion) installedVersion = versions[0];//get the installed version or the latest available version
+      return {name: pkg, specifier: "~=", version: installedVersion, availableVersions: versions};
+    }
+    return undefined;
   } catch {
     //logger.log('Error installing new requirement, is the package name correct?');
     vscode.window.showErrorMessage("Error installing new requirement, is the package name correct?", pkg);
@@ -168,6 +175,18 @@ export async function addPythonDep(components: string[], requires: IRequires[], 
   }
 }
 
+export async function updateRobotPyVersion(ver: string, workspace: string) {
+  let f = await readFile(path.join(workspace, 'pyproject.toml'), 'utf8');
+  let robotPy = await getPyProjectFile(workspace);
+  if(robotPy?.tool.robotpy && robotPy.tool.robotpy.robotpy_version !== ver) {
+    let robotPyIndex = f.indexOf('robotpy_version');
+    let robotPyLength = ("robotpy_version = \"\"" + robotPy.tool.robotpy.robotpy_version).length;
+    let replace = f.substring(robotPyIndex, robotPyLength + robotPyIndex)
+    f = f.replace(replace, `robotpy_version = "${ver}"`);
+    await writeFile(path.join(workspace, 'pyproject.toml'), f);
+  }
+}
+
 export async function updateVersion(req: IRequires, workspace: string): Promise<boolean> {
   try {
     if(req.version) {
@@ -188,14 +207,20 @@ export async function updateVersion(req: IRequires, workspace: string): Promise<
         }
         if(!req.specifier) req.specifier = (await parseRequirement(oldReq)).specifier;
         let replace = req.name;
+        let version = req.version;
         if(req.version) {
-          if(req.version.indexOf(" (prerelease)") !== -1) {
-            replace = replace + req.specifier + req.version.substring(0, req.version.indexOf(" (prerelease)"));
+          if(version.indexOf(" (prerelease)") !== -1) {
+            version = req.version.substring(0, req.version.indexOf(" (prerelease)"));
           }
-          else replace = replace + req.specifier + req.version; 
+          replace = replace + req.specifier + version; 
         }
         await writeFile(dir, file.substring(0, toReplace) + replace + file.substring(toReplace + oldReq.length), 'utf8');
-        return true;
+        try {
+         cp.execSync(`uv pip install ${req.name}==${version} --prerelease=allow`, {cwd: workspace, encoding: 'utf8'});
+         return true;
+        } catch(err) {
+         logger.log('Error installing new package version');
+        }
       }
     }
     return false;
@@ -311,36 +336,35 @@ export async function getRequires(file: IPyProject): Promise<IRequires[]> {
 
 export async function getInstalledVersion(pkg: string, workspace: string): Promise<string | undefined> {
   try {
-    const regexp = /INSTALLED: .*/;
-    const dir = path.join(workspace, 'pyproject.toml');
+    const regexp = /Version: .*/;
     const reqs = await getRequires(await getPyProjectFile(workspace) as unknown as IPyProject);
     for(const r of reqs) {
       if(r.name === pkg) {
         return r.version;
       }
     }
-    let cmd = 'pip index versions ' + pkg;
-    if(getIsWindows()) cmd = 'py -m ' + cmd;
-    const out = cp.execSync(cmd).toString();
+    let cmd = 'uv pip show ' + pkg;
+    const out = cp.execSync(cmd, {cwd: workspace, encoding: 'utf8'});
     const match: RegExpMatchArray | null = out.match(regexp);
-    let version = match?.toString().substring(11);
+    let version = match?.toString().substring(9);
     if(match) return version;
     return undefined;
   
   } catch {
+    logger.log('Error getting installed version');
     return undefined;
   }
 }                            
 
-export function getVersions(pkg: string): string[] {
+export function getVersions(pkg: string, workspace: string): string[] {
   try {
-    let cmd = 'pip index versions ' + pkg;
-    if(getIsWindows()) cmd = 'py -3 -m ' + cmd;
+    let cmd = 'uvx pip index versions ' + pkg;
+    //if(getIsWindows()) cmd = 'py -3 -m ' + cmd;
     let year = getWPILibYear().substring(0, 4);
-    let currentVersions = cp.execSync(cmd).toString();
+    let currentVersions = cp.execSync(cmd, {cwd: workspace, encoding: 'utf8'});
     let regexp = /\d[^,\r\n]+(?=,)/g;
     let notPre = currentVersions.match(regexp) as string[];
-    let pre = (cp.execSync(cmd + ' --pre')).toString().match(regexp) as string[];
+    let pre = cp.execSync(cmd + ' --pre', {cwd: workspace, encoding: 'utf8'}).match(regexp) as string[];
     let match: string[] = [];
     for(const p of pre) {
       for(const c of notPre) {
