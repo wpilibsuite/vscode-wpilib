@@ -79,6 +79,24 @@ export async function gradleRun(
   return executeApi.executeCommand(command, name, rootDir, workspace, varCommands);
 }
 
+export async function robotpyRun(
+  args: string,
+  rootDir: string,
+  workspace: vscode.WorkspaceFolder,
+  name: string,
+  executeApi: IExecuteAPI
+): Promise<number> {
+  let command = 'robotpy ' + args;
+  if (getIsWindows()) {
+    command = 'py -3 -m ' + command;
+  } else {
+    command = 'python3 -m ' + command;
+  }
+
+  await setExecutePermissions(workspace.uri.fsPath);
+  return executeApi.executeCommand(command, name, rootDir, workspace);
+}
+
 export let extensionContext: vscode.ExtensionContext;
 export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;

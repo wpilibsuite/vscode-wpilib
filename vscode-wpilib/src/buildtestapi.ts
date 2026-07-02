@@ -25,6 +25,18 @@ export class BuildTestAPI implements IBuildTestAPI {
     source: vscode.Uri | undefined,
     ...args: string[]
   ): Promise<boolean> {
+    if (this.preferences.getPreferences(workspace).getCurrentLanguage() === 'python')
+      return Promise.resolve(false);
+    return this.buildTestCommon(workspace, this.builders, source, args);
+  }
+
+  public syncCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
+    if (this.preferences.getPreferences(workspace).getCurrentLanguage() !== 'python')
+      return Promise.resolve(false);
     return this.buildTestCommon(workspace, this.builders, source, args);
   }
 

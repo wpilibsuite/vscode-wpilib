@@ -97,7 +97,6 @@ export class ProjectCreator extends WebViewBase {
       data.projectName,
       parseInt(data.teamNumber, 10)
     );
-
     if (!successful) {
       return;
     }
@@ -106,10 +105,8 @@ export class ProjectCreator extends WebViewBase {
 
     if (data.desktop) {
       const buildgradle = path.join(toFolder, 'build.gradle');
-
       await setDesktopEnabled(buildgradle, true);
     }
-
     await promptForProjectOpen(vscode.Uri.file(toFolder));
   }
 

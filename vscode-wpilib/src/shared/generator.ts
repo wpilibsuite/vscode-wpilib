@@ -6,6 +6,7 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
+import { getRobotPyVersion } from '../pythondetector';
 
 export async function generateCopyCpp(
   resourcesFolder: string,
@@ -51,6 +52,49 @@ export async function generateCopyCpp(
     return true;
   } catch (e) {
     logger.error('C++ project creation failure', e);
+    return false;
+  }
+}
+
+export async function generateCopyPython(
+  fromTemplateFolder: string,
+  fromTemplateTestFolder: string | undefined,
+  fromGradleFolder: string,
+  toFolder: string,
+  vendordeps: string[]
+): Promise<boolean> {
+  try {
+    // Check if destination folder is empty
+    if (!(await pathUtils.isFolderEmpty(toFolder))) {
+      logger.warn('Destination folder is not empty');
+      return false;
+    }
+
+    // Get project paths
+    const codePath = toFolder;
+    const testPath = path.join(toFolder, 'tests');
+    // Get the GradleRIO version
+    const grRoot = path.dirname(fromGradleFolder);
+    const robotpyVersion = await getRobotPyVersion();
+
+    // Copy template folders
+    await cp(fromTemplateFolder, codePath, { recursive: true });
+    if (fromTemplateTestFolder !== undefined) {
+      await cp(fromTemplateTestFolder, testPath, { recursive: true });
+    }
+
+    // Setup project structure
+    await genUtils.setupProjectStructure(fromGradleFolder, toFolder, grRoot, true);
+    // Update robotpy version in the pyproject.toml file of the new project
+    if (robotpyVersion) {
+      await genUtils.updateRobotPyVersion(path.join(toFolder, 'pyproject.toml'), robotpyVersion);
+    }
+
+    await genUtils.setupComponentsPy(vendordeps, toFolder);
+
+    return true;
+  } catch (e) {
+    logger.error('Python project creation failure', e);
     return false;
   }
 }
@@ -166,7 +210,6 @@ export async function generateCopyJava(
 
     // Setup vendor dependencies
     await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
-
     return true;
   } catch (e) {
     logger.error('Java project creation failure', e);

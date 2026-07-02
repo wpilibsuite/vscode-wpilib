@@ -19,6 +19,7 @@ import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
 import { findJdkPath } from './jdkdetector';
+import { activatePython } from './python/python';
 import { localize as i18n } from './locale';
 import { closeLogger, getMainLogFile, logger, setLoggerDirectory } from './logger';
 import { PersistentFolderState } from './persistentState';
@@ -128,6 +129,8 @@ async function handleAfterTrusted(
   await activateCpp(context, externalApi);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
+  // Activate the python parts of the extension
+  await activatePython(context, externalApi);
 
   try {
     // Add built in tools
@@ -234,11 +237,14 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java') {
+        if (
+          prefs.getCurrentLanguage() !== 'cpp' &&
+          prefs.getCurrentLanguage() !== 'java' &&
+          prefs.getCurrentLanguage() !== 'python'
+        ) {
           logger.log('Project with Unknown Language: ' + prefs.getCurrentLanguage());
           continue;
         }
-
         if (prefs.getProjectYear() !== '2027_alpha5') {
           const importPersistentState = new PersistentFolderState(
             'wpilib.2027_alpha5persist',
@@ -260,7 +266,7 @@ async function handleAfterTrusted(
             );
             if (upgradeResult?.title === 'Yes') {
               if (gradle2025import) {
-                await gradle2025import.startWithProject(w.uri);
+                await gradle2025import.startWithProject(w.uri, prefs.getCurrentLanguage());
               }
             } else if (upgradeResult?.title === "No, Don't ask again") {
               importPersistentState.Value = true;
@@ -269,7 +275,11 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java') {
+        if (
+          prefs.getCurrentLanguage() === 'cpp' ||
+          prefs.getCurrentLanguage() === 'java' ||
+          prefs.getCurrentLanguage() === 'python'
+        ) {
           const didUpdate: boolean = await checkForInitialUpdate(w);
 
           let runBuild: boolean;

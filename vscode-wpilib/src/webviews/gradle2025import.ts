@@ -6,7 +6,12 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
-import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
+import {
+  generateCopyCpp,
+  generateCopyJava,
+  generateCopyPython,
+  setDesktopEnabled,
+} from '../shared/generator';
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { extensionContext, promptForProjectOpen } from '../utilities';
@@ -37,9 +42,11 @@ export class Gradle2025Import extends WebViewBase {
     );
   }
 
-  public async startWithProject(projectRoot: vscode.Uri) {
+  public async startWithProject(projectRoot: vscode.Uri, language: string) {
     await this.startWebpage();
-    const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
+    let project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
+    if (language === 'python')
+      project = vscode.Uri.file(path.join(projectRoot.fsPath, 'pyproject.toml'));
     return this.handleProject(project, true);
   }
 
@@ -140,6 +147,7 @@ export class Gradle2025Import extends WebViewBase {
       defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
       filters: {
         'Gradle 2025 Project': ['gradle'],
+        'PyProject TOML file': ['toml'],
       },
       openLabel: 'Select a Project',
     });
@@ -183,19 +191,24 @@ export class Gradle2025Import extends WebViewBase {
     // Detect C++ or Java project
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
-    let cpp = true;
+    let language = 'cpp';
     try {
       const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
       if (wpilibJsonFileParsed.currentLanguage === 'cpp') {
-        cpp = true;
+        language = 'cpp';
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
-        cpp = false;
+        language = 'java';
+      } else if (
+        wpilibJsonFileParsed.currentLanguage === 'python' ||
+        (await readFile(path.join(oldProjectPath, 'pyproject.toml')))
+      ) {
+        language = 'python';
       } else {
         await vscode.window.showErrorMessage(
           i18n(
             'message',
-            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java" or "cpp".'
+            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java", "cpp", or "python".'
           ),
           {
             modal: true,
@@ -208,7 +221,7 @@ export class Gradle2025Import extends WebViewBase {
       await vscode.window.showErrorMessage(
         i18n(
           'message',
-          'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+          'Failed to detect project type. Did you select the build.gradle (or pyproject.toml) file of a wpilib project?'
         ),
         {
           modal: true,
@@ -221,7 +234,7 @@ export class Gradle2025Import extends WebViewBase {
 
     let javaRobotPackage: string = '';
     let mainClassPackage: string = '';
-    if (!cpp) {
+    if (language === 'java') {
       try {
         const gradleContents = await readFile(gradleFile, 'utf8');
         const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
@@ -241,7 +254,7 @@ export class Gradle2025Import extends WebViewBase {
       }
     }
 
-    if (javaRobotPackage === '') {
+    if (javaRobotPackage === '' && language !== 'python') {
       const res = await vscode.window.showInformationMessage(
         i18n('message', 'Failed to determine robot class. Enter it manually?'),
         {
@@ -281,7 +294,8 @@ export class Gradle2025Import extends WebViewBase {
     const vendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
 
     if (fs.existsSync(commandsV2JsonPath)) {
-      vendordeps.push('commandsv2');
+      if (language === 'python') vendordeps.push('commands2');
+      else vendordeps.push('commandsv2');
     } else if (fs.existsSync(commandsV2OldJsonPath)) {
       vendordeps.push('commandsv2');
     } else if (fs.existsSync(commandsV3JsonPath)) {
@@ -291,7 +305,7 @@ export class Gradle2025Import extends WebViewBase {
     }
 
     let success = false;
-    if (cpp) {
+    if (language === 'cpp') {
       const gradlePath = path.join(
         gradleBasePath,
         data.romi ? 'cppromi' : data.xrp ? 'cppxrp' : 'cpp'
@@ -305,7 +319,7 @@ export class Gradle2025Import extends WebViewBase {
         true,
         vendordeps
       );
-    } else {
+    } else if (language === 'java') {
       const mainJavaFile = path.join(resourceRoot, 'java', 'src', 'Main.java');
       const gradlePath = path.join(
         gradleBasePath,
@@ -321,6 +335,14 @@ export class Gradle2025Import extends WebViewBase {
         javaRobotPackage,
         '',
         true,
+        vendordeps
+      );
+    } else {
+      success = await generateCopyPython(
+        oldProjectPath,
+        undefined,
+        path.join(gradleBasePath, 'python'),
+        toFolder,
         vendordeps
       );
     }
@@ -351,8 +373,10 @@ export class Gradle2025Import extends WebViewBase {
     await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));
 
     let replacementFile = path.join(resourceRoot, 'java_replacements.json');
-    if (cpp) {
+    if (language === 'cpp') {
       replacementFile = path.join(resourceRoot, 'cpp_replacements.json');
+    } else if (language === 'python') {
+      replacementFile = path.join(resourceRoot, 'python_replacements.json');
     }
     await ImportUpdate(toFolder, replacementFile);
 

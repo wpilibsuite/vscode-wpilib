@@ -79,7 +79,7 @@ task extractJavaDependencies(type: Copy) {
 
 def downloadCommandsV2 = tasks.register('downloadCommandsV2', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/commandsv2/CommandsV2.json'
-  dest 'vscode-wpilib/resources/vendordeps/CommandsV2.json'
+  dest 'vscode-wpilib/resources/vendordeps/Commands2.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
@@ -93,14 +93,14 @@ def downloadCommandsV3 = tasks.register('downloadCommandsV3', Download) {
 
 def downloadRomiVendordep = tasks.register('downloadRomiVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/romiVendordep/RomiVendordep.json'
-  dest 'vscode-wpilib/resources/vendordeps/RomiVendordep.json'
+  dest 'vscode-wpilib/resources/vendordeps/romi.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }
 
 def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
   src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/xrpVendordep/XRPVendordep.json'
-  dest 'vscode-wpilib/resources/vendordeps/XRPVendordep.json'
+  dest 'vscode-wpilib/resources/vendordeps/xrp.json'
   outputs.dir 'vscode-wpilib/resources/vendordeps'
   overwrite true
 }

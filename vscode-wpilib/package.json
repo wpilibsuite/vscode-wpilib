@@ -159,6 +159,12 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
+                "command": "wpilibcore.syncCode",
+                "title": "%wpilibcore.syncCode.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
                 "command": "wpilibcore.testCode",
                 "title": "%wpilibcore.testCode.title%",
                 "category": "WPILib",
@@ -297,6 +303,18 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
+                "command": "wpilibcore.downloadPythonForSystemcore",
+                "title": "%wpilibcore.downloadPythonForSystemcore.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
+                "command": "wpilibcore.installPythonForSystemcore",
+                "title": "%wpilibcore.installPythonForSystemcore.title%",
+                "category": "WPILib",
+                "enablement": "isWorkspaceTrusted"
+            },
+            {
                 "command": "wpilibcore.openApiDocumentation",
                 "title": "%wpilibcore.openApiDocumentation.title%",
                 "category": "WPILib",
@@ -372,6 +390,11 @@
                 },
                 {
                     "when": "isWPILibProject",
+                    "command": "wpilibcore.syncCode",
+                    "group": "wpilib@2"
+                },
+                {
+                    "when": "isWPILibProject",
                     "command": "wpilibcore.testCode",
                     "group": "wpilib@3"
                 },
@@ -399,6 +422,11 @@
                 {
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.buildCode",
+                    "group": "wpilib"
+                },
+                {
+                    "when": "resourceFilename == build.gradle",
+                    "command": "wpilibcore.syncCode",
                     "group": "wpilib"
                 },
                 {
@@ -470,6 +498,7 @@
         "glob": "^11.0.2",
         "jsonc-parser": "^3.3.1",
         "micromatch": "^4.0.8",
+        "smol-toml": "^1.7.0",
         "vscode-cpptools": "^6.3.0",
         "vscode-nls": "^5.2.0",
         "winston": "^3.17.0",
