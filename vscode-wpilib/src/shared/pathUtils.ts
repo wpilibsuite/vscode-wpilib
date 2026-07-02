@@ -3,7 +3,6 @@
 import { copyFile, readFile, readdir, writeFile } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
-import { PythonVendorDepFiles } from './projectGeneratorUtils';
 
 /**
  * Creates source and test paths based on project type and import mode
@@ -58,28 +57,28 @@ export async function copyVendorDep(
 
 export async function copyComponets(components: string[], targetDir: string) {
   try {
-      const dir = path.join(targetDir, 'pyproject.toml');
-      let file = (await readFile(dir)).toString();
-      const allComponents = ["all", "apriltag", "commands2", "cscore", "romi", "sim", "xrp"];
-      let toAdd = "components = [";
-      let added = false;
-      for(const a of allComponents) {
-        added = false;
-        for(const c of components) {
-          if(c === a) {
-            toAdd += "\n\t \"" + c + "\",";
-            added = true;
-          }
-        }
-        if(!added) {
-          toAdd += "\n\t#  \"" + a + "\",";
+    const dir = path.join(targetDir, 'pyproject.toml');
+    let file = (await readFile(dir)).toString();
+    const allComponents = ['all', 'apriltag', 'commands2', 'cscore', 'romi', 'sim', 'xrp'];
+    let toAdd = 'components = [';
+    let added = false;
+    for (const a of allComponents) {
+      added = false;
+      for (const c of components) {
+        if (c === a) {
+          toAdd += '\n\t "' + c + '",';
+          added = true;
         }
       }
-      let toReplace = new RegExp(`(${"components = ["})([\\s\\S]*?)(${"]"})`, 'g');
-      file = file.replace(toReplace, toAdd + "\n]");
-      await writeFile(dir, file);
+      if (!added) {
+        toAdd += '\n\t#  "' + a + '",';
+      }
+    }
+    let toReplace = new RegExp(`(${'components = ['})([\\s\\S]*?)(${']'})`, 'g');
+    file = file.replace(toReplace, toAdd + '\n]');
+    await writeFile(dir, file);
   } catch {
-    logger.log("Error copying python components, add manually");
+    logger.log('Error copying python components, add manually');
   }
 }
 

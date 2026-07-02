@@ -140,8 +140,8 @@ Vendor Libraries:
 
     if (!currentGradleVersion) {
       currentGradleVersion = 'unknown';
-      if(prefs.getCurrentLanguage() === 'python') {
-        currentGradleVersion = await getRobotPyVersion(workspace.uri.fsPath) as string;
+      if (prefs.getCurrentLanguage() === 'python') {
+        currentGradleVersion = (await getRobotPyVersion(workspace.uri.fsPath)) as string;
       }
     }
 

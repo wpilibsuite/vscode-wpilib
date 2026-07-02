@@ -1,7 +1,7 @@
 [
   {
     "fileMatcher": "**/*.py",
-    "flags": "g", 
+    "flags": "g",
     "replacements": [
       {
         "from": "robotInit",

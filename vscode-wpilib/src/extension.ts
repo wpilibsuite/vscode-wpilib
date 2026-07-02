@@ -182,7 +182,7 @@ async function handleAfterTrusted(
         context.extensionUri,
         projectInfo,
         vendorLibs,
-        externalApi,
+        externalApi
       );
 
       context.subscriptions.push(
@@ -237,7 +237,11 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getCurrentLanguage() !== 'cpp' && prefs.getCurrentLanguage() !== 'java' && prefs.getCurrentLanguage() !== 'python') {
+        if (
+          prefs.getCurrentLanguage() !== 'cpp' &&
+          prefs.getCurrentLanguage() !== 'java' &&
+          prefs.getCurrentLanguage() !== 'python'
+        ) {
           logger.log('Project with Unknown Language: ' + prefs.getCurrentLanguage());
           continue;
         }
@@ -271,7 +275,11 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getCurrentLanguage() === 'cpp' || prefs.getCurrentLanguage() === 'java' || prefs.getCurrentLanguage() === 'python') {
+        if (
+          prefs.getCurrentLanguage() === 'cpp' ||
+          prefs.getCurrentLanguage() === 'java' ||
+          prefs.getCurrentLanguage() === 'python'
+        ) {
           const didUpdate: boolean = await checkForInitialUpdate(w);
 
           let runBuild: boolean;

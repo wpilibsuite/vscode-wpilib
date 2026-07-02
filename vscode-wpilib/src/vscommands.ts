@@ -136,10 +136,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           i18n('message', 'Cannot build robot code since this is not a WPILib project')
         );
         return;
-      }
-      else if(!workspace || preferencesApi.getPreferences(workspace).getCurrentLanguage() === 'python') {
+      } else if (
+        !workspace ||
+        preferencesApi.getPreferences(workspace).getCurrentLanguage() === 'python'
+      ) {
         vscode.window.showInformationMessage(
-          i18n('message', 'Cannot build robot code since this is a robotpy project, use Sync to download required packages')
+          i18n(
+            'message',
+            'Cannot build robot code since this is a robotpy project, use Sync to download required packages'
+          )
         );
         return;
       }
@@ -156,8 +161,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           i18n('message', 'Cannot sync robot code since this is not a WPILib project')
         );
         return;
-      }
-      else if(preferencesApi.getPreferences(workspace).getCurrentLanguage() !== 'python') {
+      } else if (preferencesApi.getPreferences(workspace).getCurrentLanguage() !== 'python') {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot sync robot code since this is not a robotpy project')
         );
@@ -352,19 +356,33 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
   context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.downloadPythonForSystemcore', async () => {
       let cmd = 'installer download-python';
-      const preferencesApi = externalApi.getPreferencesAPI()
-      const workspaceFolder =  await preferencesApi.getFirstOrSelectedWorkspace();
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspaceFolder = await preferencesApi.getFirstOrSelectedWorkspace();
       const executeApi = externalApi.getExecuteAPI();
-      if (workspaceFolder) await robotpyRun(cmd, getWPILibHomeDir(), workspaceFolder, 'Download Python (Systemcore)', executeApi, preferencesApi.getPreferences(workspaceFolder));
+      if (workspaceFolder)
+        await robotpyRun(
+          cmd,
+          getWPILibHomeDir(),
+          workspaceFolder,
+          'Download Python (Systemcore)',
+          executeApi
+        );
     })
   );
   context.subscriptions.push(
     vscode.commands.registerCommand('wpilibcore.installPythonForSystemcore', async () => {
       let cmd = 'installer install-python';
-      const preferencesApi = externalApi.getPreferencesAPI()
-      const workspaceFolder =  await preferencesApi.getFirstOrSelectedWorkspace();
+      const preferencesApi = externalApi.getPreferencesAPI();
+      const workspaceFolder = await preferencesApi.getFirstOrSelectedWorkspace();
       const executeApi = externalApi.getExecuteAPI();
-      if (workspaceFolder) await robotpyRun(cmd, getWPILibHomeDir(), workspaceFolder, 'Install Python (Systemcore)', executeApi, preferencesApi.getPreferences(workspaceFolder));
+      if (workspaceFolder)
+        await robotpyRun(
+          cmd,
+          getWPILibHomeDir(),
+          workspaceFolder,
+          'Install Python (Systemcore)',
+          executeApi
+        );
     })
   );
   context.subscriptions.push(
@@ -418,7 +436,9 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           }
         }
       } else if (pick === 'Python') {
-        vscode.window.showErrorMessage("Cannot download or access Python API Documentation, RobotPy Docs are available at this link: https://robotpy.readthedocs.io/en/stable/");
+        vscode.window.showErrorMessage(
+          'Cannot download or access Python API Documentation, RobotPy Docs are available at this link: https://robotpy.readthedocs.io/en/stable/'
+        );
       }
     })
   );

@@ -28,9 +28,9 @@ export async function registerProjectTemplates(
   core: IExampleTemplateAPI
 ) {
   let templatesFolder = path.join(resourceRoot, 'src', 'templates');
-  if(language === 'python') templatesFolder = path.join(resourceRoot, 'templates');
+  if (language === 'python') templatesFolder = path.join(resourceRoot, 'templates');
   let templatesTestFolder = path.join(resourceRoot, 'src', 'templates_test');
-  if(language === 'python') templatesTestFolder = path.join(resourceRoot, 'templates_test')
+  if (language === 'python') templatesTestFolder = path.join(resourceRoot, 'templates_test');
   const resourceFile = path.join(templatesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
   try {
@@ -79,7 +79,7 @@ export async function registerProjectTemplates(
                 );
                 return false;
               }
-            } else if(language === 'cpp') {
+            } else if (language === 'cpp') {
               if (
                 !(await generateCopyCpp(
                   resourceRoot,
@@ -96,18 +96,18 @@ export async function registerProjectTemplates(
                 );
                 return false;
               }
-            } else{
-              if(!(await generateCopyPython(
-                resourceRoot,
-                path.join(templatesFolder, e.foldername),
-                templatesTestFolder,
-                path.join(gradleBasePath, e.gradlebase),
-                folderInto.fsPath,
-                false,
-                vendordeps
-              ))) {
+            } else {
+              if (
+                !(await generateCopyPython(
+                  path.join(templatesFolder, e.foldername),
+                  templatesTestFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
+                  vendordeps
+                ))
+              ) {
                 vscode.window.showErrorMessage(
-                  i18n('message', 'Cannot create into non empty folder')  
+                  i18n('message', 'Cannot create into non empty folder')
                 );
                 return false;
               }

@@ -8,7 +8,6 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
-import { error } from 'console';
 
 /**
  * Common patterns used in text replacements
@@ -30,7 +29,7 @@ export const VendorDepFiles = {
   COMMANDSV2_OLD: 'WPILibNewCommands.json',
   APRILTAG: 'apriltag.json',
   CSCORE: 'cscore.json',
-  SIM: 'sim.json'
+  SIM: 'sim.json',
 };
 
 /**
@@ -75,7 +74,7 @@ export async function setupProjectStructure(
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
       recursive: true,
     });
-    if(python) return true; //RobotPy does not use build.gradle, skip over shared folder
+    if (python) return true; //RobotPy does not use build.gradle, skip over shared folder
     // Copy shared gradle files
     await cp(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
@@ -109,41 +108,43 @@ export async function updateGradleRioVersion(
   }
 }
 
-export async function updateRobotPyVersion(pyprojectPath: string, robotpyVersion: string): Promise<boolean> {
+export async function updateRobotPyVersion(
+  pyprojectPath: string,
+  robotpyVersion: string
+): Promise<boolean> {
   try {
     let file = await readFile(pyprojectPath, 'utf-8');
     const versionString = 'robotpy_version = ';
     file = file.replace(versionString, versionString + '\"' + robotpyVersion + '\"');
     await writeFile(pyprojectPath, file, 'utf8');
     return true;
-  } catch(err) {
-    logger.log("Error updating robotpy version");
+  } catch (err) {
+    logger.log('Error updating robotpy version');
     return false;
   }
-  
 }
 
 export async function setupComponentsPy(vendors: string[], toFolder: string) {
   let components: string[] = [];
-  for(const v of vendors) {
-    if(v === "commands2") components.push('commands2');
-    else if(v === "apriltag") components.push('apriltag');
-    else if(v === "cscore") components.push('cscore');
-    else if(v === "romi") components.push('romi');
-    else if(v === "sim") components.push('sim');
-    else if(v === "xrp") components.push('xrp');
+  for (const v of vendors) {
+    if (v === 'commands2') components.push('commands2');
+    else if (v === 'apriltag') components.push('apriltag');
+    else if (v === 'cscore') components.push('cscore');
+    else if (v === 'romi') components.push('romi');
+    else if (v === 'sim') components.push('sim');
+    else if (v === 'xrp') components.push('xrp');
   }
   pathUtils.copyComponets(components, toFolder);
 }
 
 export function isComponent(pkg: string) {
   let component = false;
-  if(pkg === "apriltag") component = true;
-  else if(pkg === "commands2") component = true;
-  else if(pkg === "cscore") component = true;
-  else if(pkg === "romi") component = true;
-  else if(pkg === "sim") component = true;
-  else if(pkg === 'xrp') component = true;
+  if (pkg === 'apriltag') component = true;
+  else if (pkg === 'commands2') component = true;
+  else if (pkg === 'cscore') component = true;
+  else if (pkg === 'romi') component = true;
+  else if (pkg === 'sim') component = true;
+  else if (pkg === 'xrp') component = true;
   return component;
 }
 

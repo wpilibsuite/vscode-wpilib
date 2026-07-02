@@ -3,7 +3,13 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { addPythonDep, getHomeDirDeps, getPyProjectFile, IJsonDependency, installDependency, IPyProject, parseRequirement } from './shared/vendorlibrariesbase';
+import {
+  addPythonDep,
+  getHomeDirDeps,
+  IJsonDependency,
+  installDependency,
+  parseRequirement,
+} from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 import { isComponent } from './shared/projectGeneratorUtils';
@@ -143,7 +149,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       console.log(item.name.concat(' / ', item.version))
     );
 
-    if(prefs.getCurrentLanguage() === 'python') webviewView.webview.html = this._getPythonHtmlForWebview(webviewView.webview);
+    if (prefs.getCurrentLanguage() === 'python')
+      webviewView.webview.html = this._getPythonHtmlForWebview(webviewView.webview);
     else webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage((data) => {
@@ -211,28 +218,40 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           versionToInstall === available.version &&
           this.installedList[index].name === available.name
       );
-      if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
-        await this.vendorLibraries.updateVersion(await parseRequirement(this.installedList[index].name), version, this.wp);
-      }
-      else await this.getURLInstallDep(avail);
+      if (
+        this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() ===
+        'python'
+      ) {
+        await this.vendorLibraries.updateVersion(
+          await parseRequirement(this.installedList[index].name),
+          version,
+          this.wp
+        );
+      } else await this.getURLInstallDep(avail);
       await this._refresh(this.wp);
     }
   }
 
   private async updateall() {
     if (this.wp) {
-      if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
+      if (
+        this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() ===
+        'python'
+      ) {
         for (const installed of this.installedList) {
           if (installed.versionInfo[0].version !== installed.currentVersion && this.wp) {
             // Match both the name and the version
             const avail = (await this.getAvailablePythonDependencies()).find(
-              (available) =>
-                installed.name === available.python
+              (available) => installed.name === available.python
             );
-            if(avail && avail.python) {
-              await this.vendorLibraries.updateVersion(await parseRequirement(avail.python), installed.versionInfo[0].version, this.wp);
+            if (avail && avail.python) {
+              await this.vendorLibraries.updateVersion(
+                await parseRequirement(avail.python),
+                installed.versionInfo[0].version,
+                this.wp
+              );
               break;
-            } 
+            }
           }
         }
       } else {
@@ -253,12 +272,16 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async install(index: string) {
-    let prefsLanguage = "";
-    if(this.wp) prefsLanguage = this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage();
-    if(prefsLanguage === 'python') {
+    let prefsLanguage = '';
+    if (this.wp)
+      prefsLanguage = this.externalApi
+        .getPreferencesAPI()
+        .getPreferences(this.wp)
+        .getCurrentLanguage();
+    if (prefsLanguage === 'python') {
       const available = this.availableDepsList[parseInt(index, 10)];
-      if(available.python && this.wp) {
-        await this.vendorLibraries.installPythonDependency([available.python], this.wp)
+      if (available.python && this.wp) {
+        await this.vendorLibraries.installPythonDependency([available.python], this.wp);
         await this._refresh(this.wp);
       }
     } else {
@@ -271,7 +294,10 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private async uninstall(index: string) {
-    if(this.wp && this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() !== 'python') {
+    if (
+      this.wp &&
+      this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() !== 'python'
+    ) {
       this.sortInstalledDeps();
       const uninstall = [this.installedDeps[parseInt(index, 10)]];
       const success = await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
@@ -380,7 +406,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
    * @param url The URL to install the dependency from
    */
   private async installFromUrl(url: string | undefined) {
-
     if (!url || !this.wp) {
       logger.warn('installFromUrl called with invalid parameters', {
         url,
@@ -389,19 +414,21 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    if(this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python') {
-      if(isComponent(url)) {
+    if (
+      this.externalApi.getPreferencesAPI().getPreferences(this.wp).getCurrentLanguage() === 'python'
+    ) {
+      if (isComponent(url)) {
         await addPythonDep([url], [], this.wp.uri.fsPath);
         return;
       }
       vscode.window.showInformationMessage(
-          i18n('message', 'It may take a few minutes to install a new package'), 
-          {
-            modal: true
-          }
+        i18n('message', 'It may take a few minutes to install a new package'),
+        {
+          modal: true,
+        }
       );
       let result = await this.vendorLibraries.installPythonDependency([url], this.wp);
-      if(!result) {
+      if (!result) {
         logger.warn('Unable to install python package');
       }
       return;
@@ -538,19 +565,30 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     this.refreshInProgress = true;
 
     try {
-      if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      if (
+        this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() ===
+        'python'
+      ) {
         await this.vendorLibraries.syncRequirements(workspace);
-        this.installedPythonDeps = await this.vendorLibraries.getCurrentlyInstalledPythonLibraries(workspace);
-      }
-      else this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
+        this.installedPythonDeps =
+          await this.vendorLibraries.getCurrentlyInstalledPythonLibraries(workspace);
+      } else
+        this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
       this.installedList = [];
       this.availableDepsList = [];
-      if(this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() === 'python') {
+      if (
+        this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() ===
+        'python'
+      ) {
         this.availableDeps = await this.getAvailablePythonDependencies();
       } else {
-        this.availableDeps = await this.getAvailableDependencies()
+        this.availableDeps = await this.getAvailableDependencies();
       }
-      if (this.availableDeps.length !== 0 && this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() !== 'python') {
+      if (
+        this.availableDeps.length !== 0 &&
+        this.externalApi.getPreferencesAPI().getPreferences(workspace).getCurrentLanguage() !==
+          'python'
+      ) {
         // Check Github for the VendorDep list
         for (const id of this.installedDeps) {
           let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
@@ -569,10 +607,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                     buttonText: i18n('ui', 'Downgrade'),
                   });
                 }
-              } 
-            }
-
               }
+            }
+          }
           // Now we need to sort the version list newest to oldest
           versionList = this.sortVersions(versionList);
 
@@ -581,7 +618,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             currentVersion: id.version,
             versionInfo: versionList,
           });
-        } 
+        }
 
         // We need to group the available deps and filter out the installed ones
         this.availableDeps.forEach((dep) => {
@@ -604,19 +641,25 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         this.sortAvailable();
 
         this.updateDependencies();
-      } else if(this.availableDeps.length !== 0 && this.wp) {
+      } else if (this.availableDeps.length !== 0 && this.wp) {
         for (const id of this.installedPythonDeps) {
-          let installedVersion = await getRobotPyVersion(this.wp.uri.fsPath); 
-          if(!isComponent(id)) {
+          let installedVersion = await getRobotPyVersion(this.wp.uri.fsPath);
+          if (!isComponent(id)) {
             let req = await this.vendorLibraries.getIRequires(id, this.wp);
-            if(req) {
-              if(req.version) installedVersion = req.version;
-              else installedVersion = "";
-              let versionList = [{ version: installedVersion, buttonText: i18n('ui', 'To Latest') }];
-              for(const ver of req.availableVersions) {
+            if (req) {
+              if (req.version) installedVersion = req.version;
+              else installedVersion = '';
+              let versionList = [
+                { version: installedVersion, buttonText: i18n('ui', 'To Latest') },
+              ];
+              for (const ver of req.availableVersions) {
                 //still detects it's the same version if the version has (prerelease) after it
-                if(ver !== installedVersion && ver !== installedVersion + " (prerelease)" && installedVersion) {
-                  if(isNewerVersion(ver, installedVersion)) {
+                if (
+                  ver !== installedVersion &&
+                  ver !== installedVersion + ' (prerelease)' &&
+                  installedVersion
+                ) {
+                  if (isNewerVersion(ver, installedVersion)) {
                     versionList.push({
                       version: ver,
                       buttonText: i18n('ui', 'Update'),
@@ -627,19 +670,18 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                       buttonText: i18n('ui', 'Downgrade'),
                     });
                   }
-                } 
+                }
               }
-                versionList = this.sortVersions(versionList);
+              versionList = this.sortVersions(versionList);
 
-                this.installedList.push({
-                  name: id,
-                  currentVersion: installedVersion,
-                  versionInfo: versionList,
-                });
-              }
-          }
-          else if (isComponent(id)) {
-            let versionList = [{version: installedVersion, buttonText: i18n('ui', 'To Latest')}];
+              this.installedList.push({
+                name: id,
+                currentVersion: installedVersion,
+                versionInfo: versionList,
+              });
+            }
+          } else if (isComponent(id)) {
+            let versionList = [{ version: installedVersion, buttonText: i18n('ui', 'To Latest') }];
             //Because this is a component, the version is tied to the version of robotpy, so there is no need for version drop-downs
             this.installedList.push({
               name: id,
@@ -648,16 +690,20 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             });
             continue;
           }
-        } 
+        }
 
         // We need to group the available deps and filter out the installed ones
         this.availableDeps.forEach((dep) => {
-          if(dep.python !== undefined) {
+          if (dep.python !== undefined) {
             // See if the dep is one of the installed deps if so don't add it
-            const installedDep = this.installedPythonDeps.findIndex((depend) => depend === dep.python);
+            const installedDep = this.installedPythonDeps.findIndex(
+              (depend) => depend === dep.python
+            );
             if (installedDep < 0) {
               // Check to see if it is already in the available list
-              const foundDep = this.availableDepsList.findIndex((depend) => depend.name === dep.python);
+              const foundDep = this.availableDepsList.findIndex(
+                (depend) => depend.name === dep.python
+              );
               if (foundDep < 0 && dep.python) {
                 // Not in the list so just add it
                 dep.name = dep.python;
@@ -779,13 +825,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         version: i18n('ui', homedep.version),
         uuid: i18n('ui', homedep.uuid),
         description: i18n('ui', 'Loaded from Local Copy'),
-        website: i18n('ui', 'Loaded from Local Copy')
+        website: i18n('ui', 'Loaded from Local Copy'),
       };
       const found = this.onlineDeps.find(
         (onlinedep) => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version
       );
       if (!found) {
-        if(isComponent(homedep.fileName.substring(0, homedep.fileName.length - 5))) {
+        if (isComponent(homedep.fileName.substring(0, homedep.fileName.length - 5))) {
           depList.python = homedep.fileName.substring(0, homedep.fileName.length - 5);
           this.onlineDeps.push(depList);
         }
@@ -800,21 +846,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         uuid: i18n('ui', ''),
         python: requirement,
         description: i18n('ui', 'Entered package name'),
-        website: i18n('ui', 'Entered package name')
+        website: i18n('ui', 'Entered package name'),
       };
-      const found = this.onlineDeps.find(
-        (onlinedep) => onlinedep.python === depList.python
-      );
-      if(!found) {
+      const found = this.onlineDeps.find((onlinedep) => onlinedep.python === depList.python);
+      if (!found) {
         this.onlineDeps.push(depList);
-      } 
+      }
     });
     let dep = this.onlineDeps.at(0);
     const ret: string[] = [];
-    for(let i = 0; i < this.onlineDeps.length; i++) {
+    for (let i = 0; i < this.onlineDeps.length; i++) {
       dep = this.onlineDeps.at(i);
-      if(dep) {
-        if(!dep.python) {
+      if (dep) {
+        if (!dep.python) {
           this.onlineDeps.splice(this.onlineDeps.indexOf(dep), 1);
           i--;
         } else if (ret.indexOf(dep.name) !== -1) {
@@ -940,7 +984,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     </html>
   `;
   }
-
 
   private _getHtmlForWebview(webview: vscode.Webview): string {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.

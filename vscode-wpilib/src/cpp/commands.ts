@@ -67,7 +67,7 @@ export async function registerCommandTemplates(
   core: ICommandAPI,
   preferences: IPreferencesAPI
 ) {
-  const commandFolder = path.join(resourceRoot, 'src', 'commands'); 
+  const commandFolder = path.join(resourceRoot, 'src', 'commands');
   const resourceFile = path.join(commandFolder, commandResourceName);
   try {
     const data = await readFile(resourceFile, 'utf8');

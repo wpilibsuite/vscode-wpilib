@@ -117,7 +117,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
       return false;
     }
     const jsonFilePath = path.join(toFolder, '.wpilib', 'wpilib_preferences.json');
-    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson; 
+    const parsed = JSON.parse(await readFile(jsonFilePath, 'utf8')) as IPreferencesJson;
 
     parsed.teamNumber = teamNumber;
     await writeFile(jsonFilePath, JSON.stringify(parsed, null, 4));

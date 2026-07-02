@@ -6,7 +6,12 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
-import { generateCopyCpp, generateCopyJava, generateCopyPython, setDesktopEnabled } from '../shared/generator';
+import {
+  generateCopyCpp,
+  generateCopyJava,
+  generateCopyPython,
+  setDesktopEnabled,
+} from '../shared/generator';
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { extensionContext, promptForProjectOpen } from '../utilities';
@@ -40,7 +45,8 @@ export class Gradle2025Import extends WebViewBase {
   public async startWithProject(projectRoot: vscode.Uri, language: string) {
     await this.startWebpage();
     let project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
-    if (language === 'python') project = vscode.Uri.file(path.join(projectRoot.fsPath, 'pyproject.toml'));
+    if (language === 'python')
+      project = vscode.Uri.file(path.join(projectRoot.fsPath, 'pyproject.toml'));
     return this.handleProject(project, true);
   }
 
@@ -141,7 +147,7 @@ export class Gradle2025Import extends WebViewBase {
       defaultUri: vscode.Uri.file(path.join(os.homedir(), 'Documents')),
       filters: {
         'Gradle 2025 Project': ['gradle'],
-        'PyProject TOML file': ['toml']
+        'PyProject TOML file': ['toml'],
       },
       openLabel: 'Select a Project',
     });
@@ -193,7 +199,10 @@ export class Gradle2025Import extends WebViewBase {
         language = 'cpp';
       } else if (wpilibJsonFileParsed.currentLanguage === 'java') {
         language = 'java';
-      } else if(wpilibJsonFileParsed.currentLanguage === 'python' || await readFile(path.join(oldProjectPath, 'pyproject.toml'))) {
+      } else if (
+        wpilibJsonFileParsed.currentLanguage === 'python' ||
+        (await readFile(path.join(oldProjectPath, 'pyproject.toml')))
+      ) {
         language = 'python';
       } else {
         await vscode.window.showErrorMessage(
@@ -285,7 +294,7 @@ export class Gradle2025Import extends WebViewBase {
     const vendordeps: string[] = data.romi ? ['romi'] : data.xrp ? ['xrp'] : [];
 
     if (fs.existsSync(commandsV2JsonPath)) {
-      if(language === 'python') vendordeps.push('commands2');
+      if (language === 'python') vendordeps.push('commands2');
       else vendordeps.push('commandsv2');
     } else if (fs.existsSync(commandsV2OldJsonPath)) {
       vendordeps.push('commandsv2');
@@ -330,12 +339,10 @@ export class Gradle2025Import extends WebViewBase {
       );
     } else {
       success = await generateCopyPython(
-        path.join(resourceRoot, 'python'),
-        oldProjectPath, 
+        oldProjectPath,
         undefined,
         path.join(gradleBasePath, 'python'),
         toFolder,
-        false,
         vendordeps
       );
     }
@@ -369,7 +376,7 @@ export class Gradle2025Import extends WebViewBase {
     if (language === 'cpp') {
       replacementFile = path.join(resourceRoot, 'cpp_replacements.json');
     } else if (language === 'python') {
-      replacementFile = path.join(resourceRoot, 'python_replacements.json')
+      replacementFile = path.join(resourceRoot, 'python_replacements.json');
     }
     await ImportUpdate(toFolder, replacementFile);
 

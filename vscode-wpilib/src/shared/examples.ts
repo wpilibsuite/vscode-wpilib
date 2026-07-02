@@ -27,10 +27,10 @@ export async function registerExamples(
   language: string,
   core: IExampleTemplateAPI
 ) {
-  let examplesFolder = path.join(resourceRoot, 'src', 'examples'); 
-  if(language === 'python') examplesFolder = path.join(resourceRoot, 'examples');
+  let examplesFolder = path.join(resourceRoot, 'src', 'examples');
+  if (language === 'python') examplesFolder = path.join(resourceRoot, 'examples');
   let examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
-  if(language === 'python') examplesTestFolder = path.join(resourceRoot, 'examples_test');;
+  if (language === 'python') examplesTestFolder = path.join(resourceRoot, 'examples_test');
   const resourceFile = path.join(examplesFolder, exampleResourceName);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
   try {
@@ -79,7 +79,7 @@ export async function registerExamples(
                 );
                 return false;
               }
-            } else if(language == 'cpp') {
+            } else if (language == 'cpp') {
               if (
                 !(await generateCopyCpp(
                   resourceRoot,
@@ -97,16 +97,15 @@ export async function registerExamples(
                 return false;
               }
             } else {
-              if(
+              if (
                 !(await generateCopyPython(
-                resourceRoot, 
-                path.join(examplesFolder, e.foldername),
-                examplesTestFolder,
-                path.join(gradleBasePath, e.gradlebase),
-                folderInto.fsPath,
-                false,
-                vendordeps
-              ))) {
+                  path.join(examplesFolder, e.foldername),
+                  examplesTestFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
+                  vendordeps
+                ))
+              ) {
                 vscode.window.showErrorMessage(
                   i18n('message', 'Cannot create into non empty folder')
                 );

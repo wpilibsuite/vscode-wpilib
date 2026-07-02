@@ -57,12 +57,10 @@ export async function generateCopyCpp(
 }
 
 export async function generateCopyPython(
-  resourcesFolder: string,
   fromTemplateFolder: string,
   fromTemplateTestFolder: string | undefined,
   fromGradleFolder: string,
   toFolder: string,
-  directGradleImport: boolean,
   vendordeps: string[]
 ): Promise<boolean> {
   try {
@@ -78,7 +76,7 @@ export async function generateCopyPython(
     // Get the GradleRIO version
     const grRoot = path.dirname(fromGradleFolder);
     const robotpyVersion = await getRobotPyVersion();
-    
+
     // Copy template folders
     await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
@@ -91,9 +89,9 @@ export async function generateCopyPython(
     if (robotpyVersion) {
       await genUtils.updateRobotPyVersion(path.join(toFolder, 'pyproject.toml'), robotpyVersion);
     }
-    
+
     await genUtils.setupComponentsPy(vendordeps, toFolder);
-    
+
     return true;
   } catch (e) {
     logger.error('Python project creation failure', e);

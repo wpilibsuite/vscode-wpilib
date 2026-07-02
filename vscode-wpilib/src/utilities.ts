@@ -84,19 +84,17 @@ export async function robotpyRun(
   rootDir: string,
   workspace: vscode.WorkspaceFolder,
   name: string,
-  executeApi: IExecuteAPI,
-  preferences: IPreferences
+  executeApi: IExecuteAPI
 ): Promise<number> {
-  let command =  'robotpy ' + args;
-  if(getIsWindows()) {
+  let command = 'robotpy ' + args;
+  if (getIsWindows()) {
     command = 'py -3 -m ' + command;
   } else {
     command = 'python3 -m ' + command;
   }
-  
+
   await setExecutePermissions(workspace.uri.fsPath);
   return executeApi.executeCommand(command, name, rootDir, workspace);
-
 }
 
 export let extensionContext: vscode.ExtensionContext;
