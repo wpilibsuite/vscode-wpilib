@@ -38,12 +38,12 @@ export class Gradle2025Import extends WebViewBase {
   }
 
   public async startWithProject(projectRoot: vscode.Uri) {
-    await this.startWebpage();
+    this.startWebpage();
     const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
     return this.handleProject(project, true);
   }
 
-  private async startWebpage() {
+  private startWebpage() {
     this.displayWebView(vscode.ViewColumn.Active, true, {
       enableScripts: true,
       retainContextWhenHidden: true,

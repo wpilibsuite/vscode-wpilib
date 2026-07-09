@@ -28,7 +28,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         return;
       }
       const preferences = preferencesApi.getPreferences(workspace);
-      await externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
+      externalApi.getDeployDebugAPI().startRioLog(await preferences.getTeamNumber(), true);
     })
   );
 

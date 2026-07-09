@@ -196,15 +196,19 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.disposables.push(this.binaryTypeStatusBar);
 
+    /* eslint-disable @typescript-eslint/unbound-method */
     this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange, this));
     this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange, this));
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
+    /* eslint-enable @typescript-eslint/unbound-method */
 
     this.setupWatchers();
 
-    this.loadConfigs().catch();
+    this.loadConfigs().catch(() => {});
   }
 
+  // Disable this because upstream requires these methods to be async, but we don't use await in several of them
+  /* eslint-disable @typescript-eslint/require-await */
   public async canProvideBrowseConfigurationsPerFolder(
     _?: vscode.CancellationToken
   ): Promise<boolean> {
@@ -493,11 +497,11 @@ export class ApiProvider implements CustomConfigurationProvider {
       this.gradleWatcher = vscode.workspace.createFileSystemWatcher(gradlePattern);
       this.disposables.push(this.gradleWatcher);
 
+      /* eslint-disable @typescript-eslint/unbound-method */
       this.gradleWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
-
       this.gradleWatcher.onDidCreate(this.couldBeUpdated, this, this.disposables);
-
       this.gradleWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
+      /* eslint-enable @typescript-eslint/unbound-method */
 
       onVendorDepsChanged(
         async (wp) => {
