@@ -77,6 +77,11 @@ export interface IBuildTestAPI {
     source: vscode.Uri | undefined,
     ...args: string[]
   ): Promise<boolean>;
+  syncCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean>;
   registerCodeBuild(builder: ICodeBuilder): void;
   testCode(
     workspace: vscode.WorkspaceFolder,
@@ -116,6 +121,7 @@ export interface IPreferences {
   setCurrentLanguage(language: string): Promise<void>;
   getAutoStartRioLog(): boolean;
   getAutoSaveOnDeploy(): boolean;
+  getIsRobotPyProject(): boolean;
   getIsWPILibProject(): boolean;
   getEnableCppIntellisense(): boolean;
   setEnableCppIntellisense(set: boolean): Promise<void>;

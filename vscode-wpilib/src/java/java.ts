@@ -43,8 +43,8 @@ export async function activateJava(context: vscode.ExtensionContext, coreExports
   await registerCommandTemplates(extensionResourceLocation, commandApi, preferences);
 
   // Setup examples and template
-  await registerExamples(extensionResourceLocation, true, exampleTemplate);
-  await registerProjectTemplates(extensionResourceLocation, true, exampleTemplate);
+  await registerExamples(extensionResourceLocation, 'java', exampleTemplate);
+  await registerProjectTemplates(extensionResourceLocation, 'java', exampleTemplate);
 
   if (vscode.extensions.getExtension('redhat.java')) {
     // Add handlers for each workspace if java is installed

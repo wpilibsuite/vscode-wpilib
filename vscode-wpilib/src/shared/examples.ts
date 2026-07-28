@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
-import { generateCopyCpp, generateCopyJava } from './generator';
+import { generateCopyCpp, generateCopyJava, generateCopyPython } from './generator';
 
 export interface IExampleJsonLayout {
   name: string;
@@ -24,7 +24,7 @@ const exampleResourceName = 'examples.json';
 
 export async function registerExamples(
   resourceRoot: string,
-  java: boolean,
+  language: string,
   core: IExampleTemplateAPI
 ) {
   const examplesFolder = path.join(resourceRoot, 'src', 'examples');
@@ -44,7 +44,7 @@ export async function registerExamples(
       }
       const provider: IExampleTemplateCreator = {
         getLanguage(): string {
-          return java ? 'java' : 'cpp';
+          return language;
         },
         getDescription(): string {
           return e.description;
@@ -58,7 +58,7 @@ export async function registerExamples(
             if (e.hasunittests) {
               testFolder = path.join(examplesTestFolder, e.foldername);
             }
-            if (java) {
+            if (language === 'java') {
               const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
               if (
                 !(await generateCopyJava(
@@ -79,7 +79,7 @@ export async function registerExamples(
                 );
                 return false;
               }
-            } else {
+            } else if (language === 'cpp') {
               if (
                 !(await generateCopyCpp(
                   resourceRoot,
@@ -88,6 +88,21 @@ export async function registerExamples(
                   path.join(gradleBasePath, e.gradlebase),
                   folderInto.fsPath,
                   false,
+                  vendordeps
+                ))
+              ) {
+                vscode.window.showErrorMessage(
+                  i18n('message', 'Cannot create into non empty folder')
+                );
+                return false;
+              }
+            } else {
+              if (
+                !(await generateCopyPython(
+                  path.join(examplesFolder, e.foldername),
+                  examplesTestFolder,
+                  path.join(gradleBasePath, e.gradlebase),
+                  folderInto.fsPath,
                   vendordeps
                 ))
               ) {
