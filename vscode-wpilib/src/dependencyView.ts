@@ -12,7 +12,7 @@ import {
 } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
-import { isComponent } from './shared/projectGeneratorUtils';
+import { isComponent, allComponents } from './shared/projectGeneratorUtils';
 import { getRobotPyVersion } from './pythondetector';
 
 export interface IJsonList {
@@ -848,6 +848,28 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         } else {
           ret.push(dep.name);
         }
+      }
+    }
+    for (const c of allComponents) {
+      let found = false;
+      if (c === 'all') continue;
+      for (let i = 0; i < this.onlineDeps.length; i++) {
+        if (c === this.onlineDeps.at(i)?.python) {
+          found = true;
+          continue;
+        }
+      }
+      if (!found) {
+        const list = {
+          path: i18n('ui', ''),
+          name: i18n('ui', c),
+          version: i18n('ui', ''),
+          uuid: i18n('ui', ''),
+          python: c,
+          description: i18n('ui', 'WPILib Component'),
+          website: i18n('ui', 'WPILib Component'),
+        };
+        this.onlineDeps.push(list);
       }
     }
     return this.onlineDeps;

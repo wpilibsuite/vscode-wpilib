@@ -26,14 +26,12 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
 
   const pythonExtension = vscode.extensions.getExtension('the0807.uv-toolkit');
   if (!pythonExtension) {
-    vscode.window.showWarningMessage(
-      i18n('message', 'Could not find python extension') // TODO: change message
-    );
+    vscode.window.showWarningMessage(i18n('message', 'Could not find python package manager'));
   }
   const pyDebugger = vscode.extensions.getExtension('astral-sh.ty');
   if (!pyDebugger) {
     vscode.window.showWarningMessage(
-      i18n('message', 'Could not find Python Debugger Extension. Debugging is disabled') // TODO: change message
+      i18n('message', 'Could not find Python Debugger Extension. Debugging is disabled')
     );
     allowDebug = false;
   }

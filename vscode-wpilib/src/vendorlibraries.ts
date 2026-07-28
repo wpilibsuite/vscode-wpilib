@@ -908,8 +908,7 @@ export class VendorLibraries {
     const buildRes = await vscode.window.showInformationMessage(
       i18n(
         'message',
-        'It is recommended to run a "Sync" after a vendor update. ' +
-          'Would you like to do this now?'
+        'It is recommended to run "Sync" after a vendor update. ' + 'Would you like to do this now?'
       ),
       {
         modal: modal,
