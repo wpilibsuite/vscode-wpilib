@@ -116,7 +116,7 @@ export async function getDependencies(dir: string): Promise<IJsonDependency[]> {
 
     const results = await Promise.all(promises);
 
-    return results.filter((x) => x !== undefined) as IJsonDependency[];
+    return results.filter((x) => x !== undefined);
   } catch (err) {
     return [];
   }
