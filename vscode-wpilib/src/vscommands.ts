@@ -338,7 +338,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         } catch {
           try {
             const downloadDir = await downloadDocs(
-              'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibj/documentation/',
+              'https://frcmaven.wpi.edu/artifactory/release/org/wpilib/wpilibj/documentation/',
               '.zip',
               path.join(homeDir, 'documentation'),
               'java'
@@ -360,7 +360,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         } catch {
           try {
             const downloadDir = await downloadDocs(
-              'https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/wpilibc/documentation/',
+              'https://frcmaven.wpi.edu/artifactory/release/org/wpilib/wpilibc/documentation/',
               '.zip',
               path.join(homeDir, 'documentation'),
               'cpp'
