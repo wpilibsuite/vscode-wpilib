@@ -142,7 +142,7 @@ export async function setupComponents(vendors: string[], toFolder: string) {
     else if (v === 'sim') components.push(ComponentPackages.SIM);
     else if (v === 'xrp') components.push(ComponentPackages.XRP);
   }
-  pathUtils.copyComponets(components, toFolder);
+  pathUtils.copyComponents(components, toFolder);
 }
 
 export function isComponent(pkg: string) {

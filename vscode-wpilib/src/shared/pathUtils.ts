@@ -56,7 +56,7 @@ export async function copyVendorDep(
   }
 }
 
-export async function copyComponets(components: string[], targetDir: string) {
+export async function copyComponents(components: string[], targetDir: string) {
   try {
     const dir = path.join(targetDir, 'pyproject.toml');
     let file = (await readFile(dir)).toString();
