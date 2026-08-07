@@ -208,7 +208,7 @@ export class Gradle2025Import extends WebViewBase {
         await vscode.window.showErrorMessage(
           i18n(
             'message',
-            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java", "cpp", or "python".'
+            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to "java", "cpp", or "python".'
           ),
           {
             modal: true,
