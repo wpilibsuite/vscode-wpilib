@@ -824,7 +824,10 @@
       { "from": "ColorOrder::kGBR", "to": "ColorOrder::GBR" },
       { "from": "OnboardIMU::kFlat", "to": "OnboardIMU::FLAT" },
       { "from": "OnboardIMU::kLandscape", "to": "OnboardIMU::LANDSCAPE" },
-      { "from": "OnboardIMU::kPortrait", "to": "OnboardIMU::PORTRAIT" }
+      { "from": "OnboardIMU::kPortrait", "to": "OnboardIMU::PORTRAIT" },
+      { "from": "TestInit()", "to": "UtilityInit()" },
+      { "from": "TestPeriodic()", "to": "UtilityPeriodic()" },
+      { "from": "TestExit()", "to": "UtilityExit()" }
     ]
   }
 ]
