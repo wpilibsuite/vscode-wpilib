@@ -401,7 +401,10 @@
       {
         "from": "org.wpilib.driverstation.DriverStation;",
         "to": "org.wpilib.driverstation.MatchState;\nimport org.wpilib.driverstation.RobotState;\nimport org.wpilib.driverstation.Alliance;\nimport org.wpilib.driverstation.MatchType;"
-      }
+      },
+      { "from": "testInit()", "to": "utilityInit()" },
+      { "from": "testPeriodic()", "to": "utilityPeriodic()" },
+      { "from": "testExit()", "to": "utilityExit()" }
     ]
   }
 ]
