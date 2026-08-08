@@ -368,7 +368,10 @@
       { "from": "ColorOrder.kGBR", "to": "ColorOrder.GBR" },
       { "from": "MountOrientation.kFlat", "to": "MountOrientation.FLAT" },
       { "from": "MountOrientation.kLandscape", "to": "MountOrientation.LANDSCAPE" },
-      { "from": "MountOrientation.kPortrait", "to": "MountOrientation.PORTRAIT" }
+      { "from": "MountOrientation.kPortrait", "to": "MountOrientation.PORTRAIT" },
+      { "from": "testInit()", "to": "utilityInit()" },
+      { "from": "testPeriodic()", "to": "utilityPeriodic()" },
+      { "from": "testExit()", "to": "utilityExit()" }
     ]
   }
 ]
