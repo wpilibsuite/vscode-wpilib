@@ -404,7 +404,8 @@
       },
       { "from": "testInit()", "to": "utilityInit()" },
       { "from": "testPeriodic()", "to": "utilityPeriodic()" },
-      { "from": "testExit()", "to": "utilityExit()" }
+      { "from": "testExit()", "to": "utilityExit()" },
+      { "from": "org.wpilib.hardware.motor.", "to": "org.wpilib.drivers.motor." }
     ]
   }
 ]
