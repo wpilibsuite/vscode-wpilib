@@ -83,7 +83,9 @@ class SimulateCodeDeployer implements ICodeDeployer {
       'Python Simulate',
       this.executeApi
     );
-    if (result !== 0) return false;
+    if (result !== 0) {
+      return false;
+    }
     return true;
   }
 

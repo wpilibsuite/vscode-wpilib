@@ -63,8 +63,11 @@ class LibraryQuickPickPy implements vscode.QuickPickItem {
 
   constructor(dep: string, version?: string, oldVersion?: string) {
     this.label = dep;
-    if (version) this.description = version;
-    else this.description = '';
+    if (version) {
+      this.description = version;
+    } else {
+      this.description = '';
+    }
     if (oldVersion) {
       this.oldVersion = oldVersion;
     }
@@ -260,7 +263,9 @@ export class VendorLibraries {
   }
 
   public async syncRequirements(workspace: vscode.WorkspaceFolder): Promise<void> {
-    if (this.requirements.length <= 0) return;
+    if (this.requirements.length <= 0) {
+      return;
+    }
     const pipList = cp.execSync('uv pip list', { cwd: workspace.uri.fsPath, encoding: 'utf8' });
     const installedReqs: IRequires[] = [];
     const remove: IRequires[] = [];
@@ -296,28 +301,35 @@ export class VendorLibraries {
             i18n('ui', 'No')
           );
           if (res === i18n('ui', 'Yes')) {
-            if (v !== -1)
+            if (v !== -1) {
               validPackage = await installNewRequirement(
                 pkg,
                 workspace,
                 this.executeApi,
                 version.substring(0, v)
               );
-            else
+            } else {
               validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version);
+            }
           }
         } else {
-          if (v !== -1)
+          if (v !== -1) {
             validPackage = await installNewRequirement(
               pkg,
               workspace,
               this.executeApi,
               version.substring(0, v)
             );
-          else validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version);
+          } else {
+            validPackage = await installNewRequirement(pkg, workspace, this.executeApi, version);
+          }
         }
-      } else validPackage = await installNewRequirement(pkg, workspace, this.executeApi);
-      if (!validPackage) return undefined;
+      } else {
+        validPackage = await installNewRequirement(pkg, workspace, this.executeApi);
+      }
+      if (!validPackage) {
+        return undefined;
+      }
       const req = validPackage;
       const versions = validPackage.availableVersions;
       let installedVersion = validPackage.version;
@@ -330,10 +342,16 @@ export class VendorLibraries {
           installedVersion += ' (prerelease)';
         }
       }
-      if (installedVersion) req.version = installedVersion;
+      if (installedVersion) {
+        req.version = installedVersion;
+      }
       // If the requirement has a version but does not have a specifier, default to ~=
-      if (installedVersion && !req.specifier) req.specifier = '~=';
-      if (version && versions.indexOf(version) !== -1) req.version = version;
+      if (installedVersion && !req.specifier) {
+        req.specifier = '~=';
+      }
+      if (version && versions.indexOf(version) !== -1) {
+        req.version = version;
+      }
       req.availableVersions = versions;
       this.requirements.push(req);
       return req;
@@ -351,12 +369,17 @@ export class VendorLibraries {
       }
       if (add) {
         let toPush: IRequires;
-        if (version) toPush = { name: pkg, version: version, availableVersions: [version] };
-        else toPush = { name: pkg, availableVersions: [] };
+        if (version) {
+          toPush = { name: pkg, version: version, availableVersions: [version] };
+        } else {
+          toPush = { name: pkg, availableVersions: [] };
+        }
         this.requirements.push(toPush);
         await addPythonDep([], [toPush], workspace.uri.fsPath);
         return toPush;
-      } else return undefined;
+      } else {
+        return undefined;
+      }
     }
   }
 
@@ -382,7 +405,9 @@ export class VendorLibraries {
       const req = await parseRequirement(pkg);
       const versions = getVersions(pkg, workspace);
       const installedVersion = await getInstalledVersion(pkg, workspace);
-      if (installedVersion) req.version = installedVersion;
+      if (installedVersion) {
+        req.version = installedVersion;
+      }
       req.availableVersions = versions;
       this.requirements.push(req);
       ret.push(req);
@@ -401,12 +426,16 @@ export class VendorLibraries {
 
       for (const r of this.requirements) {
         if (r.name === pkgReq.name) {
-          if (r.version === pkgReq.version) return r;
+          if (r.version === pkgReq.version) {
+            return r;
+          }
           if (r.availableVersions) {
             for (const v of r.availableVersions) {
               if (v === pkgReq.version) {
                 const req = await this.updateVersion(r, pkgReq.version, workspace);
-                if (req) return req;
+                if (req) {
+                  return req;
+                }
               }
             }
           }
@@ -420,7 +449,9 @@ export class VendorLibraries {
       }
     }
     const addedReq = await this.addRequirement(pkg, workspace);
-    if (addedReq) return addedReq;
+    if (addedReq) {
+      return addedReq;
+    }
     return undefined;
   }
 
@@ -445,7 +476,9 @@ export class VendorLibraries {
         if (!removed) {
           const req = await parseRequirement(p);
           const toRemove = await this.getIRequires(req.name, workspace, req.version);
-          if (toRemove) removeRequires.push(toRemove);
+          if (toRemove) {
+            removeRequires.push(toRemove);
+          }
         }
       }
       await removePythonDep(removeComponents, removeRequires, workspace.uri.fsPath);
@@ -467,7 +500,9 @@ export class VendorLibraries {
           } else {
             const req = await parseRequirement(d);
             const toPush = await this.getIRequires(req.name, workspace, req.version);
-            if (toPush) requires.push(toPush);
+            if (toPush) {
+              requires.push(toPush);
+            }
           }
         }
         // Returns true if toml file was updated without errors
@@ -603,10 +638,13 @@ export class VendorLibraries {
           const req = await this.getIRequires(d, workspace);
           if (req) {
             const versions = getVersions(req.name, workspace.uri.fsPath);
-            if (!req.version)
+            if (!req.version) {
               req.version = (await getInstalledVersion(req.name, workspace.uri.fsPath)) as string;
+            }
             for (let i = versions.length - 1; i >= 0; i--) {
-              if (versions[i] === req.version) continue;
+              if (versions[i] === req.version) {
+                continue;
+              }
               if (isNewerVersion(versions[i], req.version)) {
                 availableUpdates.push(new LibraryQuickPickPy(req.name, versions[i]));
                 break;
@@ -880,8 +918,9 @@ export class VendorLibraries {
   }
 
   public async offerBuild(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {
-    if (this.externalApi.getPreferencesAPI().getPreferences(workspace).getIsRobotPyProject())
+    if (this.externalApi.getPreferencesAPI().getPreferences(workspace).getIsRobotPyProject()) {
       return false;
+    }
     const buildRes = await vscode.window.showInformationMessage(
       i18n(
         'message',
@@ -903,8 +942,9 @@ export class VendorLibraries {
   }
 
   public async offerSync(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {
-    if (!this.externalApi.getPreferencesAPI().getPreferences(workspace).getIsRobotPyProject())
+    if (!this.externalApi.getPreferencesAPI().getPreferences(workspace).getIsRobotPyProject()) {
       return false;
+    }
     const buildRes = await vscode.window.showInformationMessage(
       i18n(
         'message',

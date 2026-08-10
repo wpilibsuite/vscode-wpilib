@@ -45,8 +45,9 @@ export class Gradle2025Import extends WebViewBase {
   public async startWithProject(projectRoot: vscode.Uri, language: string) {
     await this.startWebpage();
     let project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
-    if (language === 'python')
+    if (language === 'python') {
       project = vscode.Uri.file(path.join(projectRoot.fsPath, 'pyproject.toml'));
+    }
     return this.handleProject(project, true);
   }
 

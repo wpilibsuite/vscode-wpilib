@@ -115,7 +115,9 @@ export async function installNewRequirement(
   try {
     let cmd = 'uv pip install ' + pkg + ' --prerelease=allow';
     if (version) {
-      if (version.substring(4) !== getWPILibYear()) return;
+      if (version.substring(4) !== getWPILibYear()) {
+        return;
+      }
       cmd = `uv pip install ${pkg}==${version} --prerelease=allow`;
     }
     //Make sure that this is a valid package name, if there's an error installing, should go to the catch
@@ -126,17 +128,20 @@ export async function installNewRequirement(
       workspace
     );
     // If exits with code 2, the project is offline, add offline tag and run the command again
-    if (n === 2)
+    if (n === 2) {
       n = await executeApi.executeCommand(
         cmd + ' --offline',
         'UV Install Requirement',
         path.join(workspace.uri.fsPath, '.venv'),
         workspace
       );
+    }
     if (n === 0) {
       const versions = getVersions(pkg, workspace.uri.fsPath);
       let installedVersion = await getInstalledVersion(pkg, workspace.uri.fsPath);
-      if (!installedVersion) installedVersion = versions[0]; //get the installed version or the latest available version
+      if (!installedVersion) {
+        installedVersion = versions[0];
+      } //get the installed version or the latest available version
       return { name: pkg, specifier: '~=', version: installedVersion, availableVersions: versions };
     }
     return undefined;
@@ -172,8 +177,11 @@ export async function addPythonDep(
         }
       }
       if (!added) {
-        if (installedComponents.indexOf(a) !== -1) toAdd += '\n\t "' + a + '",';
-        else toAdd += '\n\t#  "' + a + '",';
+        if (installedComponents.indexOf(a) !== -1) {
+          toAdd += '\n\t "' + a + '",';
+        } else {
+          toAdd += '\n\t#  "' + a + '",';
+        }
       }
     }
     let toReplace = new RegExp(`(${'components = ['})([\\s\\S]*?)(${']'})`, 'g');
@@ -182,11 +190,15 @@ export async function addPythonDep(
     for (const r of requires) {
       if (installedRequirements.indexOf(r.name) === -1) {
         if (r.version) {
-          if (r.version.indexOf(' (prerelease)') !== -1)
+          if (r.version.indexOf(' (prerelease)') !== -1) {
             toAdd =
               toAdd + '"' + r.name + '~=' + r.version.substring(0, r.version.indexOf(' (')) + '", ';
-          else toAdd = toAdd + '"' + r.name + '~=' + r.version + '", ';
-        } else toAdd = toAdd + '"' + r.name + '", ';
+          } else {
+            toAdd = toAdd + '"' + r.name + '~=' + r.version + '", ';
+          }
+        } else {
+          toAdd = toAdd + '"' + r.name + '", ';
+        }
       }
     }
     toReplace = /requires = \[/g;
@@ -229,7 +241,9 @@ export async function updateVersion(req: IRequires, workspace: string): Promise<
             }
           }
         }
-        if (!req.specifier) req.specifier = (await parseRequirement(oldReq)).specifier;
+        if (!req.specifier) {
+          req.specifier = (await parseRequirement(oldReq)).specifier;
+        }
         let replace = req.name;
         let version = req.version;
         if (req.version) {
@@ -280,10 +294,14 @@ export async function removePythonDep(
       for (let i = 0; i < installedRequirements.length; i++) {
         const reqDep = installedRequirements[i];
         let iString = reqDep.name;
-        if (reqDep.specifier) iString += reqDep.specifier + reqDep.version;
+        if (reqDep.specifier) {
+          iString += reqDep.specifier + reqDep.version;
+        }
         if (reqDep.name === r.name) {
           let endIndex = file.indexOf(iString) + iString.length + 2;
-          if (file.substring(endIndex).indexOf(']') === -1) endIndex = endIndex - 1;
+          if (file.substring(endIndex).indexOf(']') === -1) {
+            endIndex = endIndex - 1;
+          }
           file = file.substring(0, file.indexOf(iString) - 1) + file.substring(endIndex);
         }
       }
@@ -340,7 +358,9 @@ export async function getComponents(workspace: string) {
 export async function getVendorPackageNames(workspace: string) {
   const ret: string[] = [];
   const projectFile = await getPyProjectFile(workspace);
-  if (!projectFile) return ret;
+  if (!projectFile) {
+    return ret;
+  }
   const rawRequires = projectFile.tool.robotpy.requires;
   for (const r of rawRequires) {
     ret.push(r.name);
@@ -383,7 +403,9 @@ export async function getInstalledVersion(
     const cmd = 'uv pip show ' + pkg;
     const out = cp.execSync(cmd, { cwd: workspace, encoding: 'utf8' });
     const match: RegExpMatchArray | null = out.match(regexp);
-    if (match) return match.toString().substring(9);
+    if (match) {
+      return match.toString().substring(9);
+    }
     return undefined;
   } catch {
     logger.log('Error getting installed version');
@@ -409,7 +431,9 @@ export function getVersions(pkg: string, workspace: string): string[] {
           continue;
         }
       }
-      if (match.indexOf(p) === -1 && p.indexOf(year) !== -1) match.push(p + ' (prerelease)');
+      if (match.indexOf(p) === -1 && p.indexOf(year) !== -1) {
+        match.push(p + ' (prerelease)');
+      }
     }
     return match;
   } catch {

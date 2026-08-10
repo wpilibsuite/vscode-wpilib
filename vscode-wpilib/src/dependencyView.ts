@@ -225,7 +225,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           version,
           this.wp
         );
-      } else await this.getURLInstallDep(avail);
+      } else {
+        await this.getURLInstallDep(avail);
+      }
       await this._refresh(this.wp);
     }
   }
@@ -263,11 +265,12 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   private async install(index: string) {
     let prefsLanguage = '';
-    if (this.wp)
+    if (this.wp) {
       prefsLanguage = this.externalApi
         .getPreferencesAPI()
         .getPreferences(this.wp)
         .getCurrentLanguage();
+    }
     if (prefsLanguage === 'python') {
       const available = this.availableDepsList[parseInt(index, 10)];
       if (available.python && this.wp) {
@@ -626,8 +629,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           if (!isComponent(id)) {
             const req = await this.vendorLibraries.getIRequires(id, this.wp);
             if (req) {
-              if (req.version) installedVersion = req.version;
-              else installedVersion = '';
+              if (req.version) {
+                installedVersion = req.version;
+              } else {
+                installedVersion = '';
+              }
               let versionList = [
                 { version: installedVersion, buttonText: i18n('ui', 'To Latest') },
               ];
@@ -852,7 +858,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
     for (const c of allComponents) {
       let found = false;
-      if (c === 'all') continue;
+      if (c === 'all') {
+        continue;
+      }
       for (let i = 0; i < this.onlineDeps.length; i++) {
         if (c === this.onlineDeps.at(i)?.python) {
           found = true;
@@ -914,9 +922,13 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     const vscodeElementsUri = createUri(`resources/media/vscode-elements.css`);
     const codiconUri = createUri(`resources/media/icons.css`);
     let helpText = 'JSON URL';
-    if (python) helpText = 'Python Package Name';
+    if (python) {
+      helpText = 'Python Package Name';
+    }
     let installText = 'URL';
-    if (python) installText = 'package name';
+    if (python) {
+      installText = 'package name';
+    }
 
     // Return the complete HTML
     return `

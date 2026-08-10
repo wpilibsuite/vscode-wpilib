@@ -33,11 +33,15 @@ export async function getRobotPyVersion(wp?: string): Promise<string> {
       }
     } else {
       cmd = 'pip index versions --pre robotpy';
-      if (getIsWindows()) cmd = 'py -3 -m ' + cmd;
+      if (getIsWindows()) {
+        cmd = 'py -3 -m ' + cmd;
+      }
       const out2 = cp.execSync(cmd, { encoding: 'utf8' });
       regexp = /INSTALLED: .*/;
       const match2: RegExpMatchArray | null = out2.match(regexp);
-      if (match2) return match2.toLocaleString().substring(11);
+      if (match2) {
+        return match2.toLocaleString().substring(11);
+      }
     }
     return 'version undefined';
   } catch (err) {
@@ -61,15 +65,21 @@ export async function setupVenv(
       num = await executeApi.executeCommand(cmd, 'Set Up Venv Offline', wp.uri.fsPath, wp);
     }
     const robotpyver = await getRobotPyVersion(wp.uri.fsPath);
-    if (robotpyver === 'version undefined') cmd = 'uv pip install robotpy --prerelease=allow';
-    else cmd = `uv pip install robotpy==${robotpyver} --prerelease=allow`;
+    if (robotpyver === 'version undefined') {
+      cmd = 'uv pip install robotpy --prerelease=allow';
+    } else {
+      cmd = `uv pip install robotpy==${robotpyver} --prerelease=allow`;
+    }
     let n = await executeApi.executeCommand(cmd, 'Install RobotPy', wp.uri.fsPath, wp);
     // If exits with code 2, the project is offline, add offline tag and run the command again
     if (n === 2) {
       n = await executeApi.executeCommand(cmd + ' --offline', 'Install RobotPy', wp.uri.fsPath, wp);
     }
-    if (n === 0) return Promise.resolve(true);
-    else return Promise.resolve(false);
+    if (n === 0) {
+      return Promise.resolve(true);
+    } else {
+      return Promise.resolve(false);
+    }
   } catch {
     logger.log('Error setting up venv');
     return Promise.resolve(false);
@@ -97,8 +107,11 @@ async function checkPythonPath(path: string | undefined, source: string) {
 
 export async function findPythonPath(): Promise<string | undefined> {
   let cmd = 'python';
-  if (getIsWindows()) cmd = 'where ' + cmd;
-  else cmd = 'which ' + cmd;
+  if (getIsWindows()) {
+    cmd = 'where ' + cmd;
+  } else {
+    cmd = 'which ' + cmd;
+  }
   const vscodePythonPath = cp.execSync(cmd, { encoding: 'utf-8' });
   if (await checkPythonPath(vscodePythonPath, 'Execute Command Output')) {
     return vscodePythonPath;

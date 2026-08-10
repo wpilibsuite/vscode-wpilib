@@ -39,7 +39,7 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
     const cmd = 'uv pip list | findstr robotpy';
     let robotpyInstalled = false;
     try {
-      const result = cp.execSync(cmd, { encoding: 'utf8' , cwd: wp.uri.fsPath});
+      const result = cp.execSync(cmd, { encoding: 'utf8', cwd: wp.uri.fsPath });
       if (result.indexOf('robotpy') !== -1) {
         robotpyInstalled = true;
       }
@@ -61,7 +61,7 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
       );
       if (installReq?.title === i18n('ui', 'Yes')) {
         const installCmd = 'uv pip install robotpy --prerelease=allow';
-        cp.execSync(installCmd, {cwd: wp.uri.fsPath});
+        cp.execSync(installCmd, { cwd: wp.uri.fsPath });
       }
     }
     await setupVenv(executeApi, wp);

@@ -82,7 +82,9 @@ export async function setupProjectStructure(
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
       recursive: true,
     });
-    if (python) return true; //RobotPy does not use build.gradle, skip over shared folder
+    if (python) {
+      return true;
+    } //RobotPy does not use build.gradle, skip over shared folder
     // Copy shared gradle files
     await cp(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
@@ -135,12 +137,19 @@ export async function updateRobotPyVersion(
 export async function setupComponents(vendors: string[], toFolder: string) {
   const components: string[] = [];
   for (const v of vendors) {
-    if (v === 'commandsv2') components.push(ComponentPackages.COMMANDSV2);
-    else if (v === 'apriltag') components.push(ComponentPackages.APRILTAG);
-    else if (v === 'cscore') components.push(ComponentPackages.CSCORE);
-    else if (v === 'romi') components.push(ComponentPackages.ROMI);
-    else if (v === 'sim') components.push(ComponentPackages.SIM);
-    else if (v === 'xrp') components.push(ComponentPackages.XRP);
+    if (v === 'commandsv2') {
+      components.push(ComponentPackages.COMMANDSV2);
+    } else if (v === 'apriltag') {
+      components.push(ComponentPackages.APRILTAG);
+    } else if (v === 'cscore') {
+      components.push(ComponentPackages.CSCORE);
+    } else if (v === 'romi') {
+      components.push(ComponentPackages.ROMI);
+    } else if (v === 'sim') {
+      components.push(ComponentPackages.SIM);
+    } else if (v === 'xrp') {
+      components.push(ComponentPackages.XRP);
+    }
   }
   pathUtils.copyComponents(components, toFolder);
 }

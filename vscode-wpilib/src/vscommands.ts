@@ -356,7 +356,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspaceFolder = await preferencesApi.getFirstOrSelectedWorkspace();
       const executeApi = externalApi.getExecuteAPI();
-      if (workspaceFolder)
+      if (workspaceFolder) {
         await robotpyRun(
           cmd,
           getWPILibHomeDir(),
@@ -364,6 +364,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           'Download Python (Systemcore)',
           executeApi
         );
+      }
     })
   );
   context.subscriptions.push(
@@ -372,7 +373,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspaceFolder = await preferencesApi.getFirstOrSelectedWorkspace();
       const executeApi = externalApi.getExecuteAPI();
-      if (workspaceFolder)
+      if (workspaceFolder) {
         await robotpyRun(
           cmd,
           getWPILibHomeDir(),
@@ -380,6 +381,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           'Install Python (Systemcore)',
           executeApi
         );
+      }
     })
   );
   context.subscriptions.push(
