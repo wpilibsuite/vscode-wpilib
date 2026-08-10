@@ -31,7 +31,7 @@ export class ProjectCreator extends WebViewBase {
     this.exampleTemplateApi = exampleTemplateApi;
 
     this.disposables.push(
-      vscode.commands.registerCommand('wpilibcore.createNewProject', async () => {
+      vscode.commands.registerCommand('wpilibcore.createNewProject', () => {
         this.displayWebView(vscode.ViewColumn.Active, true, {
           enableScripts: true,
           retainContextWhenHidden: true,

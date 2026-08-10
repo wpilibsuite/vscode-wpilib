@@ -806,7 +806,7 @@ export class VendorLibraries {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace, true);
+            await this.offerBuild(workspace, true);
           }
         }
       } else {

@@ -48,7 +48,7 @@ export interface ICommandAPI {
 }
 
 export interface IDeployDebugAPI {
-  startRioLog(teamNumber: number, show: boolean): Promise<boolean>;
+  startRioLog(teamNumber: number, show: boolean): boolean;
   deployCode(
     workspace: vscode.WorkspaceFolder,
     source: vscode.Uri | undefined,
