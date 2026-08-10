@@ -50,7 +50,7 @@ export class Gradle2025Import extends WebViewBase {
     return this.handleProject(project, true);
   }
 
-  private async startWebpage() {
+  private startWebpage() {
     this.displayWebView(vscode.ViewColumn.Active, true, {
       enableScripts: true,
       retainContextWhenHidden: true,

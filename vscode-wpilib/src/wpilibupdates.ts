@@ -202,8 +202,8 @@ async function checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<st
     });
     if (response.ok) {
       const text = await response.text();
-      const versions = (await xml2js.parseStringPromise(text)).metadata.versioning[0].versions[0]
-        .version;
+      const versions: string[] = (await xml2js.parseStringPromise(text)).metadata.versioning[0]
+        .versions[0].version as string[];
       if (!versions) {
         logger.warn('parse failure');
         return undefined;

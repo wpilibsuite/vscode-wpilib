@@ -99,7 +99,7 @@ export class DeployDebugAPI implements IDeployDebugAPI {
     this.disposables.push(this.debugConfigurationProvider);
   }
 
-  public async startRioLog(teamNumber: number, _: boolean): Promise<boolean> {
+  public startRioLog(teamNumber: number, _: boolean): boolean {
     if (this.liveWindow) {
       this.liveWindow.start(teamNumber);
       return true;
