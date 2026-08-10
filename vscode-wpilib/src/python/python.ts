@@ -60,7 +60,7 @@ export async function activatePython(context: vscode.ExtensionContext, coreExpor
         { title: i18n('ui', 'No'), isCloseAffordance: true }
       );
       if (installReq?.title === i18n('ui', 'Yes')) {
-        let installCmd = 'uv pip install robotpy --prerelease=allow';
+        const installCmd = 'uv pip install robotpy --prerelease=allow';
         cp.execSync(installCmd, {cwd: wp.uri.fsPath});
       }
     }
