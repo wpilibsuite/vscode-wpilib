@@ -369,6 +369,39 @@
       { "from": "MountOrientation.kFlat", "to": "MountOrientation.FLAT" },
       { "from": "MountOrientation.kLandscape", "to": "MountOrientation.LANDSCAPE" },
       { "from": "MountOrientation.kPortrait", "to": "MountOrientation.PORTRAIT" },
+      { "from": "DriverStation.Alliance", "to": "Alliance" },
+      { "from": "DriverStation.MatchType", "to": "MatchType" },
+      { "from": "DriverStation.getAlliance\\(\\)", "to": "MatchState.getAlliance()" },
+      { "from": "DriverStation.getMatchType\\(\\)", "to": "MatchState.getMatchType()" },
+      { "from": "DriverStation.getMatchNumber\\(\\)", "to": "MatchState.getMatchNumber()" },
+      { "from": "DriverStation.getEventName\\(\\)", "to": "MatchState.getEventName()" },
+      { "from": "DriverStation.getReplayNumber\\(\\)", "to": "MatchState.getReplayNumber()" },
+      { "from": "DriverStation.getLocation\\(\\)", "to": "MatchState.getLocation()" },
+      { "from": "DriverStation.getMatchTime\\(\\)", "to": "MatchState.getMatchTime()" },
+      { "from": "DriverStation.getGameSpecificMessage\\(\\)", "to": "MatchState.getGameData()" },
+      { "from": "Alliance.Red", "to": "Alliance.RED" },
+      { "from": "Alliance.Blue", "to": "Alliance.BLUE" },
+      { "from": "MatchType.None", "to": "MatchType.NONE" },
+      { "from": "MatchType.Practice", "to": "MatchType.PRACTICE" },
+      { "from": "MatchType.Qualification", "to": "MatchType.QUALIFICATION" },
+      { "from": "MatchType.Elimination", "to": "MatchType.ELIMINATION" },
+      { "from": "DriverStation.isEnabled\\(\\)", "to": "RobotState.isEnabled()" },
+      { "from": "DriverStation.isDisabled\\(\\)", "to": "RobotState.isDisabled()" },
+      { "from": "DriverStation.isAutonomous\\(\\)", "to": "RobotState.isAutonomous()" },
+      { "from": "DriverStation.isTeleop\\(\\)", "to": "RobotState.isTeleop()" },
+      { "from": "DriverStation.isTest\\(\\)", "to": "RobotState.isUtility()" },
+      {
+        "from": "DriverStation.isAutonomousEnabled\\(\\)",
+        "to": "RobotState.isAutonomousEnabled()"
+      },
+      { "from": "DriverStation.isTeleopEnabled\\(\\)", "to": "RobotState.isTeleopEnabled()" },
+      { "from": "DriverStation.isTestEnabled\\(\\)", "to": "RobotState.isUtilityEnabled()" },
+      { "from": "DriverStation.isFMSAttached\\(\\)", "to": "RobotState.isFMSAttached()" },
+      { "from": "DriverStation.isDSAttached\\(\\)", "to": "RobotState.isDSAttached()" },
+      {
+        "from": "org.wpilib.driverstation.DriverStation;",
+        "to": "org.wpilib.driverstation.MatchState;\nimport org.wpilib.driverstation.RobotState;\nimport org.wpilib.driverstation.Alliance;\nimport org.wpilib.driverstation.MatchType;"
+      },
       { "from": "org.wpilib.hardware.motor.", "to": "org.wpilib.drivers.motor." }
     ]
   }
