@@ -74,6 +74,7 @@
         "from": "edu.wpi.first.math.InterpolatingMatrixTreeMap",
         "to": "org.wpilib.math.interpolation.InterpolatingMatrixTreeMap"
       },
+      { "from": "edu.wpi.first.math.system.plant", "to": "org.wpilib.math.system" },
       { "from": "edu.wpi.first.wpilibj.ProtoTestBase", "to": "org.wpilib.ProtoTestBase" },
       { "from": "edu.wpi.first.wpilibj.StructTestBase", "to": "org.wpilib.StructTestBase" },
       { "from": "edu.wpi.first.wpilibj.UtilityClassTest", "to": "org.wpilib.UtilityClassTest" },
