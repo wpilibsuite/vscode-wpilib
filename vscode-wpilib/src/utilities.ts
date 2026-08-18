@@ -86,7 +86,7 @@ export async function robotpyRun(
   name: string,
   executeApi: IExecuteAPI
 ): Promise<number> {
-  let command = 'uv run robotpy ' + args;
+  const command = 'uv run robotpy ' + args;
 
   await setExecutePermissions(workspace.uri.fsPath);
   return executeApi.executeCommand(command, name, rootDir, workspace);
