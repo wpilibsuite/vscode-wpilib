@@ -318,7 +318,7 @@ export async function getPyProjectFile(workspace: string): Promise<IPyProject | 
   try {
     const f = await readFile(path.join(workspace, 'pyproject.toml'), 'utf-8');
     const project = TOML.parse(f) as unknown as IPyProject;
-    const requires = project.tool.robotpy.requires.+();
+    const requires = project.tool.robotpy.requires.toLocaleString();
     const regexp = /[a-z -]+(?=[=><!~*]{1,2})[><!~*=]{1,2}(?<=[><!~*=]{1})\d[\d . a-z]+/g;
     const req = requires.match(regexp) as string[];
     const ret: IRequires[] = [];
