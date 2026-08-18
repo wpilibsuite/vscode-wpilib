@@ -247,7 +247,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 installed.versionInfo[0].version,
                 this.wp
               );
-              break;
             }
           } else {
             const avail = this.availableDeps.find(

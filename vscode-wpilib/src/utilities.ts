@@ -86,12 +86,7 @@ export async function robotpyRun(
   name: string,
   executeApi: IExecuteAPI
 ): Promise<number> {
-  let command = 'robotpy ' + args;
-  if (getIsWindows()) {
-    command = 'py -3 -m ' + command;
-  } else {
-    command = 'python3 -m ' + command;
-  }
+  let command = 'uv run robotpy ' + args;
 
   await setExecutePermissions(workspace.uri.fsPath);
   return executeApi.executeCommand(command, name, rootDir, workspace);

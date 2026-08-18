@@ -112,9 +112,13 @@ export async function findPythonPath(): Promise<string | undefined> {
   } else {
     cmd = 'which ' + cmd;
   }
-  const vscodePythonPath = cp.execSync(cmd, { encoding: 'utf-8' });
-  if (await checkPythonPath(vscodePythonPath, 'Execute Command Output')) {
-    return vscodePythonPath;
+  try {
+    const vscodePythonPath = cp.execSync(cmd, { encoding: 'utf-8' });
+    if (await checkPythonPath(vscodePythonPath, 'Execute Command Output')) {
+      return vscodePythonPath;
+    }
+  } catch {
+    return undefined;
   }
   return undefined;
 }

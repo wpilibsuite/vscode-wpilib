@@ -423,12 +423,7 @@
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.buildCode",
                     "group": "wpilib"
-                },
-                {
-                    "when": "resourceFilename == build.gradle",
-                    "command": "wpilibcore.syncCode",
-                    "group": "wpilib"
-                },
+                },               
                 {
                     "when": "resourceFilename == build.gradle",
                     "command": "wpilibcore.testCode",
