@@ -28,6 +28,14 @@ export class BuildTestAPI implements IBuildTestAPI {
     return this.buildTestCommon(workspace, this.builders, source, args);
   }
 
+  public syncCode(
+    workspace: vscode.WorkspaceFolder,
+    source: vscode.Uri | undefined,
+    ...args: string[]
+  ): Promise<boolean> {
+    return this.buildTestCommon(workspace, this.builders, source, args);
+  }
+
   public testCode(
     workspace: vscode.WorkspaceFolder,
     source: vscode.Uri | undefined,
