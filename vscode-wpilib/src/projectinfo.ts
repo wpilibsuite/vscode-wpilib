@@ -28,7 +28,7 @@ export interface IProjectInfo {
   wpilibLanguage: string;
 }
 
-async function extensionVersion(extension: vscode.Extension<unknown> | undefined): Promise<string> {
+function extensionVersion(extension: vscode.Extension<unknown> | undefined): string {
   if (!extension) {
     return 'Not Installed';
   }
@@ -137,18 +137,16 @@ Vendor Libraries:
       currentGradleVersion = 'unknown';
     }
 
-    const debugExt = await extensionVersion(
-      vscode.extensions.getExtension('vscjava.vscode-java-debug')
-    );
-    const depViewer = await extensionVersion(
+    const debugExt = extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-debug'));
+    const depViewer = extensionVersion(
       vscode.extensions.getExtension('vscjava.vscode-java-dependency')
     );
-    const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
-    const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
+    const javaExt = extensionVersion(vscode.extensions.getExtension('redhat.java'));
+    const cpp = extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFile(extensionPackageJson, 'utf8');
-    const currentVsCodeVersion: string = json.parse(packageJson).version;
+    const currentVsCodeVersion: string = json.parse(packageJson).version as string;
     const currentProjectYear: string = prefs.getProjectYear();
     const currentLanguage: string = prefs.getCurrentLanguage();
 

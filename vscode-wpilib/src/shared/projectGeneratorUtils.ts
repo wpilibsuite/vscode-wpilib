@@ -27,6 +27,8 @@ export const VendorDepFiles = {
   XRP: 'XRPVendordep.json',
   COMMANDSV3: 'CommandsV3.json',
   COMMANDSV2_OLD: 'WPILibNewCommands.json',
+  APRILTAG: 'AprilTag.json',
+  CAMERASERVER: 'CameraServer.json',
 };
 
 /**
@@ -162,6 +164,10 @@ export async function setupVendorDeps(
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV2, vendorDir);
       } else if (vendordep === 'commandsv3') {
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV3, vendorDir);
+      } else if (vendordep === 'aprilTag') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.APRILTAG, vendorDir);
+      } else if (vendordep === 'cameraServer') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.CAMERASERVER, vendorDir);
       }
     }
 

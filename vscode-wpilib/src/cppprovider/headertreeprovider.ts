@@ -103,7 +103,7 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
     this._onDidChangeFile.fire(undefined);
   }
 
-  public getChildren(element?: Entry): Promise<Entry[]> {
+  public async getChildren(element?: Entry): Promise<Entry[]> {
     if (element) {
       return this.getChildrenElement(element);
     } else {
@@ -183,7 +183,7 @@ export class HeaderTreeProvider implements vscode.TreeDataProvider<Entry> {
     }
   }
 
-  private async getChildrenRoot(): Promise<Entry[]> {
+  private getChildrenRoot(): Entry[] {
     const entries: Entry[] = [];
 
     if (!this.toolchains) {

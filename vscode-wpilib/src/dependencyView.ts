@@ -117,17 +117,17 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.viewInfo = await this.projectInfo.getViewInfo();
     }
 
-    void this._refresh(this.wp);
-    webviewView.onDidChangeVisibility(() => {
+    await this._refresh(this.wp);
+    webviewView.onDidChangeVisibility(async () => {
       if (this.wp) {
         // If the webview becomes visible refresh it, invisible then check for changes
         if (webviewView.visible) {
-          void this._refresh(this.wp);
+          await this._refresh(this.wp);
         } else {
           if (this.showingInstructions) {
             this.showingInstructions = false;
           } else if (this.changed > this.vendorLibraries.getLastBuild()) {
-            this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+            await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
             this.changed = 0;
           }
         }
@@ -140,27 +140,27 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-    webviewView.webview.onDidReceiveMessage((data) => {
+    webviewView.webview.onDidReceiveMessage(async (data) => {
       if (this.isJSMessage(data)) {
         switch (data.type) {
           case 'install': {
-            void this.install(data.index);
+            await this.install(data.index);
             break;
           }
           case 'uninstall': {
-            void this.uninstall(data.index);
+            await this.uninstall(data.index);
             break;
           }
           case 'update': {
-            void this.update(data.version, data.index);
+            await this.update(data.version, data.index);
             break;
           }
           case 'updateall': {
-            void this.updateall();
+            await this.updateall();
             break;
           }
           case 'installFromUrl': {
-            void this.installFromUrl(data.url);
+            await this.installFromUrl(data.url);
             break;
           }
           case 'blur': {
@@ -168,7 +168,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
               if (this.showingInstructions) {
                 this.showingInstructions = false;
               } else if (this.changed > this.vendorLibraries.getLastBuild()) {
-                this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+                await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
                 this.changed = 0;
               }
             }
@@ -454,8 +454,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public updateDependencies() {
-    this._view?.webview.postMessage({
+  public async updateDependencies() {
+    await this._view?.webview.postMessage({
       type: 'updateDependencies',
       installed: this.installedList,
       available: this.availableDepsList,
@@ -534,7 +534,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         this.sortInstalled();
         this.sortAvailable();
 
-        this.updateDependencies();
+        await this.updateDependencies();
       }
     } finally {
       this.refreshInProgress = false;
