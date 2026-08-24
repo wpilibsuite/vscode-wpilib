@@ -26,7 +26,7 @@ export function getWPILibHomeDirForPlatform(
 
   if (platform === 'linux') {
     const dataHome = env.XDG_DATA_HOME;
-    if (dataHome && dataHome.trim().length > 0) {
+    if (dataHome && dataHome.trim().length > 0 && path.isAbsolute(dataHome)) {
       return path.join(dataHome, 'wpilib', year);
     }
     return path.join(homeDir, '.local', 'share', 'wpilib', year);

@@ -14,7 +14,7 @@ pluginManagement {
             wpilibHome = new File(homeRoot, wpilibYear)
         } else if (os.isLinux()) {
             String xdgDataHome = System.getenv('XDG_DATA_HOME')
-            if (xdgDataHome == null || xdgDataHome.trim().isEmpty()) {
+            if (xdgDataHome == null || xdgDataHome.trim().isEmpty() || !new File(xdgDataHome).isAbsolute()) {
                 xdgDataHome = new File(System.getProperty("user.home"), ".local/share").getPath()
             }
             def homeRoot = new File(xdgDataHome, "wpilib")
