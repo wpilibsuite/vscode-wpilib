@@ -856,9 +856,9 @@
         "from": "(\"|\\<)wpi/driverstation/DriverStation.hpp(\"|\\>)",
         "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\""
       },
-      { "from": "TestInit()", "to": "UtilityInit()" },
-      { "from": "TestPeriodic()", "to": "UtilityPeriodic()" },
-      { "from": "TestExit()", "to": "UtilityExit()" },
+      { "from": "TestInit\\(\\)", "to": "UtilityInit()" },
+      { "from": "TestPeriodic\\(\\)", "to": "UtilityPeriodic()" },
+      { "from": "TestExit\\(\\)", "to": "UtilityExit()" },
       { "from": "wpi/hardware/motor/", "to": "wpi/drivers/motor/" }
     ]
   }
