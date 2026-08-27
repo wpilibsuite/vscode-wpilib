@@ -49,7 +49,6 @@ wpi.sim.addWebsocketsClient().defaultEnabled = true
 
 application.mainClass = ROBOT_MAIN_CLASS
 
-deployArtifact.configureApplication(application)
 wpi.java.configureApplication(application)
 wpi.java.configureTestTasks(test)
 
