@@ -49,7 +49,7 @@
                         "properties": {
                             "desktop": {
                                 "type": "boolean",
-                                "description": "True for desktop, false for roboRIO"
+                                "description": "True for desktop, false for Systemcore"
                             },
                             "hwsim": {
                                 "type": "boolean",
