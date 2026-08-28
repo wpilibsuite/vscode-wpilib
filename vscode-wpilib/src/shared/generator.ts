@@ -1,6 +1,6 @@
 'use strict';
 
-import { cp, rm } from 'fs/promises';
+import { cp } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
@@ -153,7 +153,10 @@ export async function generateCopyJava(
     // Update gradle file with correct version and robot class
     await fileUtils.updateFileContents(path.join(toFolder, 'build.gradle'), (content) =>
       content
-        .replace(new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'), 'first.Main')
+        .replace(
+          new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'),
+          mainFile === undefined ? robotClass : 'first.Main'
+        )
         .replace(new RegExp(genUtils.ReplacementPatterns.GRADLE_RIO_MARKER, 'g'), gradleRioVersion)
     );
 

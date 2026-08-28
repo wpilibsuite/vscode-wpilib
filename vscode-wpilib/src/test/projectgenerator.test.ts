@@ -1,11 +1,12 @@
 'use strict';
 
 import * as assert from 'assert';
-import { access, mkdtemp, readFile, rm } from 'fs/promises';
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises';
 import { test } from 'mocha';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { getWPILibApi, IExternalAPI } from '../api';
+import { generateCopyJava } from '../shared/generator';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { ReplacementPatterns } from '../shared/projectGeneratorUtils';
 
@@ -57,6 +58,63 @@ async function ensureBaseFilesGeneratedCorrectly(tmp: string) {
 }
 
 suite('Project Generation Tests', () => {
+  test('Java Gradle Import Preserves Main Class', async () => {
+    const tmp = await mkdtemp(path.join(tmpdir(), path.sep));
+    const sourceFolder = path.join(tmp, 'import', 'src');
+    const gradleRoot = path.join(tmp, 'gradle');
+    const gradleFolder = path.join(gradleRoot, 'java');
+    const sharedGradleFolder = path.join(gradleRoot, 'shared');
+    const destinationFolder = path.join(tmp, 'generated');
+    const importedMainFile = path.join(sourceFolder, 'main', 'java', 'frc', 'robot', 'Main.java');
+
+    try {
+      await mkdir(path.dirname(importedMainFile), { recursive: true });
+      await mkdir(gradleFolder, { recursive: true });
+      await mkdir(sharedGradleFolder, { recursive: true });
+      await writeFile(importedMainFile, 'package frc.robot;\n\npublic final class Main {}\n');
+      await writeFile(
+        path.join(gradleFolder, 'build.gradle'),
+        `def ROBOT_MAIN_CLASS = "${ReplacementPatterns.ROBOT_CLASS_MARKER}"\n` +
+          `id "edu.wpi.first.GradleRIO" version "${ReplacementPatterns.GRADLE_RIO_MARKER}"\n`
+      );
+      await writeFile(path.join(gradleRoot, 'version.txt'), '2027.0.0');
+      await writeFile(path.join(sharedGradleFolder, 'gradlew'), '');
+
+      assert.ok(
+        await generateCopyJava(
+          path.join(tmp, 'resources', 'java'),
+          sourceFolder,
+          undefined,
+          gradleFolder,
+          destinationFolder,
+          undefined,
+          'frc.robot.Main',
+          '',
+          true,
+          []
+        )
+      );
+
+      const buildGradleContent = await readFile(
+        path.join(destinationFolder, 'build.gradle'),
+        'utf8'
+      );
+      assert.ok(buildGradleContent.includes('def ROBOT_MAIN_CLASS = "frc.robot.Main"'));
+      assert.equal(
+        await readFile(
+          path.join(destinationFolder, 'src', 'main', 'java', 'frc', 'robot', 'Main.java'),
+          'utf8'
+        ),
+        'package frc.robot;\n\npublic final class Main {}\n'
+      );
+      await assert.rejects(
+        access(path.join(destinationFolder, 'src', 'main', 'java', 'first', 'Main.java'))
+      );
+    } finally {
+      await rm(tmp, { recursive: true });
+    }
+  });
+
   test('Java Template Project Generation New Folder', async () => {
     const api = await getWPILibApi();
     const tmp = await mkdtemp(path.join(tmpdir(), path.sep));
