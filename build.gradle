@@ -11,7 +11,6 @@ if (project.hasProperty('buildServer')) {
 
 ext.addedRelease = false
 wpilibVersioning.useAllTags = true
-wpilibRepositories.use2027Repos()
 
 def azureRelease = System.getenv('GITHUB_REF')
 if (azureRelease != null) {
@@ -105,12 +104,28 @@ def downloadXRPVendordep = tasks.register('downloadXRPVendordep', Download) {
   overwrite true
 }
 
+def downloadAprilTagVendordep = tasks.register('downloadAprilTagVendordep', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/apriltag/AprilTag.json'
+  dest 'vscode-wpilib/resources/vendordeps/AprilTag.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
+  overwrite true
+}
+
+def downloadCameraServerVendordep = tasks.register('downloadCameraServerVendordep', Download) {
+  src 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/cameraserver/CameraServer.json'
+  dest 'vscode-wpilib/resources/vendordeps/CameraServer.json'
+  outputs.dir 'vscode-wpilib/resources/vendordeps'
+  overwrite true
+}
+
 build.dependsOn extractCppDependencies
 build.dependsOn extractJavaDependencies
 build.dependsOn downloadCommandsV2
 build.dependsOn downloadCommandsV3
 build.dependsOn downloadRomiVendordep
 build.dependsOn downloadXRPVendordep
+build.dependsOn downloadAprilTagVendordep
+build.dependsOn downloadCameraServerVendordep
 
 clean {
     delete 'vscode-wpilib/resources/java/src'

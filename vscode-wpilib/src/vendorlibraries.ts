@@ -226,7 +226,7 @@ export class VendorLibraries {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace, true);
+            await this.offerBuild(workspace, true);
           }
         }
       } else {
@@ -252,9 +252,7 @@ export class VendorLibraries {
           return undefined;
         }
       });
-      const results = (await Promise.all(promises)).filter(
-        (x) => x !== undefined
-      ) as IJsonDependency[];
+      const results = (await Promise.all(promises)).filter((x) => x !== undefined);
       const updatable = [];
       for (const newDep of results) {
         for (const oldDep of installedDeps) {
@@ -288,7 +286,7 @@ export class VendorLibraries {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace, true);
+            await this.offerBuild(workspace, true);
           }
         }
       } else {
@@ -333,7 +331,7 @@ export class VendorLibraries {
           }
         }
         if (anySucceeded) {
-          this.offerBuild(workspace, true);
+          await this.offerBuild(workspace, true);
         }
       }
     } else {
@@ -362,7 +360,7 @@ export class VendorLibraries {
 
       const success = await installDependency(file, this.getWpVendorFolder(workspace), true);
       if (success) {
-        this.offerBuild(workspace, true);
+        await this.offerBuild(workspace, true);
       } else {
         vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
       }

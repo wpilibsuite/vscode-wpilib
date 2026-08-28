@@ -38,12 +38,12 @@ export class Gradle2025Import extends WebViewBase {
   }
 
   public async startWithProject(projectRoot: vscode.Uri) {
-    await this.startWebpage();
+    this.startWebpage();
     const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
     return this.handleProject(project, true);
   }
 
-  private async startWebpage() {
+  private startWebpage() {
     this.displayWebView(vscode.ViewColumn.Active, true, {
       enableScripts: true,
       retainContextWhenHidden: true,
@@ -220,21 +220,13 @@ export class Gradle2025Import extends WebViewBase {
     const gradleFile = path.join(oldProjectPath, 'build.gradle');
 
     let javaRobotPackage: string = '';
-    let mainClassPackage: string = '';
     if (!cpp) {
       try {
         const gradleContents = await readFile(gradleFile, 'utf8');
         const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
         const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
         if (regexRes !== null && regexRes.length === 2) {
-          mainClassPackage = regexRes[1].replace(/\./g, path.sep) + '.java';
-        }
-        const mainClassPath = path.join(oldProjectPath, 'src', 'main', 'java', mainClassPackage);
-        const mainClassContents = await readFile(mainClassPath, 'utf8');
-        const packageRegex = 'package\\s+([a-zA-Z0-9_.]+);';
-        const packageRes = new RegExp(packageRegex, 'g').exec(mainClassContents);
-        if (packageRes !== null && packageRes.length === 2) {
-          javaRobotPackage = packageRes[1] + '.Robot';
+          javaRobotPackage = regexRes[1];
         }
       } catch {
         // File doesn't exist
@@ -306,7 +298,6 @@ export class Gradle2025Import extends WebViewBase {
         vendordeps
       );
     } else {
-      const mainJavaFile = path.join(resourceRoot, 'java', 'src', 'Main.java');
       const gradlePath = path.join(
         gradleBasePath,
         data.romi ? 'javaromi' : data.xrp ? 'javaxrp' : 'java'
@@ -317,7 +308,7 @@ export class Gradle2025Import extends WebViewBase {
         undefined,
         gradlePath,
         toFolder,
-        mainJavaFile,
+        undefined,
         javaRobotPackage,
         '',
         true,

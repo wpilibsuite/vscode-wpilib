@@ -13,7 +13,7 @@ import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
 import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
-import { activateCpp } from './cpp/cpp';
+import { activateCpp, warnIfMissingCppExtension } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
 import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
@@ -120,7 +120,7 @@ async function handleAfterTrusted(
     setJavaHome(jdkLoc);
   } else {
     vscode.window.showErrorMessage(
-      i18n('message', 'Java 21 required, but not found. Might have compilation errors.')
+      i18n('message', 'Java 25 required, but not found. Might have compilation errors.')
     );
   }
 
@@ -225,6 +225,10 @@ async function handleAfterTrusted(
 
         vendorDepsWatcher.onDidDelete(fireEvent, null, context.subscriptions);
 
+        if (prefs.getEnableCppIntellisense()) {
+          warnIfMissingCppExtension();
+        }
+
         if (prefs.getProjectYear() === 'intellisense') {
           logger.log('Intellisense only build project found');
           continue;
@@ -235,9 +239,9 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2027_alpha5') {
+        if (prefs.getProjectYear() !== '2027_alpha7') {
           const importPersistentState = new PersistentFolderState(
-            'wpilib.2027_alpha5persist',
+            'wpilib.2027_alpha7persist',
             false,
             w.uri.fsPath
           );
@@ -245,7 +249,7 @@ async function handleAfterTrusted(
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
-                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha5?'
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha7?'
               ),
               {
                 modal: true,
