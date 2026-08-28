@@ -1,6 +1,6 @@
 'use strict';
 
-import { cp, rm } from 'fs/promises';
+import { cp } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
@@ -77,7 +77,7 @@ export async function generateCopyJava(
   fromTemplateTestFolder: string | undefined,
   fromGradleFolder: string,
   toFolder: string,
-  mainFile: string,
+  mainFile: string | undefined,
   robotClass: string,
   copyRoot: string,
   directGradleImport: boolean,
@@ -102,25 +102,21 @@ export async function generateCopyJava(
     const grRoot = path.dirname(fromGradleFolder);
     const gradleRioVersion = await genUtils.getGradleRioVersion(grRoot);
 
-    // Copy and do replacements on main
-    const mainDestFile = path.join(toFolder, 'src', 'main', 'java', 'first', 'Main.java');
-    await cp(mainFile, mainDestFile);
-    await fileUtils.updateFileContents(mainDestFile, (content) =>
-      content
-        .replace('package org.wpilib;', 'package first;')
-        .replace('org.wpilib.templates.timed.Robot.class', `${robotClass}.class`)
-    );
+    if (mainFile !== undefined) {
+      // Copy and do replacements on main
+      const mainDestFile = path.join(toFolder, 'src', 'main', 'java', 'first', 'Main.java');
+      await cp(mainFile, mainDestFile);
+      await fileUtils.updateFileContents(mainDestFile, (content) =>
+        content
+          .replace('package org.wpilib;', 'package first;')
+          .replace('org.wpilib.templates.timed.Robot.class', `${robotClass}.class`)
+      );
+    }
 
     // Copy template folders
     await cp(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
       await cp(fromTemplateTestFolder, testPath, { recursive: true });
-    }
-
-    // delete imported main, replaced by template main
-    const mainSrcFile = path.join(toFolder, 'src', 'main', 'java', 'frc', 'robot', 'Main.java');
-    if (directGradleImport) {
-      await rm(mainSrcFile);
     }
 
     // Find files that need template processing
@@ -157,7 +153,10 @@ export async function generateCopyJava(
     // Update gradle file with correct version and robot class
     await fileUtils.updateFileContents(path.join(toFolder, 'build.gradle'), (content) =>
       content
-        .replace(new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'), 'first.Main')
+        .replace(
+          new RegExp(genUtils.ReplacementPatterns.ROBOT_CLASS_MARKER, 'g'),
+          mainFile === undefined ? robotClass : 'first.Main'
+        )
         .replace(new RegExp(genUtils.ReplacementPatterns.GRADLE_RIO_MARKER, 'g'), gradleRioVersion)
     );
 
