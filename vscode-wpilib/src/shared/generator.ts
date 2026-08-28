@@ -109,7 +109,7 @@ export async function generateCopyJava(
       await fileUtils.updateFileContents(mainDestFile, (content) =>
         content
           .replace('package org.wpilib;', 'package first;')
-          .replace('org.wpilib.templates.timed.Robot.class', `${robotClass}.class`)
+          .replace('org.wpilib.templates.timed.Robot::new', `${robotClass}::new`)
       );
     }
 
