@@ -33,7 +33,7 @@ export class ToolAPI implements IToolAPI {
         i18n('ui', 'Yes'),
         i18n('ui', 'No')
       );
-      if (result !== undefined && result === i18n('ui', 'Yes')) {
+      if (result === i18n('ui', 'Yes')) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
       }
     } else {
@@ -59,13 +59,10 @@ export class ToolAPI implements IToolAPI {
         i18n('ui', 'Yes'),
         i18n('ui', 'No')
       );
-      if (grResult !== undefined && grResult === i18n('ui', 'Yes')) {
+      if (grResult === i18n('ui', 'Yes')) {
         const preferencesApi = this.externalApi.getPreferencesAPI();
         const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-        if (
-          workspace === undefined ||
-          !preferencesApi.getPreferences(workspace).getIsWPILibProject()
-        ) {
+        if (!workspace || !preferencesApi.getPreferences(workspace).getIsWPILibProject()) {
           vscode.window.showInformationMessage(
             i18n('message', 'Cannot install gradle tools since this is not a WPILib project')
           );
@@ -80,7 +77,7 @@ export class ToolAPI implements IToolAPI {
       placeHolder: i18n('ui', 'Pick a tool'),
     });
 
-    if (result === undefined) {
+    if (!result) {
       vscode.window.showInformationMessage(i18n('message', 'Tool run canceled'));
       return false;
     }

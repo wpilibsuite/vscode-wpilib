@@ -27,7 +27,7 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     env.LD_LIBRARY_PATH = commands.librarydir;
   }
 
-  if (commands.environment !== undefined) {
+  if (commands.environment) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
       env[envVar] = value;

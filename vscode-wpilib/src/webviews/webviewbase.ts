@@ -9,7 +9,7 @@ import { logger } from '../logger';
 import { rewriteDistWebviewHtml } from './distWebviewHtml';
 
 export abstract class WebViewBase {
-  protected html = '';
+  protected html: string = '';
   protected webview?: vscode.WebviewPanel;
   protected disposables: vscode.Disposable[] = [];
 

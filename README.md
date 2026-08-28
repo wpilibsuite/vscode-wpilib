@@ -7,7 +7,7 @@ This repository contains the WPILib VS Code extension.
 ## Build Dependencies
 
 - Node JS - Tested with Node 22.
-- Java - Tested with Java 21
+- Java - Tested with Java 25
 - VS Code - For development/debugging.
   - TS Lint Extension
   - Chrome Debug Extension

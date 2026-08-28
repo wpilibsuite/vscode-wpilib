@@ -9,7 +9,7 @@ import { findJdkPath, getJavaVersion } from './jdkdetector';
 import { logger } from './logger';
 import { extensionContext } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
-import { WPILibUpdates } from './wpilibupdates';
+import { getGradleRIOVersion } from './wpilibupdates';
 
 export interface IVendorLibraryPair {
   name: string;
@@ -28,8 +28,8 @@ export interface IProjectInfo {
   wpilibLanguage: string;
 }
 
-async function extensionVersion(extension: vscode.Extension<unknown> | undefined): Promise<string> {
-  if (extension === undefined) {
+function extensionVersion(extension: vscode.Extension<unknown> | undefined): string {
+  if (!extension) {
     return 'Not Installed';
   }
   return extension.packageJSON.version;
@@ -37,18 +37,12 @@ async function extensionVersion(extension: vscode.Extension<unknown> | undefined
 
 export class ProjectInfoGatherer {
   private vendorLibraries: VendorLibraries;
-  private wpilibUpdates: WPILibUpdates;
   private externalApi: IExternalAPI;
   private disposables: vscode.Disposable[] = [];
   private statusBar: vscode.StatusBarItem;
 
-  public constructor(
-    vendorLibraries: VendorLibraries,
-    wpilibUpdates: WPILibUpdates,
-    externalApi: IExternalAPI
-  ) {
+  public constructor(vendorLibraries: VendorLibraries, externalApi: IExternalAPI) {
     this.vendorLibraries = vendorLibraries;
-    this.wpilibUpdates = wpilibUpdates;
     this.externalApi = externalApi;
 
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
@@ -58,7 +52,7 @@ export class ProjectInfoGatherer {
     this.disposables.push(this.statusBar);
 
     const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
+    if (workspaces) {
       for (const wp of workspaces) {
         const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
         if (prefs.getIsWPILibProject()) {
@@ -83,13 +77,13 @@ export class ProjectInfoGatherer {
 
   public async displayProjectInfo(): Promise<void> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       logger.warn('no workspace');
       return;
     }
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
-    const jdkVer = jdkLoc === undefined ? 'unknown' : await getJavaVersion(jdkLoc);
+    const jdkVer = !jdkLoc ? 'unknown' : await getJavaVersion(jdkLoc);
     let infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 VS Code Version: ${vscode.version}
@@ -127,7 +121,7 @@ Vendor Libraries:
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       return wp;
     }
     return this.getProjectInfo(wp);
@@ -137,24 +131,22 @@ Vendor Libraries:
     const vendorLibs = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
     const prefs = this.externalApi.getPreferencesAPI().getPreferences(workspace);
 
-    let currentGradleVersion = await this.wpilibUpdates.getGradleRIOVersion(workspace);
+    let currentGradleVersion = await getGradleRIOVersion(workspace);
 
-    if (currentGradleVersion === undefined) {
+    if (!currentGradleVersion) {
       currentGradleVersion = 'unknown';
     }
 
-    const debugExt = await extensionVersion(
-      vscode.extensions.getExtension('vscjava.vscode-java-debug')
-    );
-    const depViewer = await extensionVersion(
+    const debugExt = extensionVersion(vscode.extensions.getExtension('vscjava.vscode-java-debug'));
+    const depViewer = extensionVersion(
       vscode.extensions.getExtension('vscjava.vscode-java-dependency')
     );
-    const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
-    const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
+    const javaExt = extensionVersion(vscode.extensions.getExtension('redhat.java'));
+    const cpp = extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
 
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFile(extensionPackageJson, 'utf8');
-    const currentVsCodeVersion: string = json.parse(packageJson).version;
+    const currentVsCodeVersion: string = json.parse(packageJson).version as string;
     const currentProjectYear: string = prefs.getProjectYear();
     const currentLanguage: string = prefs.getCurrentLanguage();
 

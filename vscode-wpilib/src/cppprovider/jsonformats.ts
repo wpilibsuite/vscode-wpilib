@@ -45,11 +45,6 @@ export interface IBinary {
   executable?: boolean;
 }
 
-export interface IBinaryMap {
-  0: string;
-  1: number;
-}
-
 export interface IToolChain {
   name: string;
   architecture: string;

@@ -6,11 +6,22 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from '../api';
 import { activateCppProvider } from '../cppprovider/cppprovider';
 import { localize as i18n } from '../locale';
-import { Examples } from '../shared/examples';
-import { Templates } from '../shared/templates';
-import { BuildTest } from './buildtest';
-import { Commands } from './commands';
-import { DeployDebug } from './deploydebug';
+import { registerExamples } from '../shared/examples';
+import { registerProjectTemplates } from '../shared/templates';
+import { registerCodeBuilderAndTester } from './buildtest';
+import { registerCommandTemplates } from './commands';
+import { registerCodeDeployerAndDebugger } from './deploydebug';
+
+export function warnIfMissingCppExtension() {
+  if (!vscode.extensions.getExtension('ms-vscode.cpptools')) {
+    vscode.window.showWarningMessage(
+      i18n(
+        'message',
+        'Could not find cpptools C++ extension. Intellisense and Debugging will not work.'
+      )
+    );
+  }
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,34 +35,18 @@ export async function activateCpp(context: vscode.ExtensionContext, coreExports:
   const exampleTemplate = coreExports.getExampleTemplateAPI();
   const commandApi = coreExports.getCommandAPI();
 
-  let allowDebug = true;
-
-  const cppExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
-  if (cppExtension === undefined) {
-    vscode.window.showWarningMessage(
-      i18n('message', 'Could not find cpptools C++ extension. Debugging is disabled.')
-    );
-    allowDebug = false;
-  }
+  const allowDebug = !!vscode.extensions.getExtension('ms-vscode.cpptools');
 
   await activateCppProvider(context, coreExports);
 
   // Setup build and test
-
-  const buildTest = new BuildTest(coreExports);
-
-  context.subscriptions.push(buildTest);
-
-  const deployDebug = new DeployDebug(coreExports, allowDebug);
-  context.subscriptions.push(deployDebug);
+  registerCodeBuilderAndTester(coreExports);
+  registerCodeDeployerAndDebugger(coreExports, allowDebug);
 
   // Setup commands
-  const commands: Commands = new Commands(extensionResourceLocation, commandApi, preferences);
-  context.subscriptions.push(commands);
+  await registerCommandTemplates(extensionResourceLocation, commandApi, preferences);
 
   // Setup examples and template
-  const examples: Examples = new Examples(extensionResourceLocation, false, exampleTemplate);
-  context.subscriptions.push(examples);
-  const templates: Templates = new Templates(extensionResourceLocation, false, exampleTemplate);
-  context.subscriptions.push(templates);
+  await registerExamples(extensionResourceLocation, false, exampleTemplate);
+  await registerProjectTemplates(extensionResourceLocation, false, exampleTemplate);
 }

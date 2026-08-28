@@ -3,7 +3,7 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { IJsonDependency } from './shared/vendorlibrariesbase';
+import { getHomeDirDeps, IJsonDependency, installDependency } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
 import { loadDistWebviewHtml } from './webviews/distWebviewHtml';
@@ -31,11 +31,14 @@ export interface IJSMessage {
   url?: string;
 }
 
+const collator = Intl.Collator('en', { sensitivity: 'base' });
+const sort = (a: { name: string }, b: { name: string }) => collator.compare(a.name, b.name);
+
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
   private projectInfo: ProjectInfoGatherer;
   private vendorLibraries: VendorLibraries;
-  private viewInfo: IProjectInfo | undefined;
+  private viewInfo?: IProjectInfo;
   private disposables: vscode.Disposable[] = [];
   private installedDeps: IJsonDependency[] = []; // The actual dep information that is installed
   private availableDeps: IJsonList[] = []; // All available deps
@@ -45,7 +48,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
   private externalApi: IExternalAPI;
   private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
-  private wp: vscode.WorkspaceFolder | undefined;
+  private wp?: vscode.WorkspaceFolder;
   private changed = 0;
   private refreshInProgress = false;
   private showingInstructions = false;
@@ -98,7 +101,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     };
 
     this.wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (this.wp === undefined) {
+    if (!this.wp) {
       logger.warn('no workspace');
       webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, 'no-workspace');
       return;
@@ -114,19 +117,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.viewInfo = await this.projectInfo.getViewInfo();
     }
 
-    void this._refresh(this.wp);
-    webviewView.onDidChangeVisibility(() => {
+    await this._refresh(this.wp);
+    webviewView.onDidChangeVisibility(async () => {
       if (this.wp) {
         // If the webview becomes visible refresh it, invisible then check for changes
         if (webviewView.visible) {
           // Show cached data immediately while refresh runs.
           this.updateDependencies();
-          void this._refresh(this.wp);
+          await this._refresh(this.wp);
         } else {
           if (this.showingInstructions) {
             this.showingInstructions = false;
           } else if (this.changed > this.vendorLibraries.getLastBuild()) {
-            this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+            await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
             this.changed = 0;
           }
         }
@@ -147,7 +150,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     });
     this.disposables.push(disposeListener);
 
-    webviewView.webview.onDidReceiveMessage((data) => {
+    webviewView.webview.onDidReceiveMessage(async (data) => {
       if (this.isJSMessage(data)) {
         switch (data.type) {
           case 'loaded': {
@@ -159,23 +162,23 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             break;
           }
           case 'install': {
-            void this.install(data.index);
+            await this.install(data.index);
             break;
           }
           case 'uninstall': {
-            void this.uninstall(data.index);
+            await this.uninstall(data.index);
             break;
           }
           case 'update': {
-            void this.update(data.version, data.index);
+            await this.update(data.version, data.index);
             break;
           }
           case 'updateall': {
-            void this.updateall();
+            await this.updateall();
             break;
           }
           case 'installFromUrl': {
-            void this.installFromUrl(data.url);
+            await this.installFromUrl(data.url);
             break;
           }
           case 'blur': {
@@ -183,7 +186,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
               if (this.showingInstructions) {
                 this.showingInstructions = false;
               } else if (this.changed > this.vendorLibraries.getLastBuild()) {
-                this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
+                await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
                 this.changed = 0;
               }
             }
@@ -281,7 +284,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
         // If no conflict is found install otherwise show dialog
         if (!conflictdep) {
-          const success = await this.vendorLibraries.installDependency(
+          const success = await installDependency(
             dep,
             this.vendorLibraries.getWpVendorFolder(this.wp),
             true
@@ -310,7 +313,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                 );
                 const newDep = await this.listToDependency(reqDep);
                 if (reqDep && newDep) {
-                  await this.vendorLibraries.installDependency(
+                  await installDependency(
                     newDep,
                     this.vendorLibraries.getWpVendorFolder(this.wp),
                     true
@@ -421,7 +424,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
       // If no conflict is found, proceed with installation
       if (!conflictDep) {
-        const success = await this.vendorLibraries.installDependency(
+        const success = await installDependency(
           file,
           this.vendorLibraries.getWpVendorFolder(this.wp),
           true
@@ -435,7 +438,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             for (const required of file.requires) {
               try {
                 const requiredDep = await this.vendorLibraries.getJsonDepURL(required.onlineUrl);
-                await this.vendorLibraries.installDependency(
+                await installDependency(
                   requiredDep,
                   this.vendorLibraries.getWpVendorFolder(this.wp),
                   true
@@ -469,13 +472,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  public addDependency() {
-    if (this._view) {
-      this._view.webview.postMessage({ type: 'addDependency' });
-    }
-  }
-
-  public updateDependencies() {
+  public async updateDependencies() {
     const message = {
       type: 'updateDependencies' as const,
       installed: this.installedList,
@@ -487,9 +484,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    if (this._view) {
-      this._view.webview.postMessage(message);
-    }
+    await this._view?.webview.postMessage(message);
   }
 
   public dispose() {
@@ -513,30 +508,28 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       const installedList: IDepInstalled[] = [];
       const availableDepsList: IJsonList[] = [];
 
-      if (installedDeps.length !== 0) {
-        for (const id of installedDeps) {
-          let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-          for (const ad of availableDeps) {
-            if (id.uuid === ad.uuid) {
-              if (id.version !== ad.version) {
-                versionList.push({
-                  version: ad.version,
-                  buttonText: isNewerVersion(ad.version, id.version)
-                    ? i18n('ui', 'Update')
-                    : i18n('ui', 'Downgrade'),
-                });
-              }
+      for (const id of installedDeps) {
+        let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
+        for (const ad of availableDeps) {
+          if (id.uuid === ad.uuid) {
+            if (id.version !== ad.version) {
+              versionList.push({
+                version: ad.version,
+                buttonText: isNewerVersion(ad.version, id.version)
+                  ? i18n('ui', 'Update')
+                  : i18n('ui', 'Downgrade'),
+              });
             }
           }
-          versionList = this.sortVersions(versionList);
-
-          installedList.push({
-            uuid: id.uuid,
-            name: id.name,
-            currentVersion: id.version,
-            versionInfo: versionList,
-          });
         }
+        versionList = this.sortVersions(versionList);
+
+        installedList.push({
+          uuid: id.uuid,
+          name: id.name,
+          currentVersion: id.version,
+          versionInfo: versionList,
+        });
       }
 
       availableDeps.forEach((dep) => {
@@ -559,7 +552,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.sortInstalled();
       this.sortAvailable();
 
-      this.updateDependencies();
+      await this.updateDependencies();
     } finally {
       this.refreshInProgress = false;
     }
@@ -567,7 +560,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
   public async refresh() {
     if (this.wp) {
-      void this._refresh(this.wp);
+      await this._refresh(this.wp);
     }
   }
 
@@ -587,44 +580,20 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private sortInstalled() {
-    this.installedList.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.installedList.sort(sort);
   }
 
   private sortInstalledDeps() {
-    this.installedDeps.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.installedDeps.sort(sort);
   }
 
   private sortAvailable() {
-    this.availableDepsList.sort((a, b) => {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      } else if (a.name.toLowerCase() === b.name.toLowerCase()) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
+    this.availableDepsList.sort(sort);
   }
 
   public async getAvailableDependencies(): Promise<IJsonList[]> {
     this.homeDeps = [];
-    if (this.wp === undefined) {
+    if (!this.wp) {
       this.onlineDeps = [];
     } else {
       const projectYear = this.externalApi
@@ -664,7 +633,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
       this.onlineDeps = [...this.marketplaceDeps];
     }
-    this.homeDeps = await this.vendorLibraries.getHomeDirDeps();
+    this.homeDeps = await getHomeDirDeps();
     this.homeDeps.forEach((homedep) => {
       const depList: IJsonList = {
         path: i18n('ui', homedep.jsonUrl),
@@ -689,9 +658,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     const response = await fetch(url, {
       signal: AbortSignal.timeout(5000),
     });
-    if (response === undefined) {
-      throw new Error('Failed to fetch file');
-    }
     if (response.ok) {
       const json = (await response.json()) as IJsonList[];
       if (this.isJsonList(json)) {
@@ -705,16 +671,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   }
 
   private isJsonList(jsonDepList: IJsonList[]): jsonDepList is IJsonList[] {
-    return jsonDepList.every((jsonDep) => {
-      return (
+    return jsonDepList.every(
+      (jsonDep) =>
         jsonDep.path !== undefined &&
         jsonDep.name !== undefined &&
         jsonDep.uuid !== undefined &&
         jsonDep.version !== undefined &&
         jsonDep.description !== undefined &&
         jsonDep.website !== undefined
-      );
-    });
+    );
   }
 
   private _getHtmlForWebview(webview: vscode.Webview, viewMode: string): string {

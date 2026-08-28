@@ -38,7 +38,7 @@ ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
         def mainFile = new File(outputFolder, 'src/main/java/first/Main.java')
         def mainText = mainFile.text
         mainText = mainText.replaceAll("package org.wpilib;", "package first;")
-        mainText = mainText.replaceAll("org.wpilib.templates.timed.Robot.class", "first.robot.${template.robotclass}.class")
+        mainText = mainText.replaceAll("org.wpilib.templates.timed.Robot::new", "first.robot.${template.robotclass}::new")
         mainFile.text = mainText
 
 

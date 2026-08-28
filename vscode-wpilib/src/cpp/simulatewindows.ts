@@ -22,7 +22,7 @@ export async function simulateWindowsWindbgX(
   const env: { [key: string]: string } = {
     HALSIM_EXTENSIONS: commands.extensions,
   };
-  if (commands.environment !== undefined) {
+  if (commands.environment) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
       env[envVar] = value;
@@ -44,7 +44,7 @@ export async function startWindowsSimulation(
 ): Promise<void> {
   const wpConfiguration = vscode.workspace.getConfiguration('wpilib', commands.workspace.uri);
   const res = wpConfiguration.get<boolean>('useWindbgX');
-  if (res === true) {
+  if (res) {
     return simulateWindowsWindbgX(commands, executor);
   }
 
@@ -75,7 +75,7 @@ export async function startWindowsSimulation(
     type: 'cppvsdbg',
   };
 
-  if (commands.environment !== undefined) {
+  if (commands.environment) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
       config.environment.push({

@@ -49,7 +49,7 @@
                         "properties": {
                             "desktop": {
                                 "type": "boolean",
-                                "description": "True for desktop, false for roboRIO"
+                                "description": "True for desktop, false for Systemcore"
                             },
                             "hwsim": {
                                 "type": "boolean",
@@ -441,9 +441,8 @@
         "watch:webviews": "rolldown -c rolldown.webviews.config.mjs -w --environment NODE_ENV:development",
         "watch:extension": "rolldown -c rolldown.extension.config.mjs -w --environment NODE_ENV:development",
         "watch": "npm-run-all --parallel watch:extension watch:webviews",
-        "unittest": "mocha -r ts-node/register -u tdd src/unittest/*.ts",
+        "test": "gulp clean && tsc -p . && vscode-test",
         "gulp": "gulp",
-        "test": "npm run build:extension && node ./node_modules/vscode/bin/test",
         "updateActivation": "gulp update-activation",
         "vscePackage": "vsce package --no-dependencies"
     },
@@ -454,6 +453,8 @@
         "@types/node": "^22.19.0",
         "@types/vscode": "1.105.0",
         "@types/xml2js": "^0.4.14",
+        "@vscode/test-cli": "^0.0.15",
+        "@vscode/test-electron": "^3.1.0",
         "@vscode/vsce": "^3.5.0",
         "eslint": "^9.34.0",
         "gulp": "^5.0.1",

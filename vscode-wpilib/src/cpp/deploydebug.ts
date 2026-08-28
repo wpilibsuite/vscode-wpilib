@@ -41,7 +41,7 @@ interface ICppDebugCommand {
   target: string;
   launchfile: string;
   gdb: string;
-  sysroot: string | undefined;
+  sysroot?: string;
   srcpaths: string[];
   headerpaths: string[];
   libpaths: string[];
@@ -50,9 +50,9 @@ interface ICppDebugCommand {
 
 class CppQuickPick<T> implements vscode.QuickPickItem {
   public label: string;
-  public description?: string | undefined;
-  public detail?: string | undefined;
-  public picked?: boolean | undefined;
+  public description?: string;
+  public detail?: string;
+  public picked?: boolean;
 
   public debugInfo: T;
 
@@ -124,7 +124,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select a target',
       });
-      if (picked === undefined) {
+      if (!picked) {
         vscode.window.showInformationMessage('Target cancelled');
         return false;
       }
@@ -156,7 +156,7 @@ class DebugCodeDeployer implements ICodeDeployer {
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
       });
-      if (picked === undefined) {
+      if (!picked) {
         vscode.window.showInformationMessage('Artifact cancelled');
         return false;
       }
@@ -311,7 +311,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
       const picked = await vscode.window.showQuickPick(arr, {
         placeHolder: 'Select an artifact',
       });
-      if (picked === undefined) {
+      if (!picked) {
         vscode.window.showInformationMessage('Artifact cancelled');
         return false;
       }
@@ -340,7 +340,7 @@ class SimulateCodeDeployer implements ICodeDeployer {
           canPickMany: true,
           placeHolder: 'Pick extensions to run',
         });
-        if (quickPick === undefined) {
+        if (!quickPick) {
           vscode.window.showInformationMessage('Simulation cancelled');
           return false;
         }
@@ -398,28 +398,14 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
 }
 
-export class DeployDebug {
-  private deployDebuger: DebugCodeDeployer;
-  private deployDeployer: DeployCodeDeployer;
-  private simulator: SimulateCodeDeployer;
+export function registerCodeDeployerAndDebugger(externalApi: IExternalAPI, allowDebug: boolean) {
+  const deployDebugApi = externalApi.getDeployDebugAPI();
+  deployDebugApi.addLanguageChoice('cpp');
 
-  constructor(externalApi: IExternalAPI, allowDebug: boolean) {
-    const deployDebugApi = externalApi.getDeployDebugAPI();
-    deployDebugApi.addLanguageChoice('cpp');
+  deployDebugApi.registerCodeDeploy(new DeployCodeDeployer(externalApi));
 
-    this.deployDebuger = new DebugCodeDeployer(externalApi);
-    this.deployDeployer = new DeployCodeDeployer(externalApi);
-    this.simulator = new SimulateCodeDeployer(externalApi);
-
-    deployDebugApi.registerCodeDeploy(this.deployDeployer);
-
-    if (allowDebug) {
-      deployDebugApi.registerCodeDebug(this.deployDebuger);
-      deployDebugApi.registerCodeSimulate(this.simulator);
-    }
-  }
-
-  public dispose() {
-    //
+  if (allowDebug) {
+    deployDebugApi.registerCodeDebug(new DebugCodeDeployer(externalApi));
+    deployDebugApi.registerCodeSimulate(new SimulateCodeDeployer(externalApi));
   }
 }

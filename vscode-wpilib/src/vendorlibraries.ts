@@ -6,7 +6,14 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
-import { IJsonDependency, VendorLibrariesBase } from './shared/vendorlibrariesbase';
+import {
+  getDependencies,
+  getHomeDirDeps,
+  IJsonDependency,
+  installDependency,
+  loadFileFromUrl,
+  parseVendordepJson,
+} from './shared/vendorlibrariesbase';
 import { isNewerVersion } from './versions';
 
 class OptionQuickPick implements vscode.QuickPickItem {
@@ -27,20 +34,19 @@ class LibraryQuickPick implements vscode.QuickPickItem {
   constructor(dep: IJsonDependency, oldVersion?: string) {
     this.label = dep.name;
     this.description = dep.version;
-    if (oldVersion !== undefined) {
+    if (oldVersion) {
       this.description += ` (${i18n('ui', 'Old Version: {0}', oldVersion)})`;
     }
     this.dep = dep;
   }
 }
 
-export class VendorLibraries extends VendorLibrariesBase {
+export class VendorLibraries {
   private disposables: vscode.Disposable[] = [];
   private externalApi: IExternalAPI;
   private lastBuildTime = 1;
 
   constructor(externalApi: IExternalAPI) {
-    super(externalApi.getUtilitiesAPI());
     this.externalApi = externalApi;
 
     this.disposables.push(
@@ -62,14 +68,14 @@ export class VendorLibraries extends VendorLibrariesBase {
 
   public async manageVendorLibraries(uri: vscode.Uri | undefined): Promise<void> {
     let workspace: vscode.WorkspaceFolder | undefined;
-    if (uri !== undefined) {
+    if (uri) {
       workspace = vscode.workspace.getWorkspaceFolder(uri);
     }
 
-    if (workspace === undefined) {
+    if (!workspace) {
       const prefsApi = this.externalApi.getPreferencesAPI();
       workspace = await prefsApi.getFirstOrSelectedWorkspace();
-      if (workspace === undefined || !prefsApi.getPreferences(workspace).getIsWPILibProject()) {
+      if (!workspace || !prefsApi.getPreferences(workspace).getIsWPILibProject()) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot install vendor libraries since this is not a WPILib project')
         );
@@ -121,7 +127,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   public async getJsonDepURL(url: string): Promise<IJsonDependency> {
-    return this.loadFileFromUrl(url);
+    return loadFileFromUrl(url);
   }
 
   private async manageCurrentLibraries(workspace: vscode.WorkspaceFolder): Promise<void> {
@@ -137,7 +143,7 @@ export class VendorLibraries extends VendorLibrariesBase {
         placeHolder: i18n('message', 'Check to uninstall libraries'),
       });
 
-      if (toRemove !== undefined) {
+      if (toRemove) {
         for (const ti of toRemove) {
           deps.push(ti.dep);
         }
@@ -154,13 +160,13 @@ export class VendorLibraries extends VendorLibrariesBase {
     workspace: vscode.WorkspaceFolder
   ): Promise<boolean> {
     let anySucceeded = false;
-    if (toRemove !== undefined && toRemove.length > 0) {
+    if (toRemove && toRemove.length > 0) {
       const url = this.getWpVendorFolder(workspace);
       const files = await readdir(url);
       for (const file of files) {
         const fullPath = path.join(url, file);
-        const result = await this.readFile(fullPath);
-        if (result !== undefined) {
+        const result = await parseVendordepJson(fullPath);
+        if (result) {
           for (const ti of toRemove) {
             if (result.uuid === ti.uuid) {
               try {
@@ -186,7 +192,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     const installedDeps = await this.getInstalledDependencies(workspace);
 
     if (installedDeps.length !== 0) {
-      const availableDeps = await this.getHomeDirDeps();
+      const availableDeps = await getHomeDirDeps();
       const updatableDeps = [];
       for (const ad of availableDeps) {
         for (const id of installedDeps) {
@@ -205,10 +211,10 @@ export class VendorLibraries extends VendorLibrariesBase {
           placeHolder: i18n('message', 'Check to update libraries'),
         });
 
-        if (toUpdate !== undefined) {
+        if (toUpdate) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
-            const success = await this.installDependency(
+            const success = await installDependency(
               ti.dep,
               this.getWpVendorFolder(workspace),
               true
@@ -220,7 +226,7 @@ export class VendorLibraries extends VendorLibrariesBase {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace, true);
+            await this.offerBuild(workspace, true);
           }
         }
       } else {
@@ -236,19 +242,17 @@ export class VendorLibraries extends VendorLibrariesBase {
 
     if (installedDeps.length !== 0) {
       const promises = installedDeps.map(async (dep) => {
-        if (dep.jsonUrl === undefined || dep.jsonUrl.length === 0) {
+        if (!dep.jsonUrl) {
           return undefined;
         }
         try {
-          return await this.loadFileFromUrl(dep.jsonUrl);
+          return await loadFileFromUrl(dep.jsonUrl);
         } catch (err) {
           logger.log('Error fetching file', err);
           return undefined;
         }
       });
-      const results = (await Promise.all(promises)).filter(
-        (x) => x !== undefined
-      ) as IJsonDependency[];
+      const results = (await Promise.all(promises)).filter((x) => x !== undefined);
       const updatable = [];
       for (const newDep of results) {
         for (const oldDep of installedDeps) {
@@ -267,10 +271,10 @@ export class VendorLibraries extends VendorLibrariesBase {
           placeHolder: i18n('message', 'Check to update libraries'),
         });
 
-        if (toUpdate !== undefined) {
+        if (toUpdate) {
           let anySucceeded = false;
           for (const ti of toUpdate) {
-            const success = await this.installDependency(
+            const success = await installDependency(
               ti.dep,
               this.getWpVendorFolder(workspace),
               true
@@ -282,7 +286,7 @@ export class VendorLibraries extends VendorLibrariesBase {
             }
           }
           if (anySucceeded) {
-            this.offerBuild(workspace, true);
+            await this.offerBuild(workspace, true);
           }
         }
       } else {
@@ -296,7 +300,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   private async offlineNew(workspace: vscode.WorkspaceFolder): Promise<void> {
     const installedDeps = await this.getInstalledDependencies(workspace);
 
-    const availableDeps = await this.getHomeDirDeps();
+    const availableDeps = await getHomeDirDeps();
     const updatableDeps = [];
     for (const ad of availableDeps) {
       let foundDep = false;
@@ -316,14 +320,10 @@ export class VendorLibraries extends VendorLibrariesBase {
         placeHolder: i18n('message', 'Check to install libraries'),
       });
 
-      if (toInstall !== undefined) {
+      if (toInstall) {
         let anySucceeded = false;
         for (const ti of toInstall) {
-          const success = await this.installDependency(
-            ti.dep,
-            this.getWpVendorFolder(workspace),
-            true
-          );
+          const success = await installDependency(ti.dep, this.getWpVendorFolder(workspace), true);
           if (!success) {
             vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', ti.dep.name));
           } else {
@@ -331,7 +331,7 @@ export class VendorLibraries extends VendorLibrariesBase {
           }
         }
         if (anySucceeded) {
-          this.offerBuild(workspace, true);
+          await this.offerBuild(workspace, true);
         }
       }
     } else {
@@ -347,7 +347,7 @@ export class VendorLibraries extends VendorLibrariesBase {
     });
 
     if (result) {
-      const file = await this.loadFileFromUrl(result);
+      const file = await loadFileFromUrl(result);
       // Load existing libraries
       const existing = await this.getInstalledDependencies(workspace);
 
@@ -358,9 +358,9 @@ export class VendorLibraries extends VendorLibrariesBase {
         }
       }
 
-      const success = await this.installDependency(file, this.getWpVendorFolder(workspace), true);
+      const success = await installDependency(file, this.getWpVendorFolder(workspace), true);
       if (success) {
-        this.offerBuild(workspace, true);
+        await this.offerBuild(workspace, true);
       } else {
         vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
       }
@@ -372,7 +372,7 @@ export class VendorLibraries extends VendorLibrariesBase {
   }
 
   private getInstalledDependencies(workspace: vscode.WorkspaceFolder): Promise<IJsonDependency[]> {
-    return this.getDependencies(this.getWpVendorFolder(workspace));
+    return getDependencies(this.getWpVendorFolder(workspace));
   }
 
   public async offerBuild(workspace: vscode.WorkspaceFolder, modal = false): Promise<boolean> {

@@ -39,5 +39,6 @@
     "org.mockito.Answers.*",
     "org.wpilib.units.Units.*"
   ],
+  "java.debug.settings.enableRunDebugCodeLens": false,
   "java.dependency.enableDependencyCheckup": false
 }

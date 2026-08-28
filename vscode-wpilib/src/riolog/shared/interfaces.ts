@@ -28,32 +28,8 @@ export interface IIPCReceiveMessage {
   message: boolean | string[] | number;
 }
 
-export interface IWindowProvider {
-  createWindowView(): IWindowView;
-}
-
 export interface IDisposable {
   dispose(): unknown;
-}
-
-export interface IWindowView extends EventEmitter, IDisposable {
-  postMessage(message: IIPCSendMessage): Promise<boolean>;
-  handleSave(saveData: (IPrintMessage | IErrorMessage)[]): Promise<boolean>;
-
-  addListener(event: string, listener: (...args: unknown[]) => void): this;
-  addListener(event: 'didReceiveMessage', listener: (message: IIPCReceiveMessage) => void): this;
-  addListener(event: 'didDispose', listener: () => void): this;
-  addListener(event: 'windowActive', listener: () => void): this;
-
-  on(event: string, listener: (...args: unknown[]) => void): this;
-  on(event: 'didReceiveMessage', listener: (message: IIPCReceiveMessage) => void): this;
-  on(event: 'didDispose', listener: () => void): this;
-  on(event: 'windowActive', listener: () => void): this;
-
-  emit(event: string | symbol, ...args: unknown[]): boolean;
-  emit(event: 'didReceiveMessage', message: IIPCReceiveMessage): boolean;
-  emit(event: 'didDispose'): boolean;
-  emit(event: 'windowActive'): boolean;
 }
 
 export interface IRioConsole extends EventEmitter, IDisposable {
@@ -78,8 +54,4 @@ export interface IRioConsole extends EventEmitter, IDisposable {
   emit(event: 'connectionChanged', connected: boolean): boolean;
 
   disconnect(): void;
-}
-
-export interface IRioConsoleProvider {
-  getRioConsole(): IRioConsole;
 }
