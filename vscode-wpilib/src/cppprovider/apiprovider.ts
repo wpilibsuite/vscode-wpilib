@@ -290,11 +290,11 @@ export class ApiProvider implements CustomConfigurationProvider {
     this.toolchains = jsonc.parse(file) as IToolChain[];
 
     if (this.selectedName.Value === 'none') {
-      // Look for roborio release first
+      // Look for Systemcore release first
       const c = this.toolchains[0];
       let name = getToolchainName(c);
       for (const t of this.toolchains) {
-        if (t.name === 'linuxathena' && t.buildType === 'release') {
+        if (t.name === 'linuxsystemcore' && t.buildType === 'release') {
           name = getToolchainName(t);
           break;
         }
@@ -313,11 +313,11 @@ export class ApiProvider implements CustomConfigurationProvider {
     }
 
     if (!found) {
-      // Look for roborio release first
+      // Look for Systemcore release first
       const c = this.toolchains[0];
       let name = getToolchainName(c);
       for (const t of this.toolchains) {
-        if (t.name === 'linuxathena' && t.buildType === 'release') {
+        if (t.name === 'linuxsystemcore' && t.buildType === 'release') {
           name = getToolchainName(t);
           break;
         }

@@ -38,7 +38,7 @@ model {
         }
     }
     testSuites {
-        wpilibUserProgramTest(GoogleTestTestSuiteSpec) {
+        wpilibUserProgramCatch2Test(GoogleTestTestSuiteSpec) {
             testing $.components.wpilibUserProgram
 
             sources.cpp {
@@ -52,7 +52,7 @@ model {
 
             wpi.cpp.vendor.cpp(it)
             wpi.cpp.deps.wpilib(it)
-            wpi.cpp.deps.googleTest(it)
+            wpi.cpp.deps.catch2(it)
         }
     }
 }

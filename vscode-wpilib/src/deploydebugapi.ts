@@ -32,7 +32,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
     if ('desktop' in config) {
       desktop = config.desktop as boolean;
     } else {
-      logger.log('debugger has no desktop argument. Assuming roboRIO');
+      logger.log('debugger has no desktop argument. Assuming Systemcore');
     }
 
     let hwsim = false;
@@ -59,7 +59,7 @@ class WPILibDebugConfigurationProvider implements vscode.DebugConfigurationProvi
   ): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     const configurationDeploy: vscode.DebugConfiguration = {
       desktop: false,
-      name: 'WPILib roboRIO Debug',
+      name: 'WPILib Systemcore Debug',
       request: 'launch',
       type: 'wpilib',
     };
