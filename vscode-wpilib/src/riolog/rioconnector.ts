@@ -28,17 +28,16 @@ async function properRace<T>(promises: Promise<T>[]): Promise<T> {
 }
 
 interface IDriverStationData {
-  robotIP?: number | string;
+  robotIp?: string;
 }
 
 const constantIps: string[] = [
   process.platform == 'win32' ? '172.26.0.1' : '172.27.0.1',
   '172.30.0.1',
-  //, '127.0.0.1',
-  // Uncomment the above line for testing on localhost.
+  'robot.local'
+  // //, '127.0.0.1',
+  // // Uncomment the above line for testing on localhost.
 ];
-
-const constantHosts: string[] = ['robot.local'];
 
 interface ISocketPromisePair {
   socket: net.Socket;
@@ -93,10 +92,10 @@ function getRobotIpFromDriverStationMessage(data: string): string | undefined {
   }
 
   const parsed = JSON.parse(trimmedData) as IDriverStationData;
-  const robotIP = parsed.robotIP;
+  const robotIp = parsed.robotIp;
 
-  if (typeof robotIP === 'string') {
-    const trimmed = robotIP.trim();
+  if (typeof robotIp === 'string') {
+    const trimmed = robotIp.trim();
     if (
       trimmed.length === 0 ||
       trimmed === '0' ||
@@ -106,11 +105,6 @@ function getRobotIpFromDriverStationMessage(data: string): string | undefined {
       return undefined;
     }
     return trimmed;
-  }
-
-  if (typeof robotIP === 'number' && robotIP !== 0) {
-    const ip = robotIP >>> 0;
-    return `${(ip >> 24) & 0xff}.${(ip >> 16) & 0xff}.${(ip >> 8) & 0xff}.${ip & 0xff}`;
   }
 
   return undefined;
@@ -147,84 +141,6 @@ function connectSocketToIP(
   });
 }
 
-function getSocketFromDSTcp(port: number, dsPort: number): ISocketPromisePair {
-  const s = new net.Socket();
-  const ds = new net.Socket();
-  let dsBuffer = '';
-  let foundRobotIp = false;
-
-  const disposeDs = () => {
-    ds.emit('dispose');
-  };
-
-  const retVal = new DSSocketPromisePair(
-    s,
-    disposeDs,
-    new Promise((resolve, reject) => {
-      const cleanupDs = () => {
-        ds.end();
-        ds.destroy();
-        ds.removeAllListeners();
-      };
-      const tryConnectToRobot = (rawMessage: string) => {
-        let ipAddr: string | undefined;
-        try {
-          ipAddr = getRobotIpFromDriverStationMessage(rawMessage);
-        } catch (e) {
-          logger.info('failed parsing driver station message', e);
-          return false;
-        }
-
-        if (!ipAddr) {
-          return false;
-        }
-
-        foundRobotIp = true;
-        cleanupDs();
-        connectSocketToIP(s, port, ipAddr, resolve, reject);
-        return true;
-      };
-
-      ds.on('data', (data) => {
-        if (foundRobotIp) {
-          return;
-        }
-
-        dsBuffer += data.toString();
-        const messages = dsBuffer.split('\n');
-        dsBuffer = messages.pop() ?? '';
-
-        for (const message of messages) {
-          if (message.trim().length === 0) {
-            continue;
-          }
-          if (tryConnectToRobot(message)) {
-            return;
-          }
-        }
-
-        const pendingMessage = dsBuffer.trim();
-        if (pendingMessage.endsWith('}')) {
-          if (!tryConnectToRobot(dsBuffer)) {
-            dsBuffer = '';
-          }
-        }
-      });
-      ds.on('error', () => {
-        cleanupDs();
-        reject();
-      });
-      ds.on('dispose', () => {
-        logger.info('disposed ds');
-        cleanupDs();
-        reject();
-      });
-      ds.connect(dsPort, '127.0.0.1');
-    })
-  );
-  return retVal;
-}
-
 function getSocketFromDSWebSocket(port: number): ISocketPromisePair {
   const s = new net.Socket();
   let ws: WebSocket | undefined;
@@ -240,15 +156,11 @@ function getSocketFromDSWebSocket(port: number): ISocketPromisePair {
     }
   };
 
-  const retVal = new DSSocketPromisePair(
+  return new DSSocketPromisePair(
     s,
     disposeDs,
     new Promise((resolve, reject) => {
       rejectPromise = reject;
-      if (typeof WebSocket === 'undefined') {
-        reject();
-        return;
-      }
 
       ws = new WebSocket('ws://localhost:6768/ipws');
 
@@ -287,7 +199,6 @@ function getSocketFromDSWebSocket(port: number): ISocketPromisePair {
       });
     })
   );
-  return retVal;
 }
 
 class RawSocketPromisePair implements ISocketPromisePair {
@@ -325,12 +236,8 @@ export async function connectToRobot(
   for (const c of constantIps) {
     pairs.push(getSocketFromIP(port, c));
   }
-  for (const c of constantHosts) {
-    pairs.push(getSocketFromIP(port, c));
-  }
   pairs.push(getSocketFromIP(port, `10.${Math.trunc(teamNumber / 100)}.${teamNumber % 100}.2`));
   pairs.push(getSocketFromDSWebSocket(port));
-  pairs.push(getSocketFromDSTcp(port, 6770));
   const connectors: Promise<net.Socket | undefined>[] = [];
   for (const p of pairs) {
     connectors.push(p.promise);
