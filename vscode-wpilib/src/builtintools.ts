@@ -5,7 +5,7 @@ import { access, readFile } from 'fs/promises';
 import * as path from 'path';
 import { IExternalAPI, IPreferencesAPI, IToolRunner } from './api';
 import { getWPILibHomeDir } from './shared/utilitiesapi';
-import { getIsMac, getIsWindows } from './utilities';
+import { getIsLinux, getIsMac, getIsWindows } from './utilities';
 
 interface ITool {
   name: string;
@@ -67,9 +67,11 @@ export async function registerBuiltinTools(api: IExternalAPI) {
   const homeTools = await enumerateHomeTools();
   const isWindows = getIsWindows();
   const isMac = getIsMac();
+  const isLinux = getIsLinux();
   const exten = isWindows ? '.exe' : isMac ? '.app' : '';
   for (const ht of homeTools.tools) {
-    const toolPath = path.join(homeTools.dir, ht.name + exten);
+    const toolName = isLinux ? ht.name.toLowerCase() : ht.name;
+    const toolPath = path.join(homeTools.dir, toolName + exten);
     try {
       await access(toolPath);
       // Tool exists, add it

@@ -16,6 +16,10 @@ export function getIsMac(): boolean {
   return process.platform === 'darwin';
 }
 
+export function getIsLinux(): boolean {
+  return process.platform === 'linux';
+}
+
 export async function getClassName(): Promise<string | undefined> {
   const promptString = 'Please enter a class name';
   const className = await vscode.window.showInputBox({
