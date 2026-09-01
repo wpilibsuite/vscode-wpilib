@@ -9,6 +9,8 @@ export default defineConfig([
     'resources/',
     'eslint.config.mjs',
     'rollup.*.config.mjs',
+    'rolldown.*.config.mjs',
+    'svelte.config.mjs',
     'gulpfile.mjs',
     'dist',
     'node_modules/',
