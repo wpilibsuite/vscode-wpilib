@@ -4,7 +4,7 @@
     onInstall: (url: string) => void;
   }
 
-  let { url = $bindable(''), onInstall = () => {} }: Props = $props();
+  let { url = $bindable(''), onInstall }: Props = $props();
 
   const install = () => {
     if (url.trim().length === 0) {
@@ -38,6 +38,7 @@
     </button>
   </div>
   <div class="url-help-text">
-    Enter a vendor dependency JSON URL to install a library not listed in the available dependencies.
+    Enter a vendor dependency JSON URL to install a library not listed in the available
+    dependencies.
   </div>
 </div>

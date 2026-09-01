@@ -1,77 +1,84 @@
 <script lang="ts">
+  import { ReceiveTypes } from '../../../riolog/shared/interfaces';
   interface Props {
     connected: boolean;
-    paused: boolean;
     pausedCount: number;
-    discard: boolean;
     autoScroll: boolean;
     showPrints: boolean;
     showWarnings: boolean;
     showTimestamps: boolean;
-    autoReconnect: boolean;
-    teamNumber: string;
     filterText: string;
-
-    onPause: () => void;
-    onDiscard: () => void;
+    sendReceiveMessage: (message: unknown, type: ReceiveTypes) => void;
     onClear: () => void;
     onToggleAutoScroll: () => void;
     onTogglePrints: () => void;
     onToggleWarnings: () => void;
     onToggleTimestamps: () => void;
-    onToggleReconnect: () => void;
     onSave: () => void;
-    onApplyTeamNumber: () => boolean;
-    onTeamNumberInput: (value: string) => void;
     onFilterInput: (value: string) => void;
   }
 
   let {
     connected,
-    paused,
     pausedCount,
-    discard,
     autoScroll,
     showPrints,
     showWarnings,
     showTimestamps,
-    autoReconnect,
-    teamNumber,
     filterText,
-    onPause,
-    onDiscard,
+    sendReceiveMessage,
     onClear,
     onToggleAutoScroll,
     onTogglePrints,
     onToggleWarnings,
     onToggleTimestamps,
-    onToggleReconnect,
     onSave,
-    onApplyTeamNumber,
-    onTeamNumberInput,
     onFilterInput,
   }: Props = $props();
 
   let appliedFlash = $state(false);
+  let autoReconnect = $state(true);
+  let discard = $state(false);
   let inputError = $state(false);
+  let paused = $state(false);
+  let teamNumber = $state('');
 
   const applyTeam = async () => {
-    const ok = onApplyTeamNumber();
-    if (!ok) {
+    const num = Number.parseInt(teamNumber, 10);
+    if (!Number.isFinite(num) || num < 0 || num > 99999) {
       inputError = true;
       setTimeout(() => {
         inputError = false;
       }, 1000);
       return;
     }
+    sendReceiveMessage(num, ReceiveTypes.ChangeNumber);
     appliedFlash = true;
     setTimeout(() => {
       appliedFlash = false;
     }, 1000);
   };
 
+  const toggleDiscard = () => {
+    discard = !discard;
+    sendReceiveMessage(discard, ReceiveTypes.Discard);
+  };
+
+  const togglePause = () => {
+    paused = !paused;
+    if (paused) {
+      pausedCount = 0;
+    }
+    sendReceiveMessage(paused, ReceiveTypes.Pause);
+  };
+
+  const toggleReconnect = () => {
+    autoReconnect = !autoReconnect;
+    sendReceiveMessage(autoReconnect, ReceiveTypes.Reconnect);
+  };
+
   const onTeamInput = (event: Event) => {
-    onTeamNumberInput((event.currentTarget as HTMLInputElement).value);
+    teamNumber = (event.currentTarget as HTMLInputElement).value;
     inputError = false;
   };
 </script>
@@ -123,7 +130,7 @@
       <button
         id="pause-button"
         class={['vscode-button', paused && 'active']}
-        onclick={onPause}
+        onclick={togglePause}
         title="Pause log updates"
       >
         {paused ? `Paused: ${pausedCount}` : 'Pause'}
@@ -131,12 +138,17 @@
       <button
         id="discard-button"
         class={['vscode-button', discard && 'active']}
-        onclick={onDiscard}
+        onclick={toggleDiscard}
         title="Discard incoming messages"
       >
         {discard ? 'Resume Capture' : 'Discard'}
       </button>
-      <button id="clear-button" class="vscode-button" onclick={onClear} title="Clear all log entries">
+      <button
+        id="clear-button"
+        class="vscode-button"
+        onclick={onClear}
+        title="Clear all log entries"
+      >
         Clear
       </button>
       <button
@@ -177,7 +189,7 @@
       <button
         id="reconnect-button"
         class={['vscode-button', !autoReconnect && 'active']}
-        onclick={onToggleReconnect}
+        onclick={toggleReconnect}
         title="Toggle auto reconnection"
       >
         {autoReconnect ? 'Auto-Reconnect: On' : 'Auto-Reconnect: Off'}

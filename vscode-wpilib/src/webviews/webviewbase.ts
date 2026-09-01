@@ -59,7 +59,7 @@ export abstract class WebViewBase {
         retainContextWhenHidden: true,
         ...(options || {}),
         localResourceRoots: [
-          vscode.Uri.file(extensionContext.extensionPath),
+          vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources')),
           vscode.Uri.file(path.join(extensionContext.extensionPath, 'resources', 'media')),
         ],
       });

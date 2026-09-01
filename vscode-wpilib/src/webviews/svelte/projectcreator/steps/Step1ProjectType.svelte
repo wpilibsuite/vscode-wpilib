@@ -8,14 +8,8 @@
     onNext: () => void;
   }
 
-  let { selected = null, onSelect = () => {}, onNext = () => {} }: Props = $props();
+  let { selected, onSelect, onNext }: Props = $props();
   const t = createTranslator('projectcreator');
-
-  const select = (type: ProjectType) => {
-    onSelect(type);
-  };
-
-  const next = () => onNext();
 </script>
 
 <div class="step-header">
@@ -28,7 +22,7 @@
     type="button"
     class={['selection-card', selected === ProjectType.Template && 'selected']}
     data-value="Template"
-    onclick={() => select(ProjectType.Template)}
+    onclick={() => onSelect(ProjectType.Template)}
     aria-pressed={selected === ProjectType.Template}
   >
     <h3>{t('Template')}</h3>
@@ -41,7 +35,7 @@
     type="button"
     class={['selection-card', selected === ProjectType.Example && 'selected']}
     data-value="Example"
-    onclick={() => select(ProjectType.Example)}
+    onclick={() => onSelect(ProjectType.Example)}
     aria-pressed={selected === ProjectType.Example}
   >
     <h3>{t('Example')}</h3>
@@ -59,7 +53,7 @@
     type="button"
     class="vscode-button"
     disabled={selected === null}
-    onclick={next}
+    onclick={onNext}
   >
     {t('Next')}
   </button>

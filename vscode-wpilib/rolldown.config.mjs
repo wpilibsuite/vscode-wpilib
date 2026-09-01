@@ -97,55 +97,67 @@ function isSharedWebviewModule(moduleId) {
   );
 }
 
-export default {
-  input: bundleEntries,
-  platform: 'browser',
-  tsconfig: path.resolve(__dirname, 'tsconfig.json'),
-  resolve: {
-    conditionNames: production ? ['production'] : ['development'],
-    extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
-  },
-  output: {
-    dir: path.resolve(__dirname, 'resources', 'dist'),
-    entryFileNames: '[name].js',
-    format: 'es',
-    sourcemap: !production,
-    minify: production
-      ? {
-          compress: {
-            passes: 2,
-          },
-          mangle: true,
+export default [
+  {
+    input: bundleEntries,
+    platform: 'browser',
+    tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+    resolve: {
+      conditionNames: production ? ['production'] : ['development'],
+      extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
+    },
+    output: {
+      dir: path.resolve(__dirname, 'resources', 'dist'),
+      entryFileNames: '[name].js',
+      format: 'es',
+      sourcemap: !production,
+      minify: production,
+      manualChunks(id) {
+        if (isSharedWebviewModule(id)) {
+          return 'webview-shared';
         }
-      : false,
-    manualChunks(id) {
-      if (isSharedWebviewModule(id)) {
-        return 'webview-shared';
+        return undefined;
+      },
+    },
+    onwarn(warning, handler) {
+      if (
+        warning.code === 'CIRCULAR_DEPENDENCY' &&
+        Array.isArray(warning.ids) &&
+        warning.ids.every((id) =>
+          id.includes(`${path.sep}node_modules${path.sep}svelte${path.sep}`)
+        )
+      ) {
+        return;
       }
-      return undefined;
+      handler(warning);
+    },
+    plugins: [
+      svelte({
+        compilerOptions: {
+          dev: !production,
+        },
+        emitCss: false,
+        preprocess: svelteConfig.preprocess,
+      }),
+      generateWebviewHtmlFiles(),
+    ],
+    watch: {
+      clearScreen: false,
     },
   },
-  onwarn(warning, handler) {
-    if (
-      warning.code === 'CIRCULAR_DEPENDENCY' &&
-      Array.isArray(warning.ids) &&
-      warning.ids.every((id) => id.includes(`${path.sep}node_modules${path.sep}svelte${path.sep}`))
-    ) {
-      return;
-    }
-    handler(warning);
+  {
+    input: path.resolve(__dirname, 'src/extension.ts'),
+    platform: 'node',
+    resolve: {
+      extensions: ['.mjs', '.js', '.json', '.ts'],
+      mainFields: ['module', 'main'],
+    },
+    output: {
+      file: path.resolve(__dirname, 'out/extension.js'),
+      format: 'esm',
+      sourcemap: production ? 'hidden' : 'inline',
+      exports: 'named',
+    },
+    external: ['vscode'],
   },
-  plugins: [
-    svelte({
-      compilerOptions: {
-        dev: !production,
-      },
-      emitCss: false,
-      preprocess: svelteConfig.preprocess,
-    }),
-    generateWebviewHtmlFiles(),
-  ],
-  watch: {
-    clearScreen: false,
-  },
-};
+];

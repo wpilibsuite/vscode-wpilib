@@ -1,8 +1,4 @@
 import { mount } from 'svelte';
 import Gradle2025Import from './Gradle2025Import.svelte';
 
-const target = document.getElementById('app') ?? document.body;
-
-export default mount(Gradle2025Import, {
-  target,
-});
+export default mount(Gradle2025Import, { target: document.getElementById('app') ?? document.body });

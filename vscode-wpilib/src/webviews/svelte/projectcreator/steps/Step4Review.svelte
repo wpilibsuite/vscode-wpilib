@@ -13,19 +13,8 @@
     onCreate: () => void;
   }
 
-  let {
-    projectType = ProjectType.Template,
-    language = '',
-    base = '',
-    location = '',
-    teamNumber = '',
-    onBack = () => {},
-    onCreate = () => {},
-  }: Props = $props();
+  let { projectType, language, base, location, teamNumber, onBack, onCreate }: Props = $props();
   const t = createTranslator('projectcreator');
-
-  const back = () => onBack();
-  const createProject = () => onCreate();
 
   const projectTypeLabel = $derived(
     projectType === ProjectType.Template ? t('Template') : t('Example')
@@ -50,10 +39,10 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-3" type="button" class="vscode-button secondary" onclick={back}>
+  <button id="back-to-step-3" type="button" class="vscode-button secondary" onclick={onBack}>
     {t('Back')}
   </button>
-  <button id="generateProject" type="button" class="vscode-button" onclick={createProject}>
+  <button id="generateProject" type="button" class="vscode-button" onclick={onCreate}>
     {t('Create Project')}
   </button>
 </div>

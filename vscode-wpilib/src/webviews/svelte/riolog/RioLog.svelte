@@ -17,16 +17,12 @@
   let nextId = 1;
 
   let connected = $state(false);
-  let paused = $state(false);
   let pausedCount = $state(0);
-  let discard = $state(false);
-  let autoReconnect = $state(true);
   let showWarnings = $state(true);
   let showPrints = $state(true);
   let showTimestamps = $state(false);
   let autoScroll = $state(true);
   let filterText = $state('');
-  let teamNumber = $state('');
 
   const maxLogEntries = 2000;
 
@@ -107,22 +103,8 @@
     addMessage(welcomeMessage);
   };
 
-  const sendReceiveMessage = (message: unknown, type: ReceiveTypes) => {
+  const sendReceiveMessage = (message: unknown, type: ReceiveTypes) =>
     vscode.postMessage({ type, message });
-  };
-
-  const togglePause = () => {
-    paused = !paused;
-    if (paused) {
-      pausedCount = 0;
-    }
-    sendReceiveMessage(paused, ReceiveTypes.Pause);
-  };
-
-  const toggleDiscard = () => {
-    discard = !discard;
-    sendReceiveMessage(discard, ReceiveTypes.Discard);
-  };
 
   const clearLog = () => {
     entries.length = 0;
@@ -132,41 +114,17 @@
   const toggleAutoScroll = () => {
     autoScroll = !autoScroll;
     if (autoScroll) {
-      void tick().then(() => {
-        logContainer?.scrollTo({ top: logContainer.scrollHeight });
-      });
+      void tick().then(() => logContainer?.scrollTo({ top: logContainer.scrollHeight }));
     }
   };
 
-  const togglePrints = () => {
-    showPrints = !showPrints;
-  };
-
-  const toggleWarnings = () => {
-    showWarnings = !showWarnings;
-  };
-
-  const toggleTimestamps = () => {
-    showTimestamps = !showTimestamps;
-  };
-
-  const toggleReconnect = () => {
-    autoReconnect = !autoReconnect;
-    sendReceiveMessage(autoReconnect, ReceiveTypes.Reconnect);
-  };
+  const togglePrints = () => (showPrints = !showPrints);
+  const toggleWarnings = () => (showWarnings = !showWarnings);
+  const toggleTimestamps = () => (showTimestamps = !showTimestamps);
 
   const saveLog = () => {
     const logs = entries.map((entry) => JSON.stringify(entry.message));
     sendReceiveMessage(logs, ReceiveTypes.Save);
-  };
-
-  const applyTeamNumber = (): boolean => {
-    const num = Number.parseInt(teamNumber, 10);
-    if (!Number.isFinite(num) || num < 0 || num > 99999) {
-      return false;
-    }
-    sendReceiveMessage(num, ReceiveTypes.ChangeNumber);
-    return true;
   };
 
   const toggleExpanded = (id: number) => {
@@ -190,32 +148,30 @@
 
   const onHostMessage = (event: MessageEvent<IIPCSendMessage | ThemeColorsMessage>) => {
     const data = event.data;
-    if (!data) return;
-    if ((data as ThemeColorsMessage).type === 'themeColors') {
+    if (!data) {
+      return;
+    }
+    if (data.type === 'themeColors') {
       return;
     }
 
-    const msg = data as IIPCSendMessage;
-    switch (msg.type) {
+    switch (data.type) {
       case SendTypes.New:
-        addMessage(msg.message as IPrintMessage | IErrorMessage);
+        addMessage(data.message as IPrintMessage | IErrorMessage);
         break;
       case SendTypes.Batch:
-        addMessages(msg.message as (IPrintMessage | IErrorMessage)[]);
+        addMessages(data.message as (IPrintMessage | IErrorMessage)[]);
         break;
       case SendTypes.PauseUpdate:
-        pausedCount = msg.message as number;
+        pausedCount = data.message as number;
         break;
       case SendTypes.ConnectionChanged: {
-        const nextState = msg.message as boolean;
+        const nextState = data.message as boolean;
         connected = nextState;
         addConnectionMessage(nextState);
         break;
       }
-      default: {
-        const _exhaustive: never = msg.type;
-        return _exhaustive;
-      }
+      default:
     }
   };
 
@@ -227,9 +183,7 @@
     if (count !== lastVisibleCount) {
       lastVisibleCount = count;
       if (autoScroll) {
-        void tick().then(() => {
-          logContainer?.scrollTo({ top: logContainer.scrollHeight });
-        });
+        void tick().then(() => logContainer?.scrollTo({ top: logContainer.scrollHeight }));
       }
     }
   });
@@ -246,27 +200,19 @@
 
   <RioLogToolbar
     {connected}
-    {paused}
     {pausedCount}
-    {discard}
     {autoScroll}
     {showPrints}
     {showWarnings}
     {showTimestamps}
-    {autoReconnect}
-    {teamNumber}
     {filterText}
-    onPause={togglePause}
-    onDiscard={toggleDiscard}
+    {sendReceiveMessage}
     onClear={clearLog}
     onToggleAutoScroll={toggleAutoScroll}
     onTogglePrints={togglePrints}
     onToggleWarnings={toggleWarnings}
     onToggleTimestamps={toggleTimestamps}
-    onToggleReconnect={toggleReconnect}
     onSave={saveLog}
-    onApplyTeamNumber={applyTeamNumber}
-    onTeamNumberInput={(value) => (teamNumber = value)}
     onFilterInput={(value) => (filterText = value)}
   />
 </div>

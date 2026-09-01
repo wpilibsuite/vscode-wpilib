@@ -3,14 +3,6 @@
 
   const vscode = acquireVsCodeApi();
   const logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
-
-  const openCommandPalette = () => {
-    vscode.postMessage({ command: 'openCommandPalette' });
-  };
-
-  const openDocumentation = () => {
-    vscode.postMessage({ command: 'openDocumentation' });
-  };
 </script>
 
 <div class="project-container">
@@ -20,8 +12,7 @@
 
   <div class="project-row">
     <p>
-      Welcome to WPILib Help! Thank you for alpha testing the Systemcore and 2027 WPILib. Please
-      see
+      Welcome to WPILib Help! Thank you for alpha testing the Systemcore and 2027 WPILib. Please see
       <a href="https://github.com/wpilibsuite/SystemcoreTesting/">
         https://github.com/wpilibsuite/SystemcoreTesting/</a
       >
@@ -43,12 +34,10 @@
     <h2 class="project-subtitle">Common Tasks</h2>
     <ul>
       <li>
-        Create a new project: Click on the Command Palette and type "WPILib: Create a new
-        project"
+        Create a new project: Click on the Command Palette and type "WPILib: Create a new project"
       </li>
       <li>
-        Deploy code to the robot: Click on the Command Palette and type "WPILib: Deploy Robot
-        Code"
+        Deploy code to the robot: Click on the Command Palette and type "WPILib: Deploy Robot Code"
       </li>
       <li>
         Start a simulation: Click on the Command Palette and type "WPILib: Simulate Robot Code"
@@ -61,8 +50,7 @@
     <h2 class="project-subtitle">Setting Up Your Workspace</h2>
     <ul>
       <li>
-        Enable desktop support: Click on the Command Palette and type "WPILib: Set Desktop
-        Support"
+        Enable desktop support: Click on the Command Palette and type "WPILib: Set Desktop Support"
       </li>
       <li>Run RioLog: Click on the Command Palette and type "WPILib: Start RioLog"</li>
       <li>
@@ -73,10 +61,20 @@
   </div>
 
   <div class="project-actions">
-    <button id="openCommandPalette" type="button" class="vscode-button" onclick={openCommandPalette}>
+    <button
+      id="openCommandPalette"
+      type="button"
+      class="vscode-button"
+      onclick={() => vscode.postMessage({ command: 'openCommandPalette' })}
+    >
       Open Command Palette
     </button>
-    <button id="openDocumentation" type="button" class="vscode-button" onclick={openDocumentation}>
+    <button
+      id="openDocumentation"
+      type="button"
+      class="vscode-button"
+      onclick={() => vscode.postMessage({ command: 'openDocumentation' })}
+    >
       Open WPILib Documentation
     </button>
   </div>

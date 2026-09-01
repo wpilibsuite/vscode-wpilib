@@ -14,29 +14,18 @@
   }
 
   let {
-    languages = [],
-    selectedLanguage = '',
-    bases = [],
-    selectedBase = '',
-    onLanguageChange = () => {},
-    onBaseChange = () => {},
-    onNext = () => {},
-    onBack = () => {},
+    languages,
+    selectedLanguage,
+    bases,
+    selectedBase,
+    onLanguageChange,
+    onBaseChange,
+    onNext,
+    onBack,
   }: Props = $props();
   const t = createTranslator('projectcreator');
 
   const canProceed = $derived(selectedLanguage !== '' && selectedBase !== '');
-
-  const notifyLanguageChange = (event: Event) => {
-    onLanguageChange((event.currentTarget as HTMLSelectElement).value);
-  };
-
-  const notifyBaseChange = (event: Event) => {
-    onBaseChange((event.currentTarget as HTMLSelectElement).value);
-  };
-
-  const next = () => onNext();
-  const back = () => onBack();
 </script>
 
 <div class="step-header">
@@ -52,7 +41,7 @@
       id="language-select"
       class="project-select"
       value={selectedLanguage}
-      onchange={notifyLanguageChange}
+      onchange={(event) => onLanguageChange(event.currentTarget.value)}
       disabled={languages.length === 0}
     >
       <option value="" disabled>{t('Select a language')}</option>
@@ -71,7 +60,7 @@
       id="base-select"
       class="project-select"
       value={selectedBase}
-      onchange={notifyBaseChange}
+      onchange={(event) => onBaseChange(event.currentTarget.value)}
       disabled={bases.length === 0}
     >
       <option value="" disabled>{t('Select a project base')}</option>
@@ -83,7 +72,7 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-1" type="button" class="vscode-button secondary" onclick={back}>
+  <button id="back-to-step-1" type="button" class="vscode-button secondary" onclick={onBack}>
     {t('Back')}
   </button>
   <button
@@ -91,7 +80,7 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    onclick={next}
+    onclick={onNext}
   >
     {t('Next')}
   </button>

@@ -27,61 +27,29 @@
   }
 
   let {
-    projectFolder = '',
-    projectFolderError = null,
-    projectName = '',
-    projectNameError = null,
-    teamNumber = '',
-    teamNumberError = null,
-    newFolder = true,
-    desktop = false,
-    hardware = 'none',
-    showProjectFolderError = false,
-    showProjectNameError = false,
-    showTeamNumberError = false,
-    onSelectFolder = () => {},
-    onProjectNameChange = () => {},
-    onTeamNumberChange = () => {},
-    onNewFolderChange = () => {},
-    onDesktopChange = () => {},
-    onHardwareChange = () => {},
-    onBack = () => {},
-    onNext = () => {},
+    projectFolder,
+    projectFolderError,
+    projectName,
+    projectNameError,
+    teamNumber,
+    teamNumberError,
+    newFolder,
+    desktop,
+    hardware,
+    showProjectFolderError,
+    showProjectNameError,
+    showTeamNumberError,
+    onSelectFolder,
+    onProjectNameChange,
+    onTeamNumberChange,
+    onNewFolderChange,
+    onDesktopChange,
+    onHardwareChange,
+    onBack,
+    onNext,
   }: Props = $props();
 
   let canProceed = $derived(!projectFolderError && !projectNameError);
-
-  const selectFolder = () => onSelectFolder();
-  const back = () => onBack();
-  const next = () => onNext();
-
-  const updateHardware = (option: HardwareOption) => {
-    onHardwareChange(option);
-  };
-
-  const handleProjectNameInput = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const inputValue = target?.value ?? projectName;
-    onProjectNameChange(inputValue);
-  };
-
-  const handleTeamNumberInput = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const inputValue = target?.value ?? teamNumber;
-    onTeamNumberChange(inputValue);
-  };
-
-  const handleNewFolderChange = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const checkedValue = target?.checked ?? newFolder;
-    onNewFolderChange(checkedValue);
-  };
-
-  const handleDesktopChange = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const checkedValue = target?.checked ?? desktop;
-    onDesktopChange(checkedValue);
-  };
 </script>
 
 <div class="step-header">
@@ -106,7 +74,7 @@
 </div>
 
 <div class="project-row">
-  <button id="projectSelectButton" type="button" class="vscode-button" onclick={selectFolder}>
+  <button id="projectSelectButton" type="button" class="vscode-button" onclick={onSelectFolder}>
     Select Base Folder
   </button>
 </div>
@@ -119,7 +87,7 @@
       class="vscode-textfield"
       type="text"
       value={projectName}
-      oninput={handleProjectNameInput}
+      oninput={(event) => onProjectNameChange(event.currentTarget?.value ?? projectName)}
     />
     <ValidationError
       id="projectNameError"
@@ -137,7 +105,7 @@
       class="vscode-textfield"
       type="number"
       value={teamNumber}
-      oninput={handleTeamNumberInput}
+      oninput={(event) => onTeamNumberChange(event.currentTarget?.value ?? teamNumber)}
     />
     <ValidationError
       id="teamNumberError"
@@ -153,7 +121,7 @@
       id="newFolderCB"
       type="checkbox"
       checked={newFolder}
-      onchange={handleNewFolderChange}
+      onchange={(event) => onNewFolderChange(event.currentTarget?.checked ?? newFolder)}
     />
     <label for="newFolderCB">
       <span class="icon">
@@ -171,7 +139,7 @@
       id="desktopCB"
       type="checkbox"
       checked={desktop}
-      onchange={handleDesktopChange}
+      onchange={(event) => onDesktopChange(event.currentTarget?.checked ?? desktop)}
     />
     <label for="desktopCB">
       <span class="icon">
@@ -193,7 +161,7 @@
       name="hardware"
       value="none"
       checked={hardware === 'none'}
-      onchange={() => updateHardware('none')}
+      onchange={() => onHardwareChange('none')}
     />
     <label for="noneCB">SystemCore</label>
   </div>
@@ -204,7 +172,7 @@
       name="hardware"
       value="romi"
       checked={hardware === 'romi'}
-      onchange={() => updateHardware('romi')}
+      onchange={() => onHardwareChange('romi')}
     />
     <label for="romiCB">Romi</label>
   </div>
@@ -215,14 +183,14 @@
       name="hardware"
       value="xrp"
       checked={hardware === 'xrp'}
-      onchange={() => updateHardware('xrp')}
+      onchange={() => onHardwareChange('xrp')}
     />
     <label for="xrpCB">XRP</label>
   </div>
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-1" type="button" class="vscode-button secondary" onclick={back}>
+  <button id="back-to-step-1" type="button" class="vscode-button secondary" onclick={onBack}>
     Back
   </button>
   <button
@@ -230,7 +198,7 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    onclick={next}
+    onclick={onNext}
   >
     Next
   </button>

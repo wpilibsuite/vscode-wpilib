@@ -5,10 +5,7 @@
     onNext: () => void;
   }
 
-  let { sourcePath = '', onSelectSource = () => {}, onNext = () => {} }: Props = $props();
-
-  const selectSource = () => onSelectSource();
-  const next = () => onNext();
+  let { sourcePath, onSelectSource, onNext }: Props = $props();
 
   let canProceed = $derived(sourcePath.trim().length > 0);
 </script>
@@ -28,7 +25,7 @@
 </div>
 
 <div class="project-row">
-  <button id="gradle2025SelectButton" type="button" class="vscode-button" onclick={selectSource}>
+  <button id="gradle2025SelectButton" type="button" class="vscode-button" onclick={onSelectSource}>
     Select Source Project
   </button>
 </div>
@@ -40,7 +37,7 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    onclick={next}
+    onclick={onNext}
   >
     Next
   </button>

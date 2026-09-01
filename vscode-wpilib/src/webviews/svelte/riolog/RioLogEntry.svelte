@@ -9,11 +9,10 @@
     onToggleExpanded: (id: number) => void;
   }
 
-  let { entry, showTimestamps, onToggleExpanded = () => {} }: Props = $props();
+  let { entry, showTimestamps, onToggleExpanded }: Props = $props();
 
-  const formatRioLogTimestamp = (tsSeconds: number): string => {
-    return new Date(tsSeconds * 1000).toISOString().slice(11, -1) + ': ';
-  };
+  const formatRioLogTimestamp = (tsSeconds: number): string =>
+    new Date(tsSeconds * 1000).toISOString().slice(11, -1) + ': ';
 
   const isErrorOrWarning = $derived(entry.message.messageType !== MessageType.Print);
   const isWarning = $derived(entry.message.messageType === MessageType.Warning);
@@ -27,6 +26,24 @@
         : ['log-entry', 'print-log']
   );
 </script>
+
+{#snippet message()}
+  <div class="log-message">
+    {#if showTimestamps}
+      <span class="timestamp">{formatRioLogTimestamp(entry.message.timestamp)}</span>
+    {/if}
+    <span
+      class="message-content"
+      style={isErrorOrWarning
+        ? isWarning
+          ? 'color: var(--vscode-warningForeground, #ff9800)'
+          : 'color: var(--vscode-testing-iconFailed, #f44336)'
+        : ''}
+    >
+      <AnsiText lines={entry.lines} />
+    </span>
+  </div>
+{/snippet}
 
 {#if isErrorOrWarning}
   <div
@@ -43,17 +60,7 @@
   >
     <div class={['toggle-button', isExpanded ? 'expanded' : 'collapsed']}></div>
     <div class={['error-content', isExpanded ? 'expanded' : 'collapsed']}>
-      <div class="log-message">
-        {#if showTimestamps}
-          <span class="timestamp">{formatRioLogTimestamp(entry.message.timestamp)}</span>
-        {/if}
-      <span
-        class="message-content"
-        style={isWarning ? 'color: var(--vscode-warningForeground, #ff9800)' : 'color: var(--vscode-testing-iconFailed, #f44336)'}
-      >
-          <AnsiText lines={entry.lines} />
-        </span>
-      </div>
+      {@render message()}
 
       {#if isExpanded}
         <div class="location-info">
@@ -75,13 +82,6 @@
   </div>
 {:else}
   <div class={rowClass}>
-    <div class="log-message">
-      {#if showTimestamps}
-        <span class="timestamp">{formatRioLogTimestamp(entry.message.timestamp)}</span>
-      {/if}
-      <span class="message-content">
-        <AnsiText lines={entry.lines} />
-      </span>
-    </div>
+    {@render message()}
   </div>
 {/if}

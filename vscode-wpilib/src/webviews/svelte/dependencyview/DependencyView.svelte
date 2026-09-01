@@ -17,26 +17,6 @@
   let availableDependencies: AvailableDependency[] = $state([]);
   let urlInput = $state('');
 
-  const updateAll = () => {
-    vscode.postMessage({ type: 'updateall' });
-  };
-
-  const installFromUrl = (url: string) => {
-    vscode.postMessage({ type: 'installFromUrl', url });
-  };
-
-  const installDependency = (index: number) => {
-    vscode.postMessage({ type: 'install', index });
-  };
-
-  const uninstallDependency = (index: number) => {
-    vscode.postMessage({ type: 'uninstall', index });
-  };
-
-  const updateDependency = (index: number, version: string) => {
-    vscode.postMessage({ type: 'update', index: index.toString(), version });
-  };
-
   const onHostMessage = (event: MessageEvent<DependencyMessage>) => {
     const message = event.data;
     if (!message || typeof message !== 'object') {
@@ -48,15 +28,18 @@
     }
   };
 
-  onMount(() => {
-    vscode.postMessage({ type: 'loaded' });
-  });
+  onMount(() => vscode.postMessage({ type: 'loaded' }));
 </script>
 
 <svelte:window onblur={() => vscode.postMessage({ type: 'blur' })} onmessage={onHostMessage} />
 
 <div class="top-line">
-  <button id="updateall-action" class="vscode-button block" disabled={installedDependencies.length === 0} onclick={updateAll}>
+  <button
+    id="updateall-action"
+    class="vscode-button block"
+    disabled={installedDependencies.length === 0}
+    onclick={() => vscode.postMessage({ type: 'updateall' })}
+  >
     <i class="codicon codicon-sync"></i>
     <span>Update All Dependencies</span>
   </button>
@@ -67,7 +50,10 @@
     <i class="codicon codicon-chevron-right icon-arrow"></i>
     <h2 class="title">Install from URL</h2>
   </summary>
-  <UrlInstallSection bind:url={urlInput} onInstall={installFromUrl} />
+  <UrlInstallSection
+    bind:url={urlInput}
+    onInstall={(url) => vscode.postMessage({ type: 'installFromUrl', url })}
+  />
 </details>
 
 <details class="vscode-collapsible always-show-actions" open>
@@ -78,11 +64,17 @@
       <span class="vscode-badge counter">{installedDependencies.length}</span>
     </div>
   </summary>
-  <InstalledDependencies
-    dependencies={installedDependencies}
-    onUpdate={updateDependency}
-    onUninstall={uninstallDependency}
-  />
+
+  {#if installedDependencies.length === 0}
+    <div class="empty-state">No dependencies installed</div>
+  {:else}
+    <InstalledDependencies
+      dependencies={installedDependencies}
+      onUpdate={(index, version) =>
+        vscode.postMessage({ type: 'update', index: index.toString(), version })}
+      onUninstall={(index) => vscode.postMessage({ type: 'uninstall', index })}
+    />
+  {/if}
 </details>
 
 <details class="vscode-collapsible always-show-actions" open>
@@ -93,8 +85,12 @@
       <span class="vscode-badge counter">{availableDependencies.length}</span>
     </div>
   </summary>
-  <AvailableDependencies
-    dependencies={availableDependencies}
-    onInstall={installDependency}
-  />
+  {#if availableDependencies.length === 0}
+    <div class="empty-state">No additional dependencies available</div>
+  {:else}
+    <AvailableDependencies
+      dependencies={availableDependencies}
+      onInstall={(index) => vscode.postMessage({ type: 'install', index })}
+    />
+  {/if}
 </details>

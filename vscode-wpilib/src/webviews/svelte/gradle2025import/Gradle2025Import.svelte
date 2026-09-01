@@ -66,17 +66,11 @@
     return null;
   };
 
-  const goToStep = (step: WizardStepNumber) => {
-    currentStep = step;
-  };
+  const goToStep = (step: WizardStepNumber) => (currentStep = step);
 
-  const selectSourceProject = () => {
-    vscode.postMessage({ type: 'gradle2025' });
-  };
+  const selectSourceProject = () => vscode.postMessage({ type: 'gradle2025' });
 
-  const selectDestinationFolder = () => {
-    vscode.postMessage({ type: 'newproject' });
-  };
+  const selectDestinationFolder = () => vscode.postMessage({ type: 'newproject' });
 
   const submitImport = () => {
     showProjectFolderError = true;
@@ -102,9 +96,7 @@
   };
 
   const destinationPath = $derived(
-    newFolder && projectName
-      ? `${projectFolder}/${projectName}`
-      : projectFolder
+    newFolder && projectName ? `${projectFolder}/${projectName}` : projectFolder
   );
 
   const projectFolderError = $derived(validateProjectFolder(projectFolder));
@@ -134,9 +126,7 @@
     }
   };
 
-  onMount(() => {
-    vscode.postMessage({ type: 'loaded' });
-  });
+  onMount(() => vscode.postMessage({ type: 'loaded' }));
 </script>
 
 <svelte:window onmessage={onHostMessage} />
@@ -146,11 +136,11 @@
 
   <h1 class="project-title">Import WPILib 2025-2026 Project</h1>
 
-  <WizardProgress {steps} currentStep={currentStep} />
+  <WizardProgress {steps} {currentStep} />
 
   <WizardStep active={currentStep === 1} step={1}>
     <Step1SelectSource
-      sourcePath={sourcePath}
+      {sourcePath}
       onSelectSource={selectSourceProject}
       onNext={() => goToStep(2)}
     />
@@ -163,9 +153,9 @@
       {teamNumber}
       {newFolder}
       {desktop}
-      projectFolderError={projectFolderError}
-      projectNameError={projectNameError}
-      teamNumberError={teamNumberError}
+      {projectFolderError}
+      {projectNameError}
+      {teamNumberError}
       {hardware}
       {showProjectFolderError}
       {showProjectNameError}
@@ -196,9 +186,9 @@
 
   <WizardStep active={currentStep === 3} step={3}>
     <Step3Review
-      sourcePath={sourcePath}
-      destinationPath={destinationPath}
-      teamNumber={teamNumber}
+      {sourcePath}
+      {destinationPath}
+      {teamNumber}
       onBack={() => goToStep(2)}
       onImport={submitImport}
     />

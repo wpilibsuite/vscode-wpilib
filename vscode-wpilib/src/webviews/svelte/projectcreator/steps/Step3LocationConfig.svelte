@@ -24,56 +24,28 @@
   }
 
   let {
-    projectFolder = '',
-    projectFolderError = null,
-    projectName = '',
-    projectNameError = null,
-    teamNumber = '',
-    teamNumberError = null,
-    newFolder = true,
-    desktop = false,
-    showProjectFolderError = false,
-    showProjectNameError = false,
-    showTeamNumberError = false,
-    onSelectFolder = () => {},
-    onProjectNameChange = () => {},
-    onTeamNumberChange = () => {},
-    onNewFolderChange = () => {},
-    onDesktopChange = () => {},
-    onBack = () => {},
-    onNext = () => {},
+    projectFolder,
+    projectFolderError,
+    projectName,
+    projectNameError,
+    teamNumber,
+    teamNumberError,
+    newFolder,
+    desktop,
+    showProjectFolderError,
+    showProjectNameError,
+    showTeamNumberError,
+    onSelectFolder,
+    onProjectNameChange,
+    onTeamNumberChange,
+    onNewFolderChange,
+    onDesktopChange,
+    onBack,
+    onNext,
   }: Props = $props();
   const t = createTranslator('projectcreator');
 
   let canProceed = $derived(!projectFolderError && !projectNameError);
-
-  const selectFolder = () => onSelectFolder();
-  const back = () => onBack();
-  const next = () => onNext();
-
-  const handleProjectNameInput = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const inputValue = target?.value ?? projectName;
-    onProjectNameChange(inputValue);
-  };
-
-  const handleTeamNumberInput = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const inputValue = target?.value ?? teamNumber;
-    onTeamNumberChange(inputValue);
-  };
-
-  const handleNewFolderChange = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const checkedValue = target?.checked ?? newFolder;
-    onNewFolderChange(checkedValue);
-  };
-
-  const handleDesktopChange = (event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    const checkedValue = target?.checked ?? desktop;
-    onDesktopChange(checkedValue);
-  };
 </script>
 
 <div class="step-header">
@@ -94,7 +66,7 @@
 </div>
 
 <div class="project-row">
-  <button id="projectSelectButton" type="button" class="vscode-button" onclick={selectFolder}>
+  <button id="projectSelectButton" type="button" class="vscode-button" onclick={onSelectFolder}>
     {t('Select Folder')}
   </button>
 </div>
@@ -107,7 +79,7 @@
       class="vscode-textfield"
       type="text"
       value={projectName}
-      oninput={handleProjectNameInput}
+      oninput={(event) => onProjectNameChange(event.currentTarget?.value ?? projectName)}
     />
     <ValidationError
       id="projectNameError"
@@ -125,7 +97,7 @@
       class="vscode-textfield"
       type="number"
       value={teamNumber}
-      oninput={handleTeamNumberInput}
+      oninput={(event) => onTeamNumberChange(event.currentTarget?.value ?? teamNumber)}
     />
     <ValidationError
       id="teamNumberError"
@@ -141,7 +113,7 @@
       id="newFolderCB"
       type="checkbox"
       checked={newFolder}
-      onchange={handleNewFolderChange}
+      onchange={(event) => onNewFolderChange(event.currentTarget?.checked ?? newFolder)}
     />
     <label for="newFolderCB">
       <span class="icon">
@@ -159,7 +131,7 @@
       id="desktopCB"
       type="checkbox"
       checked={desktop}
-      onchange={handleDesktopChange}
+      onchange={(event) => onDesktopChange(event.currentTarget?.checked ?? desktop)}
     />
     <label for="desktopCB">
       <span class="icon">
@@ -172,7 +144,7 @@
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={back}>
+  <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={onBack}>
     {t('Back')}
   </button>
   <button
@@ -180,7 +152,7 @@
     type="button"
     class="vscode-button"
     disabled={!canProceed}
-    onclick={next}
+    onclick={onNext}
   >
     {t('Next')}
   </button>

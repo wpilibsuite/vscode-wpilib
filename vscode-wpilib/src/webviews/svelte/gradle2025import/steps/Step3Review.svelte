@@ -9,16 +9,7 @@
     onImport: () => void;
   }
 
-  let {
-    sourcePath = '',
-    destinationPath = '',
-    teamNumber = '',
-    onBack = () => {},
-    onImport = () => {},
-  }: Props = $props();
-
-  const back = () => onBack();
-  const importProject = () => onImport();
+  let { sourcePath, destinationPath, teamNumber, onBack, onImport }: Props = $props();
 </script>
 
 <div class="step-header">
@@ -45,19 +36,21 @@
     </p>
     <p>
       For more details, see
-      <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-overview/importing-gradle-project.html">
+      <a
+        href="https://docs.wpilib.org/en/stable/docs/software/wpilib-overview/importing-gradle-project.html"
+      >
         Importing a Gradle Project
       </a>
-      on frc-docs.
+      on wpilib-docs.
     </p>
   </div>
 </div>
 
 <div class="wizard-navigation">
-  <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={back}>
+  <button id="back-to-step-2" type="button" class="vscode-button secondary" onclick={onBack}>
     Back
   </button>
-  <button id="importProject" type="button" class="vscode-button" onclick={importProject}>
+  <button id="importProject" type="button" class="vscode-button" onclick={onImport}>
     Import Project
   </button>
 </div>

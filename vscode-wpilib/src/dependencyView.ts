@@ -94,7 +94,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       enableScripts: true,
 
       localResourceRoots: [
-        this._extensionUri,
         vscode.Uri.joinPath(this._extensionUri, 'resources', 'media'),
         vscode.Uri.joinPath(this._extensionUri, 'resources', 'dist'),
       ],

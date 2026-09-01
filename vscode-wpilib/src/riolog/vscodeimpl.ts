@@ -16,7 +16,6 @@ export function createRioLogWindowView(resourceRoot: string, disposables: IDispo
       enableScripts: true,
       retainContextWhenHidden: true,
       localResourceRoots: [
-        vscode.Uri.file(path.join(resourceRoot, '..')),
         vscode.Uri.file(path.join(resourceRoot, 'media')),
         vscode.Uri.file(path.join(resourceRoot, 'dist')),
       ],
