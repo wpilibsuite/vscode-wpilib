@@ -4,6 +4,9 @@ export default {
   preprocess: sveltePreprocess({
     typescript: {
       tsconfigFile: './tsconfig.json',
+      compilerOptions: {
+        verbatimModuleSyntax: true,
+      },
     },
   }),
   compilerOptions: {

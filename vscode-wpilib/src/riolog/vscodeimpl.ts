@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IDisposable } from './shared/interfaces';
 import { IErrorMessage, IPrintMessage } from './shared/message';
-import { rewriteDistWebviewHtml } from '../webviews/distWebviewHtml';
+import { loadDistWebviewHtml } from '../webviews/distWebviewHtml';
 
 export function createRioLogWindowView(resourceRoot: string, disposables: IDisposable[]) {
   const webview = vscode.window.createWebviewPanel(
@@ -79,13 +79,13 @@ export async function handleSave(saveData: (IPrintMessage | IErrorMessage)[]): P
 }
 
 function getHTML(webview: vscode.Webview, resourceRoot: string): string {
-  return rewriteDistWebviewHtml({
+  return loadDistWebviewHtml({
     webview,
     extensionRoot: vscode.Uri.file(path.join(resourceRoot, '..')),
-    html: path.join(resourceRoot, 'dist', 'riolog.html'),
+    distHtmlFileName: 'riolog.html',
     extraCss: [
-      vscode.Uri.file(path.join(resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')),
-      vscode.Uri.file(path.join(resourceRoot, '..', 'resources', 'media', 'riolog.css')),
+      vscode.Uri.file(path.join(resourceRoot, 'media', 'vscode-elements.css')),
+      vscode.Uri.file(path.join(resourceRoot, 'media', 'riolog.css')),
     ],
   });
 }

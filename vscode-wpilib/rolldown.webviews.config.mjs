@@ -93,7 +93,6 @@ function isSharedWebviewModule(moduleId) {
   return (
     modulePath.includes('/node_modules/') ||
     modulePath.includes('/src/webviews/svelte/lib/') ||
-    modulePath.includes('/src/webviews/svelte/components/shared/') ||
     modulePath.endsWith('/src/formatter.ts')
   );
 }
