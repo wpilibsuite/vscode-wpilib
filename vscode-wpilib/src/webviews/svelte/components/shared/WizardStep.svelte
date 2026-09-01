@@ -1,10 +1,12 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
-    active: boolean;
-    step: number | string | undefined;
-    element: 'section' | 'div';
-    ariaLabelledBy: string | undefined;
-    children?: import('svelte').Snippet;
+    active?: boolean;
+    step?: number | string;
+    element?: 'section' | 'div';
+    ariaLabelledBy?: string;
+    children?: Snippet;
   }
 
   let {
@@ -14,13 +16,11 @@
     ariaLabelledBy = undefined,
     children,
   }: Props = $props();
-
-  let classes = $derived(['wizard-step', active ? 'active' : ''].filter(Boolean).join(' '));
 </script>
 
 {#if element === 'section'}
   <section
-    class={classes}
+    class={['wizard-step', active && 'active']}
     data-step={step}
     aria-labelledby={ariaLabelledBy}
   >
@@ -28,7 +28,7 @@
   </section>
 {:else}
   <div
-    class={classes}
+    class={['wizard-step', active && 'active']}
     data-step={step}
     aria-expanded={active}
     aria-labelledby={ariaLabelledBy}

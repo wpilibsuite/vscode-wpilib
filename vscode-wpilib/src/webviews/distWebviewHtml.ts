@@ -5,14 +5,6 @@ import * as vscode from 'vscode';
 type DistHtmlOptions = {
   webview: vscode.Webview;
   extensionRoot: vscode.Uri;
-  distHtmlFileName: string;
-  extraCss?: vscode.Uri[];
-};
-
-type RewriteHtmlOptions = {
-  webview: vscode.Webview;
-  extensionRoot: vscode.Uri;
-  html: string;
   extraCss?: vscode.Uri[];
 };
 
@@ -44,14 +36,14 @@ function rewriteDistScriptTags(
   );
 }
 
-export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
+export function rewriteDistWebviewHtml(options: DistHtmlOptions, html: string): string {
   const distRootFsPath = path.join(options.extensionRoot.fsPath, 'resources', 'dist');
-  let html = options.html;
+  let rewritten = html;
 
-  html = rewriteDistScriptTags(html, options.webview, distRootFsPath);
+  rewritten = rewriteDistScriptTags(rewritten, options.webview, distRootFsPath);
 
   const extensionRootUri = options.webview.asWebviewUri(options.extensionRoot).toString();
-  html = rewriteReplaceresourceBase(html, extensionRootUri);
+  rewritten = rewriteReplaceresourceBase(rewritten, extensionRootUri);
 
   if (options.extraCss && options.extraCss.length > 0) {
     const cssLinks = options.extraCss
@@ -59,20 +51,14 @@ export function rewriteDistWebviewHtml(options: RewriteHtmlOptions): string {
         (uri) => `<link rel="stylesheet" href="${options.webview.asWebviewUri(uri).toString()}">`
       )
       .join('\n');
-    html = insertBeforeHeadClose(html, cssLinks);
+    rewritten = insertBeforeHeadClose(rewritten, cssLinks);
   }
 
-  return html;
+  return rewritten;
 }
 
-export function loadDistWebviewHtml(options: DistHtmlOptions): string {
+export function loadDistWebviewHtml(options: DistHtmlOptions, distHtmlFileName: string): string {
   const distRootFsPath = path.join(options.extensionRoot.fsPath, 'resources', 'dist');
-  const htmlPath = path.join(distRootFsPath, options.distHtmlFileName);
-  const html = fs.readFileSync(htmlPath, 'utf8');
-  return rewriteDistWebviewHtml({
-    webview: options.webview,
-    extensionRoot: options.extensionRoot,
-    html,
-    extraCss: options.extraCss,
-  });
+  const html = fs.readFileSync(path.join(distRootFsPath, distHtmlFileName), 'utf8');
+  return rewriteDistWebviewHtml(options, html);
 }

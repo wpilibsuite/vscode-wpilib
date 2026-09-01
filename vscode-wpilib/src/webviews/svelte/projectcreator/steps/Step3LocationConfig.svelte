@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ValidationError } from '../../components/shared';
-  import { createTranslator } from '../../lib';
+  import ValidationError from '../../components/shared/ValidationError.svelte';
+  import { createTranslator } from '../../lib/i18n';
 
   interface Props {
     projectFolder: string;

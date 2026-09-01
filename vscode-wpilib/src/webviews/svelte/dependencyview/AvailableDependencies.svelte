@@ -12,7 +12,7 @@
 {#if dependencies.length === 0}
   <div class="empty-state">No additional dependencies available</div>
 {:else}
-  {#each dependencies as dependency, index}
+  {#each dependencies as dependency, index (`${dependency.name}@${dependency.version}`)}
     <div class="available-dependency">
       <div class="dependency-header">
         <span class="dependency-name">{dependency.name}</span>

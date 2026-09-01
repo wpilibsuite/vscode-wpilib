@@ -1,4 +1,3 @@
-import { readable } from 'svelte/store';
 import formatMessage from '../../../formatter';
 
 type MessageInput = string | [string, string];
@@ -36,13 +35,4 @@ export function translate(domain: string, message: MessageInput, ...args: unknow
 
 export function createTranslator(defaultDomain: string) {
   return (message: MessageInput, ...args: unknown[]) => translate(defaultDomain, message, ...args);
-}
-
-export const localeDomainsStore = readable<LocaleDomains>({}, (set) => {
-  set(initializeLocales());
-  return () => undefined;
-});
-
-export function getLocaleDomains(): LocaleDomains {
-  return initializeLocales();
 }

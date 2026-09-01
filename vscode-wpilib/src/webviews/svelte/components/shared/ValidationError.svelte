@@ -1,10 +1,12 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
-    message: string | undefined;
-    visible: boolean;
-    id: string | undefined;
-    className: string;
-    children?: import('svelte').Snippet;
+    message?: string;
+    visible?: boolean;
+    id?: string;
+    className?: string;
+    children?: Snippet;
   }
 
   let {

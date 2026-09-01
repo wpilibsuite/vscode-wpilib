@@ -1,14 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { getResourceBase } from '../lib';
+  import { getResourceBase } from '../lib/webview-context';
 
   const vscode = acquireVsCodeApi();
-
-  let logoPath = $state('');
-
-  onMount(() => {
-    logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
-  });
+  const logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
 
   const openCommandPalette = () => {
     vscode.postMessage({ command: 'openCommandPalette' });

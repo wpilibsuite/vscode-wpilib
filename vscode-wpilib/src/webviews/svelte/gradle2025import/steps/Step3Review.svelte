@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SummaryBox } from '../../components/shared';
+  import SummaryBox from '../../components/shared/SummaryBox.svelte';
 
   interface Props {
     sourcePath: string;

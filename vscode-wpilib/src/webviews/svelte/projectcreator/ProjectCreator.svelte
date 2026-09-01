@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { WizardProgress, WizardStep } from '../components/shared';
+  import WizardProgress from '../components/shared/WizardProgress.svelte';
+  import WizardStep from '../components/shared/WizardStep.svelte';
   import Step1ProjectType from './steps/Step1ProjectType.svelte';
   import Step2LanguageBase from './steps/Step2LanguageBase.svelte';
   import Step3LocationConfig from './steps/Step3LocationConfig.svelte';
   import Step4Review from './steps/Step4Review.svelte';
-  import { createTranslator, getResourceBase, onWebviewMessage } from '../lib';
+  import { createTranslator } from '../lib/i18n';
+  import { getResourceBase } from '../lib/webview-context';
   import {
     ProjectType,
     type BaseOption,
@@ -14,8 +15,7 @@
 
   const vscode = acquireVsCodeApi();
   const t = createTranslator('projectcreator');
-
-  let logoPath = $state('');
+  const logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
 
   interface WizardStepConfig {
     step: number;
@@ -195,48 +195,44 @@
     vscode.postMessage({ type: 'createproject', data: payload });
   };
 
-  onMount(() => {
-    logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
-
-    const unsubscribe = onWebviewMessage<{ type: string; data: unknown }>((event) => {
-      switch (event.type) {
-        case 'newproject': {
-          if (typeof event.data === 'string') {
-            handleProjectFolderUpdate(event.data);
-          }
-          break;
+  const onHostMessage = (event: MessageEvent<{ type?: string; data?: unknown }>) => {
+    const message = event.data;
+    if (!message || typeof message !== 'object') {
+      return;
+    }
+    switch (message.type) {
+      case 'newproject': {
+        if (typeof message.data === 'string') {
+          handleProjectFolderUpdate(message.data);
         }
-        case 'projecttype': {
-          if (typeof event.data === 'number') {
-            projectType = event.data as ProjectType;
-          }
-          break;
-        }
-        case 'language': {
-          if (Array.isArray(event.data)) {
-            languages = event.data as string[];
-          } else if (typeof event.data === 'string') {
-            selectedLanguage = event.data;
-          }
-          break;
-        }
-        case 'base': {
-          if (Array.isArray(event.data)) {
-            bases = event.data as BaseOption[];
-          } else if (typeof event.data === 'string') {
-            selectedBase = event.data;
-          }
-          break;
-        }
-        default:
-          break;
+        break;
       }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  });
+      case 'projecttype': {
+        if (typeof message.data === 'number') {
+          projectType = message.data as ProjectType;
+        }
+        break;
+      }
+      case 'language': {
+        if (Array.isArray(message.data)) {
+          languages = message.data as string[];
+        } else if (typeof message.data === 'string') {
+          selectedLanguage = message.data;
+        }
+        break;
+      }
+      case 'base': {
+        if (Array.isArray(message.data)) {
+          bases = message.data as BaseOption[];
+        } else if (typeof message.data === 'string') {
+          selectedBase = message.data;
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  };
 
   const projectFolderError = $derived(validateProjectFolder(projectFolder));
   const projectNameError = $derived(validateProjectName(projectName));
@@ -248,6 +244,8 @@
       : projectFolder
   );
 </script>
+
+<svelte:window onmessage={onHostMessage} />
 
 <div class="project-container">
   <img src={logoPath} alt="WPILib" height="75" />

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { onWebviewMessage } from '../lib';
   import InstalledDependencies from './InstalledDependencies.svelte';
   import AvailableDependencies from './AvailableDependencies.svelte';
   import UrlInstallSection from './UrlInstallSection.svelte';
@@ -38,25 +37,23 @@
     vscode.postMessage({ type: 'update', index: index.toString(), version });
   };
 
+  const onHostMessage = (event: MessageEvent<DependencyMessage>) => {
+    const message = event.data;
+    if (!message || typeof message !== 'object') {
+      return;
+    }
+    if (message.type === 'updateDependencies') {
+      installedDependencies = message.installed ?? [];
+      availableDependencies = message.available ?? [];
+    }
+  };
+
   onMount(() => {
-    const unsubscribe = onWebviewMessage<DependencyMessage>((message) => {
-      if (message.type === 'updateDependencies') {
-        installedDependencies = message.installed ?? [];
-        availableDependencies = message.available ?? [];
-      }
-    });
-
-    const blurListener = () => vscode.postMessage({ type: 'blur' });
-    window.addEventListener('blur', blurListener);
-
     vscode.postMessage({ type: 'loaded' });
-
-    return () => {
-      unsubscribe();
-      window.removeEventListener('blur', blurListener);
-    };
   });
 </script>
+
+<svelte:window onblur={() => vscode.postMessage({ type: 'blur' })} onmessage={onHostMessage} />
 
 <div class="top-line">
   <button id="updateall-action" class="vscode-button block" disabled={installedDependencies.length === 0} onclick={updateAll}>

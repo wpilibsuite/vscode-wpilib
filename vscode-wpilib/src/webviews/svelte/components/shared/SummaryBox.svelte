@@ -6,10 +6,12 @@
 </script>
 
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
     title?: string;
-    items: SummaryItem[];
-    children?: import('svelte').Snippet;
+    items?: SummaryItem[];
+    children?: Snippet;
   }
 
   let { title = undefined, items = [], children }: Props = $props();

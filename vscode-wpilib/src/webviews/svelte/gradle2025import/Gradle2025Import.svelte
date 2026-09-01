@@ -1,18 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { WizardProgress, WizardStep } from '../components/shared';
+  import WizardProgress from '../components/shared/WizardProgress.svelte';
+  import WizardStep from '../components/shared/WizardStep.svelte';
   import Step1SelectSource from './steps/Step1SelectSource.svelte';
   import Step2Configure from './steps/Step2Configure.svelte';
   import Step3Review from './steps/Step3Review.svelte';
-  import { getResourceBase, onWebviewMessage } from '../lib';
+  import { getResourceBase } from '../lib/webview-context';
   import type { Gradle2025Message, Gradle2025ImportData } from './types';
 
   const vscode = acquireVsCodeApi();
+  const logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
 
   type WizardStepNumber = 1 | 2 | 3;
   type HardwareOption = 'none' | 'romi' | 'xrp';
-
-  let logoPath = $state('');
 
   const steps = [
     { step: 1, label: 'Select Source' },
@@ -28,10 +28,6 @@
   let newFolder = $state(true);
   let desktop = $state(false);
   let hardware: HardwareOption = $state('none');
-
-  let projectFolderError: string | null = $state(null);
-  let projectNameError: string | null = $state(null);
-  let teamNumberError: string | null = $state(null);
 
   let showProjectFolderError = $state(false);
   let showProjectNameError = $state(false);
@@ -87,10 +83,6 @@
     showProjectNameError = true;
     showTeamNumberError = true;
 
-    projectFolderError = validateProjectFolder(projectFolder);
-    projectNameError = validateProjectName(projectName);
-    teamNumberError = validateTeamNumber(teamNumber);
-
     if (projectFolderError || projectNameError || teamNumberError) {
       goToStep(2);
       return;
@@ -115,43 +107,39 @@
       : projectFolder
   );
 
+  const projectFolderError = $derived(validateProjectFolder(projectFolder));
+  const projectNameError = $derived(validateProjectName(projectName));
+  const teamNumberError = $derived(validateTeamNumber(teamNumber));
+
+  const onHostMessage = (event: MessageEvent<Gradle2025Message>) => {
+    const message = event.data;
+    if (!message || typeof message !== 'object') {
+      return;
+    }
+    switch (message.type) {
+      case 'gradle2025':
+        sourcePath = message.data;
+        break;
+      case 'projectname':
+        projectName = message.data;
+        break;
+      case 'newproject':
+        projectFolder = message.data;
+        break;
+      case 'teamnumber':
+        teamNumber = message.data;
+        break;
+      default:
+        break;
+    }
+  };
+
   onMount(() => {
-    logoPath = `${getResourceBase()}/resources/wpilib-generic.svg`;
-
-    const unsubscribe = onWebviewMessage<Gradle2025Message>((event) => {
-      switch (event.type) {
-        case 'gradle2025':
-          sourcePath = event.data;
-          break;
-        case 'projectname':
-          projectName = event.data;
-          break;
-        case 'newproject':
-          projectFolder = event.data;
-          break;
-        case 'teamnumber':
-          teamNumber = event.data;
-          break;
-        default:
-          break;
-      }
-    });
-
     vscode.postMessage({ type: 'loaded' });
-
-    return () => unsubscribe();
-  });
-
-  $effect(() => {
-    projectFolderError = validateProjectFolder(projectFolder);
-  });
-  $effect(() => {
-    projectNameError = validateProjectName(projectName);
-  });
-  $effect(() => {
-    teamNumberError = validateTeamNumber(teamNumber);
   });
 </script>
+
+<svelte:window onmessage={onHostMessage} />
 
 <div class="project-container">
   <img src={logoPath} alt="WPILib" height="75" />

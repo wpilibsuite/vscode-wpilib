@@ -21,10 +21,10 @@
 
   const rowClass = $derived(
     entry.kind === 'error'
-      ? 'log-entry error-log'
+      ? ['log-entry', 'error-log']
       : entry.kind === 'warning'
-        ? 'log-entry warning-log'
-        : 'log-entry print-log'
+        ? ['log-entry', 'warning-log']
+        : ['log-entry', 'print-log']
   );
 </script>
 
@@ -41,8 +41,8 @@
       }
     }}
   >
-    <div class={'toggle-button ' + (isExpanded ? 'expanded' : 'collapsed')}></div>
-    <div class={'error-content ' + (isExpanded ? 'expanded' : 'collapsed')}>
+    <div class={['toggle-button', isExpanded ? 'expanded' : 'collapsed']}></div>
+    <div class={['error-content', isExpanded ? 'expanded' : 'collapsed']}>
       <div class="log-message">
         {#if showTimestamps}
           <span class="timestamp">{formatRioLogTimestamp(entry.message.timestamp)}</span>

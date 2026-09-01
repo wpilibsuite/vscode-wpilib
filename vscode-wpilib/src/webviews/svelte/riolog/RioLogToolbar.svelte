@@ -80,7 +80,7 @@
   <div class="status-container">
     <div
       id="connection-status"
-      class={'connection-status ' + (connected ? 'connected' : 'disconnected')}
+      class={['connection-status', connected ? 'connected' : 'disconnected']}
       title={connected ? 'Connected to Robot' : 'Disconnected from Robot'}
     ></div>
   </div>
@@ -89,7 +89,7 @@
     <label for="team-number">Team:</label>
     <input
       id="team-number"
-      class={'vscode-textfield' + (inputError ? ' error' : '')}
+      class={['vscode-textfield', inputError && 'error']}
       type="number"
       min="1"
       max="99999"
@@ -99,7 +99,7 @@
     />
     <button
       id="team-number-button"
-      class={'vscode-button' + (appliedFlash ? ' success' : '')}
+      class={['vscode-button', appliedFlash && 'success']}
       onclick={applyTeam}
       title="Apply team number"
     >
@@ -122,7 +122,7 @@
     <div class="button-group">
       <button
         id="pause-button"
-        class={'vscode-button' + (paused ? ' active' : '')}
+        class={['vscode-button', paused && 'active']}
         onclick={onPause}
         title="Pause log updates"
       >
@@ -130,7 +130,7 @@
       </button>
       <button
         id="discard-button"
-        class={'vscode-button' + (discard ? ' active' : '')}
+        class={['vscode-button', discard && 'active']}
         onclick={onDiscard}
         title="Discard incoming messages"
       >
@@ -141,7 +141,7 @@
       </button>
       <button
         id="autoscroll-button"
-        class={'vscode-button' + (autoScroll ? '' : ' active')}
+        class={['vscode-button', !autoScroll && 'active']}
         onclick={onToggleAutoScroll}
         title="Toggle automatic scrolling"
       >
@@ -152,7 +152,7 @@
     <div class="button-group">
       <button
         id="prints-button"
-        class={'vscode-button' + (showPrints ? '' : ' active')}
+        class={['vscode-button', !showPrints && 'active']}
         onclick={onTogglePrints}
         title="Toggle print messages"
       >
@@ -160,7 +160,7 @@
       </button>
       <button
         id="warnings-button"
-        class={'vscode-button' + (showWarnings ? '' : ' active')}
+        class={['vscode-button', !showWarnings && 'active']}
         onclick={onToggleWarnings}
         title="Toggle warning messages"
       >
@@ -168,7 +168,7 @@
       </button>
       <button
         id="timestamps-button"
-        class={'vscode-button' + (showTimestamps ? '' : ' active')}
+        class={['vscode-button', !showTimestamps && 'active']}
         onclick={onToggleTimestamps}
         title="Toggle timestamps"
       >
@@ -176,7 +176,7 @@
       </button>
       <button
         id="reconnect-button"
-        class={'vscode-button' + (autoReconnect ? '' : ' active')}
+        class={['vscode-button', !autoReconnect && 'active']}
         onclick={onToggleReconnect}
         title="Toggle auto reconnection"
       >

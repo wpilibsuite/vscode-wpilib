@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createTranslator } from '../../lib';
+  import { createTranslator } from '../../lib/i18n';
   import { ProjectType } from '../types';
 
   interface Props {
@@ -26,8 +26,7 @@
 <div class="selection-cards">
   <button
     type="button"
-    class:selected={selected === ProjectType.Template}
-    class="selection-card"
+    class={['selection-card', selected === ProjectType.Template && 'selected']}
     data-value="Template"
     onclick={() => select(ProjectType.Template)}
     aria-pressed={selected === ProjectType.Template}
@@ -40,8 +39,7 @@
   </button>
   <button
     type="button"
-    class:selected={selected === ProjectType.Example}
-    class="selection-card"
+    class={['selection-card', selected === ProjectType.Example && 'selected']}
     data-value="Example"
     onclick={() => select(ProjectType.Example)}
     aria-pressed={selected === ProjectType.Example}

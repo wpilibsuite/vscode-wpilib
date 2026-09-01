@@ -144,7 +144,7 @@ export default {
       preprocess: svelteConfig.preprocess,
     }),
     generateWebviewHtmlFiles(),
-  ].filter(Boolean),
+  ],
   watch: {
     clearScreen: false,
   },

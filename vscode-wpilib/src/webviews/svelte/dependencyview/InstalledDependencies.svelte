@@ -2,34 +2,21 @@
   import type { InstalledDependency } from './types';
 
   interface Props {
-    dependencies: InstalledDependency[];
-    onUpdate: (index: number, version: string) => void;
-    onUninstall: (index: number) => void;
+    dependencies?: InstalledDependency[];
+    onUpdate?: (index: number, version: string) => void;
+    onUninstall?: (index: number) => void;
   }
 
   let { dependencies = [], onUpdate = () => {}, onUninstall = () => {} }: Props = $props();
 
   let selectedVersions: Record<string, string> = $state({});
 
-  const getSelectedVersion = (dependency: InstalledDependency) => {
+  const versionFor = (dependency: InstalledDependency): string => {
     const selectedVersion = selectedVersions[dependency.uuid];
     return dependency.versionInfo.some((info) => info.version === selectedVersion)
       ? selectedVersion
       : dependency.currentVersion;
   };
-
-  $effect(() => {
-    const nextSelected = Object.fromEntries(
-      dependencies.map((dependency) => [dependency.uuid, getSelectedVersion(dependency)])
-    );
-
-    if (
-      Object.keys(nextSelected).length !== Object.keys(selectedVersions).length ||
-      Object.entries(nextSelected).some(([uuid, version]) => selectedVersions[uuid] !== version)
-    ) {
-      selectedVersions = nextSelected;
-    }
-  });
 
   const getButtonText = (dependency: InstalledDependency, selectedVersion: string) => {
     const entry = dependency.versionInfo.find((info) => info.version === selectedVersion);
@@ -46,6 +33,7 @@
   <div class="empty-state">No dependencies installed</div>
 {:else}
   {#each dependencies as dependency, index (dependency.uuid)}
+    {@const selectedVersion = versionFor(dependency)}
     <div class="installed-dependency">
       <div class="dependency-header">
         <div class="dependency-title">
@@ -57,8 +45,13 @@
       <div class="dependency-controls">
         <div class="vscode-select" style="margin: 4px 0">
           <i class="codicon codicon-chevron-right chevron-icon"></i>
-          <select bind:value={selectedVersions[dependency.uuid]}>
-            {#each dependency.versionInfo as versionInfo}
+          <select
+            value={selectedVersion}
+            onchange={(event) => {
+              selectedVersions[dependency.uuid] = (event.currentTarget as HTMLSelectElement).value;
+            }}
+          >
+            {#each dependency.versionInfo as versionInfo (versionInfo.version)}
               <option value={versionInfo.version}>
                 {versionInfo.version}
               </option>
@@ -68,10 +61,10 @@
 
         <button
           class="vscode-button"
-          disabled={isUpdateDisabled(dependency, getSelectedVersion(dependency))}
-          onclick={() => onUpdate(index, getSelectedVersion(dependency))}
+          disabled={isUpdateDisabled(dependency, selectedVersion)}
+          onclick={() => onUpdate(index, selectedVersion)}
         >
-          {getButtonText(dependency, getSelectedVersion(dependency))}
+          {getButtonText(dependency, selectedVersion)}
         </button>
 
         <button

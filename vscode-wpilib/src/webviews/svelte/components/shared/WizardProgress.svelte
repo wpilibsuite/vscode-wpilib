@@ -7,8 +7,8 @@
 
 <script lang="ts">
   interface Props {
-    steps: WizardProgressStep[];
-    currentStep: number;
+    steps?: WizardProgressStep[];
+    currentStep?: number;
   }
 
   let { steps = [], currentStep = 1 }: Props = $props();
@@ -18,7 +18,11 @@
   {#each steps as step (step.step)}
     <div
       role="listitem"
-      class={`progress-step${currentStep === step.step ? ' active' : ''}${currentStep > step.step ? ' completed' : ''}`}
+      class={[
+        'progress-step',
+        currentStep === step.step && 'active',
+        currentStep > step.step && 'completed',
+      ]}
       data-step={step.step}
     >
       {step.label}

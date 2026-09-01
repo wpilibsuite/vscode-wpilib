@@ -701,16 +701,18 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       );
     }
 
-    return loadDistWebviewHtml({
-      webview,
-      extensionRoot: this._extensionUri,
-      distHtmlFileName: 'dependencyview.html',
-      extraCss: [
-        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'vscode-elements.css'),
-        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'),
-        vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'),
-      ],
-    });
+    return loadDistWebviewHtml(
+      {
+        webview,
+        extensionRoot: this._extensionUri,
+        extraCss: [
+          vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'vscode-elements.css'),
+          vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'main.css'),
+          vscode.Uri.joinPath(this._extensionUri, 'resources', 'media', 'icons.css'),
+        ],
+      },
+      'dependencyview.html'
+    );
   }
 
   private _getUnavailableHtml(

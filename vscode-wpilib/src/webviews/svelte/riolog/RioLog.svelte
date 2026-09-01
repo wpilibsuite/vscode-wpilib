@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
-  import { onWebviewMessage } from '../lib';
+  import { tick } from 'svelte';
   import { parseAnsiString } from '../../../riolog/ansi/ansiparser';
   import type { IIPCSendMessage } from '../../../riolog/shared/interfaces';
   import { ReceiveTypes, SendTypes } from '../../../riolog/shared/interfaces';
@@ -15,7 +14,7 @@
   type ThemeColorsMessage = { type: 'themeColors'; message: Record<string, string> };
 
   let entries = $state<RioLogEntry[]>([]);
-  let nextId = $state(1);
+  let nextId = 1;
 
   let connected = $state(false);
   let paused = $state(false);
@@ -189,43 +188,40 @@
     addMessage(message);
   };
 
-  onMount(() => {
-    addWelcomeMessageOnce();
+  const onHostMessage = (event: MessageEvent<IIPCSendMessage | ThemeColorsMessage>) => {
+    const data = event.data;
+    if (!data) return;
+    if ((data as ThemeColorsMessage).type === 'themeColors') {
+      return;
+    }
 
-    const unsubscribe = onWebviewMessage<IIPCSendMessage | ThemeColorsMessage>((data) => {
-      if (!data) return;
-      if ((data as ThemeColorsMessage).type === 'themeColors') {
-        return;
+    const msg = data as IIPCSendMessage;
+    switch (msg.type) {
+      case SendTypes.New:
+        addMessage(msg.message as IPrintMessage | IErrorMessage);
+        break;
+      case SendTypes.Batch:
+        addMessages(msg.message as (IPrintMessage | IErrorMessage)[]);
+        break;
+      case SendTypes.PauseUpdate:
+        pausedCount = msg.message as number;
+        break;
+      case SendTypes.ConnectionChanged: {
+        const nextState = msg.message as boolean;
+        connected = nextState;
+        addConnectionMessage(nextState);
+        break;
       }
-
-      const msg = data as IIPCSendMessage;
-      switch (msg.type) {
-        case SendTypes.New:
-          addMessage(msg.message as IPrintMessage | IErrorMessage);
-          break;
-        case SendTypes.Batch:
-          addMessages(msg.message as (IPrintMessage | IErrorMessage)[]);
-          break;
-        case SendTypes.PauseUpdate:
-          pausedCount = msg.message as number;
-          break;
-        case SendTypes.ConnectionChanged: {
-          const nextState = msg.message as boolean;
-          connected = nextState;
-          addConnectionMessage(nextState);
-          break;
-        }
-        default:
-          break;
+      default: {
+        const _exhaustive: never = msg.type;
+        return _exhaustive;
       }
-    });
+    }
+  };
 
-    return () => {
-      unsubscribe();
-    };
-  });
+  addWelcomeMessageOnce();
 
-  let lastVisibleCount = $state(0);
+  let lastVisibleCount = 0;
   $effect(() => {
     const count = visibleEntries.length;
     if (count !== lastVisibleCount) {
@@ -238,6 +234,8 @@
     }
   });
 </script>
+
+<svelte:window onmessage={onHostMessage} />
 
 <div id="mainDiv">
   <div id="log-container" bind:this={logContainer}>

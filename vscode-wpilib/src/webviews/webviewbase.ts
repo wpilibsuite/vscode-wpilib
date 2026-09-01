@@ -27,15 +27,9 @@ export abstract class WebViewBase {
       return;
     }
 
-    const specifiedDomains = Array.isArray(localeDomains) ? localeDomains.filter(Boolean) : [];
-    if (!specifiedDomains.includes('ui')) {
-      specifiedDomains.push('ui');
-    }
-    const uniqueDomains = [...new Set(specifiedDomains)];
-
-    if (uniqueDomains.length > 0) {
-      const defaultDomain = uniqueDomains[0];
-      const scriptBlocks = uniqueDomains
+    if (localeDomains && localeDomains.length > 0) {
+      const defaultDomain = localeDomains[0];
+      const scriptBlocks = localeDomains
         .map((domain) => {
           const localeJson = JSON.stringify(loadLocaleFile(domain)).replace(
             /<\/(script)/gi,
@@ -89,21 +83,23 @@ export abstract class WebViewBase {
   }
 
   private rewriteHtml(webview: vscode.Webview): string {
-    return rewriteDistWebviewHtml({
-      webview,
-      extensionRoot: vscode.Uri.file(extensionContext.extensionPath),
-      html: this.html,
-      extraCss: [
-        vscode.Uri.file(
-          path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css')
-        ),
-        vscode.Uri.file(
-          path.join(extensionContext.extensionPath, 'resources', 'media', 'vscode-elements.css')
-        ),
-        vscode.Uri.file(
-          path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css')
-        ),
-      ],
-    });
+    return rewriteDistWebviewHtml(
+      {
+        webview,
+        extensionRoot: vscode.Uri.file(extensionContext.extensionPath),
+        extraCss: [
+          vscode.Uri.file(
+            path.join(extensionContext.extensionPath, 'resources', 'media', 'icons.css')
+          ),
+          vscode.Uri.file(
+            path.join(extensionContext.extensionPath, 'resources', 'media', 'vscode-elements.css')
+          ),
+          vscode.Uri.file(
+            path.join(extensionContext.extensionPath, 'resources', 'media', 'main.css')
+          ),
+        ],
+      },
+      this.html
+    );
   }
 }

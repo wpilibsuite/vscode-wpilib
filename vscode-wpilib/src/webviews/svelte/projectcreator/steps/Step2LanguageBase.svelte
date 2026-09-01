@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createTranslator } from '../../lib';
+  import { createTranslator } from '../../lib/i18n';
   import type { BaseOption } from '../types';
 
   interface Props {
@@ -56,7 +56,7 @@
       disabled={languages.length === 0}
     >
       <option value="" disabled>{t('Select a language')}</option>
-      {#each languages as lang}
+      {#each languages as lang (lang)}
         <option value={lang}>{lang}</option>
       {/each}
     </select>
@@ -75,7 +75,7 @@
       disabled={bases.length === 0}
     >
       <option value="" disabled>{t('Select a project base')}</option>
-      {#each bases as base}
+      {#each bases as base (base.label)}
         <option value={base.label}>{base.label}</option>
       {/each}
     </select>

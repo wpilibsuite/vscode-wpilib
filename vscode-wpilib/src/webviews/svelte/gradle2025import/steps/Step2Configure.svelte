@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ValidationError } from '../../components/shared';
+  import ValidationError from '../../components/shared/ValidationError.svelte';
 
   type HardwareOption = 'none' | 'romi' | 'xrp';
 

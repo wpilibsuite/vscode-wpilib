@@ -8,17 +8,14 @@ body {
 body {
   scrollbar-gutter: stable;
   padding: 0;
-}
-
-body,
-#app,
-#mainDiv {
   display: flex;
   flex-direction: column;
 }
 
 #app,
 #mainDiv {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   overflow: hidden;
   min-height: 0;

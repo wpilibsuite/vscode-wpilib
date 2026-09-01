@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { SummaryBox } from '../../components/shared';
-  import { createTranslator } from '../../lib';
+  import SummaryBox from '../../components/shared/SummaryBox.svelte';
+  import { createTranslator } from '../../lib/i18n';
   import { ProjectType } from '../types';
 
   interface Props {

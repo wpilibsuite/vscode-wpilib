@@ -79,13 +79,15 @@ export async function handleSave(saveData: (IPrintMessage | IErrorMessage)[]): P
 }
 
 function getHTML(webview: vscode.Webview, resourceRoot: string): string {
-  return loadDistWebviewHtml({
-    webview,
-    extensionRoot: vscode.Uri.file(path.join(resourceRoot, '..')),
-    distHtmlFileName: 'riolog.html',
-    extraCss: [
-      vscode.Uri.file(path.join(resourceRoot, 'media', 'vscode-elements.css')),
-      vscode.Uri.file(path.join(resourceRoot, 'media', 'riolog.css')),
-    ],
-  });
+  return loadDistWebviewHtml(
+    {
+      webview,
+      extensionRoot: vscode.Uri.file(path.join(resourceRoot, '..')),
+      extraCss: [
+        vscode.Uri.file(path.join(resourceRoot, 'media', 'vscode-elements.css')),
+        vscode.Uri.file(path.join(resourceRoot, 'media', 'riolog.css')),
+      ],
+    },
+    'riolog.html'
+  );
 }
