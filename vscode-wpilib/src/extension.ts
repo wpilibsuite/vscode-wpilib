@@ -11,10 +11,10 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { BuildTestAPI } from './buildtestapi';
-import { registerBuiltinTools } from './builtintools';
 import { CommandAPI } from './commandapi';
 import { activateCpp, warnIfMissingCppExtension } from './cpp/cpp';
 import { ApiProvider } from './cppprovider/apiprovider';
+import { DependencyViewProvider } from './dependencyView';
 import { DeployDebugAPI } from './deploydebugapi';
 import { ExecuteAPI } from './executor';
 import { activateJava } from './java/java';
@@ -28,7 +28,6 @@ import { ProjectInfoGatherer } from './projectinfo';
 import { ExampleTemplateAPI } from './shared/exampletemplateapi';
 import { getWPILibHomeDir, UtilitiesAPI } from './shared/utilitiesapi';
 import { addVendorExamples } from './shared/vendorexamples';
-import { ToolAPI } from './toolapi';
 import { setExtensionContext, setJavaHome } from './utilities';
 import { fireVendorDepsChanged, VendorLibraries } from './vendorlibraries';
 import { createVsCommands } from './vscommands';
@@ -36,7 +35,6 @@ import { Gradle2025Import } from './webviews/gradle2025import';
 import { Help } from './webviews/help';
 import { ProjectCreator } from './webviews/projectcreator';
 import { checkForInitialUpdate, checkForUpdates } from './wpilibupdates';
-import { DependencyViewProvider } from './dependencyView';
 
 // External API class to implement the IExternalAPI interface
 class ExternalAPI implements IExternalAPI {
@@ -49,7 +47,6 @@ class ExternalAPI implements IExternalAPI {
     return externalApi;
   }
 
-  private readonly toolApi: ToolAPI;
   private readonly deployDebugApi: DeployDebugAPI;
   private readonly buildTestApi: BuildTestAPI;
   private readonly preferencesApi: PreferencesAPI;
@@ -70,12 +67,8 @@ class ExternalAPI implements IExternalAPI {
     this.deployDebugApi = deployDebugApi;
     this.buildTestApi = buildTestApi;
     this.utilitiesApi = new UtilitiesAPI();
-    this.toolApi = new ToolAPI(this);
   }
 
-  public getToolAPI(): ToolAPI {
-    return this.toolApi;
-  }
   public getExampleTemplateAPI(): ExampleTemplateAPI {
     return this.exampleTemplateApi;
   }
@@ -128,14 +121,6 @@ async function handleAfterTrusted(
   await activateCpp(context, externalApi);
   // Active the java parts of the extension
   await activateJava(context, externalApi);
-
-  try {
-    // Add built in tools
-    await registerBuiltinTools(externalApi);
-  } catch (err) {
-    logger.error('error registering built in tool handler', err);
-    creationError = true;
-  }
 
   let vendorLibs: VendorLibraries | undefined;
 

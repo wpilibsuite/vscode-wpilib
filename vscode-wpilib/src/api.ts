@@ -10,11 +10,6 @@ export interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
 }
 
-export interface IToolAPI {
-  startTool(): Promise<boolean>;
-  addTool(tool: IToolRunner): void;
-}
-
 export interface IExecuteAPI {
   executeCommand(
     command: string,
@@ -99,7 +94,6 @@ export interface IUtilitiesAPI {
 }
 
 export interface IExternalAPI {
-  getToolAPI(): IToolAPI;
   getExampleTemplateAPI(): IExampleTemplateAPI;
   getDeployDebugAPI(): IDeployDebugAPI;
   getBuildTestAPI(): IBuildTestAPI;
@@ -142,12 +136,6 @@ export interface ICommandCreator {
   getDescription(): string;
   getIsCurrentlyValid(workspace: vscode.WorkspaceFolder): Promise<boolean>;
   generate(folder: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<boolean>;
-}
-
-export interface IToolRunner {
-  runTool(): Promise<boolean>;
-  getDisplayName(): string;
-  getDescription(): string;
 }
 
 /**
