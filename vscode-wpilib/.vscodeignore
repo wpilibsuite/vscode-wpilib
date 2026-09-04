@@ -1,5 +1,6 @@
 .vscode/**
 .vscode-test/**
+.rollup.cache/
 node_modules
 .gitignore
 gulpfile.js
@@ -7,6 +8,7 @@ i18n/**/package.i18n.json
 locale/**
 src/**
 tsconfig.json
+**/tsconfig.tsbuildinfo
 vsc-extension-quickstart.md
 eslint.config.mjs
 rolldown.config.mjs

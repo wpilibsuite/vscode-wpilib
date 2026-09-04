@@ -435,13 +435,14 @@
         "build": "gulp clean && rolldown -c rolldown.config.mjs --environment NODE_ENV:production",
         "build:dev": "gulp clean && rolldown -c rolldown.config.mjs --environment NODE_ENV:development",
         "watch": "rolldown -c rolldown.config.mjs -w --environment NODE_ENV:development",
-        "test": "gulp clean && tsc -p . && vscode-test",
+        "test": "gulp clean && tsc --build src/test --clean && tsc --build src/test && vscode-test",
         "gulp": "gulp",
         "updateActivation": "gulp update-activation",
         "vscePackage": "vsce package --no-dependencies"
     },
     "devDependencies": {
         "@eslint/js": "^9.29.0",
+        "@rollup/plugin-typescript": "^12.3.0",
         "@types/micromatch": "^4.0.9",
         "@types/mocha": "^10.0.10",
         "@types/node": "^22.19.0",
@@ -459,6 +460,7 @@
         "rolldown": "^1.2.6",
         "rollup-plugin-svelte": "^7.2.3",
         "svelte": "^5.0.0",
+        "svelte-check": "^4.7.6",
         "svelte-preprocess": "^6.0.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.9.2",

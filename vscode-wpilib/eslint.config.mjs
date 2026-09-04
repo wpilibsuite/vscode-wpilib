@@ -14,6 +14,7 @@ export default defineConfig([
     'dist',
     'node_modules/',
     '.vscode-test/',
+    '.rollup.cache/',
     '.vscode-test.mjs',
   ]),
   {

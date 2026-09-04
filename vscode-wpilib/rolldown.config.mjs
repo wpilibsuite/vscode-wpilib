@@ -1,11 +1,8 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
 
+import typescript from '@rollup/plugin-typescript';
 import svelte from 'rollup-plugin-svelte';
 import svelteConfig from './svelte.config.mjs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const production = process.env.NODE_ENV === 'production';
 
@@ -80,9 +77,7 @@ function generateWebviewHtmlFiles() {
   };
 }
 
-const bundleEntries = Object.fromEntries(
-  webviews.map(({ name, input }) => [name, path.resolve(__dirname, input)])
-);
+const bundleEntries = Object.fromEntries(webviews.map(({ name, input }) => [name, input]));
 
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');
@@ -101,13 +96,13 @@ export default [
   {
     input: bundleEntries,
     platform: 'browser',
-    tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+    tsconfig: './src/webviews/svelte/tsconfig.json',
     resolve: {
       conditionNames: production ? ['production'] : ['development'],
       extensions: ['.mjs', '.js', '.json', '.ts', '.svelte'],
     },
     output: {
-      dir: path.resolve(__dirname, 'resources', 'dist'),
+      dir: './resources/dist',
       entryFileNames: '[name].js',
       format: 'es',
       sourcemap: !production,
@@ -132,6 +127,10 @@ export default [
       handler(warning);
     },
     plugins: [
+      typescript({
+        compilerOptions: { outDir: './resources/dist' },
+        noEmitOnError: true,
+      }),
       svelte({
         compilerOptions: {
           dev: !production,
@@ -146,14 +145,14 @@ export default [
     },
   },
   {
-    input: path.resolve(__dirname, 'src/extension.ts'),
+    input: 'src/extension.ts',
     platform: 'node',
     resolve: {
       extensions: ['.mjs', '.js', '.json', '.ts'],
       mainFields: ['module', 'main'],
     },
     output: {
-      file: path.resolve(__dirname, 'out/extension.js'),
+      file: 'out/extension.js',
       format: 'esm',
       sourcemap: production ? 'hidden' : 'inline',
       exports: 'named',
