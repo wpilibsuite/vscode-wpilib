@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "../../out",
+    "rootDir": "."
+  },
+  "include": ["./*.ts"],
+  "exclude": [],
+  "extends": "../../tsconfig.json",
+  "references": [
+    {
+      "path": "../../tsconfig.json"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
+.rollup.cache/
 out
 i18n
 node_modules
+tsconfig.tsbuildinfo
 .vscode-test/
 *.vsix
 resources/cpp

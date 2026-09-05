@@ -4,17 +4,29 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "npm: build:dev",
       "type": "npm",
-      "identifier": "vscode-web-watch",
-      "script": "webpack-watch",
+      "script": "build:dev",
       "path": "vscode-wpilib/",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "never"
-      },
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "wpilib: watch",
+      "type": "npm",
+      "script": "watch",
+      "path": "vscode-wpilib/",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "never"
       },
       "problemMatcher": []
     }

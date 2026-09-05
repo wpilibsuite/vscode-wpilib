@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IDisposable } from './shared/interfaces';
 import { IErrorMessage, IPrintMessage } from './shared/message';
+import { loadDistWebviewHtml } from '../webviews/distWebviewHtml';
 
 export function createRioLogWindowView(resourceRoot: string, disposables: IDisposable[]) {
   const webview = vscode.window.createWebviewPanel(
@@ -14,6 +15,10 @@ export function createRioLogWindowView(resourceRoot: string, disposables: IDispo
       enableCommandUris: true,
       enableScripts: true,
       retainContextWhenHidden: true,
+      localResourceRoots: [
+        vscode.Uri.file(path.join(resourceRoot, 'media')),
+        vscode.Uri.file(path.join(resourceRoot, 'dist')),
+      ],
     }
   );
 
@@ -73,38 +78,15 @@ export async function handleSave(saveData: (IPrintMessage | IErrorMessage)[]): P
 }
 
 function getHTML(webview: vscode.Webview, resourceRoot: string): string {
-  // Get paths to script and CSS
-  const scriptPath = vscode.Uri.file(
-    path.join(resourceRoot, '..', 'resources', 'dist', 'riologpage.js')
+  return loadDistWebviewHtml(
+    {
+      webview,
+      extensionRoot: vscode.Uri.file(path.join(resourceRoot, '..')),
+      extraCss: [
+        vscode.Uri.file(path.join(resourceRoot, 'media', 'vscode-elements.css')),
+        vscode.Uri.file(path.join(resourceRoot, 'media', 'riolog.css')),
+      ],
+    },
+    'riolog.html'
   );
-  const elementsCssPath = vscode.Uri.file(
-    path.join(resourceRoot, '..', 'resources', 'media', 'vscode-elements.css')
-  );
-  const rioLogCssPath = vscode.Uri.file(
-    path.join(resourceRoot, '..', 'resources', 'media', 'riolog.css')
-  );
-
-  // Convert to webview URIs
-  const scriptUri = webview.asWebviewUri(scriptPath);
-  const elementsCssUri = webview.asWebviewUri(elementsCssPath);
-  const rioLogCssUri = webview.asWebviewUri(rioLogCssPath);
-
-  return `<!doctype html>
-          <html>
-            <head>
-              <link rel="stylesheet" href="${elementsCssUri}" />
-              <link rel="stylesheet" href="${rioLogCssUri}" />
-              <title>WPILib RioLog</title>
-            </head>
-
-            <body>
-              <div id="mainDiv"></div>
-              <script>
-                window.addEventListener('error', (event) => {
-                  console.error('Error in RioLog script:', event.error);
-                });
-              </script>
-              <script src="${scriptUri}"></script>
-            </body>
-          </html>`;
 }
