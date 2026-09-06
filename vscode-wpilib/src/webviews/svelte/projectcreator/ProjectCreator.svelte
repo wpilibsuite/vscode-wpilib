@@ -7,11 +7,7 @@
   import Step4Review from './steps/Step4Review.svelte';
   import { createTranslator } from '../lib/i18n';
   import { getResourceBase } from '../lib/webview-context';
-  import {
-    ProjectType,
-    type BaseOption,
-    type ProjectCreationData,
-  } from './types';
+  import { ProjectType, type BaseOption, type ProjectCreationData } from './types';
 
   const vscode = acquireVsCodeApi();
   const t = createTranslator('projectcreator');
@@ -239,9 +235,7 @@
   const teamNumberError = $derived(validateTeamNumber(teamNumber));
 
   const summaryLocation = $derived(
-    newFolder && projectName
-      ? `${projectFolder}/${projectName}`
-      : projectFolder
+    newFolder && projectName ? `${projectFolder}/${projectName}` : projectFolder
   );
 </script>
 
@@ -252,7 +246,7 @@
 
   <h1 class="project-title">{t('Welcome to WPILib New Project Creator')}</h1>
 
-  <WizardProgress {steps} currentStep={currentStep} />
+  <WizardProgress {steps} {currentStep} />
 
   <WizardStep active={currentStep === 1} step={1}>
     <Step1ProjectType
@@ -266,8 +260,8 @@
     <Step2LanguageBase
       {languages}
       {bases}
-      selectedLanguage={selectedLanguage}
-      selectedBase={selectedBase}
+      {selectedLanguage}
+      {selectedBase}
       onLanguageChange={handleLanguageChange}
       onBaseChange={handleBaseChange}
       onNext={() => goToStep(3)}
@@ -285,9 +279,9 @@
       {projectFolderError}
       {projectNameError}
       {teamNumberError}
-      showProjectFolderError={showProjectFolderError}
-      showProjectNameError={showProjectNameError}
-      showTeamNumberError={showTeamNumberError}
+      {showProjectFolderError}
+      {showProjectNameError}
+      {showTeamNumberError}
       onSelectFolder={selectProjectFolder}
       onProjectNameChange={handleProjectNameChange}
       onTeamNumberChange={handleTeamNumberChange}
@@ -304,7 +298,7 @@
       language={selectedLanguage}
       base={selectedBase}
       location={summaryLocation}
-      teamNumber={teamNumber}
+      {teamNumber}
       onBack={() => goToStep(3)}
       onCreate={createProject}
     />
