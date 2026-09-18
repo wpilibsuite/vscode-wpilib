@@ -24,6 +24,7 @@ export interface IProjectInfo {
   javaDependenciesExtensionVersion: string;
   cppExtensionVersion: string;
   vendorLibraries: IVendorLibraryPair[];
+  mavenRepositories: string[];
   wpilibProjectYear: string;
   wpilibLanguage: string;
 }
@@ -104,19 +105,32 @@ Vendor Libraries:
 `;
     }
 
-    vscode.window
-      .showInformationMessage(
-        infoString,
+    const action = await vscode.window.showInformationMessage(
+      infoString,
+      {
+        modal: true,
+      },
+      'Dependency URLs',
+      'Copy'
+    );
+
+    if (action === 'Copy') {
+      await vscode.env.clipboard.writeText(infoString);
+    } else if (action === 'Dependency URLs') {
+      const repositories =
+        'https://plugins.gradle.org/\nhttps://frcmaven.wpi.edu/artifactory\n' +
+        (projectInfo.mavenRepositories.length > 0 ? projectInfo.mavenRepositories.join('\n') : '');
+      const repositoryAction = await vscode.window.showInformationMessage(
+        `Dependency URLs used by project:\n${repositories}`,
         {
           modal: true,
         },
         'Copy'
-      )
-      .then((action) => {
-        if (action === 'Copy') {
-          vscode.env.clipboard.writeText(infoString);
-        }
-      });
+      );
+      if (repositoryAction === 'Copy') {
+        await vscode.env.clipboard.writeText(repositories);
+      }
+    }
   }
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
@@ -156,6 +170,7 @@ Vendor Libraries:
       javaDependenciesExtensionVersion: depViewer,
       javaExtensionVersion: javaExt,
       vendorLibraries: [],
+      mavenRepositories: Array.from(new Set(vendorLibs.flatMap((lib) => lib.mavenUrls ?? []))),
       wpilibExtensionVersion: currentVsCodeVersion,
       wpilibProjectVersion: currentGradleVersion,
       wpilibProjectYear: currentProjectYear,
