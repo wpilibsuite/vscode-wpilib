@@ -119,7 +119,7 @@ Vendor Libraries:
     } else if (action === 'Dependency URLs') {
       const repositories =
         'https://plugins.gradle.org/\nhttps://frcmaven.wpi.edu/artifactory\n' +
-        (projectInfo.mavenRepositories.length > 0 ? projectInfo.mavenRepositories.join('\n') : '');
+        projectInfo.mavenRepositories.join('\n');
       const repositoryAction = await vscode.window.showInformationMessage(
         `Dependency URLs used by project:\n${repositories}`,
         {
