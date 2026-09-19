@@ -30,15 +30,15 @@ export interface IProjectInfo {
   wpilibLanguage: string;
 }
 
-const wpiLibExtensionIds = {
+const wpilibExtensionIds = {
   cpp: 'ms-vscode.cpptools',
   java: 'redhat.java',
   javaDebug: 'vscjava.vscode-java-debug',
   javaDependencies: 'vscjava.vscode-java-dependency',
   wpilib: 'wpilibsuite.vscode-wpilib',
-} as const;
+};
 
-const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpiLibExtensionIds));
+const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpilibExtensionIds));
 
 function extensionVersion(id: string): string {
   const extension = vscode.extensions.getExtension(id);
@@ -97,10 +97,10 @@ export class ProjectInfoGatherer {
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
     const jdkVer = !jdkLoc ? 'unknown' : await getJavaVersion(jdkLoc);
-    const debugExt = extensionVersion(wpiLibExtensionIds.javaDebug);
-    const depViewer = extensionVersion(wpiLibExtensionIds.javaDependencies);
-    const javaExt = extensionVersion(wpiLibExtensionIds.java);
-    const cppExt = extensionVersion(wpiLibExtensionIds.cpp);
+    const debugExt = extensionVersion(wpilibExtensionIds.javaDebug);
+    const depViewer = extensionVersion(wpilibExtensionIds.javaDependencies);
+    const javaExt = extensionVersion(wpilibExtensionIds.java);
+    const cppExt = extensionVersion(wpilibExtensionIds.cpp);
     let vendorLibs = '\n';
     let extensionList = '\n';
     for (const lib of projectInfo.vendorLibraries) {
