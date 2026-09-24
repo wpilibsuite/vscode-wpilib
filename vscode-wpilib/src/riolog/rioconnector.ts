@@ -3,30 +3,6 @@
 import * as net from 'net';
 import { logger } from '../logger';
 
-async function properRace<T>(promises: Promise<T>[]): Promise<T> {
-  if (promises.length < 1) {
-    return Promise.reject("Can't start a race without promises!");
-  }
-
-  // There is no way to know which promise is rejected.
-  // So we map it to a new promise to return the index when it fails
-  const indexPromises = promises.map((p, index) =>
-    p.catch(() => {
-      throw index;
-    })
-  );
-
-  try {
-    return await Promise.race(indexPromises);
-  } catch (index) {
-    // The promise has rejected, remove it from the list of promises and just continue the race.
-    logger.info('reject promise');
-    const p = promises.splice(index as number, 1)[0];
-    p.catch((e) => logger.info('A promise has been rejected, but awaiting others', e));
-    return properRace(promises);
-  }
-}
-
 interface IDriverStationData {
   robotIp?: string;
 }
@@ -35,7 +11,7 @@ const constantIps: string[] = [
   process.platform === 'win32' ? '172.26.0.1' : '172.27.0.1',
   '172.30.0.1',
   'robot.local',
-  //, '127.0.0.1',
+  // '127.0.0.1',
   // Uncomment the above line for testing on localhost.
 ];
 
@@ -244,7 +220,7 @@ export async function connectToRobot(
   }
   const timer = timerPromise(timeout);
   connectors.push(timer.promise);
-  const firstDone: net.Socket | undefined = await properRace(connectors);
+  const firstDone: net.Socket | undefined = await Promise.any(connectors);
   if (!firstDone) {
     // Kill all
     for (const p of pairs) {

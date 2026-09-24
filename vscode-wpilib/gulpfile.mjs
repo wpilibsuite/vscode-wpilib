@@ -29,6 +29,7 @@ gulp.task('i18n-additional', async () =>
 
 gulp.task('clean', async () => {
   await rm('out/', { force: true, recursive: true });
+  await rm('resources/dist/', { force: true, recursive: true });
   globSync(['package.nls.*.json', '*.vsix']).map(async (file) => await rm(file));
 });
 
