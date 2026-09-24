@@ -52,9 +52,6 @@ def deployArtifact = deploy.targets.systemcore.artifacts.wpilibJava
 // Set to true to use debug for simulation including JNI
 wpi.java.runSimWithDebugJni = false
 
-// Set this to true to enable desktop support.
-def includeDesktopSupport = false
-
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
