@@ -40,6 +40,19 @@ const wpilibExtensionIds = {
 };
 
 const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpilibExtensionIds));
+const builtInRepositories = ['https://plugins.gradle.org/', 'https://frcmaven.wpi.edu/artifactory'];
+
+function getUniqueMavenRepositories(mavenRepositories: string[]): string[] {
+  const repositories = Array.from(new Set(mavenRepositories));
+  return repositories.filter(
+    (repository) =>
+      !builtInRepositories.some((builtIn) => repository.startsWith(builtIn)) &&
+      !repositories.some(
+        (otherRepository) =>
+          repository !== otherRepository && repository.startsWith(otherRepository)
+      )
+  );
+}
 
 function extensionVersion(id: string): string {
   const extension = vscode.extensions.getExtension(id);
@@ -135,16 +148,17 @@ VS Code Extensions: ${extensionList}
       {
         modal: true,
       },
-      'Dependency URLs',
+      'Show Dependency URLs',
       'Copy'
     );
 
     if (action === 'Copy') {
       await vscode.env.clipboard.writeText(infoString);
-    } else if (action === 'Dependency URLs') {
-      const repositories =
-        'https://plugins.gradle.org/\nhttps://frcmaven.wpi.edu/artifactory\n' +
-        projectInfo.mavenRepositories.join('\n');
+    } else if (action === 'Show Dependency URLs') {
+      const repositories = [
+        ...builtInRepositories,
+        ...getUniqueMavenRepositories(projectInfo.mavenRepositories),
+      ].join('\n');
       const repositoryAction = await vscode.window.showInformationMessage(
         `Dependency URLs used by project:\n${repositories}`,
         {
