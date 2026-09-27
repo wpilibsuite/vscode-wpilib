@@ -42,7 +42,7 @@ const wpilibExtensionIds = {
 const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpilibExtensionIds));
 const builtInRepositories = ['https://plugins.gradle.org/', 'https://frcmaven.wpi.edu/artifactory'];
 
-function getUniqueMavenRepositories(mavenRepositories: string[]): string[] {
+export function getUniqueMavenRepositories(mavenRepositories: string[]): string[] {
   const repositories = Array.from(new Set(mavenRepositories));
   return repositories.filter(
     (repository) =>
