@@ -20,7 +20,6 @@ suite('Project Info Tests', () => {
       getUniqueMavenRepositories([
         'https://repo.example.com/maven',
         'https://repo.example.com/maven',
-
       ]),
       ['https://repo.example.com/maven']
     );
