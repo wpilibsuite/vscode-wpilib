@@ -1,15 +1,43 @@
 'use strict';
 
+import * as cp from 'child_process';
 import { readFile } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { logger } from './logger';
 
+function parseMajorVersion(content: string): number {
+  let regexp = /version "(.*)"/g;
+  let match = regexp.exec(content);
+  if (!match) {
+    return 0;
+  }
+
+  // look into the interesting bits now
+  regexp = /\d+/g;
+  match = regexp.exec(match[1]);
+  let javaVersion = 0;
+  if (match) {
+    javaVersion = parseInt(match[0], 10);
+  }
+  return javaVersion;
+}
+
 export async function getJavaVersion(javaHome: string): Promise<number> {
-  const releaseFile = await readFile(path.join(javaHome, 'release'), 'utf-8');
-  // JAVA_VERSION should always exist in this format, so asserting it's non-null should be fine
-  return parseInt(releaseFile.match(/JAVA_VERSION="(\d+)\./)![1]);
+  try {
+    const releaseFile = await readFile(path.join(javaHome, 'release'), 'utf-8');
+    // JAVA_VERSION should always exist in this format, so asserting it's non-null should be fine
+    return parseInt(releaseFile.match(/JAVA_VERSION="(\d+)\./)![1], 10);
+  } catch {
+    // But if it doesn't exist, fall back
+    return new Promise((resolve) => {
+      cp.execFile(path.join(javaHome, 'bin', 'java'), ['-version'], {}, (_, __, stderr) => {
+        const javaVersion = parseMajorVersion(stderr);
+        resolve(javaVersion);
+      });
+    });
+  }
 }
 
 async function checkJavaPath(path: string | undefined, source: string) {
