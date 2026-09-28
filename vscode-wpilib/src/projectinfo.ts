@@ -160,7 +160,8 @@ VS Code Extensions: ${extensionList}
         ...getUniqueMavenRepositories(projectInfo.mavenRepositories),
       ].join('\n');
       const repositoryAction = await vscode.window.showInformationMessage(
-        `Dependency URLs used by project:\n${repositories}`,
+        `Dependency URLs used by project:\n${repositories}\n
+Note: URLs are based on standard WPILib build.gradle and vendordeps used in the project. Non-standard changes to build.gradle files will not be reflected in this list.`,
         {
           modal: true,
         },
