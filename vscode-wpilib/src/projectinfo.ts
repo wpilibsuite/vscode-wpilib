@@ -26,7 +26,7 @@ export interface IProjectInfo {
   wpilibExtensionVersion: string;
   vendorLibraries: IVendorLibraryPair[];
   vscodeExtensions: IVscodeExtension[];
-  mavenRepositories: string[];
+  mavenRepositories: Set<string>;
   wpilibProjectYear: string;
   wpilibLanguage: string;
 }
@@ -40,19 +40,10 @@ const wpilibExtensionIds = {
 };
 
 const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpilibExtensionIds));
-const builtInRepositories = ['https://plugins.gradle.org/', 'https://frcmaven.wpi.edu/artifactory'];
-
-export function getUniqueMavenRepositories(mavenRepositories: string[]): string[] {
-  const repositories = Array.from(new Set(mavenRepositories));
-  return repositories.filter(
-    (repository) =>
-      !builtInRepositories.some((builtIn) => repository.startsWith(builtIn)) &&
-      !repositories.some(
-        (otherRepository) =>
-          repository !== otherRepository && repository.startsWith(otherRepository)
-      )
-  );
-}
+const builtInRepositories = new Set([
+  'https://plugins.gradle.org/',
+  'https://frcmaven.wpi.edu/artifactory',
+]);
 
 function extensionVersion(id: string): string {
   const extension = vscode.extensions.getExtension(id);
@@ -155,10 +146,9 @@ VS Code Extensions: ${extensionList}
     if (action === 'Copy') {
       await vscode.env.clipboard.writeText(infoString);
     } else if (action === 'Show Dependency URLs') {
-      const repositories = [
-        ...builtInRepositories,
-        ...getUniqueMavenRepositories(projectInfo.mavenRepositories),
-      ].join('\n');
+      const repositories = Array.from(
+        new Set([...builtInRepositories, ...projectInfo.mavenRepositories])
+      ).join('\n');
       const repositoryAction = await vscode.window.showInformationMessage(
         `Dependency URLs used by project:\n${repositories}\n
 Note: URLs are based on standard WPILib build.gradle and vendordeps used in the project. Non-standard changes to build.gradle files will not be reflected in this list.`,
@@ -206,7 +196,7 @@ Note: URLs are based on standard WPILib build.gradle and vendordeps used in the 
     const projectInfo: IProjectInfo = {
       vendorLibraries: [],
       vscodeExtensions,
-      mavenRepositories: Array.from(new Set(vendorLibs.flatMap((lib) => lib.mavenUrls ?? []))),
+      mavenRepositories: new Set(vendorLibs.flatMap((lib) => lib.mavenUrls ?? [])),
       wpilibExtensionVersion: currentVsCodeVersion,
       wpilibProjectVersion: currentGradleVersion,
       wpilibProjectYear: currentProjectYear,
