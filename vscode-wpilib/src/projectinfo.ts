@@ -96,7 +96,7 @@ export class ProjectInfoGatherer {
     }
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
-    const jdkVer = !jdkLoc ? 'unknown' : await getJavaVersion(jdkLoc);
+    const jdkVer = !jdkLoc ? 'unknown' : (await getJavaVersion(jdkLoc)).full;
     const debugExt = extensionVersion(wpilibExtensionIds.javaDebug);
     const depViewer = extensionVersion(wpilibExtensionIds.javaDependencies);
     const javaExt = extensionVersion(wpilibExtensionIds.java);

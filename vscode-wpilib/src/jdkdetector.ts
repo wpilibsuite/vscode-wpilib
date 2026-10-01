@@ -7,34 +7,32 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { logger } from './logger';
 
-function parseMajorVersion(content: string): number {
+function parseVersion(content: string): string {
   let regexp = /version "(.*)"/g;
   let match = regexp.exec(content);
   if (!match) {
     return 0;
   }
-
-  // look into the interesting bits now
-  regexp = /\d+/g;
-  match = regexp.exec(match[1]);
-  let javaVersion = 0;
-  if (match) {
-    javaVersion = parseInt(match[0], 10);
+  let version = match[1];
+  // Ignore '1.' prefix for legacy Java versions
+  if (version.startsWith('1.')) {
+    version = version.substring(2);
   }
-  return javaVersion;
+  return version;
 }
 
-export async function getJavaVersion(javaHome: string): Promise<number> {
+export async function getJavaVersion(javaHome: string): Promise<{ major: number; full: string }> {
   try {
     const releaseFile = await readFile(path.join(javaHome, 'release'), 'utf-8');
     // JAVA_VERSION should always exist in this format, so asserting it's non-null should be fine
-    return parseInt(releaseFile.match(/JAVA_VERSION="(\d+)\./)![1], 10);
+    const fullVersion = releaseFile.match(/JAVA_VERSION="(.*)"/)![1];
+    return { major: parseInt(fullVersion.split('.')[0], 10), full: fullVersion };
   } catch {
     // But if it doesn't exist, fall back
     return new Promise((resolve) => {
       cp.execFile(path.join(javaHome, 'bin', 'java'), ['-version'], {}, (_, __, stderr) => {
-        const javaVersion = parseMajorVersion(stderr);
-        resolve(javaVersion);
+        const fullVersion = parseVersion(stderr);
+        resolve({ major: parseInt(fullVersion.split('.')[0], 10), full: fullVersion });
       });
     });
   }
@@ -44,7 +42,7 @@ async function checkJavaPath(path: string | undefined, source: string) {
   if (path) {
     try {
       const javaVersion = await getJavaVersion(path);
-      if (javaVersion >= 25) {
+      if (javaVersion.major >= 25) {
         logger.log(`Found ${source} Version: ${javaVersion} at ${path}`);
         return true;
       } else {
