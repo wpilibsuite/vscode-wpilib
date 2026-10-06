@@ -26,6 +26,7 @@ export interface IProjectInfo {
   wpilibExtensionVersion: string;
   vendorLibraries: IVendorLibraryPair[];
   vscodeExtensions: IVscodeExtension[];
+  mavenRepositories: Set<string>;
   wpilibProjectYear: string;
   wpilibLanguage: string;
 }
@@ -39,6 +40,10 @@ const wpilibExtensionIds = {
 };
 
 const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpilibExtensionIds));
+const builtInRepositories = new Set([
+  'https://plugins.gradle.org/',
+  'https://frcmaven.wpi.edu/artifactory',
+]);
 
 function extensionVersion(id: string): string {
   const extension = vscode.extensions.getExtension(id);
@@ -129,19 +134,33 @@ Vendor Libraries: ${vendorLibs}
 VS Code Extensions: ${extensionList}
 `;
 
-    vscode.window
-      .showInformationMessage(
-        infoString,
+    const action = await vscode.window.showInformationMessage(
+      infoString,
+      {
+        modal: true,
+      },
+      'Show Dependency URLs',
+      'Copy'
+    );
+
+    if (action === 'Copy') {
+      await vscode.env.clipboard.writeText(infoString);
+    } else if (action === 'Show Dependency URLs') {
+      const repositories = Array.from(
+        new Set([...builtInRepositories, ...projectInfo.mavenRepositories])
+      ).join('\n');
+      const repositoryAction = await vscode.window.showInformationMessage(
+        `Dependency URLs used by project:\n${repositories}\n
+Note: URLs are based on standard WPILib build.gradle and vendordeps used in the project. Non-standard changes to build.gradle files will not be reflected in this list.`,
         {
           modal: true,
         },
         'Copy'
-      )
-      .then((action) => {
-        if (action === 'Copy') {
-          vscode.env.clipboard.writeText(infoString);
-        }
-      });
+      );
+      if (repositoryAction === 'Copy') {
+        await vscode.env.clipboard.writeText(repositories);
+      }
+    }
   }
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
@@ -177,6 +196,7 @@ VS Code Extensions: ${extensionList}
     const projectInfo: IProjectInfo = {
       vendorLibraries: [],
       vscodeExtensions,
+      mavenRepositories: new Set(vendorLibs.flatMap((lib) => lib.mavenUrls ?? [])),
       wpilibExtensionVersion: currentVsCodeVersion,
       wpilibProjectVersion: currentGradleVersion,
       wpilibProjectYear: currentProjectYear,
