@@ -460,18 +460,17 @@
         "ts-node": "^10.9.2",
         "typescript": "^5.9.2",
         "typescript-eslint": "^8.43.0",
-        "vscode-nls-dev": "^4.0.4",
         "webpack": "^5.101.3",
         "webpack-cli": "^6.0.1",
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
+        "@vscode/l10n": "^0.0.18",
         "extract-zip": "^2.0.1",
         "glob": "^11.0.2",
         "jsonc-parser": "^3.3.1",
         "micromatch": "^4.0.8",
         "vscode-cpptools": "^6.3.0",
-        "vscode-nls": "^5.2.0",
         "winston": "^3.17.0",
         "winston-transport": "^4.9.0",
         "xml2js": "^0.6.2"

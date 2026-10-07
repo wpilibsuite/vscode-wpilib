@@ -7,7 +7,7 @@ import { globSync } from 'fs';
 import { rm } from 'fs/promises';
 import gulp from 'gulp';
 import yaml from 'gulp-yaml';
-import nls from 'vscode-nls-dev';
+import nls from '@vscode/l10n';
 
 // If all VS Code languages are supported you can use nls.coreLanguages
 const languages = [
@@ -23,7 +23,7 @@ gulp.task('i18n-compile', async () =>
 gulp.task('i18n-additional', async () =>
   gulp
     .src(['package.nls.json'])
-    .pipe(nls.createAdditionalLanguageFiles(languages, 'i18n'))
+    .pipe(nls.t().createAdditionalLanguageFiles(languages, 'i18n'))
     .pipe(gulp.dest('.'))
 );
 
