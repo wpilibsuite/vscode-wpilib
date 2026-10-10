@@ -4,7 +4,9 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from './api';
 import { localize as i18n } from './locale';
-import { setExecutePermissions } from './shared/permissions';
+import { setExecutePermissions, setWritableRecursive } from './shared/permissions';
+import { CopyOptions } from 'fs';
+import { cp } from 'fs/promises';
 
 // General utilities usable by multiple classes
 
@@ -119,4 +121,9 @@ export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolea
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
   }
   return true;
+}
+
+export async function cpWithWritePermsissions(source: string | URL, destination: string, opts?: CopyOptions): Promise<void> {
+  await cp(source, destination, opts);
+  await setWritableRecursive(destination);
 }
