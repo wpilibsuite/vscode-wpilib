@@ -1,8 +1,8 @@
 'use strict';
 
 import { S_IXGRP, S_IXOTH, S_IXUSR } from 'constants';
-import { chmod, stat } from 'fs/promises';
-import * as fs from 'fs';
+import { chmod, stat, constants, readdir } from 'fs/promises';
+import { join } from 'path';
 
 /**
  * Recursively ensures all files and directories under `dir` are
@@ -15,15 +15,15 @@ export async function setWritableRecursive(path: string): Promise<void> {
     return;
   }
 
-  const stat = await fs.promises.stat(path);
-  if (stat.isFile()) {
-    await fs.promises.chmod(path, stat.mode | fs.constants.S_IWUSR);
+  const fileStat = await stat(path);
+  if (fileStat.isFile()) {
+    await chmod(path, fileStat.mode | constants.S_IWUSR);
     return;
   }
   
-  const entries = await fs.promises.readdir(path, { withFileTypes: true });
+  const entries = await readdir(path, { withFileTypes: true });
   for (const entry of entries) {
-    const fullPath = path.join(path, entry.name);
+    const fullPath = join(path, entry.name);
     if (entry.isDirectory()) {
       await setWritableRecursive(fullPath);
     }
@@ -31,8 +31,8 @@ export async function setWritableRecursive(path: string): Promise<void> {
     if (!entry.isFile()) {
       return;
     }
-    const stat = await fs.promises.stat(fullPath);
-    await fs.promises.chmod(fullPath, stat.mode | fs.constants.S_IWUSR);
+    const fileStat = await stat(fullPath);
+    await chmod(fullPath, fileStat.mode | constants.S_IWUSR);
   }
 }
 
