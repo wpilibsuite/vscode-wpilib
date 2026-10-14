@@ -3,7 +3,6 @@
 import { S_IXGRP, S_IXOTH, S_IXUSR } from 'constants';
 import { chmod, stat } from 'fs/promises';
 import * as fs from 'fs';
-import * as path from 'path';
 
 /**
  * Recursively ensures all files and directories under `dir` are
