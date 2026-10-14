@@ -28,7 +28,6 @@ jobs:
       - run: |
           npm run lint
           npm run gulp
-          npm run webpack
           npm run vscePackage
         working-directory: vscode-wpilib
         name: Build VSIX
