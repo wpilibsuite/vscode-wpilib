@@ -29,10 +29,10 @@ export async function setWritableRecursive(path: string): Promise<void> {
       await setWritableRecursive(fullPath);
     }
 
-    const stat = await fs.promises.stat(fullPath);
-    if (!stat.isFile) {
+    if (!entry.isFile()) {
       return;
     }
+    const stat = await fs.promises.stat(fullPath);
     await fs.promises.chmod(fullPath, stat.mode | fs.constants.S_IWUSR);
   }
 }
