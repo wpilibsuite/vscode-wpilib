@@ -11,20 +11,20 @@ import * as path from 'path';
  * filesystems (e.g. the Nix store) where copied files preserve
  * the source's read-only permissions.
  */
-export async function setWritableRecursive(dir: string): Promise<void> {
+export async function setWritableRecursive(path: string): Promise<void> {
   if (process.platform === 'win32') {
     return;
   }
 
-  const stat = await fs.promises.stat(dir);
+  const stat = await fs.promises.stat(path);
   if (stat.isFile()) {
-    await fs.promises.chmod(dir, stat.mode | fs.constants.S_IWUSR);
+    await fs.promises.chmod(path, stat.mode | fs.constants.S_IWUSR);
     return;
   }
   
-  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+  const entries = await fs.promises.readdir(path, { withFileTypes: true });
   for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
+    const fullPath = path.join(path, entry.name);
     if (entry.isDirectory()) {
       await setWritableRecursive(fullPath);
     }
