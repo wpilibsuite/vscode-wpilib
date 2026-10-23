@@ -1,6 +1,12 @@
 'use strict';
 
-import { IProjectIPCReceive, IProjectIPCSend, ProjectType } from './projectcreatorpagetypes';
+import {
+  IBaseOption,
+  IProjectIPCReceive,
+  IProjectIPCSend,
+  ISnippetOption,
+  ProjectType,
+} from './projectcreatorpagetypes';
 import { validateProject, validateTeamNumber, validateProjectFolder } from './sharedpages';
 
 interface IVsCodeApi {
@@ -16,7 +22,12 @@ let language = '';
 let base = '';
 let currentStep = 1;
 let languages: string[] = [];
-let bases: string[] = [];
+let bases: IBaseOption[] = [];
+let snippets: IBaseOption[] = [];
+let snippetsLanguage = '';
+let snippetRequestId = 0;
+let exampleContent: 'examples' | 'snippets' = 'examples';
+const selectedTags = new Set<string>();
 
 function navigateToStep(step: number) {
   // Hide all steps
@@ -45,14 +56,9 @@ function navigateToStep(step: number) {
 
   currentStep = step;
 
-  // If navigating to step 2, ensure dropdowns reflect the current project type
+  // Ensure a language chip remains selected when returning to step 2.
   if (step === 2) {
-    // Reset language dropdown to default state if needed
-    const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
-    if (languageSelect.selectedIndex <= 0) {
-      languageSelect.selectedIndex = 0;
-      language = '';
-    }
+    renderLanguageOptions();
   }
 
   // Update summary when navigating to the final step
@@ -141,6 +147,9 @@ function resetBaseDropdown() {
 
   // Reset the base variable
   base = '';
+  bases = [];
+  selectedTags.clear();
+  renderExampleCatalog();
 
   // Disable next button
   const nextButton = document.getElementById('next-to-step-3');
@@ -151,6 +160,11 @@ function resetBaseDropdown() {
 
 function selectProjectType(type: ProjectType) {
   projectType = type;
+
+  const exampleCatalog = document.getElementById('example-catalog') as HTMLElement;
+  const baseSelectRow = document.getElementById('base-select-row') as HTMLElement;
+  exampleCatalog.hidden = type !== ProjectType.Example;
+  baseSelectRow.hidden = type === ProjectType.Example;
 
   // Update selection visuals
   document.querySelectorAll('.selection-card').forEach((el) => {
@@ -169,11 +183,13 @@ function selectProjectType(type: ProjectType) {
   }
 
   // Reset language and base since they depend on project type
-  const lanagageSelect = document.getElementById('language-select') as HTMLSelectElement;
-  lanagageSelect.selectedIndex = 0;
-  resetBaseDropdown();
   language = '';
+  renderLanguageOptions();
+  resetBaseDropdown();
   base = '';
+  snippets = [];
+  snippetsLanguage = '';
+  snippetRequestId++;
 
   // Request languages for this project type
   vscode.postMessage({
@@ -191,27 +207,52 @@ function selectProjectType(type: ProjectType) {
   });
 }
 
-function populateLanguageSelect(languages: string[]) {
-  const select = document.getElementById('language-select') as HTMLSelectElement;
-
-  // Clear existing options except the default
-  while (select.options.length > 1) {
-    select.remove(1);
+function renderLanguageOptions() {
+  const container = document.getElementById('language-options');
+  if (!container) {
+    return;
   }
 
-  // Add new options
+  container.replaceChildren();
   languages.forEach((lang) => {
-    const option = document.createElement('option');
-    option.value = lang;
-    option.textContent = lang;
-    select.appendChild(option);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `example-kind-button language-chip${language === lang ? ' active' : ''}`;
+    button.textContent = lang;
+    button.setAttribute('aria-pressed', String(language === lang));
+    button.addEventListener('click', () => selectLanguage(lang));
+    container.appendChild(button);
   });
-
-  // Enable the select
-  select.disabled = false;
 }
 
-function populateBaseSelect(bases: string[]) {
+function selectLanguage(selectedLanguage: string) {
+  language = selectedLanguage;
+  snippets = [];
+  snippetsLanguage = '';
+  selectedTags.clear();
+  resetBaseDropdown();
+  renderLanguageOptions();
+
+  if (exampleContent === 'snippets') {
+    requestSnippets();
+  }
+
+  vscode.postMessage({
+    data: {
+      base: '',
+      desktop: false,
+      language,
+      newFolder: false,
+      projectName: '',
+      projectType,
+      teamNumber: '',
+      toFolder: '',
+    },
+    type: 'base',
+  });
+}
+
+function populateBaseSelect(options: IBaseOption[]) {
   const select = document.getElementById('base-select') as HTMLSelectElement;
 
   // Clear existing options except the default
@@ -220,15 +261,191 @@ function populateBaseSelect(bases: string[]) {
   }
 
   // Add new options
-  bases.forEach((baseOption) => {
+  options.forEach((baseOption) => {
     const option = document.createElement('option');
-    option.value = baseOption;
-    option.textContent = baseOption;
+    option.value = baseOption.label;
+    option.textContent = baseOption.label;
     select.appendChild(option);
   });
 
   // Enable the select
   select.disabled = false;
+  bases = options;
+  selectedTags.clear();
+  renderExampleCatalog();
+}
+
+function createExampleButton(option: IBaseOption, isSnippet: boolean): HTMLButtonElement {
+  const selectionBase = isSnippet ? `${option.label} (Snippet)` : option.label;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `example-card${base === selectionBase ? ' selected' : ''}`;
+  button.setAttribute('aria-pressed', String(base === selectionBase));
+
+  const title = document.createElement('span');
+  title.className = 'example-card-title';
+  title.textContent = option.label;
+  button.appendChild(title);
+
+  if (option.description) {
+    const description = document.createElement('span');
+    description.className = 'example-card-description';
+    description.textContent = option.description;
+    button.appendChild(description);
+  }
+
+  const tags = document.createElement('span');
+  tags.className = 'example-card-tags';
+  option.tags.forEach((tag) => {
+    const badge = document.createElement('span');
+    badge.className = 'example-tag';
+    badge.textContent = tag;
+    tags.appendChild(badge);
+  });
+  button.appendChild(tags);
+
+  button.addEventListener('click', () => {
+    base = base === selectionBase ? '' : selectionBase;
+    const select = document.getElementById('base-select') as HTMLSelectElement;
+    select.value = base;
+    updateBaseSelection();
+    renderExampleCatalog();
+  });
+  return button;
+}
+
+function updateBaseSelection() {
+  const nextButton = document.getElementById('next-to-step-3') as HTMLButtonElement;
+  nextButton.disabled = !validateStep2();
+}
+
+function renderExampleList(container: HTMLElement, options: IBaseOption[], isSnippet: boolean) {
+  container.replaceChildren();
+  options.forEach((option) => container.appendChild(createExampleButton(option, isSnippet)));
+
+  if (options.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'example-empty';
+    empty.textContent = isSnippet
+      ? 'No snippets match this selection. Try different tags.'
+      : 'No examples match this selection. Try different tags or search terms.';
+    container.appendChild(empty);
+  }
+}
+
+function requestSnippets() {
+  if (!language || snippetsLanguage === language) {
+    return;
+  }
+
+  snippets = [];
+  snippetsLanguage = language;
+  const requestId = ++snippetRequestId;
+  vscode.postMessage({
+    type: 'snippets',
+    requestId,
+    data: {
+      base: '',
+      desktop: false,
+      language,
+      newFolder: false,
+      projectName: '',
+      projectType,
+      teamNumber: '',
+      toFolder: '',
+    },
+  });
+}
+
+function renderExampleCatalog() {
+  const isSnippet = exampleContent === 'snippets';
+  const options = isSnippet ? snippets : bases;
+  const selectedTagsArray = Array.from(selectedTags);
+  const filtered = options.filter((option) =>
+    selectedTagsArray.every((tag) => option.tags.includes(tag))
+  );
+  const tags = Array.from(new Set(options.flatMap((option) => option.tags))).sort((a, b) =>
+    a.localeCompare(b)
+  );
+  const count = document.getElementById('example-count');
+  if (count) {
+    const itemLabel = exampleContent === 'examples' ? 'example' : 'snippet';
+    count.textContent = `${filtered.length} ${filtered.length === 1 ? itemLabel : `${itemLabel}s`}`;
+  }
+
+  const cloud = document.getElementById('example-tags');
+  if (cloud) {
+    cloud.replaceChildren();
+    tags.forEach((tag) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `example-tag-chip${selectedTags.has(tag) ? ' active' : ''}`;
+      const tagLabel = document.createElement('span');
+      tagLabel.className = 'example-tag-label';
+      tagLabel.textContent = tag;
+      tagLabel.title = tag;
+      const tagCount = document.createElement('span');
+      tagCount.className = 'example-tag-count';
+      const otherSelectedTags = selectedTagsArray.filter((selectedTag) => selectedTag !== tag);
+      tagCount.textContent = String(
+        options.filter(
+          (option) =>
+            option.tags.includes(tag) &&
+            otherSelectedTags.every((selectedTag) => option.tags.includes(selectedTag))
+        ).length
+      );
+      button.append(tagLabel, tagCount);
+      button.setAttribute('aria-pressed', String(selectedTags.has(tag)));
+      button.addEventListener('click', () => {
+        if (selectedTags.has(tag)) {
+          selectedTags.delete(tag);
+        } else {
+          selectedTags.add(tag);
+        }
+        renderExampleCatalog();
+      });
+      cloud.appendChild(button);
+    });
+    renderExampleList(document.getElementById('example-results')!, filtered, isSnippet);
+  }
+}
+
+function setExampleContent(content: 'examples' | 'snippets') {
+  if (exampleContent !== content) {
+    selectedTags.clear();
+    if (base.endsWith(' (Snippet)')) {
+      base = '';
+      (document.getElementById('base-select') as HTMLSelectElement).value = '';
+      updateBaseSelection();
+    }
+  }
+  exampleContent = content;
+  const isExamples = content === 'examples';
+  const examplesButton = document.getElementById('show-examples') as HTMLButtonElement;
+  const snippetsButton = document.getElementById('show-snippets') as HTMLButtonElement;
+  const description = document.getElementById('example-description');
+  const hint = document.getElementById('example-hint');
+
+  examplesButton.classList.toggle('active', isExamples);
+  examplesButton.setAttribute('aria-pressed', String(isExamples));
+  snippetsButton.classList.toggle('active', !isExamples);
+  snippetsButton.setAttribute('aria-pressed', String(!isExamples));
+
+  if (description) {
+    description.textContent = isExamples
+      ? 'Select one or more tags to filter examples. Choose an example to continue.'
+      : 'Select one or more tags to filter snippets. Choose a snippet to continue.';
+  }
+  if (hint) {
+    hint.textContent = isExamples
+      ? 'Results must match every selected tag. Clear all tags to show every example.'
+      : 'Results must match every selected tag. Clear all tags to show every snippet.';
+  }
+
+  if (!isExamples) {
+    requestSnippets();
+  }
+  renderExampleCatalog();
 }
 
 function selectProjectFolder() {
@@ -290,40 +507,17 @@ function setupEventListeners() {
   });
 
   // Step 2 - Language and Base Selection
-  const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
-  languageSelect.addEventListener('change', () => {
-    language = languageSelect.value;
-
-    // Reset base dropdown when language changes
-    resetBaseDropdown();
-
-    // Request project bases for this language
-    vscode.postMessage({
-      data: {
-        base: '',
-        desktop: false,
-        language,
-        newFolder: false,
-        projectName: '',
-        projectType,
-        teamNumber: '',
-        toFolder: '',
-      },
-      type: 'base',
-    });
-
-    validateStep2();
-  });
-
   const baseSelect = document.getElementById('base-select') as HTMLSelectElement;
   baseSelect.addEventListener('change', () => {
     base = baseSelect.value;
+    updateBaseSelection();
+  });
 
-    // Enable next button if both selections are made
-    const nextButton = document.getElementById('next-to-step-3');
-    if (nextButton) {
-      (nextButton as HTMLButtonElement).disabled = !validateStep2();
-    }
+  document.getElementById('show-examples')!.addEventListener('click', () => {
+    setExampleContent('examples');
+  });
+  document.getElementById('show-snippets')!.addEventListener('click', () => {
+    setExampleContent('snippets');
   });
 
   document.getElementById('back-to-step-1')!.addEventListener('click', () => navigateToStep(1));
@@ -388,18 +582,18 @@ window.addEventListener('message', (event) => {
       if (Array.isArray(langData)) {
         // This is a language list response
         languages = langData;
-        populateLanguageSelect(languages);
+        renderLanguageOptions();
       } else {
         // This is a language selection response
         language = data.data as string;
       }
       break;
     case 'base':
-      const baseData = data.data as { label: string; description: string }[];
+      const baseData = data.data as IBaseOption[];
       if (Array.isArray(baseData)) {
         // This is a base list response
-        bases = baseData.map((b) => b.label);
-        populateBaseSelect(bases);
+        populateBaseSelect(baseData);
+        updateBaseSelection();
       } else {
         // This is a base selection response
         base = data.data as string;
@@ -408,6 +602,17 @@ window.addEventListener('message', (event) => {
         }
       }
       break;
+    case 'snippets':
+      if (data.requestId !== snippetRequestId) {
+        break;
+      }
+      snippets = (data.data as ISnippetOption[]).map((snippet) => ({
+        label: snippet.name,
+        description: snippet.description,
+        tags: snippet.tags ?? [],
+      }));
+      renderExampleCatalog();
+      break;
     default:
       break;
   }
@@ -415,5 +620,6 @@ window.addEventListener('message', (event) => {
 
 window.addEventListener('load', (_: Event) => {
   setupEventListeners();
+  setExampleContent(exampleContent);
   navigateToStep(1); // Start at first step
 });

@@ -16,6 +16,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
       creator: provider,
       description: provider.getDescription(),
       label: provider.getDisplayName(),
+      tags: provider.getTags?.() ?? [],
     };
     this.templates.push(lp);
   }
@@ -24,6 +25,7 @@ export class ExampleTemplateAPI implements IExampleTemplateAPI {
       creator: provider,
       description: provider.getDescription(),
       label: provider.getDisplayName(),
+      tags: provider.getTags?.() ?? [],
     };
     this.examples.push(lp);
   }

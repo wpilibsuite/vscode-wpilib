@@ -11,86 +11,95 @@ import { generateCopyCpp, generateCopyJava } from './generator';
 export interface IExampleJsonLayout {
   name: string;
   description: string;
-  tags: string[];
+  tags?: string[];
   foldername: string;
   gradlebase: string;
-  robotclass: string;
-  commandversion: number;
+  robotclass?: string;
+  commandversion?: number;
   extravendordeps?: string[];
   hasunittests?: boolean;
 }
 
-const exampleResourceName = 'examples.json';
+type ExampleCatalog = 'examples' | 'snippets';
 
 export async function registerExamples(
   resourceRoot: string,
   java: boolean,
   core: IExampleTemplateAPI
 ) {
-  const examplesFolder = path.join(resourceRoot, 'src', 'examples');
-  const examplesTestFolder = path.join(resourceRoot, 'src', 'examples_test');
-  const resourceFile = path.join(examplesFolder, exampleResourceName);
+  await registerExampleCatalog(resourceRoot, java, core, 'examples');
+  await registerExampleCatalog(resourceRoot, java, core, 'snippets');
+}
+
+async function registerExampleCatalog(
+  resourceRoot: string,
+  java: boolean,
+  core: IExampleTemplateAPI,
+  catalog: ExampleCatalog
+) {
+  const catalogFolder = path.join(resourceRoot, 'src', catalog);
+  const catalogTestFolder = path.join(resourceRoot, 'src', `${catalog}_test`);
+  const resourceFile = path.join(catalogFolder, `${catalog}.json`);
   const gradleBasePath = path.join(path.dirname(resourceRoot), 'gradle');
   try {
     const data = await readFile(resourceFile, 'utf8');
-    const examples: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
-    for (const e of examples) {
-      const vendordeps: string[] = e.extravendordeps ?? [];
-      const commandVersion: string = e.commandversion ? e.commandversion.toString() : '2';
-      if (commandVersion === '3') {
-        vendordeps.push('commandsv3');
-      } else {
-        vendordeps.push('commandsv2');
-      }
+    const entries: IExampleJsonLayout[] = jsonc.parse(data) as IExampleJsonLayout[];
+    for (const entry of entries) {
+      const vendordeps = [...(entry.extravendordeps ?? [])];
+      vendordeps.push(entry.commandversion === 3 ? 'commandsv3' : 'commandsv2');
       const provider: IExampleTemplateCreator = {
         getLanguage(): string {
           return java ? 'java' : 'cpp';
         },
         getDescription(): string {
-          return e.description;
+          return entry.description;
         },
         getDisplayName(): string {
-          return e.name;
+          return catalog === 'snippets' ? `${entry.name} (Snippet)` : entry.name;
+        },
+        getTags(): string[] {
+          return entry.tags ?? [];
         },
         async generate(folderInto: vscode.Uri): Promise<boolean> {
           try {
-            let testFolder;
-            if (e.hasunittests) {
-              testFolder = path.join(examplesTestFolder, e.foldername);
-            }
+            const testFolder = entry.hasunittests
+              ? path.join(catalogTestFolder, entry.foldername)
+              : undefined;
+            const sourceFolder = path.join(catalogFolder, entry.foldername);
             if (java) {
               const mainJavaFile = path.join(resourceRoot, 'src', 'Main.java');
-              if (
-                !(await generateCopyJava(
-                  resourceRoot,
-                  path.join(examplesFolder, e.foldername),
-                  testFolder,
-                  path.join(gradleBasePath, e.gradlebase),
-                  folderInto.fsPath,
-                  mainJavaFile,
-                  'first.robot.' + e.robotclass,
-                  path.join('first', 'robot'),
-                  false,
-                  vendordeps
-                ))
-              ) {
+              const packagePattern =
+                catalog === 'snippets' ? 'org\\.wpilib\\.snippets\\..+?(?=;|\\.)' : undefined;
+              const success = await generateCopyJava(
+                resourceRoot,
+                sourceFolder,
+                testFolder,
+                path.join(gradleBasePath, entry.gradlebase),
+                folderInto.fsPath,
+                mainJavaFile,
+                `first.robot.${entry.robotclass ?? 'Robot'}`,
+                path.join('first', 'robot'),
+                false,
+                vendordeps,
+                packagePattern
+              );
+              if (!success) {
                 vscode.window.showErrorMessage(
                   i18n('message', 'Cannot create into non empty folder')
                 );
                 return false;
               }
             } else {
-              if (
-                !(await generateCopyCpp(
-                  resourceRoot,
-                  path.join(examplesFolder, e.foldername),
-                  testFolder,
-                  path.join(gradleBasePath, e.gradlebase),
-                  folderInto.fsPath,
-                  false,
-                  vendordeps
-                ))
-              ) {
+              const success = await generateCopyCpp(
+                resourceRoot,
+                sourceFolder,
+                testFolder,
+                path.join(gradleBasePath, entry.gradlebase),
+                folderInto.fsPath,
+                false,
+                vendordeps
+              );
+              if (!success) {
                 vscode.window.showErrorMessage(
                   i18n('message', 'Cannot create into non empty folder')
                 );
@@ -98,7 +107,7 @@ export async function registerExamples(
               }
             }
           } catch (err) {
-            logger.error('Example generation error: ', err);
+            logger.error(`${catalog} generation error: `, err);
             return false;
           }
           return true;
@@ -107,6 +116,6 @@ export async function registerExamples(
       core.addExampleProvider(provider);
     }
   } catch (err) {
-    logger.log('Example error: ', err);
+    logger.log(`${catalog} catalog error: `, err);
   }
 }

@@ -333,6 +333,191 @@ button[id*='version-action'] {
   color: var(--vscode-button-background);
 }
 
+.example-catalog {
+  margin: 12px 0 20px;
+}
+
+.example-catalog[hidden],
+.project-row[hidden] {
+  display: none;
+}
+
+.example-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.example-heading h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.example-heading p,
+.example-hint {
+  margin: 0;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+}
+
+.example-count {
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.example-kind {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.example-kind-label {
+  margin-right: 4px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+}
+
+.example-kind-button {
+  padding: 6px 12px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 3px;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+.example-kind-button:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.example-kind-button.active {
+  border-color: var(--vscode-focusBorder);
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.example-kind-button:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+
+.example-kind .example-count {
+  margin-left: auto;
+}
+
+.example-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.example-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  min-height: 74px;
+  padding: 10px;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px;
+  background: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  color: var(--vscode-foreground);
+  text-align: left;
+  white-space: normal;
+}
+
+.example-card:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.example-card.selected {
+  border-color: var(--vscode-focusBorder);
+  background: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
+
+.example-card-title {
+  font-weight: 600;
+}
+
+.example-card-description {
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.example-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.example-tag {
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  font-size: 10px;
+}
+
+.example-tags {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.example-tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+  white-space: nowrap;
+  text-align: left;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--vscode-foreground);
+}
+
+.example-tag-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.example-tag-count {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.example-tag-chip.active {
+  border-color: var(--vscode-focusBorder);
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.example-empty {
+  grid-column: 1 / -1;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+}
+
+.example-card:focus-visible,
+.example-tag-chip:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+
 .select-wrapper {
   position: relative;
   flex: 1;
