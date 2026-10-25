@@ -249,7 +249,7 @@ async function handleAfterTrusted(
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
-                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha7?'
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha8?'
               ),
               {
                 modal: true,
