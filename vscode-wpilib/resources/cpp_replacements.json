@@ -818,7 +818,18 @@
       { "from": "TestInit\\(\\)", "to": "UtilityInit()" },
       { "from": "TestPeriodic\\(\\)", "to": "UtilityPeriodic()" },
       { "from": "TestExit\\(\\)", "to": "UtilityExit()" },
-      { "from": "wpi/hardware/motor/", "to": "wpi/drivers/motor/" }
+      { "from": "wpi/hardware/motor/", "to": "wpi/drivers/motor/" },
+      {
+        "from": "(\"|\\<)frc/smartdashboard/SmartDashboard.h(\"|\\>)",
+        "to": "\"wpi/telemetry/Telemetry.hpp\"\n#include \"wpi/tunables/Tunable.hpp\"\n#include \"wpi/tunables/Selectable.hpp\""
+      },
+      {
+        "from": "(\"|\\<)wpi/smartdashboard/SmartDashboard.hpp(\"|\\>)",
+        "to": "\"wpi/telemetry/Telemetry.hpp\"\n#include \"wpi/tunables/Tunable.hpp\"\n#include \"wpi/tunables/Selectable.hpp\""
+      },
+      { "from": "SmartDashboard::PutNumber", "to": "telemetry::Log" },
+      { "from": "SmartDashboard::PutString", "to": "telemetry::Log" },
+      { "from": "SmartDashboard::PutBoolean", "to": "telemetry::Log" }
     ]
   }
 ]
