@@ -8,8 +8,8 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { PersistentFolderState } from './persistentState';
-import { isNewerVersion } from './versions';
 import { getWPILibHomeDir, getWPILibYear } from './shared/utilitiesapi';
+import { isNewerVersion } from './versions';
 
 const gradleRioRegex = /(id\s*?["|']org\.wpilib\.GradleRIO["|'].*?version\s*?["|'])(.+?)(["|'])/;
 
@@ -89,41 +89,20 @@ export async function checkForUpdates(externalApi: IExternalAPI): Promise<boolea
     );
     if (result === i18n('ui', 'Yes')) {
       await setGradleRIOVersion(newVersion.newVersion, wp);
-      if (newVersion.online) {
-        const buildRes = await vscode.window.showInformationMessage(
-          i18n(
-            'message',
-            'It is recommended to run a "Build" and update tools after a ' +
-              'WPILib update to ensure dependencies are installed correctly. Would you like to do this now?'
-          ),
-          {
-            modal: true,
-          },
-          i18n('ui', 'Yes'),
-          i18n('ui', 'Yes (Build Only)'),
-          i18n('ui', 'No')
-        );
-        if (buildRes === i18n('ui', 'Yes')) {
-          await externalApi.getBuildTestAPI().buildCode(wp, undefined, 'InstallAllTools');
-        } else if (buildRes === i18n('ui', 'Yes (Build Only)')) {
-          await externalApi.getBuildTestAPI().buildCode(wp, undefined);
-        }
-      } else {
-        const buildRes = await vscode.window.showInformationMessage(
-          i18n(
-            'message',
-            'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
-              'Would you like to do this now?'
-          ),
-          {
-            modal: true,
-          },
-          { title: i18n('ui', 'Yes') },
-          { title: i18n('ui', 'No'), isCloseAffordance: true }
-        );
-        if (buildRes?.title !== i18n('ui', 'Yes')) {
-          await externalApi.getBuildTestAPI().buildCode(wp, undefined);
-        }
+      const buildRes = await vscode.window.showInformationMessage(
+        i18n(
+          'message',
+          'It is recommended to run a "Build" after a WPILib update to ensure dependencies are installed correctly. ' +
+            'Would you like to do this now?'
+        ),
+        {
+          modal: true,
+        },
+        { title: i18n('ui', 'Yes') },
+        { title: i18n('ui', 'No'), isCloseAffordance: true }
+      );
+      if (buildRes?.title === i18n('ui', 'Yes')) {
+        await externalApi.getBuildTestAPI().buildCode(wp, undefined);
       }
     }
   }

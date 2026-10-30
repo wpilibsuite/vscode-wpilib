@@ -1,6 +1,5 @@
 wpilibcore.setTeamNumber.title: 设置队号
 wpilibcore.startRioLog.title: 启动 RioLog
-wpilibcore.startTool.title: 启动工具
 wpilibcore.buildCode.title: 编译机器人代码
 wpilibcore.testCode.title: 测试机器人代码
 wpilibcore.deployCode.title: 部署机器人代码
@@ -19,7 +18,6 @@ wpilibcore.createNewProject.title: 创建一个新项目
 wpilibcore.manageVendorLibs.title: 管理外部供应商库
 wpilibcore.setJavaHome.title: 设置 Java 环境
 wpilibcore.checkForUpdates.title: 检查 WPILib 更新
-wpilibcore.installGradleTools.title: 从 GradleRIO 安装工具
 wpilibcore.showLogFolder.title: 显示目录文件夹
 wpilibcore.resetAutoUpdate.title: 重制自动检查 WPILib 更新设置
 wpilibcore.runGradleCommand.title: 在 Gradle 中执行命令
