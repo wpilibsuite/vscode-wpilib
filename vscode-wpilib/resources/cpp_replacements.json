@@ -184,12 +184,23 @@
       { "from": "HALSimXRP.h", "to": "wpi/halsim/xrp/HALSimXRP.hpp" },
       { "from": "HALSimXRPClient.h", "to": "wpi/halsim/xrp/HALSimXRPClient.hpp" },
       { "from": "XRP.h", "to": "wpi/halsim/xrp/XRP.hpp" },
-      { "from": "frc2/command/([\\w\/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
-      { "from": "frc/controller/([\\w\/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
-      { "from": "units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
-      { "from": "hal/([\\w\/]*)\\.h", "to": "wpi/hal/$1.h" },
-      { "from": "cameraserver/([\\w\/]*)\\.h", "to": "wpi/cameraserver/$1.hpp" },
-      { "from": "frc/([\\w\/]*)\\.h", "to": "wpi/$1.hpp" },
+      { "from": "frc2/command/([\\w/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
+      { "from": "frc/controller/([\\w/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
+      { "from": "units/([\\w/]*)\\.h", "to": "wpi/units/$1.hpp" },
+      { "from": "hal/([\\w/]*)\\.h", "to": "wpi/hal/$1.h" },
+      { "from": "cameraserver/([\\w/]*)\\.h", "to": "wpi/cameraserver/$1.hpp" },
+      { "from": "frc/([\\w/]*)\\.h", "to": "wpi/$1.hpp" },
+      {
+        "from": "(\"|\\<)wpi/driverstation/DriverStation.hpp(\"|\\>)",
+        "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\""
+      },
+      { "from": "wpi/hardware/motor/", "to": "wpi/drivers/motor/" }
+    ]
+  },
+  {
+    "fileMatcher": "**/*{.cpp,.c,.cc,.h,.hh,.hpp}",
+    "flags": "g",
+    "replacements": [
       { "from": "(\\b)wpi::contains(\\b)", "to": "$1wpi::util::contains$2" },
       { "from": "(\\b)wpi::contains_lower(\\b)", "to": "$1wpi::util::contains_lower$2" },
       { "from": "(\\b)wpi::slice(\\b)", "to": "$1wpi::util::slice$2" },
@@ -286,20 +297,14 @@
       },
       { "from": "(\\b)wpi::StructSerializable(\\b)", "to": "$1wpi::util::StructSerializable$2" },
       { "from": "(\\b)wpi::ProtobufMessage(\\b)", "to": "$1wpi::util::ProtobufMessage$2" },
-      {
-        "from": "(\\b)wpi::ForEachStructSchema(\\b)",
-        "to": "$1wpi::util::ForEachStructSchema$2"
-      },
+      { "from": "(\\b)wpi::ForEachStructSchema(\\b)", "to": "$1wpi::util::ForEachStructSchema$2" },
       { "from": "(\\b)wpi::StructArrayBuffer(\\b)", "to": "$1wpi::util::StructArrayBuffer$2" },
       {
         "from": "(\\b)wpi::MakeStructArrayTypeString(\\b)",
         "to": "$1wpi::util::MakeStructArrayTypeString$2"
       },
       { "from": "(\\b)wpi::UnpackStructInto(\\b)", "to": "$1wpi::util::UnpackStructInto$2" },
-      {
-        "from": "(\\b)wpi::GetStructTypeString(\\b)",
-        "to": "$1wpi::util::GetStructTypeString$2"
-      },
+      { "from": "(\\b)wpi::GetStructTypeString(\\b)", "to": "$1wpi::util::GetStructTypeString$2" },
       { "from": "(\\b)wpi::UnpackStruct(\\b)", "to": "$1wpi::util::UnpackStruct$2" },
       { "from": "(\\b)wpi::PackStruct(\\b)", "to": "$1wpi::util::PackStruct$2" },
       { "from": "(\\b)wpi::GetStructSize(\\b)", "to": "$1wpi::util::GetStructSize$2" },
@@ -370,14 +375,8 @@
       { "from": "(\\b)wpi::PromiseFactory(\\b)", "to": "$1wpi::util::PromiseFactory$2" },
       { "from": "(\\b)wpi::raw_istream(\\b)", "to": "$1wpi::util::raw_istream$2" },
       { "from": "(\\b)wpi::raw_ostream(\\b)", "to": "$1wpi::util::raw_ostream$2" },
-      {
-        "from": "(\\b)wpi::raw_svector_ostream(\\b)",
-        "to": "$1wpi::util::raw_svector_ostream$2"
-      },
-      {
-        "from": "(\\b)wpi::raw_uvector_ostream(\\b)",
-        "to": "$1wpi::util::raw_uvector_ostream$2"
-      },
+      { "from": "(\\b)wpi::raw_svector_ostream(\\b)", "to": "$1wpi::util::raw_svector_ostream$2" },
+      { "from": "(\\b)wpi::raw_uvector_ostream(\\b)", "to": "$1wpi::util::raw_uvector_ostream$2" },
       { "from": "(\\b)wpi::raw_string_ostream(\\b)", "to": "$1wpi::util::raw_string_ostream$2" },
       { "from": "(\\b)wpi::raw_fd_istream(\\b)", "to": "$1wpi::util::raw_fd_istream$2" },
       { "from": "(\\b)wpi::raw_fd_ostream(\\b)", "to": "$1wpi::util::raw_fd_ostream$2" },
@@ -517,10 +516,7 @@
         "from": "([ \\b{<!\\(])DifferentialDriveOdometry(\\b)",
         "to": "$1wpi::math::DifferentialDriveOdometry$2"
       },
-      {
-        "from": "^DifferentialDriveOdometry(\\b)",
-        "to": "$1wpi::math::DifferentialDriveOdometry"
-      },
+      { "from": "^DifferentialDriveOdometry(\\b)", "to": "$1wpi::math::DifferentialDriveOdometry" },
       {
         "from": "(\\b)frc::DifferentialDrivePoseEstimator(\\b)",
         "to": "$1wpi::math::DifferentialDrivePoseEstimator$2"
@@ -580,15 +576,9 @@
         "from": "([ \\b{<!\\(])MecanumDrivePoseEstimator(\\b)",
         "to": "$1wpi::math::MecanumDrivePoseEstimator$2"
       },
-      {
-        "from": "^MecanumDrivePoseEstimator(\\b)",
-        "to": "$1wpi::math::MecanumDrivePoseEstimator"
-      },
+      { "from": "^MecanumDrivePoseEstimator(\\b)", "to": "$1wpi::math::MecanumDrivePoseEstimator" },
       { "from": "(\\b)frc::SwerveModuleState(\\b)", "to": "$1wpi::math::SwerveModuleState$2" },
-      {
-        "from": "([ \\b{<!\\(])SwerveModuleState(\\b)",
-        "to": "$1wpi::math::SwerveModuleState$2"
-      },
+      { "from": "([ \\b{<!\\(])SwerveModuleState(\\b)", "to": "$1wpi::math::SwerveModuleState$2" },
       { "from": "^SwerveModuleState(\\b)", "to": "$1wpi::math::SwerveModuleState" },
       {
         "from": "(\\b)frc::SwerveModulePosition(\\b)",
@@ -608,10 +598,7 @@
         "to": "$1wpi::math::SwerveDriveKinematics$2"
       },
       { "from": "^SwerveDriveKinematics(\\b)", "to": "$1wpi::math::SwerveDriveKinematics" },
-      {
-        "from": "(\\b)frc::SwerveDriveOdometry(\\b)",
-        "to": "$1wpi::math::SwerveDriveOdometry$2"
-      },
+      { "from": "(\\b)frc::SwerveDriveOdometry(\\b)", "to": "$1wpi::math::SwerveDriveOdometry$2" },
       {
         "from": "([ \\b{<!\\(])SwerveDriveOdometry(\\b)",
         "to": "$1wpi::math::SwerveDriveOdometry$2"
@@ -656,10 +643,7 @@
         "to": "$1wpi::math::SimpleMotorFeedforward$2"
       },
       { "from": "^SimpleMotorFeedforward(\\b)", "to": "$1wpi::math::SimpleMotorFeedforward" },
-      {
-        "from": "(\\b)frc::ElevatorFeedforward(\\b)",
-        "to": "$1wpi::math::ElevatorFeedforward$2"
-      },
+      { "from": "(\\b)frc::ElevatorFeedforward(\\b)", "to": "$1wpi::math::ElevatorFeedforward$2" },
       {
         "from": "([ \\b{<!\\(])ElevatorFeedforward(\\b)",
         "to": "$1wpi::math::ElevatorFeedforward$2"
@@ -686,10 +670,7 @@
       { "from": "(\\b)frc::TrajectoryConfig(\\b)", "to": "$1wpi::math::TrajectoryConfig$2" },
       { "from": "([ \\b{<!\\(])TrajectoryConfig(\\b)", "to": "$1wpi::math::TrajectoryConfig$2" },
       { "from": "^TrajectoryConfig(\\b)", "to": "$1wpi::math::TrajectoryConfig" },
-      {
-        "from": "(\\b)frc::TrajectoryGenerator(\\b)",
-        "to": "$1wpi::math::TrajectoryGenerator$2"
-      },
+      { "from": "(\\b)frc::TrajectoryGenerator(\\b)", "to": "$1wpi::math::TrajectoryGenerator$2" },
       {
         "from": "([ \\b{<!\\(])TrajectoryGenerator(\\b)",
         "to": "$1wpi::math::TrajectoryGenerator$2"
@@ -747,10 +728,7 @@
       { "from": "([ \\b{<!\\(])Debouncer(\\b)", "to": "$1wpi::math::Debouncer$2" },
       { "from": "^Debouncer(\\b)", "to": "$1wpi::math::Debouncer" },
       { "from": "(\\b)frc::TravelingSalesman(\\b)", "to": "$1wpi::math::TravelingSalesman$2" },
-      {
-        "from": "([ \\b{<!\\(])TravelingSalesman(\\b)",
-        "to": "$1wpi::math::TravelingSalesman$2"
-      },
+      { "from": "([ \\b{<!\\(])TravelingSalesman(\\b)", "to": "$1wpi::math::TravelingSalesman$2" },
       { "from": "^TravelingSalesman(\\b)", "to": "$1wpi::math::TravelingSalesman" },
       { "from": "wpi::math::wpi::math::", "to": "wpi::math::" },
       { "from": "wpi::math::wpi::math::", "to": "wpi::math::" },
@@ -811,14 +789,9 @@
       { "from": "DriverStation::IsTestEnabled\\(\\)", "to": "RobotState::IsUtilityEnabled()" },
       { "from": "DriverStation::IsFMSAttached\\(\\)", "to": "RobotState::IsFMSAttached()" },
       { "from": "DriverStation::IsDSAttached\\(\\)", "to": "RobotState::IsDSAttached()" },
-      {
-        "from": "(\"|\\<)wpi/driverstation/DriverStation.hpp(\"|\\>)",
-        "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\""
-      },
       { "from": "TestInit\\(\\)", "to": "UtilityInit()" },
       { "from": "TestPeriodic\\(\\)", "to": "UtilityPeriodic()" },
-      { "from": "TestExit\\(\\)", "to": "UtilityExit()" },
-      { "from": "wpi/hardware/motor/", "to": "wpi/drivers/motor/" }
+      { "from": "TestExit\\(\\)", "to": "UtilityExit()" }
     ]
   }
 ]
