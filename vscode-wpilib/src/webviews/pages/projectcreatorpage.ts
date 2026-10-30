@@ -312,7 +312,14 @@ function setupEventListeners() {
       type: 'base',
     });
 
-    validateStep2();
+  const desktopCb = document.getElementById('desktopCB') as HTMLInputElement;
+    if (languageSelect.value !== 'cpp') {
+      desktopCb.disabled = true;
+      desktopCb.title = 'Desktop Support can only be enabled for C++ projects!';
+    } else {
+      desktopCb.disabled = false;
+      validateStep2();
+    }
   });
 
   const baseSelect = document.getElementById('base-select') as HTMLSelectElement;
