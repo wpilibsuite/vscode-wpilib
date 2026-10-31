@@ -79,7 +79,13 @@ function updateSummary() {
   }
 
   if (languageEl) {
-    languageEl.textContent = language;
+    if (language === 'java') {
+      languageEl.textContent = 'Java';
+    } else if (language === 'cpp') {
+      languageEl.textContent = 'C++';
+    } else {
+      languageEl.textContent = language;
+    }
   }
 
   if (baseEl) {
@@ -207,6 +213,16 @@ function selectProjectType(type: ProjectType) {
   });
 }
 
+function getLanguageDisplayName(lang: string): string {
+  if (lang === 'java') {
+    return 'Java';
+  }
+  if (lang === 'cpp') {
+    return 'C++';
+  }
+  return lang;
+}
+
 function renderLanguageOptions() {
   const container = document.getElementById('language-options');
   if (!container) {
@@ -214,11 +230,23 @@ function renderLanguageOptions() {
   }
 
   container.replaceChildren();
-  languages.forEach((lang) => {
+  const orderedLanguages = [...languages].sort((a, b) => {
+    const order = (lang: string) => {
+      if (lang === 'java') {
+        return 0;
+      }
+      if (lang === 'cpp') {
+        return 1;
+      }
+      return 2;
+    };
+    return order(a) - order(b);
+  });
+  orderedLanguages.forEach((lang) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `example-kind-button language-chip${language === lang ? ' active' : ''}`;
-    button.textContent = lang;
+    button.textContent = getLanguageDisplayName(lang);
     button.setAttribute('aria-pressed', String(language === lang));
     button.addEventListener('click', () => selectLanguage(lang));
     container.appendChild(button);

@@ -378,6 +378,17 @@ button[id*='version-action'] {
   border-bottom: 1px solid var(--vscode-panel-border);
 }
 
+.language-options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  flex: 1;
+}
+
 .example-kind-label {
   margin-right: 4px;
   color: var(--vscode-descriptionForeground);
