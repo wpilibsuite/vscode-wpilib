@@ -1,5 +1,7 @@
 'use strict';
 
+import { readFile } from 'fs/promises';
+import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExampleTemplateAPI } from '../api';
@@ -10,6 +12,7 @@ import {
   IProjectIPCData,
   IProjectIPCReceive,
   IProjectIPCSend,
+  ISnippetOption,
   ProjectType,
 } from './pages/projectcreatorpagetypes';
 import { WebViewBase } from './webviewbase';
@@ -56,6 +59,11 @@ export class ProjectCreator extends WebViewBase {
                 case 'base':
                   if (data.data) {
                     await this.handleBase(data.data);
+                  }
+                  break;
+                case 'snippets':
+                  if (data.data) {
+                    await this.handleSnippets(data.data.language, data.requestId);
                   }
                   break;
                 case 'createproject':
@@ -138,16 +146,45 @@ export class ProjectCreator extends WebViewBase {
 
   private async handleBase(data: IProjectIPCData) {
     // Get bases for the selected language and project type
-    const bases = this.exampleTemplateApi.getBases(
-      data.projectType === ProjectType.Template,
-      data.language
-    );
+    const bases = this.exampleTemplateApi
+      .getBases(data.projectType === ProjectType.Template, data.language)
+      .filter((item) => !item.label.endsWith(' (Snippet)'));
 
     // Return the complete base objects to the UI
     await this.postMessage({
-      data: bases,
+      data: bases.map((item) => ({
+        label: item.label,
+        description: item.description ?? '',
+        tags: item.tags ?? [],
+      })),
       type: 'base',
     });
+  }
+
+  private async handleSnippets(language: string, requestId?: number) {
+    if (language !== 'java' && language !== 'cpp') {
+      await this.postMessage({ type: 'snippets', data: [], requestId });
+      return;
+    }
+
+    const snippetsFile = path.join(this.resourceRoot, language, 'src', 'snippets', 'snippets.json');
+    try {
+      const contents = await readFile(snippetsFile, 'utf8');
+      const snippets = jsonc.parse(contents) as ISnippetOption[];
+      await this.postMessage({
+        type: 'snippets',
+        data: Array.isArray(snippets)
+          ? snippets.map(({ name, description, tags }) => ({
+              name,
+              description,
+              tags: tags ?? [],
+            }))
+          : [],
+        requestId,
+      });
+    } catch {
+      await this.postMessage({ type: 'snippets', data: [], requestId });
+    }
   }
 
   private async handleNewProjectLoc(data: IProjectIPCData) {
