@@ -2,7 +2,7 @@
 
 import * as assert from 'assert';
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises';
-import { test } from 'mocha';
+import { suite, test } from 'mocha';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { getWPILibApi, IExternalAPI } from '../api';

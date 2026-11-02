@@ -1,6 +1,6 @@
 'use strict';
 
-import * as extract from 'extract-zip';
+import extract = require('extract-zip');
 import { mkdir, unlink } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';

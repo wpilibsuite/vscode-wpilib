@@ -287,10 +287,9 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             this.changed = Date.now();
 
             if (dep.requires) {
-              let reqDep = undefined;
               // Check to see if there are required deps and install those too
               for (const required of dep.requires) {
-                reqDep = this.availableDepsList.find(
+                const reqDep = this.availableDepsList.find(
                   (requiredDep) => requiredDep.uuid === required.uuid
                 );
                 const newDep = await this.listToDependency(reqDep);
