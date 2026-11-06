@@ -1,7 +1,6 @@
 {
   "wpilibcore.setTeamNumber.title": "Set Team Number",
   "wpilibcore.startRioLog.title": "Start RioLog",
-  "wpilibcore.startTool.title": "Start Tool",
   "wpilibcore.buildCode.title": "Build Robot Code",
   "wpilibcore.testCode.title": "Test Robot Code",
   "wpilibcore.deployCode.title": "Deploy Robot Code",
@@ -20,7 +19,6 @@
   "wpilibcore.manageVendorLibs.title": "Manage Vendor Libraries",
   "wpilibcore.setJavaHome.title": "Set VS Code Java Home to WPILib Home",
   "wpilibcore.checkForUpdates.title": "Check for WPILib Updates",
-  "wpilibcore.installGradleTools.title": "Install tools from GradleRIO",
   "wpilibcore.showLogFolder.title": "Show Log Folder",
   "wpilibcore.runGradleCommand.title": "Run a command in Gradle",
   "wpilibcore.resetAutoUpdate.title": "Reset Ask for WPILib Updates Flag",
