@@ -6,8 +6,10 @@ def sharedGradleBase = new File(gradleBaseFolder, 'shared')
 def javaMainFile = project.file('vscode-wpilib/resources/java/src/Main.java')
 def templateJavaFolder = project.file('vscode-wpilib/resources/java/src/templates')
 def examplesJavaFolder = project.file('vscode-wpilib/resources/java/src/examples')
+def snippetsJavaFolder = project.file('vscode-wpilib/resources/java/src/snippets')
 def templateCppFolder = project.file('vscode-wpilib/resources/cpp/src/templates')
 def examplesCppFolder = project.file('vscode-wpilib/resources/cpp/src/examples')
+def snippetsCppFolder = project.file('vscode-wpilib/resources/cpp/src/snippets')
 
 ext.generateJava = { templateFile, outputDir, templateFolderRaw ->
     def jsonSlurper = new JsonSlurper()
@@ -186,5 +188,38 @@ task generateExamplesZip(type: Zip) {
     dependsOn generateExamplesFolder
     from new File(project.buildDir, "examples")
     archiveFileName = 'examples.zip'
+    build.dependsOn it
+}
+
+task generateSnippetsFolder {
+    def outputDir = new File(project.buildDir, "snippets")
+
+
+    outputs.dir outputDir
+
+    outputs.upToDateWhen {false}
+
+    def projectBuildDir = project.buildDir
+
+    doLast {
+        projectBuildDir.mkdirs()
+
+        fileSystemOperations.delete {
+            delete outputDir
+        }
+
+        // Load all java templates
+        def templateFile = new File(snippetsJavaFolder, 'snippets.json').text
+        def templateFileCpp = new File(snippetsCppFolder, 'snippets.json').text
+
+        generateJava(templateFile, new File(outputDir, 'java'), snippetsJavaFolder)
+        generateCpp(templateFileCpp, new File(outputDir, 'cpp'), snippetsCppFolder)
+    }
+}
+
+task generateSnippetsZip(type: Zip) {
+    dependsOn generateSnippetsFolder
+    from new File(project.buildDir, "snippets")
+    archiveFileName = 'snippets.zip'
     build.dependsOn it
 }

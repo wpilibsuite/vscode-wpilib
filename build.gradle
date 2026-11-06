@@ -49,6 +49,9 @@ dependencies {
 
     cppSource "org.wpilib.wpilibc:commands:${wpilibVersion}:@zip"
     javaSource "org.wpilib.wpilibj:commands:${wpilibVersion}:@zip"
+
+    cppSource "org.wpilib.wpilibc:snippets:${wpilibVersion}:@zip"
+    javaSource "org.wpilib.wpilibj:snippets:${wpilibVersion}:@zip"
 }
 
 task extractCppDependencies(type: Copy) {

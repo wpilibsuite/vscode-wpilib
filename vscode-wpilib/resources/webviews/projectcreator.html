@@ -60,15 +60,15 @@
 
         <div class="project-row">
           <div class="project-label"><b>Language</b></div>
-          <div class="select-wrapper vscode-select">
-            <i class="codicon codicon-chevron-right chevron-icon"></i>
-            <select id="language-select" disabled>
-              <option value="" selected disabled>Select a language</option>
-            </select>
-          </div>
+          <div
+            id="language-options"
+            class="language-options"
+            role="group"
+            aria-label="Programming language"
+          ></div>
         </div>
 
-        <div class="project-row">
+        <div class="project-row" id="base-select-row">
           <div class="project-label"><b>Project Base</b></div>
           <div class="select-wrapper vscode-select">
             <i class="codicon codicon-chevron-right chevron-icon"></i>
@@ -77,6 +77,41 @@
             </select>
           </div>
         </div>
+
+        <section id="example-catalog" class="example-catalog" hidden>
+          <div class="example-heading">
+            <div>
+              <p id="example-description">
+                Select one or more tags to filter examples. Choose an example to continue.
+              </p>
+            </div>
+          </div>
+          <div class="example-kind" role="group" aria-label="Choose examples or snippets">
+            <span class="example-kind-label">Browse</span>
+            <button
+              id="show-examples"
+              class="example-kind-button active"
+              type="button"
+              aria-pressed="true"
+            >
+              Examples
+            </button>
+            <button
+              id="show-snippets"
+              class="example-kind-button"
+              type="button"
+              aria-pressed="false"
+            >
+              Snippets
+            </button>
+            <span id="example-count" class="example-count" aria-live="polite"></span>
+          </div>
+          <div id="example-tags" class="example-tags"></div>
+          <p id="example-hint" class="example-hint">
+            Results must match every selected tag. Clear all tags to show every example.
+          </p>
+          <div id="example-results" class="example-results"></div>
+        </section>
 
         <div class="wizard-navigation">
           <button id="back-to-step-1" class="vscode-button secondary">Back</button>

@@ -52,6 +52,9 @@ export async function registerProjectTemplates(
         getDisplayName(): string {
           return e.name;
         },
+        getTags(): string[] {
+          return e.tags ?? [];
+        },
         async generate(folderInto: vscode.Uri): Promise<boolean> {
           try {
             let testFolder;
