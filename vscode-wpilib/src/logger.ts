@@ -3,7 +3,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as winston from 'winston';
-import TransportStream = require('winston-transport');
+import TransportStream from 'winston-transport';
 
 const outputChannel = vscode.window.createOutputChannel('WPILib', { log: true });
 class VsCodeOutputTransport extends TransportStream {
