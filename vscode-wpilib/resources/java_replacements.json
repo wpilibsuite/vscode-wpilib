@@ -576,7 +576,18 @@
       { "from": "MathUtil.clamp\\(", "to": "Math.clamp(" },
       { "from": "Timer.getFPGATimestamp\\(\\)", "to": "Timer.getTimestamp()" },
       { "from": "org.wpilib.driverstation.Alert", "to": "org.wpilib.util.Alert" },
-      { "from": "org.wpilib.driverstation.Alert.Level", "to": "org.wpilib.util.Alert.Level" }
+      { "from": "org.wpilib.driverstation.Alert.Level", "to": "org.wpilib.util.Alert.Level" },
+      { "from": "SmartDashboard.putNumber", "to": "Telemetry.log" },
+      { "from": "SmartDashboard.putString", "to": "Telemetry.log" },
+      { "from": "SmartDashboard.putBoolean", "to": "Telemetry.log" },
+      {
+        "from": "edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;",
+        "to": "org.wpilib.telemetry.Telemetry;\nimport org.wpilib.tunable.Tunable;\nimport org.wpilib.tunable.Selectable;"
+      },
+      {
+        "from": "org.wpilib.smartdashboard.SmartDashboard;",
+        "to": "org.wpilib.telemetry.Telemetry;\nimport org.wpilib.tunable.Tunable;\nimport org.wpilib.tunable.Selectable;"
+      }
     ]
   }
 ]
