@@ -108,9 +108,9 @@ export async function registerCommandTemplates(
           const includeSearchString = 'include';
           const rootInclude = workspaceRooted.indexOf(includeSearchString);
 
-          let srcFolder = vscode.Uri.file('');
-          let headerFolder = vscode.Uri.file('');
-          let includeRoot = vscode.Uri.file('');
+          let srcFolder: vscode.Uri;
+          let headerFolder: vscode.Uri;
+          let includeRoot: vscode.Uri;
 
           if (rootInclude === rootSrc) {
             // Weird folder, put both in same directory
