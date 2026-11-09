@@ -1,12 +1,13 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import { getHomeDirDeps, IJsonDependency, installDependency } from './shared/vendorlibrariesbase';
+import { getWPILibHomeDir } from './shared/utilitiesapi';
+import { getHomeDirDeps, IJsonDependency, installDependency, parseVendordepJson } from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
 import { isNewerVersion } from './versions';
-
 export interface IJsonList {
   path: string;
   name: string;
@@ -426,13 +427,27 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                   true
                 );
               } catch (err) {
-                vscode.window.showWarningMessage(
-                  i18n(
-                    'message',
-                    'Failed to install required dependency: {0}',
-                    required.errorMessage
-                  )
-                );
+                try {
+                  const requiredDep = await parseVendordepJson(
+                    path.join(getWPILibHomeDir(), 'vendordeps', required.offlineFileName)
+                  );
+
+                  if (requiredDep !== undefined) {
+                  await installDependency(
+                    requiredDep,
+                    this.vendorLibraries.getWpVendorFolder(this.wp),
+                    true
+                    )
+                  }
+                } catch {
+                  vscode.window.showWarningMessage(
+                    i18n(
+                      'message',
+                      'Failed to install required dependency: {0}',
+                      required.errorMessage
+                    )
+                  );
+                }
               }
             }
           }
