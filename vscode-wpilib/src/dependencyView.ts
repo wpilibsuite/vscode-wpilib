@@ -433,11 +433,11 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
                   );
 
                   if (requiredDep !== undefined) {
-                  await installDependency(
-                    requiredDep,
-                    this.vendorLibraries.getWpVendorFolder(this.wp),
-                    true
-                    )
+                    await installDependency(
+                      requiredDep,
+                      this.vendorLibraries.getWpVendorFolder(this.wp),
+                      true
+                    );
                   }
                 } catch {
                   vscode.window.showWarningMessage(
