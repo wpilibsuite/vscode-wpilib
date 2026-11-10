@@ -1,11 +1,10 @@
 'use strict';
 
-import { readFile } from 'fs/promises';
-import { glob } from 'glob';
+import { glob, readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import { logger } from '../logger';
-import { updateFileContents } from './fileUtils';
+import { processFile } from './fileUtils';
 
 interface IReplaceGroup {
   from: string;
@@ -26,9 +25,9 @@ export async function ImportUpdate(srcDir: string, updateFile: string): Promise<
     // Enumerate through each updater
     for (const updater of toUpdateParsed) {
       // Find files matching the pattern
-      const toUpdateFiles = await glob(updater.fileMatcher, {
+      const toUpdateFiles = glob(updater.fileMatcher, {
         cwd: srcDir,
-        nodir: true,
+        withFileTypes: true,
       });
 
       // Create replacements map
@@ -40,23 +39,12 @@ export async function ImportUpdate(srcDir: string, updateFile: string): Promise<
       }
 
       // Process all matched files with the replacements
-      await Promise.all(
-        toUpdateFiles.map(async (filePath) => {
-          const fullPath = path.join(srcDir, filePath);
-          try {
-            await updateFileContents(fullPath, (content: string) => {
-              // Apply all replacements
-              for (const [pattern, replacement] of replacements) {
-                content = content.replace(pattern, replacement);
-              }
-              return content;
-            });
-          } catch (error) {
-            logger.error(`Failed to update file: ${filePath}`, error);
-            throw error;
-          }
-        })
-      );
+      for await (const entry of toUpdateFiles) {
+        if (!entry.isFile()) {
+          continue;
+        }
+        await processFile(path.join(entry.parentPath, entry.name), replacements);
+      }
     }
 
     return true;
