@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 pluginManagement {
     repositories {
-        String wpilibYear = '2027_alpha7'
+        String wpilibYear = '2027_beta1'
         File wpilibHome
         def os = OperatingSystem.current()
         if (os.isWindows()) {
@@ -21,7 +21,7 @@ pluginManagement {
             wpilibHome = new File(homeRoot, wpilibYear)
         } else {
             def userFolder = System.getProperty("user.home")
-            def homeRoot = new File(userFolder, ".wpilib")
+            def homeRoot = new File(userFolder, "wpilib")
             wpilibHome = new File(homeRoot, wpilibYear)
         }
         def wpilibHomeMaven = new File(wpilibHome, 'maven')

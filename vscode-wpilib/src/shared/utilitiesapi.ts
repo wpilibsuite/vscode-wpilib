@@ -5,7 +5,7 @@ import * as path from 'path';
 import { IUtilitiesAPI } from '../api';
 
 export function getWPILibYear(): string {
-  return '2027_alpha7';
+  return '2027_beta1';
 }
 
 let wpilibHome: string | undefined;

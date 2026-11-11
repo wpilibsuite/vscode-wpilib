@@ -5,11 +5,11 @@ plugins {
     id "org.wpilib.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
-// Define my targets (SystemCore) and artifacts (deployable files)
+// Define my targets (Systemcore) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
     targets {
-        systemcore(getTargetTypeClass('SystemCore')) {
+        systemcore(getTargetTypeClass('Systemcore')) {
             // Team number is loaded either from the .wpilib/wpilib_preferences.json
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
@@ -31,7 +31,7 @@ deploy {
                 wpilibStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/systemcore/deploy'
-                    deleteOldFiles = false // Change to true to delete files on SystemCore that no
+                    deleteOldFiles = false // Change to true to delete files on Systemcore that no
                                            // longer exist in deploy directory of this project
                 }
             }
