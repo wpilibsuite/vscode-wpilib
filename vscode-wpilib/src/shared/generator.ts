@@ -1,11 +1,11 @@
 'use strict';
 
-import { cp } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import * as genUtils from './projectGeneratorUtils';
+import { cpWithWritePermsissions } from '../utilities';
 
 export async function generateCopyCpp(
   resourcesFolder: string,
@@ -31,9 +31,9 @@ export async function generateCopyCpp(
     const gradleRioVersion = await genUtils.getGradleRioVersion(grRoot);
 
     // Copy template folders
-    await cp(fromTemplateFolder, codePath, { recursive: true });
+    await cpWithWritePermsissions(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
-      await cp(fromTemplateTestFolder, testPath, { recursive: true });
+      await cpWithWritePermsissions(fromTemplateTestFolder, testPath, { recursive: true });
     }
 
     // Setup project structure
@@ -105,7 +105,7 @@ export async function generateCopyJava(
     if (mainFile !== undefined) {
       // Copy and do replacements on main
       const mainDestFile = path.join(toFolder, 'src', 'main', 'java', 'first', 'Main.java');
-      await cp(mainFile, mainDestFile);
+      await cpWithWritePermsissions(mainFile, mainDestFile);
       await fileUtils.updateFileContents(mainDestFile, (content) =>
         content
           .replace('package org.wpilib;', 'package first;')
@@ -114,9 +114,9 @@ export async function generateCopyJava(
     }
 
     // Copy template folders
-    await cp(fromTemplateFolder, codePath, { recursive: true });
+    await cpWithWritePermsissions(fromTemplateFolder, codePath, { recursive: true });
     if (fromTemplateTestFolder !== undefined) {
-      await cp(fromTemplateTestFolder, testPath, { recursive: true });
+      await cpWithWritePermsissions(fromTemplateTestFolder, testPath, { recursive: true });
     }
 
     // Find files that need template processing
