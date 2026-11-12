@@ -239,9 +239,9 @@ async function handleAfterTrusted(
           continue;
         }
 
-        if (prefs.getProjectYear() !== '2027_alpha7') {
+        if (prefs.getProjectYear() !== '2027_beta1') {
           const importPersistentState = new PersistentFolderState(
-            'wpilib.2027_alpha7persist',
+            'wpilib.2027_beta1persist',
             false,
             w.uri.fsPath
           );
@@ -249,7 +249,7 @@ async function handleAfterTrusted(
             const upgradeResult = await vscode.window.showInformationMessage(
               i18n(
                 'message',
-                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_alpha8?'
+                'This project is not compatible with this version of the extension. Would you like to import this project into 2027_beta1?'
               ),
               {
                 modal: true,
