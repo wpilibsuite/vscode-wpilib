@@ -95,6 +95,9 @@ export async function addVendorExamples(
             getDisplayName(): string {
               return ex.name;
             },
+            getTags(): string[] {
+              return ex.tags ?? [];
+            },
             async generate(folderInto: vscode.Uri): Promise<boolean> {
               try {
                 const exampleFolderPath = path.join(exampleDir, ex.foldername);

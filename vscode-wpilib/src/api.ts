@@ -8,6 +8,7 @@ export interface IPreferencesChangedPair {
 
 export interface ICreatorQuickPick extends vscode.QuickPickItem {
   creator: IExampleTemplateCreator;
+  tags?: string[];
 }
 
 export interface IToolAPI {
@@ -133,6 +134,7 @@ export interface IExampleTemplateCreator {
   getLanguage(): string;
   getDisplayName(): string;
   getDescription(): string;
+  getTags?(): string[];
   generate(folderInto: vscode.Uri): Promise<boolean>;
 }
 
