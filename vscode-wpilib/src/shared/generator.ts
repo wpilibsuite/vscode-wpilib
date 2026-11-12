@@ -120,7 +120,7 @@ export async function generateCopyJava(
     }
 
     // Find files that need template processing
-    const files = await genUtils.findMatchingFiles(codePath);
+    const files = genUtils.findMatchingFiles(codePath);
 
     // Create replacements map
     const replacements = new Map<RegExp, string>();
@@ -133,18 +133,16 @@ export async function generateCopyJava(
     }
 
     // Process template files
-    await Promise.all(
-      files.map((file) => fileUtils.processFile(path.join(codePath, file), replacements))
-    );
+    for await (const file of files) {
+      await fileUtils.processFile(path.join(file.parentPath, file.name), replacements);
+    }
 
     // Process test files if they exist
     if (fromTemplateTestFolder !== undefined) {
-      const testFiles = await genUtils.findMatchingFiles(testPath);
-      await Promise.all(
-        testFiles.map((testFile) =>
-          fileUtils.processFile(path.join(testPath, testFile), replacements)
-        )
-      );
+      const testFiles = genUtils.findMatchingFiles(testPath);
+      for await (const testFile of testFiles) {
+        await fileUtils.processFile(path.join(testFile.parentPath, testFile.name), replacements);
+      }
     }
 
     // Setup project structure
