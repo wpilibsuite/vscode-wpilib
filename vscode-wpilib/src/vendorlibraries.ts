@@ -231,11 +231,7 @@ export class VendorLibraries {
   ): Promise<boolean> {
     const actionName = this.getProvider(workspace).getPostChangeActionName();
     const buildRes = await vscode.window.showInformationMessage(
-      i18n(
-        'message',
-        'It is recommended to run a "{0}" after a vendor update. Would you like to do this now?',
-        actionName
-      ),
+      i18n('message', 'Run a "{0}" now to apply the change?', actionName),
       {
         modal: modal,
       },

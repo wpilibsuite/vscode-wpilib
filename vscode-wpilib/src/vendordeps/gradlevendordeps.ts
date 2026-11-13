@@ -52,8 +52,10 @@ export class GradleVendorDepProvider implements IVendorDepProvider {
 
   public getInputLabels(): IDepInputLabels {
     return {
-      inputName: i18n('ui', 'URL'),
+      inputName: i18n('ui', 'Vendordep JSON URL'),
       sourceName: i18n('ui', 'JSON URL'),
+      sectionTitle: i18n('ui', 'Install from URL'),
+      helpText: i18n('ui', 'For vendordeps that are not listed below.'),
     };
   }
 

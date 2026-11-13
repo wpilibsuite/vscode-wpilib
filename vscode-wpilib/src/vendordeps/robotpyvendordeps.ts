@@ -62,8 +62,10 @@ export class RobotPyVendorDepProvider implements IVendorDepProvider {
 
   public getInputLabels(): IDepInputLabels {
     return {
-      inputName: i18n('ui', 'package name'),
-      sourceName: i18n('ui', 'Python Package Name'),
+      inputName: i18n('ui', 'Package name'),
+      sourceName: i18n('ui', 'package name'),
+      sectionTitle: i18n('ui', 'Install by name'),
+      helpText: i18n('ui', 'For packages that are not listed below.'),
     };
   }
 
@@ -281,7 +283,7 @@ export class RobotPyVendorDepProvider implements IVendorDepProvider {
     }
 
     vscode.window.showInformationMessage(
-      i18n('message', 'It may take a few minutes to install a new package')
+      i18n('message', 'Installing {0}, this can take a few minutes', name)
     );
     if (!(await installPackage(name, workspace, this.executeApi, exact))) {
       vscode.window.showErrorMessage(

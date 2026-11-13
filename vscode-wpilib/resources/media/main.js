@@ -213,13 +213,16 @@
         className: 'dependency-description',
       });
 
-      const versionSpan = details.appendChild(
-        Object.assign(document.createElement('span'), {
-          textContent: dep.version,
-        })
-      );
-
-      details.appendChild(document.createTextNode(` - ${dep.description}`));
+      if (dep.version) {
+        details.appendChild(
+          Object.assign(document.createElement('span'), {
+            textContent: dep.version,
+          })
+        );
+        details.appendChild(document.createTextNode(` - ${dep.description}`));
+      } else {
+        details.appendChild(document.createTextNode(dep.description));
+      }
       availableDep.appendChild(details);
 
       container.appendChild(availableDep);
@@ -283,4 +286,7 @@
   }
 
   addEventListeners();
+
+  // Tell the extension we are listening, so it can replay a snapshot it already gathered.
+  vscode.postMessage({ type: 'ready' });
 })();

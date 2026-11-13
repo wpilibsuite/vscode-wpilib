@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
-import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
 import { VendorLibraries } from './vendorlibraries';
 import {
   IAvailableDep,
@@ -29,9 +28,7 @@ const sort = (a: { name: string }, b: { name: string }) => collator.compare(a.na
 
 export class DependencyViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'wpilib.dependencyView';
-  private projectInfo: ProjectInfoGatherer;
   private vendorLibraries: VendorLibraries;
-  private viewInfo?: IProjectInfo;
   private disposables: vscode.Disposable[] = [];
   private installed: IInstalledDep[] = [];
   private available: IAvailableDep[] = [];
@@ -41,16 +38,15 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private changed = 0;
   private refreshInProgress = false;
   private showingInstructions = false;
+  private hasSnapshot = false;
 
   private _view?: vscode.WebviewView;
 
   constructor(
     private readonly _extensionUri: vscode.Uri,
-    projectInfo: ProjectInfoGatherer,
     vendorLibraries: VendorLibraries,
     externalAPI: IExternalAPI
   ) {
-    this.projectInfo = projectInfo;
     this.vendorLibraries = vendorLibraries;
     this.externalApi = externalAPI;
   }
@@ -92,10 +88,8 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           <body>
             <div class="error-content" style="max-width: 500px; margin: 48px auto; text-align: center;">
               <span class="codicon codicon-warning" style="font-size: 32px; display: block; margin-bottom: 16px;"></span>
-              <b>This is not a WPILib project.</b><br/>
-              Vendor dependency management is only available for WPILib projects.<br/>
-              <br/>
-              To use vendor dependencies, open a WPILib project or create a new one from the WPILib extension.
+              <b>Not a WPILib project.</b><br/>
+              Open or create a WPILib project to manage vendor dependencies.
             </div>
           </body>
         </html>
@@ -103,34 +97,44 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    if (this.projectInfo) {
-      this.viewInfo = await this.projectInfo.getViewInfo();
-    }
-
-    await this._refresh(this.wp);
-    webviewView.onDidChangeVisibility(async () => {
-      if (this.wp) {
-        // If the webview becomes visible refresh it, invisible then check for changes
-        if (webviewView.visible) {
-          await this._refresh(this.wp);
-        } else {
-          await this.runPostChangeAction();
+    // The webview has to be wired up before anything is awaited: gathering a snapshot can take
+    // seconds (RobotPy shells out to uv), and any message posted before the content loads is
+    // dropped, which used to leave the view blank until something refreshed it again.
+    this.disposables.push(
+      webviewView.onDidChangeVisibility(async () => {
+        if (this.wp) {
+          // If the webview becomes visible refresh it, invisible then check for changes
+          if (webviewView.visible) {
+            await this._refresh(this.wp);
+          } else {
+            await this.runPostChangeAction();
+          }
         }
-      }
-    });
-
-    this.viewInfo?.vendorLibraries.forEach((item) =>
-      console.log(item.name.concat(' / ', item.version))
+      })
     );
+
+    this.registerMessageHandler(webviewView);
 
     webviewView.webview.html = this._getHtmlForWebview(
       webviewView.webview,
       this.getProvider().getInputLabels()
     );
 
-    webviewView.webview.onDidReceiveMessage(async (data) => {
+    await this._refresh(this.wp);
+  }
+
+  private registerMessageHandler(webviewView: vscode.WebviewView) {
+    const listener = webviewView.webview.onDidReceiveMessage(async (data) => {
       if (this.isJSMessage(data)) {
         switch (data.type) {
+          case 'ready': {
+            // The webview can finish loading after a refresh has already posted its results, so
+            // replay the latest snapshot once it is listening.
+            if (this.hasSnapshot) {
+              await this.updateDependencies();
+            }
+            break;
+          }
           case 'install': {
             await this.install(data.index);
             break;
@@ -161,6 +165,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         }
       }
     });
+    this.disposables.push(listener);
   }
 
   private isJSMessage(object: unknown): object is IJSMessage {
@@ -289,6 +294,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       this.installed = installed.sort(sort);
       this.installedList = this.installed.map((dep) => this.toViewModel(dep, provider));
       this.available = this.newestOfEach(available, provider).sort(sort);
+      this.hasSnapshot = true;
 
       await this.updateDependencies();
     } finally {
@@ -375,7 +381,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         <div class="top-line">
           <button id="updateall-action" class="vscode-button block">
             <i class="codicon codicon-sync"></i>
-            Update All Dependencies
+            Update All
           </button>
         </div>
 
@@ -383,19 +389,19 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           <summary>
             <i class="codicon codicon-chevron-right icon-arrow"></i>
             <h2 class="title">
-              Install from URL
+              ${labels.sectionTitle}
             </h2>
           </summary>
           <div class="url-install-section">
             <div class="url-input-container">
-              <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep ${labels.inputName}..." />
+              <input type="text" id="url-input" class="vscode-textfield" placeholder="${labels.inputName}" />
               <button id="install-url-action" class="vscode-button">
                 <i class="codicon codicon-cloud-download"></i>
                 Install
               </button>
             </div>
             <div class="url-help-text">
-              Enter a vendor dependency ${labels.sourceName} to install a library not listed in the available dependencies.
+              ${labels.helpText}
             </div>
           </div>
         </details>
@@ -408,7 +414,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             </h2>
             <div class="actions" id="installed-actions"></div>
           </summary>
-          <div id="installed-dependencies"></div>
+          <div id="installed-dependencies"><div class="empty-state">Loading…</div></div>
         </details>
 
         <details class="vscode-collapsible always-show-actions" open>
@@ -419,7 +425,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             </h2>
             <div class="actions" id="available-actions"></div>
           </summary>
-          <div id="available-dependencies"></div>
+          <div id="available-dependencies"><div class="empty-state">Loading…</div></div>
         </details>
 
         <script src="${scriptUri}"></script>

@@ -180,7 +180,6 @@ async function handleAfterTrusted(
     if (projectInfo && vendorLibs) {
       const depProvider = new DependencyViewProvider(
         context.extensionUri,
-        projectInfo,
         vendorLibs,
         externalApi
       );

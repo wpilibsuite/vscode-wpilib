@@ -31,8 +31,14 @@ export interface IVendorDepSnapshot {
 }
 
 export interface IDepInputLabels {
+  /** Placeholder for the manual install input, e.g. 'Vendordep JSON URL'. */
   inputName: string;
+  /** Used mid-sentence in the quick pick prompt, e.g. 'Enter a vendor dependency JSON URL'. */
   sourceName: string;
+  /** Heading of the manual install section, e.g. 'Install from URL'. */
+  sectionTitle: string;
+  /** One line under the manual install input saying when to use it. */
+  helpText: string;
 }
 
 export interface IVendorDepProvider {
