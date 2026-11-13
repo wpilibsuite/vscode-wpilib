@@ -1,7 +1,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import { isNewerVersion } from '../versions';
+import { isNewerPythonVersion, isNewerVersion } from '../versions';
 
 class TestData {
   public readonly a: string;
@@ -88,5 +88,35 @@ suite('Equal Version Tests', () => {
     test(`Reverse Invert Version Test: a: ${x.b} b: ${x.a}`, () => {
       assert.strictEqual(!isNewerVersion(x.b, x.a), true);
     });
+  });
+});
+
+const pythonData = [
+  new TestData('2027.0.0', '2027.0.0b2', true),
+  new TestData('2027.0.0', '2027.0.0b2 (prerelease)', true),
+  new TestData('2027.0.0b2 (prerelease)', '2027.0.0b1 (prerelease)', true),
+  new TestData('2027.0.0rc1', '2027.0.0b9', true),
+  new TestData('2027.0.0b1', '2027.0.0a9', true),
+  new TestData('2027.0.0a1', '2027.0.0.dev3', true),
+  new TestData('2027.0.0.post1', '2027.0.0', true),
+  new TestData('2027.0.1', '2027.0.0.post1', true),
+  new TestData('2027.1', '2027.0.5', true),
+  new TestData('2027.0.0.1', '2027.0.0', true),
+  new TestData('1!1.0', '2027.0.0', true),
+];
+
+suite('Python Version Tests', () => {
+  pythonData.forEach((x) => {
+    test(`Python Version Test: a: ${x.a} b: ${x.b} result: ${x.result}`, () => {
+      assert.strictEqual(isNewerPythonVersion(x.a, x.b), x.result);
+    });
+    test(`Reverse Python Version Test: a: ${x.b} b: ${x.a} result: ${!x.result}`, () => {
+      assert.strictEqual(isNewerPythonVersion(x.b, x.a), !x.result);
+    });
+  });
+  test('Python Version Test: equal versions are not newer', () => {
+    assert.strictEqual(isNewerPythonVersion('2027.0.0', '2027.0'), false);
+    assert.strictEqual(isNewerPythonVersion('2027.0', '2027.0.0'), false);
+    assert.strictEqual(isNewerPythonVersion('2027.0.0b2', '2027.0.0b2 (prerelease)'), false);
   });
 });

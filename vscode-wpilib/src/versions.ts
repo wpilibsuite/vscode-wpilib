@@ -98,3 +98,77 @@ export function isNewerVersion(version1: IVersion | string, version2: IVersion |
     return version1.else > version2.else;
   }
 }
+
+interface IPep440Version {
+  epoch: number;
+  release: number[];
+  pre: [number, number];
+  post: number;
+  dev: number;
+}
+
+const pep440Regex =
+  /^v?(?:(\d+)!)?(\d+(?:\.\d+)*)(?:[-_.]?(a|alpha|b|beta|c|rc|pre|preview)[-_.]?(\d*))?(?:-(\d+)|[-_.]?(?:post|rev|r)[-_.]?(\d*))?(?:[-_.]?dev[-_.]?(\d*))?(?:\+[a-z0-9.]*)?$/;
+
+function parsePep440(v: string): IPep440Version | undefined {
+  const preIndex = v.indexOf(' (prerelease)');
+  const version = (preIndex >= 0 ? v.substring(0, preIndex) : v).trim().toLowerCase();
+  const m = pep440Regex.exec(version);
+  if (!m) {
+    return undefined;
+  }
+  const num = (s: string | undefined) => (s ? parseInt(s, 10) : 0);
+  const preLabel = m[3];
+  let prePhase = 3;
+  if (preLabel) {
+    if (preLabel.startsWith('a')) {
+      prePhase = 0;
+    } else if (preLabel.startsWith('b')) {
+      prePhase = 1;
+    } else {
+      prePhase = 2;
+    }
+  }
+  const hasPost = m[5] !== undefined || m[6] !== undefined;
+  const hasDev = m[7] !== undefined;
+  if (!preLabel && !hasPost && hasDev) {
+    prePhase = -1;
+  }
+  return {
+    epoch: num(m[1]),
+    release: m[2].split('.').map((x) => parseInt(x, 10)),
+    pre: [prePhase, num(m[4])],
+    post: hasPost ? num(m[5] ?? m[6]) : -1,
+    dev: hasDev ? num(m[7]) : Infinity,
+  };
+}
+
+function comparePep440(a: IPep440Version, b: IPep440Version): number {
+  if (a.epoch !== b.epoch) {
+    return a.epoch - b.epoch;
+  }
+  const len = Math.max(a.release.length, b.release.length);
+  for (let i = 0; i < len; i++) {
+    const diff = (a.release[i] ?? 0) - (b.release[i] ?? 0);
+    if (diff !== 0) {
+      return diff;
+    }
+  }
+  const keysA = [a.pre[0], a.pre[1], a.post, a.dev];
+  const keysB = [b.pre[0], b.pre[1], b.post, b.dev];
+  for (let i = 0; i < keysA.length; i++) {
+    if (keysA[i] !== keysB[i]) {
+      return keysA[i] < keysB[i] ? -1 : 1;
+    }
+  }
+  return 0;
+}
+
+export function isNewerPythonVersion(version1: string, version2: string): boolean {
+  const a = parsePep440(version1);
+  const b = parsePep440(version2);
+  if (!a || !b) {
+    return isNewerVersion(version1, version2);
+  }
+  return comparePep440(a, b) > 0;
+}

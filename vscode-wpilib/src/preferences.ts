@@ -94,32 +94,35 @@ export class Preferences implements IPreferences {
     this.pyFileWatcher = vscode.workspace.createFileSystemWatcher(py);
     this.disposables.push(this.pyFileWatcher);
 
-    this.pyFileWatcher.onDidCreate(async () => {
-      await vscode.commands.executeCommand('setContext', 'isRobotPyProject', true);
-      this.isRobotPyProject = true;
-    });
-
-    this.pyFileWatcher.onDidDelete(async () => {
-      await vscode.commands.executeCommand('setContext', 'isRobotPyProject', false);
-      this.isRobotPyProject = false;
-    });
-
-    this.pyFileWatcher.onDidChange(async () => {});
+    this.pyFileWatcher.onDidCreate(() => this.updateIsRobotPyProject());
+    this.pyFileWatcher.onDidDelete(() => this.updateIsRobotPyProject());
+    this.pyFileWatcher.onDidChange(() => this.updateIsRobotPyProject());
   }
 
   public getIsRobotPyProject(): boolean {
-    // If we already know, return it
-    if (this.isRobotPyProject) {
-      return true;
-    }
-
-    const configFilePath = path.join(this.workspace.uri.fsPath, 'pyproject.toml');
-    // If the project has a pyproject.toml file, update isRobotPyProject to true
-    if (fs.existsSync(configFilePath)) {
-      this.isRobotPyProject = true;
-    }
-
     return this.isRobotPyProject;
+  }
+
+
+  private computeIsRobotPyProject(): boolean {
+    const language = this.preferencesJson.currentLanguage;
+    if (language === 'java' || language === 'cpp') {
+      return false;
+    }
+    try {
+      const pyproject = fs.readFileSync(
+        path.join(this.workspace.uri.fsPath, Preferences.pyprojectFileName),
+        'utf8'
+      );
+      return /^\s*\[\s*tool\.robotpy\s*\]/m.test(pyproject);
+    } catch {
+      return false;
+    }
+  }
+
+  private updateIsRobotPyProject(): void {
+    this.isRobotPyProject = this.computeIsRobotPyProject();
+    void vscode.commands.executeCommand('setContext', 'isRobotPyProject', this.isRobotPyProject);
   }
 
   public getIsWPILibProject(): boolean {
@@ -190,6 +193,7 @@ export class Preferences implements IPreferences {
   public async setCurrentLanguage(language: string): Promise<void> {
     this.preferencesJson.currentLanguage = language;
     await this.writePreferences();
+    this.updateIsRobotPyProject();
   }
 
   public getAutoStartRioLog(): boolean {
@@ -248,6 +252,7 @@ export class Preferences implements IPreferences {
       // Set up defaults, and create
       this.preferencesJson = defaultPreferences;
     }
+    this.updateIsRobotPyProject();
   }
 
   private getConfiguration(): vscode.WorkspaceConfiguration {
@@ -257,11 +262,13 @@ export class Preferences implements IPreferences {
   private async updatePreferences() {
     if (!this.preferencesFile) {
       this.preferencesJson = defaultPreferences;
+      this.updateIsRobotPyProject();
       return;
     }
 
     const results = await readFile(this.preferencesFile.fsPath, 'utf8');
     this.preferencesJson = jsonc.parse(results) as IPreferencesJson;
+    this.updateIsRobotPyProject();
   }
 
   private async writePreferences(): Promise<void> {

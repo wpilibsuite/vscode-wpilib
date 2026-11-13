@@ -77,11 +77,6 @@ export interface IBuildTestAPI {
     source: vscode.Uri | undefined,
     ...args: string[]
   ): Promise<boolean>;
-  syncCode(
-    workspace: vscode.WorkspaceFolder,
-    source: vscode.Uri | undefined,
-    ...args: string[]
-  ): Promise<boolean>;
   registerCodeBuild(builder: ICodeBuilder): void;
   testCode(
     workspace: vscode.WorkspaceFolder,

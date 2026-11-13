@@ -29,17 +29,6 @@ export const VendorDepFiles = {
   COMMANDSV2_OLD: 'WPILibNewCommands.json',
 };
 
-export const ComponentPackages = {
-  APRILTAG: 'apriltag',
-  COMMANDSV2: 'commands2',
-  CSCORE: 'cscore',
-  ROMI: 'romi',
-  SIM: 'sim',
-  XRP: 'xrp',
-};
-
-export const allComponents = ['all', 'apriltag', 'commands2', 'cscore', 'romi', 'sim', 'xrp'];
-
 /**
  * Filter function for excluding files from gradle copy operations
  */
@@ -73,8 +62,7 @@ export async function findMatchingFiles(
 export async function setupProjectStructure(
   fromGradleFolder: string,
   toFolder: string,
-  grRoot: string,
-  python?: boolean
+  grRoot: string
 ): Promise<boolean> {
   try {
     // Copy gradle files
@@ -82,9 +70,7 @@ export async function setupProjectStructure(
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
       recursive: true,
     });
-    if (python) {
-      return true;
-    } //RobotPy does not use build.gradle, skip over shared folder
+
     // Copy shared gradle files
     await cp(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
@@ -97,6 +83,19 @@ export async function setupProjectStructure(
     return true;
   } catch (error) {
     logger.error('Failed to setup project structure', error);
+    return false;
+  }
+}
+
+export async function copyGradleBase(fromGradleFolder: string, toFolder: string): Promise<boolean> {
+  try {
+    await cp(fromGradleFolder, toFolder, {
+      filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
+      recursive: true,
+    });
+    return true;
+  } catch (error) {
+    logger.error('Failed to copy gradle base', error);
     return false;
   }
 }
@@ -116,46 +115,6 @@ export async function updateGradleRioVersion(
     logger.error('Failed to update Gradle RIO version', error);
     return false;
   }
-}
-
-export async function updateRobotPyVersion(
-  pyprojectPath: string,
-  robotpyVersion: string
-): Promise<boolean> {
-  try {
-    let file = await readFile(pyprojectPath, 'utf-8');
-    const versionString = 'robotpy_version = ';
-    file = file.replace(versionString, versionString + '"' + robotpyVersion + '"');
-    await writeFile(pyprojectPath, file, 'utf8');
-    return true;
-  } catch (err) {
-    logger.log('Error updating robotpy version');
-    return false;
-  }
-}
-
-export async function setupComponents(vendors: string[], toFolder: string) {
-  const components: string[] = [];
-  for (const v of vendors) {
-    if (v === 'commandsv2') {
-      components.push(ComponentPackages.COMMANDSV2);
-    } else if (v === 'apriltag') {
-      components.push(ComponentPackages.APRILTAG);
-    } else if (v === 'cscore') {
-      components.push(ComponentPackages.CSCORE);
-    } else if (v === 'romi') {
-      components.push(ComponentPackages.ROMI);
-    } else if (v === 'sim') {
-      components.push(ComponentPackages.SIM);
-    } else if (v === 'xrp') {
-      components.push(ComponentPackages.XRP);
-    }
-  }
-  pathUtils.copyComponents(components, toFolder);
-}
-
-export function isComponent(pkg: string) {
-  return allComponents.includes(pkg);
 }
 
 /**

@@ -10,7 +10,8 @@ import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
 import { ToolAPI } from './toolapi';
-import { getDesktopEnabled, gradleRun, javaHome, robotpyRun } from './utilities';
+import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
+import { robotpyRun } from './pythondetector';
 import { getWPILibHomeDir } from './shared/utilitiesapi';
 import { getUpdatePersistentState } from './wpilibupdates';
 
@@ -136,14 +137,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           i18n('message', 'Cannot build robot code since this is not a WPILib project')
         );
         return;
-      } else if (!workspace || preferencesApi.getPreferences(workspace).getIsRobotPyProject()) {
-        vscode.window.showInformationMessage(
-          i18n(
-            'message',
-            'Cannot build robot code since this is a robotpy project, use Sync to download required packages'
-          )
-        );
-        return;
       }
       await externalApi.getBuildTestAPI().buildCode(workspace, source);
     })
@@ -158,13 +151,8 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
           i18n('message', 'Cannot sync robot code since this is not a WPILib project')
         );
         return;
-      } else if (!preferencesApi.getPreferences(workspace).getIsRobotPyProject()) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot sync robot code since this is not a robotpy project')
-        );
-        return;
       }
-      await externalApi.getBuildTestAPI().syncCode(workspace, source);
+      await externalApi.getBuildTestAPI().buildCode(workspace, source);
     })
   );
 
@@ -359,7 +347,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       if (workspaceFolder) {
         await robotpyRun(
           cmd,
-          getWPILibHomeDir(),
+          workspaceFolder.uri.fsPath,
           workspaceFolder,
           'Download Python (Systemcore)',
           executeApi
@@ -376,7 +364,7 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       if (workspaceFolder) {
         await robotpyRun(
           cmd,
-          getWPILibHomeDir(),
+          workspaceFolder.uri.fsPath,
           workspaceFolder,
           'Install Python (Systemcore)',
           executeApi

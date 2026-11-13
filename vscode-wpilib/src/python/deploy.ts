@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { ICodeDeployer, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../api';
-import { robotpyRun } from '../utilities';
+import { robotpyRun } from '../pythondetector';
 
 class DeployCodeDeployer implements ICodeDeployer {
   private preferences: IPreferencesAPI;
@@ -25,12 +25,8 @@ class DeployCodeDeployer implements ICodeDeployer {
     _: vscode.Uri | undefined,
     ...args: string[]
   ): Promise<boolean> {
-    const command = 'deploy ' + args.join(' ');
-    const prefs = this.preferences.getPreferences(workspace);
-
-    if (!prefs.getTeamNumber()) {
-      prefs.setTeamNumber(teamNumber);
-    }
+    const deployArgs = teamNumber >= 0 ? ['--team', teamNumber.toString(), ...args] : args;
+    const command = ['deploy', ...deployArgs].join(' ');
     const result = await robotpyRun(
       command,
       workspace.uri.fsPath,
@@ -66,16 +62,12 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
 
   public async runDeployer(
-    teamNumber: number,
+    _teamNumber: number,
     workspace: vscode.WorkspaceFolder,
     _source: vscode.Uri | undefined,
     ...args: string[]
   ): Promise<boolean> {
-    const command = 'sim ' + args.join(' ');
-    const prefs = this.preferences.getPreferences(workspace);
-    if (!prefs.getTeamNumber()) {
-      prefs.setTeamNumber(teamNumber);
-    }
+    const command = ['sim', ...args].join(' ');
     const result = await robotpyRun(
       command,
       workspace.uri.fsPath,
@@ -98,12 +90,9 @@ class SimulateCodeDeployer implements ICodeDeployer {
   }
 }
 
-export function registerCodeDeploy(externalApi: IExternalAPI, allowDebug: boolean) {
+export function registerCodeDeploy(externalApi: IExternalAPI) {
   const deployApi = externalApi.getDeployDebugAPI();
   deployApi.addLanguageChoice('python');
   deployApi.registerCodeDeploy(new DeployCodeDeployer(externalApi));
-
-  if (allowDebug) {
-    deployApi.registerCodeSimulate(new SimulateCodeDeployer(externalApi));
-  }
+  deployApi.registerCodeSimulate(new SimulateCodeDeployer(externalApi));
 }

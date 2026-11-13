@@ -1,11 +1,54 @@
 'use strict';
 
 import * as cp from 'child_process';
+import { existsSync } from 'fs';
+import * as path from 'path';
+import { promisify } from 'util';
 import { logger } from './logger';
-import { getIsWindows } from './utilities';
+import { getIsWindows, quoteShellArg } from './utilities';
 import * as vscode from 'vscode';
 import { IExecuteAPI } from './api';
-import { updateRobotPyVersion } from './shared/vendorlibrariesbase';
+import { getPyProjectFile } from './shared/pyproject';
+import { getWPILibHomeDir } from './shared/utilitiesapi';
+
+const execFileAsync = promisify(cp.execFile);
+
+export function getProjectPython(root: string): string | undefined {
+  const isWindows = getIsWindows();
+  const candidates = [
+    path.join(root, '.venv', isWindows ? 'Scripts/python.exe' : 'bin/python'),
+    vscode.workspace
+      .getConfiguration('python', vscode.Uri.file(root))
+      .get<string>('defaultInterpreterPath'),
+    path.join(getWPILibHomeDir(), 'python', isWindows ? 'python.exe' : 'bin/python3'),
+  ];
+  return candidates.find((p) => p && path.isAbsolute(p) && existsSync(p));
+}
+
+export function uvPythonOption(root: string): string {
+  const python = getProjectPython(root);
+  return python ? ` --python ${quoteShellArg(python)}` : '';
+}
+
+export function getWheelDir(): string {
+  return path.join(getWPILibHomeDir(), 'robotpy');
+}
+
+export function uvFindLinksOption(): string {
+  const wheelDir = getWheelDir();
+  return existsSync(wheelDir) ? ` --find-links ${quoteShellArg(wheelDir)}` : '';
+}
+
+export async function robotpyRun(
+  args: string,
+  rootDir: string,
+  workspace: vscode.WorkspaceFolder,
+  name: string,
+  executeApi: IExecuteAPI
+): Promise<number> {
+  const command = `uv run --no-project${uvPythonOption(rootDir)} robotpy ${args}`;
+  return executeApi.executeCommand(command, name, rootDir, workspace);
+}
 
 export async function getPythonVersion(): Promise<string | undefined> {
   try {
@@ -19,34 +62,34 @@ export async function getPythonVersion(): Promise<string | undefined> {
   return undefined;
 }
 
-export async function getRobotPyVersion(wp?: string): Promise<string> {
+export async function getRobotPyVersion(wp?: string): Promise<string | undefined> {
   try {
-    let regexp = /Version: .*/;
-    let cmd = 'pip show robotpy';
     if (wp) {
-      const out1 = cp.execSync('uv ' + cmd, { cwd: wp, encoding: 'utf8' });
-      const match1: RegExpMatchArray | null = out1.match(regexp);
-      if (match1) {
-        const v = match1.toLocaleString().substring(9);
-        await updateRobotPyVersion(v, wp);
-        return v;
+      const args = ['pip', 'show', 'robotpy'];
+      const python = getProjectPython(wp);
+      if (python) {
+        args.push('--python', python);
       }
-    } else {
-      cmd = 'pip index versions --pre robotpy';
-      if (getIsWindows()) {
-        cmd = 'py -3 -m ' + cmd;
-      }
-      const out2 = cp.execSync(cmd, { encoding: 'utf8' });
-      regexp = /INSTALLED: .*/;
-      const match2: RegExpMatchArray | null = out2.match(regexp);
-      if (match2) {
-        return match2.toLocaleString().substring(11);
-      }
+      const { stdout } = await execFileAsync('uv', args, { cwd: wp, encoding: 'utf8' });
+      const match = stdout.match(/^Version: *(\S+)/m);
+      return match ? match[1] : undefined;
     }
-    return 'version undefined';
-  } catch (err) {
-    return 'version undefined';
+    let cmd = 'pip index versions --pre robotpy';
+    if (getIsWindows()) {
+      cmd = 'py -3 -m ' + cmd;
+    }
+    const out = cp.execSync(cmd, { encoding: 'utf8' });
+    const match = out.match(/INSTALLED: *(\S+)/);
+    return match ? match[1] : undefined;
+  } catch {
+    return undefined;
   }
+}
+
+export async function getDeclaredRobotPyVersion(wp: string): Promise<string | undefined> {
+  const project = await getPyProjectFile(wp);
+  const version = project?.tool.robotpy.robotpy_version;
+  return typeof version === 'string' && version.trim() ? version.trim() : undefined;
 }
 
 export async function setupVenv(
@@ -58,31 +101,29 @@ export async function setupVenv(
     if (pyVer) {
       pyVer = pyVer.substring(0, 4);
     }
-    let cmd = `uv venv --python ${pyVer} --allow-existing --seed --refresh`;
+    const venvArgs = `--python ${pyVer} --allow-existing --seed${uvFindLinksOption()}`;
+    let cmd = `uv venv ${venvArgs}`;
     let num = await executeApi.executeCommand(cmd, 'Set Up Venv', wp.uri.fsPath, wp);
     if (num !== 0) {
-      cmd = `uv venv --python ${pyVer} --allow-existing --seed --offline`;
+      cmd = `uv venv ${venvArgs} --offline`;
       num = await executeApi.executeCommand(cmd, 'Set Up Venv Offline', wp.uri.fsPath, wp);
     }
-    const robotpyver = await getRobotPyVersion(wp.uri.fsPath);
-    if (robotpyver === 'version undefined') {
-      cmd = 'uv pip install robotpy --prerelease=allow';
-    } else {
+    const robotpyver = await getDeclaredRobotPyVersion(wp.uri.fsPath);
+    if (robotpyver) {
       cmd = `uv pip install robotpy==${robotpyver} --prerelease=allow`;
+    } else {
+      cmd = 'uv pip install robotpy --prerelease=allow';
     }
+    cmd += uvPythonOption(wp.uri.fsPath) + uvFindLinksOption();
     let n = await executeApi.executeCommand(cmd, 'Install RobotPy', wp.uri.fsPath, wp);
     // If exits with code 2, the project is offline, add offline tag and run the command again
     if (n === 2) {
       n = await executeApi.executeCommand(cmd + ' --offline', 'Install RobotPy', wp.uri.fsPath, wp);
     }
-    if (n === 0) {
-      return Promise.resolve(true);
-    } else {
-      return Promise.resolve(false);
-    }
+    return n === 0;
   } catch {
     logger.log('Error setting up venv');
-    return Promise.resolve(false);
+    return false;
   }
 }
 

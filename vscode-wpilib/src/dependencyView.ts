@@ -3,28 +3,13 @@ import { IExternalAPI } from './api';
 import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { IProjectInfo, ProjectInfoGatherer } from './projectinfo';
-import {
-  addPythonDep,
-  getHomeDirDeps,
-  IJsonDependency,
-  installDependency,
-  parseRequirement,
-} from './shared/vendorlibrariesbase';
 import { VendorLibraries } from './vendorlibraries';
-import { isNewerVersion } from './versions';
-import { isComponent, allComponents } from './shared/projectGeneratorUtils';
-import { getRobotPyVersion } from './pythondetector';
-
-export interface IJsonList {
-  path: string;
-  name: string;
-  version: string;
-  uuid: string;
-  description: string;
-  website: string;
-  python?: string;
-  instructions?: string;
-}
+import {
+  IAvailableDep,
+  IDepInputLabels,
+  IInstalledDep,
+  IVendorDepProvider,
+} from './vendordeps/vendordepprovider';
 
 export interface IDepInstalled {
   name: string;
@@ -48,16 +33,10 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
   private vendorLibraries: VendorLibraries;
   private viewInfo?: IProjectInfo;
   private disposables: vscode.Disposable[] = [];
-  private installedDeps: IJsonDependency[] = []; // The actual dep information that is installed
-  private installedPythonDeps: string[] = []; // The actual dep information that is installed
-  private availableDeps: IJsonList[] = []; // All available deps
-  private availableDepsList: IJsonList[] = []; // Only the deps that are not installed and the latest version
-  private onlineDeps: IJsonList[] = []; // The deps from the <year>.json file in the vendor-json-repo
-  private installedList: IDepInstalled[] = []; // To display deps in the installed list
-  private homeDeps: IJsonDependency[] = []; // These are the offline deps in the home directory
+  private installed: IInstalledDep[] = [];
+  private available: IAvailableDep[] = [];
+  private installedList: IDepInstalled[] = [];
   private externalApi: IExternalAPI;
-  //private preferences: IPreferences;
-  private vendordepMarketplaceURL = `https://frcmaven.wpi.edu/artifactory/vendordeps/vendordep-marketplace/`;
   private wp?: vscode.WorkspaceFolder;
   private changed = 0;
   private refreshInProgress = false;
@@ -135,12 +114,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         if (webviewView.visible) {
           await this._refresh(this.wp);
         } else {
-          if (this.showingInstructions) {
-            this.showingInstructions = false;
-          } else if (this.changed > this.vendorLibraries.getLastBuild()) {
-            await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
-            this.changed = 0;
-          }
+          await this.runPostChangeAction();
         }
       }
     });
@@ -151,7 +125,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(
       webviewView.webview,
-      prefs.getIsRobotPyProject()
+      this.getProvider().getInputLabels()
     );
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
@@ -178,14 +152,7 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
             break;
           }
           case 'blur': {
-            if (this.wp) {
-              if (this.showingInstructions) {
-                this.showingInstructions = false;
-              } else if (this.changed > this.vendorLibraries.getLastBuild()) {
-                await this.externalApi.getBuildTestAPI().buildCode(this.wp, undefined);
-                this.changed = 0;
-              }
-            }
+            await this.runPostChangeAction();
             break;
           }
           default: {
@@ -201,202 +168,83 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     return maybeJSMessage && typeof maybeJSMessage.type === 'string';
   }
 
+  private getProvider(): IVendorDepProvider {
+    return this.vendorLibraries.getProvider(this.wp as vscode.WorkspaceFolder);
+  }
+
+  private async runPostChangeAction() {
+    if (!this.wp) {
+      return;
+    }
+    if (this.showingInstructions) {
+      this.showingInstructions = false;
+    } else if (this.changed > this.vendorLibraries.getLastBuild()) {
+      await this.vendorLibraries.runPostChangeAction(this.wp);
+      this.changed = 0;
+    }
+  }
+
   private async update(version: string, indexString: string) {
     const index = parseInt(indexString, 10);
-    // Make sure we have a workspace
-    if (this.wp) {
-      // If the version matches the current version then we want to update to latest
-      const versionToInstall =
-        version === this.installedList[index].currentVersion
-          ? // Get the version of the first element of the array AKA the latest version
-            this.installedList[index].versionInfo[0].version
-          : // It isn't the current version so user must have specified something else
-            version;
-
-      // Match both the name and the version
-      const avail = this.availableDeps.find(
-        (available) =>
-          versionToInstall === available.version &&
-          this.installedList[index].name === available.name
-      );
-      if (this.externalApi.getPreferencesAPI().getPreferences(this.wp).getIsRobotPyProject()) {
-        await this.vendorLibraries.updateVersion(
-          await parseRequirement(this.installedList[index].name),
-          version,
-          this.wp
-        );
-      } else {
-        await this.getURLInstallDep(avail);
-      }
-      await this._refresh(this.wp);
+    const dep = this.installed[index];
+    if (!this.wp || !dep) {
+      return;
     }
+    // If the version matches the current version then we want to update to latest
+    const versionToInstall =
+      version === this.installedList[index].currentVersion
+        ? // Get the version of the first element of the array AKA the latest version
+          this.installedList[index].versionInfo[0].version
+        : // It isn't the current version so user must have specified something else
+          version;
+
+    if (await this.getProvider().updateTo(this.wp, dep.key, versionToInstall)) {
+      this.changed = Date.now();
+    }
+    await this._refresh(this.wp);
   }
 
   private async updateall() {
-    if (this.wp) {
-      for (const installed of this.installedList) {
-        if (installed.versionInfo[0].version !== installed.currentVersion) {
-          // Match both the name and the version
-          if (this.externalApi.getPreferencesAPI().getPreferences(this.wp).getIsRobotPyProject()) {
-            const avail = (await this.getAvailablePythonDependencies()).find(
-              (available) => installed.name === available.python
-            );
-            if (avail && avail.python) {
-              await this.vendorLibraries.updateVersion(
-                await parseRequirement(avail.python),
-                installed.versionInfo[0].version,
-                this.wp
-              );
-            }
-          } else {
-            const avail = this.availableDeps.find(
-              (available) =>
-                installed.versionInfo[0].version === available.version &&
-                installed.name === available.name
-            );
-            await this.getURLInstallDep(avail);
-          }
-        }
-      }
-      await this._refresh(this.wp);
+    if (!this.wp) {
+      return;
     }
-  }
-
-  private async install(index: string) {
-    let prefsLanguage = '';
-    if (this.wp) {
-      prefsLanguage = this.externalApi
-        .getPreferencesAPI()
-        .getPreferences(this.wp)
-        .getCurrentLanguage();
-    }
-    if (prefsLanguage === 'python') {
-      const available = this.availableDepsList[parseInt(index, 10)];
-      if (available.python && this.wp) {
-        await this.vendorLibraries.installPythonDependency([available.python], this.wp);
-        await this._refresh(this.wp);
-      }
-    } else {
-      const avail = this.availableDepsList[parseInt(index, 10)];
-      if (avail && this.wp) {
-        await this.getURLInstallDep(avail);
-        await this._refresh(this.wp);
-      }
-    }
-  }
-
-  private async uninstall(index: string) {
-    if (
-      this.wp &&
-      !this.externalApi.getPreferencesAPI().getPreferences(this.wp).getIsRobotPyProject()
-    ) {
-      this.sortInstalledDeps();
-      const uninstall = [this.installedDeps[parseInt(index, 10)]];
-      const success = await this.vendorLibraries.uninstallVendorLibraries(uninstall, this.wp);
-      if (success) {
-        this.changed = Date.now();
-      }
-      await this._refresh(this.wp);
-    } else if (this.wp) {
-      this.sortInstalledPythonDeps();
-      const uninstall = [this.installedPythonDeps[parseInt(index, 10)]];
-      const success = await this.vendorLibraries.uninstallPythonVendorLibraries(uninstall, this.wp);
-      if (success) {
-        this.changed = Date.now();
-      }
-      await this._refresh(this.wp);
-    }
-  }
-
-  private async getURLInstallDep(avail: IJsonList | undefined) {
-    if (avail && this.wp) {
-      const dep = await this.listToDependency(avail);
-
-      if (dep) {
-        let conflictdep = undefined;
-        if (dep.conflictsWith) {
-          // Check to see if it conflicts with currently installed deps
-          for (const conflict of dep.conflictsWith) {
-            if (this.installedDeps.find((installedDep) => installedDep.uuid === conflict.uuid)) {
-              conflictdep = conflict;
-              break;
-            }
-          }
-        }
-
-        // If no conflict is found install otherwise show dialog
-        if (!conflictdep) {
-          const success = await installDependency(
-            dep,
-            this.vendorLibraries.getWpVendorFolder(this.wp),
-            true
-          );
-
-          if (success) {
-            if (avail.instructions) {
-              this.showingInstructions = true;
-              try {
-                new URL(avail.instructions);
-                await vscode.commands.executeCommand('simpleBrowser.show', avail.instructions);
-              } catch (e) {
-                vscode.window.showErrorMessage(
-                  `Could not display website! Invalid URL: "${avail.instructions}"`
-                );
-              }
-            }
-            this.changed = Date.now();
-
-            if (dep.requires) {
-              let reqDep = undefined;
-              // Check to see if there are required deps and install those too
-              for (const required of dep.requires) {
-                reqDep = this.availableDepsList.find(
-                  (requiredDep) => requiredDep.uuid === required.uuid
-                );
-                const newDep = await this.listToDependency(reqDep);
-                if (reqDep && newDep) {
-                  await installDependency(
-                    newDep,
-                    this.vendorLibraries.getWpVendorFolder(this.wp),
-                    true
-                  );
-                  // Do not show install instructions for required deps only selected.
-                }
-              }
-            }
-          }
-        } else {
-          vscode.window.showErrorMessage(i18n('message', '{0}', conflictdep.errorMessage), {
-            modal: true,
-          });
+    const provider = this.getProvider();
+    for (const [index, installed] of this.installedList.entries()) {
+      const latest = installed.versionInfo[0].version;
+      if (latest !== installed.currentVersion) {
+        if (await provider.updateTo(this.wp, this.installed[index].key, latest)) {
+          this.changed = Date.now();
         }
       }
     }
+    await this._refresh(this.wp);
   }
 
-  private async listToDependency(avail: IJsonList | undefined) {
-    let dependency = undefined;
-    if (avail && this.wp) {
-      // Check to see if it is already a URL
-      let url = avail.path;
-      if (url.substring(0, 4) !== 'http') {
-        url = this.vendordepMarketplaceURL + url;
-      }
-      try {
-        dependency = await this.vendorLibraries.getJsonDepURL(url);
-      } catch {
-        dependency = this.homeDeps.find(
-          (homdep) => homdep.uuid === avail.uuid && homdep.version === avail.version
-        );
+  private async install(indexString: string) {
+    const dep = this.available[parseInt(indexString, 10)];
+    if (!this.wp || !dep) {
+      return;
+    }
+    if (await this.getProvider().install(this.wp, dep)) {
+      this.changed = Date.now();
+      if (dep.instructions) {
+        this.showingInstructions = true;
       }
     }
-    return dependency;
+    await this._refresh(this.wp);
   }
 
-  /**
-   * Install a vendor dependency from a URL
-   * @param url The URL to install the dependency from
-   */
+  private async uninstall(indexString: string) {
+    const dep = this.installed[parseInt(indexString, 10)];
+    if (!this.wp || !dep) {
+      return;
+    }
+    if (await this.getProvider().uninstall(this.wp, [dep.key])) {
+      this.changed = Date.now();
+    }
+    await this._refresh(this.wp);
+  }
+
   private async installFromUrl(url: string | undefined) {
     if (!url || !this.wp) {
       logger.warn('installFromUrl called with invalid parameters', {
@@ -406,137 +254,17 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    if (this.externalApi.getPreferencesAPI().getPreferences(this.wp).getIsRobotPyProject()) {
-      if (isComponent(url)) {
-        await addPythonDep([url], [], this.wp.uri.fsPath);
-        return;
-      }
-      vscode.window.showInformationMessage(
-        i18n('message', 'It may take a few minutes to install a new package'),
-        {
-          modal: true,
-        }
-      );
-      const result = await this.vendorLibraries.installPythonDependency([url], this.wp);
-      if (!result) {
-        logger.warn('Unable to install python package');
-      }
-      return;
+    if (await this.getProvider().installFromInput(this.wp, url)) {
+      this.changed = Date.now();
     }
-
-    // Validate URL format
-    if (!url.trim()) {
-      vscode.window.showErrorMessage(i18n('message', 'Please enter a valid URL'));
-      return;
-    }
-
-    try {
-      // Attempt to fetch and parse the dependency from the URL
-      const file = await this.vendorLibraries.getJsonDepURL(url.trim());
-
-      if (!file) {
-        vscode.window.showErrorMessage(i18n('message', 'Failed to load vendor file from URL.'));
-        return;
-      }
-
-      // Load existing libraries to check for conflicts and duplicates
-      const existing = await this.vendorLibraries.getCurrentlyInstalledLibraries(this.wp);
-
-      // Check if already installed
-      for (const dep of existing) {
-        if (dep.uuid === file.uuid) {
-          if (dep.version === file.version) {
-            vscode.window.showInformationMessage(
-              i18n('message', '{0} version {1} is already installed.', file.name, file.version)
-            );
-            return;
-          } else {
-            const res = await vscode.window.showWarningMessage(
-              i18n(
-                'message',
-                '{0} version {1} is already installed. Would you like to update to {2}?',
-                file.name,
-                dep.version,
-                file.version
-              ),
-              { modal: true },
-              i18n('ui', 'Yes'),
-              i18n('ui', 'No')
-            );
-            if (res !== i18n('ui', 'Yes')) {
-              return;
-            }
-          }
-        }
-      }
-
-      // Check for conflicts with currently installed dependencies
-      let conflictDep = undefined;
-      if (file.conflictsWith) {
-        for (const conflict of file.conflictsWith) {
-          const existingDep = existing.find((installedDep) => installedDep.uuid === conflict.uuid);
-          if (existingDep) {
-            conflictDep = conflict;
-            break;
-          }
-        }
-      }
-
-      // If no conflict is found, proceed with installation
-      if (!conflictDep) {
-        const success = await installDependency(
-          file,
-          this.vendorLibraries.getWpVendorFolder(this.wp),
-          true
-        );
-
-        if (success) {
-          this.changed = Date.now();
-
-          // Install required dependencies if any
-          if (file.requires) {
-            for (const required of file.requires) {
-              try {
-                const requiredDep = await this.vendorLibraries.getJsonDepURL(required.onlineUrl);
-                await installDependency(
-                  requiredDep,
-                  this.vendorLibraries.getWpVendorFolder(this.wp),
-                  true
-                );
-              } catch (err) {
-                vscode.window.showWarningMessage(
-                  i18n(
-                    'message',
-                    'Failed to install required dependency: {0}',
-                    required.errorMessage
-                  )
-                );
-              }
-            }
-          }
-
-          // Refresh the view to show the newly installed dependency
-          await this._refresh(this.wp);
-        } else {
-          vscode.window.showErrorMessage(i18n('message', 'Failed to install {0}', file.name));
-        }
-      } else {
-        // Show conflict error
-        vscode.window.showErrorMessage(i18n('message', '{0}', conflictDep.errorMessage), {
-          modal: true,
-        });
-      }
-    } catch (err) {
-      // Error handling matches the command palette version
-      vscode.window.showErrorMessage(i18n('message', 'Failed to load vendor file from URL.'));
-    }
+    await this._refresh(this.wp);
   }
 
   public async updateDependencies() {
     await this._view?.webview.postMessage({
       type: 'updateDependencies',
       installed: this.installedList,
-      available: this.availableDepsList,
+      available: this.available,
     });
   }
 
@@ -555,158 +283,14 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     this.refreshInProgress = true;
 
     try {
-      if (this.externalApi.getPreferencesAPI().getPreferences(workspace).getIsRobotPyProject()) {
-        await this.vendorLibraries.syncRequirements(workspace);
-        this.installedPythonDeps =
-          await this.vendorLibraries.getCurrentlyInstalledPythonLibraries(workspace);
-        this.availableDeps = await this.getAvailablePythonDependencies();
-      } else {
-        this.installedDeps = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
-        this.availableDeps = await this.getAvailableDependencies();
-      }
-      this.installedList = [];
-      this.availableDepsList = [];
-      if (
-        this.availableDeps.length !== 0 &&
-        !this.externalApi.getPreferencesAPI().getPreferences(workspace).getIsRobotPyProject()
-      ) {
-        // Check Github for the VendorDep list
-        for (const id of this.installedDeps) {
-          let versionList = [{ version: id.version, buttonText: i18n('ui', 'To Latest') }];
-          for (const ad of this.availableDeps) {
-            if (id.uuid === ad.uuid) {
-              // Populate version array with version and button text
-              if (id.version !== ad.version) {
-                if (isNewerVersion(ad.version, id.version)) {
-                  versionList.push({
-                    version: ad.version,
-                    buttonText: i18n('ui', 'Update'),
-                  });
-                } else {
-                  versionList.push({
-                    version: ad.version,
-                    buttonText: i18n('ui', 'Downgrade'),
-                  });
-                }
-              }
-            }
-          }
-          // Now we need to sort the version list newest to oldest
-          versionList = this.sortVersions(versionList);
+      const provider = this.vendorLibraries.getProvider(workspace);
+      const { installed, available } = await provider.getSnapshot(workspace);
 
-          this.installedList.push({
-            name: id.name,
-            currentVersion: id.version,
-            versionInfo: versionList,
-          });
-        }
+      this.installed = installed.sort(sort);
+      this.installedList = this.installed.map((dep) => this.toViewModel(dep, provider));
+      this.available = this.newestOfEach(available, provider).sort(sort);
 
-        // We need to group the available deps and filter out the installed ones
-        this.availableDeps.forEach((dep) => {
-          // See if the dep is one of the installed deps if so don't add it
-          const installedDep = this.installedDeps.findIndex((depend) => depend.uuid === dep.uuid);
-          if (installedDep < 0) {
-            // Check to see if it is already in the available list
-            const foundDep = this.availableDepsList.findIndex((depend) => depend.uuid === dep.uuid);
-            if (foundDep < 0) {
-              // Not in the list so just add it
-              this.availableDepsList.push(dep);
-            } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
-              // It was in the list but this version is newer so lets use that
-              this.availableDepsList[foundDep] = dep;
-            }
-          }
-        });
-
-        this.sortInstalled();
-        this.sortAvailable();
-
-        this.updateDependencies();
-      } else if (this.availableDeps.length !== 0 && this.wp) {
-        for (const id of this.installedPythonDeps) {
-          let installedVersion = await getRobotPyVersion(this.wp.uri.fsPath);
-          if (!isComponent(id)) {
-            const req = await this.vendorLibraries.getIRequires(id, this.wp);
-            if (req) {
-              if (req.version) {
-                installedVersion = req.version;
-              } else {
-                installedVersion = '';
-              }
-              let versionList = [
-                { version: installedVersion, buttonText: i18n('ui', 'To Latest') },
-              ];
-              for (const ver of req.availableVersions) {
-                //still detects it's the same version if the version has (prerelease) after it
-                if (
-                  ver !== installedVersion &&
-                  ver !== installedVersion + ' (prerelease)' &&
-                  installedVersion
-                ) {
-                  if (isNewerVersion(ver, installedVersion)) {
-                    versionList.push({
-                      version: ver,
-                      buttonText: i18n('ui', 'Update'),
-                    });
-                  } else {
-                    versionList.push({
-                      version: ver,
-                      buttonText: i18n('ui', 'Downgrade'),
-                    });
-                  }
-                }
-              }
-              versionList = this.sortVersions(versionList);
-
-              this.installedList.push({
-                name: id,
-                currentVersion: installedVersion,
-                versionInfo: versionList,
-              });
-            }
-          } else if (isComponent(id)) {
-            const versionList = [
-              { version: installedVersion, buttonText: i18n('ui', 'To Latest') },
-            ];
-            //Because this is a component, the version is tied to the version of robotpy, so there is no need for version drop-downs
-            this.installedList.push({
-              name: id,
-              currentVersion: installedVersion,
-              versionInfo: versionList,
-            });
-            continue;
-          }
-        }
-
-        // We need to group the available deps and filter out the installed ones
-        this.availableDeps.forEach((dep) => {
-          if (dep.python !== undefined) {
-            // See if the dep is one of the installed deps if so don't add it
-            const installedDep = this.installedPythonDeps.findIndex(
-              (depend) => depend === dep.python
-            );
-            if (installedDep < 0) {
-              // Check to see if it is already in the available list
-              const foundDep = this.availableDepsList.findIndex(
-                (depend) => depend.name === dep.python
-              );
-              if (foundDep < 0 && dep.python) {
-                // Not in the list so just add it
-                dep.name = dep.python;
-                this.availableDepsList.push(dep);
-              } else if (isNewerVersion(dep.version, this.availableDepsList[foundDep].version)) {
-                dep.name = dep.python;
-                // It was in the list but this version is newer so lets use that
-                this.availableDepsList[foundDep] = dep;
-              }
-            }
-          }
-        });
-
-        this.sortInstalled();
-        this.sortAvailable();
-        this.updateDependencies();
-      }
+      await this.updateDependencies();
     } finally {
       this.refreshInProgress = false;
     }
@@ -718,11 +302,24 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private sortVersions(
-    versionList: { version: string; buttonText: string }[]
-  ): { version: string; buttonText: string }[] {
-    versionList.sort((a, b) => {
-      if (isNewerVersion(a.version, b.version)) {
+  private toViewModel(dep: IInstalledDep, provider: IVendorDepProvider): IDepInstalled {
+    const versionInfo = [{ version: dep.version, buttonText: i18n('ui', 'To Latest') }];
+    for (const version of dep.availableVersions) {
+      if (
+        version !== dep.version &&
+        version !== dep.version + ' (prerelease)' &&
+        dep.version !== ''
+      ) {
+        versionInfo.push({
+          version,
+          buttonText: provider.isNewerVersion(version, dep.version)
+            ? i18n('ui', 'Update')
+            : i18n('ui', 'Downgrade'),
+        });
+      }
+    }
+    versionInfo.sort((a, b) => {
+      if (provider.isNewerVersion(a.version, b.version)) {
         return -1;
       } else if (a.version === b.version) {
         return 0;
@@ -730,187 +327,23 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
         return 1;
       }
     });
-    return versionList;
+    return { name: dep.name, currentVersion: dep.version, versionInfo };
   }
 
-  private sortInstalled() {
-    this.installedList.sort(sort);
-  }
-
-  private sortInstalledDeps() {
-    this.installedDeps.sort(sort);
-  }
-
-  private sortInstalledPythonDeps() {
-    this.installedPythonDeps.sort();
-  }
-
-  private sortAvailable() {
-    this.availableDepsList.sort(sort);
-  }
-
-  public async getAvailableDependencies(): Promise<IJsonList[]> {
-    this.homeDeps = [];
-    if (!this.wp) {
-      this.onlineDeps = [];
-    } else {
-      const projectYear = this.externalApi
-        .getPreferencesAPI()
-        .getPreferences(this.wp)
-        .getProjectYear();
-      const manifestURL = this.vendordepMarketplaceURL + `${projectYear}.json`;
-      try {
-        this.onlineDeps = await this.loadFileFromUrl(manifestURL);
-      } catch (err) {
-        logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
-        this.onlineDeps = [];
+  private newestOfEach(available: IAvailableDep[], provider: IVendorDepProvider): IAvailableDep[] {
+    const newest: IAvailableDep[] = [];
+    for (const dep of available) {
+      const found = newest.findIndex((other) => other.key === dep.key);
+      if (found < 0) {
+        newest.push(dep);
+      } else if (provider.isNewerVersion(dep.version, newest[found].version)) {
+        newest[found] = dep;
       }
     }
-    this.homeDeps = await getHomeDirDeps();
-    this.homeDeps.forEach((homedep) => {
-      const depList: IJsonList = {
-        path: i18n('ui', homedep.jsonUrl),
-        name: i18n('ui', homedep.name),
-        version: i18n('ui', homedep.version),
-        uuid: i18n('ui', homedep.uuid),
-        description: i18n('ui', 'Loaded from Local Copy'),
-        website: i18n('ui', 'Loaded from Local Copy'),
-      };
-      const found = this.onlineDeps.find(
-        (onlinedep) => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version
-      );
-      if (!found) {
-        this.onlineDeps.push(depList);
-      }
-    });
-
-    return this.onlineDeps;
-  }
-  public async getAvailablePythonDependencies(): Promise<IJsonList[]> {
-    this.homeDeps = [];
-    if (!this.wp) {
-      this.onlineDeps = [];
-    } else {
-      const projectYear = this.externalApi
-        .getPreferencesAPI()
-        .getPreferences(this.wp)
-        .getProjectYear();
-      const manifestURL = this.vendordepMarketplaceURL + `${projectYear}.json`;
-      try {
-        this.onlineDeps = await this.loadFileFromUrl(manifestURL);
-      } catch (err) {
-        logger.log('Error fetching vendordep marketplace manifest', manifestURL, err);
-        this.onlineDeps = [];
-      }
-    }
-    this.homeDeps = await getHomeDirDeps();
-    this.homeDeps.forEach((homedep) => {
-      const depList: IJsonList = {
-        path: i18n('ui', homedep.jsonUrl),
-        name: i18n('ui', homedep.name),
-        version: i18n('ui', homedep.version),
-        uuid: i18n('ui', homedep.uuid),
-        description: i18n('ui', 'Loaded from Local Copy'),
-        website: i18n('ui', 'Loaded from Local Copy'),
-      };
-      const found = this.onlineDeps.find(
-        (onlinedep) => onlinedep.uuid === depList.uuid && onlinedep.version === depList.version
-      );
-      if (!found) {
-        if (isComponent(homedep.fileName.substring(0, homedep.fileName.length - 5))) {
-          depList.python = homedep.fileName.substring(0, homedep.fileName.length - 5);
-          this.onlineDeps.push(depList);
-        }
-      }
-    });
-    const req = await this.vendorLibraries.getPythonRequirements();
-    req.forEach((requirement) => {
-      const depList: IJsonList = {
-        path: i18n('ui', ''),
-        name: i18n('ui', requirement),
-        version: i18n('ui', ''),
-        uuid: i18n('ui', ''),
-        python: requirement,
-        description: i18n('ui', 'Entered package name'),
-        website: i18n('ui', 'Entered package name'),
-      };
-      const found = this.onlineDeps.find((onlinedep) => onlinedep.python === depList.python);
-      if (!found) {
-        this.onlineDeps.push(depList);
-      }
-    });
-    let dep = this.onlineDeps.at(0);
-    const ret: string[] = [];
-    for (let i = 0; i < this.onlineDeps.length; i++) {
-      dep = this.onlineDeps.at(i);
-      if (dep) {
-        if (!dep.python) {
-          this.onlineDeps.splice(this.onlineDeps.indexOf(dep), 1);
-          i--;
-        } else if (ret.indexOf(dep.name) !== -1) {
-          this.onlineDeps.splice(this.onlineDeps.indexOf(dep), 1);
-          i--;
-        } else {
-          ret.push(dep.name);
-        }
-      }
-    }
-    for (const c of allComponents) {
-      let found = false;
-      if (c === 'all') {
-        continue;
-      }
-      for (let i = 0; i < this.onlineDeps.length; i++) {
-        if (c === this.onlineDeps.at(i)?.python) {
-          found = true;
-          continue;
-        }
-      }
-      if (!found) {
-        const list = {
-          path: i18n('ui', ''),
-          name: i18n('ui', c),
-          version: i18n('ui', ''),
-          uuid: i18n('ui', ''),
-          python: c,
-          description: i18n('ui', 'WPILib Component'),
-          website: i18n('ui', 'WPILib Component'),
-        };
-        this.onlineDeps.push(list);
-      }
-    }
-    return this.onlineDeps;
+    return newest;
   }
 
-  protected async loadFileFromUrl(url: string): Promise<IJsonList[]> {
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (response.ok) {
-      const json = (await response.json()) as IJsonList[];
-      if (this.isJsonList(json)) {
-        return json;
-      } else {
-        throw new Error('Incorrect JSON format');
-      }
-    } else {
-      throw new Error('Bad status ' + response.status);
-    }
-  }
-
-  private isJsonList(jsonDepList: IJsonList[]): jsonDepList is IJsonList[] {
-    return jsonDepList.every(
-      (jsonDep) =>
-        jsonDep.path !== undefined &&
-        jsonDep.name !== undefined &&
-        jsonDep.uuid !== undefined &&
-        jsonDep.version !== undefined &&
-        jsonDep.description !== undefined &&
-        jsonDep.website !== undefined
-    );
-  }
-
-  private _getHtmlForWebview(webview: vscode.Webview, python: boolean): string {
+  private _getHtmlForWebview(webview: vscode.Webview, labels: IDepInputLabels): string {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
     const createUri = (fp: string) => {
       return webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...fp.split('/')));
@@ -920,14 +353,6 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
     const styleUri = createUri(`resources/media/main.css`);
     const vscodeElementsUri = createUri(`resources/media/vscode-elements.css`);
     const codiconUri = createUri(`resources/media/icons.css`);
-    let helpText = 'JSON URL';
-    if (python) {
-      helpText = 'Python Package Name';
-    }
-    let installText = 'URL';
-    if (python) {
-      installText = 'package name';
-    }
 
     // Return the complete HTML
     return `
@@ -963,14 +388,14 @@ export class DependencyViewProvider implements vscode.WebviewViewProvider {
           </summary>
           <div class="url-install-section">
             <div class="url-input-container">
-              <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep ${installText}..." />
+              <input type="text" id="url-input" class="vscode-textfield" placeholder="Enter vendordep ${labels.inputName}..." />
               <button id="install-url-action" class="vscode-button">
                 <i class="codicon codicon-cloud-download"></i>
                 Install
               </button>
             </div>
             <div class="url-help-text">
-              Enter a vendor dependency ${helpText} to install a library not listed in the available dependencies.
+              Enter a vendor dependency ${labels.sourceName} to install a library not listed in the available dependencies.
             </div>
           </div>
         </details>

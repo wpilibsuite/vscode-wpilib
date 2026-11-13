@@ -6,12 +6,8 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { localize as i18n } from '../locale';
-import {
-  generateCopyCpp,
-  generateCopyJava,
-  generateCopyPython,
-  setDesktopEnabled,
-} from '../shared/generator';
+import { generateCopyPython } from '../python/generator';
+import { generateCopyCpp, generateCopyJava, setDesktopEnabled } from '../shared/generator';
 import { ImportUpdate } from '../shared/importupdater';
 import { IPreferencesJson } from '../shared/preferencesjson';
 import { extensionContext, promptForProjectOpen } from '../utilities';

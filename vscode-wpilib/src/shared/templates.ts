@@ -6,7 +6,8 @@ import * as vscode from 'vscode';
 import { IExampleTemplateAPI, IExampleTemplateCreator } from '../api';
 import { logger } from '../logger';
 import { localize as i18n } from '../locale';
-import { generateCopyCpp, generateCopyJava, generateCopyPython } from './generator';
+import { generateCopyPython } from '../python/generator';
+import { generateCopyCpp, generateCopyJava } from './generator';
 
 export interface ITemplateJsonLayout {
   name: string;
@@ -100,7 +101,7 @@ export async function registerProjectTemplates(
               if (
                 !(await generateCopyPython(
                   path.join(templatesFolder, e.foldername),
-                  templatesTestFolder,
+                  testFolder,
                   path.join(gradleBasePath, e.gradlebase),
                   folderInto.fsPath,
                   vendordeps
