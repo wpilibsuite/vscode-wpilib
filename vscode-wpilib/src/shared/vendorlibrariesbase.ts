@@ -11,6 +11,7 @@ export interface IJsonDependency {
   uuid: string;
   jsonUrl: string;
   fileName: string;
+  mavenUrls?: string[];
   conflictsWith?: IJsonConflicts[];
   requires?: IJsonRequires[];
 }

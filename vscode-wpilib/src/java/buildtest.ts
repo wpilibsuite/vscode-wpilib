@@ -1,5 +1,6 @@
 'use strict';
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
@@ -34,6 +35,10 @@ class CodeBuilder implements ICodeBuilder {
       'Java Build',
       this.executeApi,
       prefs
+    );
+    vscode.commands.executeCommand(
+      'java.projectConfiguration.update',
+      vscode.Uri.file(path.join(workspace.uri.fsPath, 'build.gradle'))
     );
     logger.log(result.toString());
     return true;
@@ -78,7 +83,10 @@ class CodeTester implements ICodeBuilder {
       this.executeApi,
       prefs
     );
-
+    vscode.commands.executeCommand(
+      'java.projectConfiguration.update',
+      vscode.Uri.file(path.join(workspace.uri.fsPath, 'build.gradle'))
+    );
     logger.log(result.toString());
     return true;
   }

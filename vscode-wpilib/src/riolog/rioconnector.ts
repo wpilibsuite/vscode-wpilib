@@ -28,19 +28,15 @@ async function properRace<T>(promises: Promise<T>[]): Promise<T> {
 }
 
 interface IDriverStationData {
-  robotIP: number;
+  robotIp?: string;
 }
 
 const constantIps: string[] = [
-  '172.22.11.2',
+  process.platform === 'win32' ? '172.26.0.1' : '172.27.0.1',
+  '172.30.0.1',
+  'robot.local',
   //, '127.0.0.1',
   // Uncomment the above line for testing on localhost.
-];
-
-const teamIps: string[] = [
-  'roboRIO-TEAM-FRC.local',
-  'roboRIO-TEAM-FRC.lan',
-  'roboRIO-TEAM-FRC.frc-field.local',
 ];
 
 interface ISocketPromisePair {
@@ -75,93 +71,134 @@ function timerPromise(ms: number): ICancellableTimer {
 class DSSocketPromisePair implements ISocketPromisePair {
   public socket: net.Socket;
   public promise: Promise<net.Socket>;
-  private dsSocket: net.Socket;
+  private dsDispose: () => void;
 
-  constructor(rs: net.Socket, ds: net.Socket, p: Promise<net.Socket>) {
+  constructor(rs: net.Socket, disposeDs: () => void, p: Promise<net.Socket>) {
     this.socket = rs;
     this.promise = p;
-    this.dsSocket = ds;
+    this.dsDispose = disposeDs;
   }
 
   public dispose(): void {
     this.socket.emit('dispose');
-    this.dsSocket.emit('dispose');
+    this.dsDispose();
   }
 }
 
-function getSocketFromDS(port: number): ISocketPromisePair {
+function getRobotIpFromDriverStationMessage(data: string): string | undefined {
+  const trimmedData = data.trim();
+  if (trimmedData.length === 0) {
+    return undefined;
+  }
+
+  const parsed = JSON.parse(trimmedData) as IDriverStationData;
+  const robotIp = parsed.robotIp;
+
+  if (typeof robotIp === 'string') {
+    const trimmed = robotIp.trim();
+    if (
+      trimmed.length === 0 ||
+      trimmed === '0' ||
+      trimmed === '0.0.0.0' ||
+      net.isIP(trimmed) === 0
+    ) {
+      return undefined;
+    }
+    return trimmed;
+  }
+
+  return undefined;
+}
+
+function connectSocketToIP(
+  socket: net.Socket,
+  port: number,
+  ip: string,
+  resolve: (value: net.Socket | PromiseLike<net.Socket>) => void,
+  reject: () => void
+): void {
+  const failConnection = () => {
+    logger.info('failed connection to ' + ip + ' at ' + port);
+    socket.end();
+    socket.destroy();
+    socket.removeAllListeners();
+    reject();
+  };
+
+  socket.on('error', failConnection);
+  socket.on('timeout', failConnection);
+  socket.on('close', failConnection);
+  socket.on('dispose', () => {
+    logger.info('disposed', ip);
+    socket.end();
+    socket.destroy();
+    socket.removeAllListeners();
+    reject();
+  });
+  socket.connect(port, ip, () => {
+    socket.removeAllListeners();
+    resolve(socket);
+  });
+}
+
+function getSocketFromDSWebSocket(port: number): ISocketPromisePair {
   const s = new net.Socket();
-  const ds = new net.Socket();
-  const retVal = new DSSocketPromisePair(
+  let ws: WebSocket | undefined;
+  let foundRobotIp = false;
+  let rejectPromise: (() => void) | undefined;
+
+  const disposeDs = () => {
+    if (ws && ws.readyState !== WebSocket.CLOSED) {
+      ws.close();
+    }
+    if (rejectPromise) {
+      rejectPromise();
+    }
+  };
+
+  return new DSSocketPromisePair(
     s,
-    ds,
+    disposeDs,
     new Promise((resolve, reject) => {
-      // First connect to ds, and wait for data
-      ds.on('data', (data) => {
-        const parsed: IDriverStationData = JSON.parse(data.toString()) as IDriverStationData;
-        if (parsed.robotIP === 0) {
-          ds.end();
-          ds.destroy();
-          ds.removeAllListeners();
-          reject();
+      rejectPromise = reject;
+
+      ws = new WebSocket('ws://localhost:6768/ipws');
+
+      ws.addEventListener('message', (event) => {
+        if (foundRobotIp) {
           return;
         }
-        let ipAddr = '';
-        const ip = parsed.robotIP;
-        ipAddr += ((ip >> 24) & 0xff) + '.';
-        ipAddr += ((ip >> 16) & 0xff) + '.';
-        ipAddr += ((ip >> 8) & 0xff) + '.';
-        ipAddr += ip & 0xff;
-        s.on('error', (_) => {
-          logger.info('failed connection to ' + ip + ' at ' + port);
-          s.end();
-          s.destroy();
-          s.removeAllListeners();
-          reject();
-        });
-        s.on('timeout', () => {
-          logger.info('failed connection to ' + ip + ' at ' + port);
-          s.end();
-          s.destroy();
-          s.removeAllListeners();
-          reject();
-        });
-        s.on('close', () => {
-          logger.info('failed connection to ' + ip + ' at ' + port);
-          s.end();
-          s.destroy();
-          s.removeAllListeners();
-          reject();
-        });
-        s.on('dispose', () => {
-          logger.info('disposed ds connected');
-          reject();
-          s.end();
-          s.destroy();
-          s.removeAllListeners();
-        });
-        s.connect(port, ipAddr, () => {
-          s.removeAllListeners();
-          resolve(s);
-        });
-        ds.end();
-        ds.destroy();
-        ds.removeAllListeners();
+
+        let ipAddr: string | undefined;
+        try {
+          ipAddr = getRobotIpFromDriverStationMessage(event.data.toString());
+        } catch (e) {
+          logger.info('failed parsing driver station websocket message', e);
+          return;
+        }
+
+        if (!ipAddr) {
+          return;
+        }
+
+        foundRobotIp = true;
+        ws?.close();
+        connectSocketToIP(s, port, ipAddr, resolve, reject);
       });
-      ds.on('error', () => {
-        reject();
+
+      ws.addEventListener('error', () => {
+        if (!foundRobotIp) {
+          reject();
+        }
       });
-      ds.on('dispose', () => {
-        logger.info('disposed ds');
-        reject();
-        ds.end();
-        ds.destroy();
-        ds.removeAllListeners();
+
+      ws.addEventListener('close', () => {
+        if (!foundRobotIp) {
+          reject();
+        }
       });
-      ds.connect(1742, '127.0.0.1');
     })
   );
-  return retVal;
 }
 
 class RawSocketPromisePair implements ISocketPromisePair {
@@ -183,37 +220,7 @@ function getSocketFromIP(port: number, ip: string): ISocketPromisePair {
   return new RawSocketPromisePair(
     s,
     new Promise((resolve, reject) => {
-      s.on('error', (_) => {
-        logger.info('failed connection to ' + ip + ' at ' + port);
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-        reject();
-      });
-      s.on('timeout', () => {
-        logger.info('failed connection to ' + ip + ' at ' + port);
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-        reject();
-      });
-      s.on('close', () => {
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-        reject();
-      });
-      s.on('dispose', () => {
-        logger.info('disposed', ip);
-        reject();
-        s.end();
-        s.destroy();
-        s.removeAllListeners();
-      });
-      s.connect(port, ip, () => {
-        s.removeAllListeners();
-        resolve(s);
-      });
+      connectSocketToIP(s, port, ip, resolve, reject);
     })
   );
 }
@@ -229,11 +236,8 @@ export async function connectToRobot(
   for (const c of constantIps) {
     pairs.push(getSocketFromIP(port, c));
   }
-  for (const c of teamIps) {
-    pairs.push(getSocketFromIP(port, c.replace('TEAM', teamNumber.toString())));
-  }
   pairs.push(getSocketFromIP(port, `10.${Math.trunc(teamNumber / 100)}.${teamNumber % 100}.2`));
-  pairs.push(getSocketFromDS(port));
+  pairs.push(getSocketFromDSWebSocket(port));
   const connectors: Promise<net.Socket | undefined>[] = [];
   for (const p of pairs) {
     connectors.push(p.promise);

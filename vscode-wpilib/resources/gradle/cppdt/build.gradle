@@ -24,7 +24,7 @@ model {
         }
     }
     testSuites {
-        desktopProgramTest(GoogleTestTestSuiteSpec) {
+        wpilibUserProgramCatch2Test(GoogleTestTestSuiteSpec) {
             testing $.components.desktopProgram
 
             sources.cpp {
@@ -35,7 +35,7 @@ model {
             }
 
             wpi.cpp.deps.wpilibStatic(it)
-            wpi.cpp.deps.googleTest(it)
+            wpi.cpp.deps.catch2(it)
         }
     }
 }

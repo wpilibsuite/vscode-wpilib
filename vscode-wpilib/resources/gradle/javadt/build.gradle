@@ -1,5 +1,6 @@
 plugins {
     id "java"
+    id "application"
     id "org.wpilib.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
@@ -32,17 +33,9 @@ test {
 }
 
 
-// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat/shaded jar')
-// in order to make them all available at runtime and merging service files to make JSON work.
-// Also adding the manifest so WPILib knows where to look for our Robot Class.
-shadowJar {
-    mergeServiceFiles()
-    from sourceSets.main.allSource
-    manifest org.wpilib.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
+application.mainClass = ROBOT_MAIN_CLASS
 
-wpi.java.configureExecutableTasks(shadowJar)
+wpi.java.configureApplication(application)
 wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile

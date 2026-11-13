@@ -188,7 +188,7 @@ export class Gradle2025Import extends WebViewBase {
     // Detect C++ or Java project
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
-    let language = 'cpp';
+    let language: 'cpp' | 'java' | 'python';
     try {
       const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
@@ -230,39 +230,31 @@ export class Gradle2025Import extends WebViewBase {
     const gradleFile = path.join(oldProjectPath, 'build.gradle');
 
     let javaRobotPackage: string = '';
-    let mainClassPackage: string = '';
     if (language === 'java') {
       try {
         const gradleContents = await readFile(gradleFile, 'utf8');
         const mainClassRegex = 'def ROBOT_MAIN_CLASS = "(.+)"';
         const regexRes = new RegExp(mainClassRegex, 'g').exec(gradleContents);
         if (regexRes !== null && regexRes.length === 2) {
-          mainClassPackage = regexRes[1].replace(/\./g, path.sep) + '.java';
-        }
-        const mainClassPath = path.join(oldProjectPath, 'src', 'main', 'java', mainClassPackage);
-        const mainClassContents = await readFile(mainClassPath, 'utf8');
-        const packageRegex = 'package\\s+([a-zA-Z0-9_.]+);';
-        const packageRes = new RegExp(packageRegex, 'g').exec(mainClassContents);
-        if (packageRes !== null && packageRes.length === 2) {
-          javaRobotPackage = packageRes[1] + '.Robot';
+          javaRobotPackage = regexRes[1];
         }
       } catch {
         // File doesn't exist
       }
-    }
 
-    if (javaRobotPackage === '' && language !== 'python') {
-      const res = await vscode.window.showInformationMessage(
-        i18n('message', 'Failed to determine robot class. Enter it manually?'),
-        {
-          modal: true,
-        },
-        { title: 'Yes' },
-        { title: 'No', isCloseAffordance: true }
-      );
-      if (res?.title !== 'Yes') {
-        await vscode.window.showErrorMessage('Project Import Failed');
-        return;
+      if (javaRobotPackage === '') {
+        const res = await vscode.window.showInformationMessage(
+          i18n('message', 'Failed to determine robot class. Enter it manually?'),
+          {
+            modal: true,
+          },
+          { title: 'Yes' },
+          { title: 'No', isCloseAffordance: true }
+        );
+        if (res?.title !== 'Yes') {
+          await vscode.window.showErrorMessage('Project Import Failed');
+          return;
+        }
       }
     }
 
@@ -300,7 +292,7 @@ export class Gradle2025Import extends WebViewBase {
       vendordeps.push('commandsv2');
     }
 
-    let success = false;
+    let success: boolean;
     if (language === 'cpp') {
       const gradlePath = path.join(
         gradleBasePath,
@@ -316,7 +308,6 @@ export class Gradle2025Import extends WebViewBase {
         vendordeps
       );
     } else if (language === 'java') {
-      const mainJavaFile = path.join(resourceRoot, 'java', 'src', 'Main.java');
       const gradlePath = path.join(
         gradleBasePath,
         data.romi ? 'javaromi' : data.xrp ? 'javaxrp' : 'java'
@@ -327,7 +318,7 @@ export class Gradle2025Import extends WebViewBase {
         undefined,
         gradlePath,
         toFolder,
-        mainJavaFile,
+        undefined,
         javaRobotPackage,
         '',
         true,

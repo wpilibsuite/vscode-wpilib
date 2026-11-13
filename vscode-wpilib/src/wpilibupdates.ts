@@ -195,7 +195,7 @@ async function checkForGradleRIOUpdate(currentVersion: string): Promise<IOnlineT
 }
 
 async function checkForRemoteGradleRIOUpdate(currentVersion: string): Promise<string | undefined> {
-  const metaDataUrl = 'https://plugins.gradle.org/m2/edu/wpi/first/GradleRIO/maven-metadata.xml';
+  const metaDataUrl = 'https://plugins.gradle.org/m2/org/wpilib/GradleRIO/maven-metadata.xml';
   try {
     const response = await fetch(metaDataUrl, {
       signal: AbortSignal.timeout(5000),

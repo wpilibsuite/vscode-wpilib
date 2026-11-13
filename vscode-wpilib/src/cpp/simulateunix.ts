@@ -64,7 +64,7 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
     }
   }
 
-  logger.log('C++ Unix Simulation: ', config);
+  logger.log('C++ Unix Simulation: ' + JSON.stringify(config, null, 2));
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }
