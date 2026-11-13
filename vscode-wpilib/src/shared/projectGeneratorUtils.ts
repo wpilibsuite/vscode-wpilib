@@ -89,6 +89,19 @@ export async function setupProjectStructure(
   }
 }
 
+export async function copyGradleBase(fromGradleFolder: string, toFolder: string): Promise<boolean> {
+  try {
+    await cp(fromGradleFolder, toFolder, {
+      filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
+      recursive: true,
+    });
+    return true;
+  } catch (error) {
+    logger.error('Failed to copy gradle base', error);
+    return false;
+  }
+}
+
 /**
  * Update Gradle version in the build.gradle file
  */

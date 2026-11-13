@@ -83,6 +83,13 @@ export async function gradleRun(
   return executeApi.executeCommand(command, name, rootDir, workspace, varCommands);
 }
 
+export function quoteShellArg(arg: string): string {
+  if (getIsWindows()) {
+    return `"${arg}"`;
+  }
+  return `'${arg.replace(/'/g, `'\\''`)}'`;
+}
+
 export let extensionContext: vscode.ExtensionContext;
 export function setExtensionContext(context: vscode.ExtensionContext): void {
   extensionContext = context;

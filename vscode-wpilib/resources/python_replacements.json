@@ -1,0 +1,16 @@
+[
+  {
+    "fileMatcher": "**/*.py",
+    "flags": "g",
+    "replacements": [
+      {
+        "from": "robotInit",
+        "to": "__init__"
+      },
+      {
+        "from": "wpilib.drive.DifferentialDrive",
+        "to": "wpilib.DifferentialDrive"
+      }
+    ]
+  }
+]

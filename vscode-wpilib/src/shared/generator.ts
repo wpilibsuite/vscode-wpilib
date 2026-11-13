@@ -165,7 +165,6 @@ export async function generateCopyJava(
 
     // Setup vendor dependencies
     await genUtils.setupVendorDeps(resourcesFolder, toFolder, vendordeps);
-
     return true;
   } catch (e) {
     logger.error('Java project creation failure', e);

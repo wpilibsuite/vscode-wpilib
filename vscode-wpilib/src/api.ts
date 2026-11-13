@@ -116,6 +116,7 @@ export interface IPreferences {
   setCurrentLanguage(language: string): Promise<void>;
   getAutoStartRioLog(): boolean;
   getAutoSaveOnDeploy(): boolean;
+  getIsRobotPyProject(): boolean;
   getIsWPILibProject(): boolean;
   getEnableCppIntellisense(): boolean;
   setEnableCppIntellisense(set: boolean): Promise<void>;

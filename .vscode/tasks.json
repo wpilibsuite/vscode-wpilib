@@ -4,8 +4,8 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "vscode-web-watch",
       "type": "npm",
-      "identifier": "vscode-web-watch",
       "script": "webpack-watch",
       "path": "vscode-wpilib/",
       "isBackground": true,
@@ -16,7 +16,7 @@
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc-watch"
     }
   ]
 }

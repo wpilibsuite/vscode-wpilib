@@ -37,6 +37,7 @@ export async function requestTeamNumber(): Promise<number> {
 export class Preferences implements IPreferences {
   public static readonly preferenceFileName: string = 'wpilib_preferences.json';
   public static readonly wpilibPreferencesFolder: string = '.wpilib';
+  public static readonly pyprojectFileName: string = 'pyproject.toml';
 
   // Create for a specific workspace
   public static async Create(workspace: vscode.WorkspaceFolder): Promise<Preferences> {
@@ -55,8 +56,11 @@ export class Preferences implements IPreferences {
   private preferencesFile?: vscode.Uri;
   private preferencesJson: IPreferencesJson = defaultPreferences;
   private configFileWatcher: vscode.FileSystemWatcher;
+  private pyFileWatcher: vscode.FileSystemWatcher;
   private readonly preferencesGlob: string = '**/' + Preferences.preferenceFileName;
+  private readonly pyprojectGlob: string = '**/' + Preferences.pyprojectFileName;
   private disposables: vscode.Disposable[] = [];
+  private isRobotPyProject: boolean = false;
   private isWPILibProject: boolean = false;
 
   private constructor(workspace: vscode.WorkspaceFolder) {
@@ -84,6 +88,40 @@ export class Preferences implements IPreferences {
     this.configFileWatcher.onDidChange(async () => {
       await this.updatePreferences();
     });
+
+    const py = new vscode.RelativePattern(workspace, this.pyprojectGlob);
+
+    this.pyFileWatcher = vscode.workspace.createFileSystemWatcher(py);
+    this.disposables.push(this.pyFileWatcher);
+
+    this.pyFileWatcher.onDidCreate(() => this.updateIsRobotPyProject());
+    this.pyFileWatcher.onDidDelete(() => this.updateIsRobotPyProject());
+    this.pyFileWatcher.onDidChange(() => this.updateIsRobotPyProject());
+  }
+
+  public getIsRobotPyProject(): boolean {
+    return this.isRobotPyProject;
+  }
+
+  private computeIsRobotPyProject(): boolean {
+    const language = this.preferencesJson.currentLanguage;
+    if (language === 'java' || language === 'cpp') {
+      return false;
+    }
+    try {
+      const pyproject = fs.readFileSync(
+        path.join(this.workspace.uri.fsPath, Preferences.pyprojectFileName),
+        'utf8'
+      );
+      return /^\s*\[\s*tool\.robotpy\s*\]/m.test(pyproject);
+    } catch {
+      return false;
+    }
+  }
+
+  private updateIsRobotPyProject(): void {
+    this.isRobotPyProject = this.computeIsRobotPyProject();
+    void vscode.commands.executeCommand('setContext', 'isRobotPyProject', this.isRobotPyProject);
   }
 
   public getIsWPILibProject(): boolean {
@@ -154,6 +192,7 @@ export class Preferences implements IPreferences {
   public async setCurrentLanguage(language: string): Promise<void> {
     this.preferencesJson.currentLanguage = language;
     await this.writePreferences();
+    this.updateIsRobotPyProject();
   }
 
   public getAutoStartRioLog(): boolean {
@@ -212,6 +251,7 @@ export class Preferences implements IPreferences {
       // Set up defaults, and create
       this.preferencesJson = defaultPreferences;
     }
+    this.updateIsRobotPyProject();
   }
 
   private getConfiguration(): vscode.WorkspaceConfiguration {
@@ -221,11 +261,13 @@ export class Preferences implements IPreferences {
   private async updatePreferences() {
     if (!this.preferencesFile) {
       this.preferencesJson = defaultPreferences;
+      this.updateIsRobotPyProject();
       return;
     }
 
     const results = await readFile(this.preferencesFile.fsPath, 'utf8');
     this.preferencesJson = jsonc.parse(results) as IPreferencesJson;
+    this.updateIsRobotPyProject();
   }
 
   private async writePreferences(): Promise<void> {
