@@ -106,7 +106,6 @@ interface IStringArray {
   items: IStringItem[];
 }
 
-
 export function findStringArray(file: string, key: string): IStringArray | undefined {
   const header = /^[ \t]*\[[ \t]*tool\.robotpy[ \t]*\][ \t]*(?:#.*)?$/m.exec(file);
   if (!header) {
@@ -181,7 +180,6 @@ function removeArrayItem(file: string, arr: IStringArray, index: number): string
   }
   return file.substring(0, start) + file.substring(end);
 }
-
 
 function writeComponents(file: string, enabled: Set<string>): string {
   let block = 'components = [';

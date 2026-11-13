@@ -103,7 +103,6 @@ export class Preferences implements IPreferences {
     return this.isRobotPyProject;
   }
 
-
   private computeIsRobotPyProject(): boolean {
     const language = this.preferencesJson.currentLanguage;
     if (language === 'java' || language === 'cpp') {
