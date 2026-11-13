@@ -50,16 +50,33 @@ export async function robotpyRun(
   return executeApi.executeCommand(command, name, rootDir, workspace);
 }
 
-export async function getPythonVersion(): Promise<string | undefined> {
+const minimumPythonVersion = { major: 3, minor: 11 };
+
+export interface IPythonVersion {
+  full: string;
+  major: number;
+  minor: number;
+}
+
+export async function getPythonVersion(pythonPath = 'python'): Promise<IPythonVersion | undefined> {
   try {
-    const version = cp.execSync('python --version').toString();
-    const match: RegExpMatchArray | null = version.match(/\d+/g);
-    const versionNum = match?.join('.');
-    return versionNum;
-  } catch (error) {
-    logger.log('Error getting python version');
+    const { stdout, stderr } = await execFileAsync(pythonPath, ['--version'], {
+      encoding: 'utf8',
+    });
+    const match = /(\d+)\.(\d+)(?:\.\d+)?/.exec(stdout || stderr);
+    if (!match) {
+      logger.log(`Could not read a Python version from ${pythonPath}`);
+      return undefined;
+    }
+    return {
+      full: match[0],
+      major: parseInt(match[1], 10),
+      minor: parseInt(match[2], 10),
+    };
+  } catch {
+    logger.log(`Error getting python version from ${pythonPath}`);
+    return undefined;
   }
-  return undefined;
 }
 
 export async function getRobotPyVersion(wp?: string): Promise<string | undefined> {
@@ -97,11 +114,12 @@ export async function setupVenv(
   wp: vscode.WorkspaceFolder
 ): Promise<boolean> {
   try {
-    let pyVer = await getPythonVersion();
-    if (pyVer) {
-      pyVer = pyVer.substring(0, 4);
+    const pythonPath = await findPythonPath();
+    if (!pythonPath) {
+      logger.log('No suitable Python found on the PATH, letting uv pick an interpreter');
     }
-    const venvArgs = `--python ${pyVer} --allow-existing --seed${uvFindLinksOption()}`;
+    const pythonOption = pythonPath ? ` --python ${quoteShellArg(pythonPath)}` : '';
+    const venvArgs = `--allow-existing --seed${pythonOption}${uvFindLinksOption()}`;
     let cmd = `uv venv ${venvArgs}`;
     let num = await executeApi.executeCommand(cmd, 'Set Up Venv', wp.uri.fsPath, wp);
     if (num !== 0) {
@@ -127,39 +145,47 @@ export async function setupVenv(
   }
 }
 
-async function checkPythonPath(path: string | undefined, source: string) {
-  if (path) {
-    try {
-      const pyVersion = await getPythonVersion();
-      const regexp = /1[2-6]/g;
-      const version = pyVersion?.match(regexp);
-      if (version && version.toString() >= '11') {
-        logger.log(`Found ${source} Version: ${pyVersion} at ${path}`);
-        return true;
-      } else {
-        logger.info(`Bad Python version ${pyVersion} at ${path} from ${source}`);
-      }
-    } catch (err) {
-      logger.log(`Error loading python from ${source}, skipping`, err);
-    }
+async function checkPythonPath(pythonPath: string, source: string): Promise<boolean> {
+  const version = await getPythonVersion(pythonPath);
+  if (!version) {
+    logger.info(`Could not read a Python version at ${pythonPath} from ${source}`);
+    return false;
   }
-  return false;
+  if (
+    version.major < minimumPythonVersion.major ||
+    (version.major === minimumPythonVersion.major && version.minor < minimumPythonVersion.minor)
+  ) {
+    logger.info(
+      `Bad Python version ${version.full} at ${pythonPath} from ${source}, ` +
+        `${minimumPythonVersion.major}.${minimumPythonVersion.minor} or newer is required`
+    );
+    return false;
+  }
+  logger.log(`Found ${source} Version: ${version.full} at ${pythonPath}`);
+  return true;
 }
 
 export async function findPythonPath(): Promise<string | undefined> {
-  let cmd = 'python';
-  if (getIsWindows()) {
-    cmd = 'where ' + cmd;
-  } else {
-    cmd = 'which ' + cmd;
-  }
-  try {
-    const vscodePythonPath = cp.execSync(cmd, { encoding: 'utf-8' });
-    if (await checkPythonPath(vscodePythonPath, 'Execute Command Output')) {
-      return vscodePythonPath;
+  const locator = getIsWindows() ? 'where' : 'which';
+  for (const name of ['python3', 'python']) {
+    let output: string;
+    try {
+      output = cp.execSync(`${locator} ${name}`, {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+    } catch {
+      continue;
     }
-  } catch {
-    return undefined;
+    const candidates = output
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line !== '');
+    for (const candidate of candidates) {
+      if (await checkPythonPath(candidate, `${locator} ${name}`)) {
+        return candidate;
+      }
+    }
   }
   return undefined;
 }

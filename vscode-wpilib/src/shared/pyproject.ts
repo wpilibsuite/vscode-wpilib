@@ -106,8 +106,10 @@ interface IStringArray {
   items: IStringItem[];
 }
 
+const robotpyHeaderRegex = /^[ \t]*\[[ \t]*tool\.robotpy[ \t]*\][ \t]*(?:#.*)?$/m;
+
 export function findStringArray(file: string, key: string): IStringArray | undefined {
-  const header = /^[ \t]*\[[ \t]*tool\.robotpy[ \t]*\][ \t]*(?:#.*)?$/m.exec(file);
+  const header = robotpyHeaderRegex.exec(file);
   if (!header) {
     return undefined;
   }
@@ -181,7 +183,7 @@ function removeArrayItem(file: string, arr: IStringArray, index: number): string
   return file.substring(0, start) + file.substring(end);
 }
 
-function writeComponents(file: string, enabled: Set<string>): string {
+function componentsBlock(enabled: Set<string>): string {
   let block = 'components = [';
   for (const component of allComponents) {
     block += enabled.has(component) ? `\n    "${component}",` : `\n    # "${component}",`;
@@ -191,7 +193,22 @@ function writeComponents(file: string, enabled: Set<string>): string {
       block += `\n    "${component}",`;
     }
   }
-  return file.replace(/components = \[[\s\S]*?\]/, block + '\n]');
+  return block + '\n]';
+}
+
+
+function writeComponents(file: string, enabled: Set<string>): string | undefined {
+  const arr = findStringArray(file, 'components');
+  if (arr) {
+    const keyStart = file.lastIndexOf('\n', arr.open) + 1;
+    return file.substring(0, keyStart) + componentsBlock(enabled) + file.substring(arr.close + 1);
+  }
+  const header = robotpyHeaderRegex.exec(file);
+  if (!header) {
+    return undefined;
+  }
+  const insertAt = header.index + header[0].length;
+  return file.substring(0, insertAt) + '\n\n' + componentsBlock(enabled) + file.substring(insertAt);
 }
 
 function readEnabledComponents(file: string): Set<string> {
@@ -212,7 +229,12 @@ export async function enableComponents(workspace: string, components: string[]):
     for (const component of components) {
       enabled.add(component);
     }
-    await writeFile(getPyProjectPath(workspace), writeComponents(file, enabled), 'utf8');
+    const updated = writeComponents(file, enabled);
+    if (updated === undefined) {
+      logger.log('No [tool.robotpy] table found in pyproject.toml, add the components manually');
+      return false;
+    }
+    await writeFile(getPyProjectPath(workspace), updated, 'utf8');
     return true;
   } catch (err) {
     logger.log('Error enabling python components, add them manually', err);
@@ -227,7 +249,12 @@ export async function disableComponents(workspace: string, components: string[])
     for (const component of components) {
       enabled.delete(component);
     }
-    await writeFile(getPyProjectPath(workspace), writeComponents(file, enabled), 'utf8');
+    const updated = writeComponents(file, enabled);
+    if (updated === undefined) {
+      logger.log('No [tool.robotpy] table found in pyproject.toml, remove the components manually');
+      return false;
+    }
+    await writeFile(getPyProjectPath(workspace), updated, 'utf8');
     return true;
   } catch (err) {
     logger.log('Error disabling python components, remove them manually', err);
@@ -235,13 +262,35 @@ export async function disableComponents(workspace: string, components: string[])
   }
 }
 
+async function addRequiresArray(
+  workspace: string,
+  file: string,
+  requires: IRequires[]
+): Promise<boolean> {
+  const header = robotpyHeaderRegex.exec(file);
+  if (!header) {
+    logger.log('No [tool.robotpy] table found in pyproject.toml, add the requirements manually');
+    return false;
+  }
+  const rendered = requires
+    .map((req) => formatRequirement({ ...req, specifier: req.specifier ?? '~=' }))
+    .join(', ');
+  const insertAt = header.index + header[0].length;
+  await writeFile(
+    getPyProjectPath(workspace),
+    `${file.substring(0, insertAt)}\n\nrequires = [${rendered}]${file.substring(insertAt)}`,
+    'utf8'
+  );
+  return true;
+}
+
 export async function addRequirements(workspace: string, requires: IRequires[]): Promise<boolean> {
   try {
     const file = await readFile(getPyProjectPath(workspace), 'utf8');
     const arr = findRequiresArray(file);
     if (!arr) {
-      logger.log('No [tool.robotpy] requires array found in pyproject.toml');
-      return false;
+      // The key is optional, so add it rather than dropping the requirements on the floor.
+      return addRequiresArray(workspace, file, requires);
     }
     const declared = new Set(arr.items.map((it) => parseRequirement(it.value).name));
     let toAdd = '';

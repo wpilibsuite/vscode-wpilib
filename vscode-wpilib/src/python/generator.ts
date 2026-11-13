@@ -6,10 +6,39 @@ import { logger } from '../logger';
 import { componentForVendorDep } from '../shared/components';
 import * as pathUtils from '../shared/pathUtils';
 import * as genUtils from '../shared/projectGeneratorUtils';
-import { enableComponents, getPyProjectPath, setRobotPyVersion } from '../shared/pyproject';
+import {
+  addRequirements,
+  enableComponents,
+  getPyProjectPath,
+  IRequires,
+  setRobotPyVersion,
+} from '../shared/pyproject';
 import { getWPILibYear } from '../shared/utilitiesapi';
 import { getRobotPyVersion } from '../pythondetector';
 import { getAvailableVersions } from './packages';
+
+
+const notProjectSources = new Set([
+  '.git',
+  '.gradle',
+  '.mypy_cache',
+  '.pytest_cache',
+  '.ruff_cache',
+  '.venv',
+  '__pycache__',
+  'node_modules',
+  'venv',
+]);
+
+function isProjectSource(sourcePath: string, root: string): boolean {
+  const relative = path.relative(root, sourcePath);
+  if (relative === '') {
+    return true;
+  }
+  return !relative
+    .split(path.sep)
+    .some((part) => notProjectSources.has(part) || part.endsWith('.egg-info'));
+}
 
 async function resolveRobotPyVersion(cwd: string): Promise<string | undefined> {
   const year = getWPILibYear().substring(0, 4);
@@ -42,9 +71,15 @@ export async function generateCopyPython(
     const pyprojectPath = getPyProjectPath(toFolder);
 
     // Copy template folders
-    await cp(fromTemplateFolder, toFolder, { recursive: true });
+    await cp(fromTemplateFolder, toFolder, {
+      filter: (source) => isProjectSource(source, fromTemplateFolder),
+      recursive: true,
+    });
     if (fromTemplateTestFolder !== undefined) {
-      await cp(fromTemplateTestFolder, testPath, { recursive: true });
+      await cp(fromTemplateTestFolder, testPath, {
+        filter: (source) => isProjectSource(source, fromTemplateTestFolder),
+        recursive: true,
+      });
     }
 
     let existingPyProject: string | undefined;
@@ -68,10 +103,24 @@ export async function generateCopyPython(
       await setRobotPyVersion(pyprojectPath, '');
     }
 
-    const components = vendordeps
-      .map((v) => componentForVendorDep(v))
-      .filter((c): c is string => c !== undefined);
-    await enableComponents(toFolder, components);
+    const components: string[] = [];
+    const requirements: IRequires[] = [];
+    for (const vendordep of vendordeps) {
+      const component = componentForVendorDep(vendordep);
+      if (component !== undefined) {
+        components.push(component);
+      } else {
+        requirements.push({ name: vendordep, availableVersions: [] });
+      }
+    }
+    if (components.length > 0 && !(await enableComponents(toFolder, components))) {
+      logger.warn(`Could not enable RobotPy components: ${components.join(', ')}`);
+    }
+    if (requirements.length > 0 && !(await addRequirements(toFolder, requirements))) {
+      logger.warn(
+        `Could not add Python requirements: ${requirements.map((r) => r.name).join(', ')}`
+      );
+    }
 
     return true;
   } catch (e) {

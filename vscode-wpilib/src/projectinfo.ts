@@ -104,7 +104,7 @@ export class ProjectInfoGatherer {
     const jdkLoc = await findJdkPath(this.externalApi);
     const jdkVer = !jdkLoc ? 'unknown' : (await getJavaVersion(jdkLoc)).full;
     const pyPath = await findPythonPath();
-    const pyVer = !pyPath ? 'unknown' : await getPythonVersion();
+    const pyVer = !pyPath ? 'unknown' : ((await getPythonVersion(pyPath))?.full ?? 'unknown');
     const debugExt = extensionVersion(wpilibExtensionIds.javaDebug);
     const depViewer = extensionVersion(wpilibExtensionIds.javaDependencies);
     const javaExt = extensionVersion(wpilibExtensionIds.java);
@@ -134,7 +134,7 @@ Java Dependencies Extension Version: ${depViewer}
 Java Version: ${jdkVer}
 Java Location: ${jdkLoc}
 Python Version: ${pyVer}
-Python Location: ${pyPath}
+Python Location: ${pyPath ?? 'unknown'}
 Vendor Libraries: ${vendorLibs}
 VS Code Extensions: ${extensionList}
 `;
