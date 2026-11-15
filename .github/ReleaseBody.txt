@@ -1,5 +1,5 @@
-# For Alpha Teams Only
+# For Beta Teams Only
 
-This release is for alpha teams only. Please download the latest stable release (v2026.2.1) if you are not an alpha team. You can find v2026.2.1 at https://github.com/wpilibsuite/vscode-wpilib/releases/tag/v2026.2.1
+This release is for beta teams only. Please download the latest stable release (v2026.2.1) if you are not a beta team. You can find v2026.2.1 at https://github.com/wpilibsuite/vscode-wpilib/releases/tag/v2026.2.1
 
 However, it is strongly recommended to use the full installer at https://github.com/wpilibsuite/allwpilib/releases/tag/v2026.2.1

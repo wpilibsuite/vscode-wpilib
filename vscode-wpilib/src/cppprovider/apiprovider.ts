@@ -2,7 +2,7 @@
 
 import { readFile } from 'fs/promises';
 import * as jsonc from 'jsonc-parser';
-import * as mm from 'micromatch';
+import mm from 'micromatch';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import {
@@ -196,19 +196,15 @@ export class ApiProvider implements CustomConfigurationProvider {
 
     this.disposables.push(this.binaryTypeStatusBar);
 
-    /* eslint-disable @typescript-eslint/unbound-method */
     this.disposables.push(this.configWatcher.onDidChange(this.onCreateOrChange, this));
     this.disposables.push(this.configWatcher.onDidCreate(this.onCreateOrChange, this));
     this.disposables.push(this.configWatcher.onDidDelete(this.onDelete, this));
-    /* eslint-enable @typescript-eslint/unbound-method */
 
     this.setupWatchers();
 
     this.loadConfigs().catch(() => {});
   }
 
-  // Disable this because upstream requires these methods to be async, but we don't use await in several of them
-  /* eslint-disable @typescript-eslint/require-await */
   public async canProvideBrowseConfigurationsPerFolder(
     _?: vscode.CancellationToken
   ): Promise<boolean> {
@@ -278,7 +274,7 @@ export class ApiProvider implements CustomConfigurationProvider {
   public async loadConfigs(): Promise<boolean> {
     this.toolchains = [];
 
-    let file = '';
+    let file: string;
     try {
       file = await readFile(path.join(this.workspace.uri.fsPath, 'build', this.configFile), 'utf8');
     } catch (err) {
@@ -497,11 +493,9 @@ export class ApiProvider implements CustomConfigurationProvider {
       this.gradleWatcher = vscode.workspace.createFileSystemWatcher(gradlePattern);
       this.disposables.push(this.gradleWatcher);
 
-      /* eslint-disable @typescript-eslint/unbound-method */
       this.gradleWatcher.onDidChange(this.couldBeUpdated, this, this.disposables);
       this.gradleWatcher.onDidCreate(this.couldBeUpdated, this, this.disposables);
       this.gradleWatcher.onDidDelete(this.couldBeUpdated, this, this.disposables);
-      /* eslint-enable @typescript-eslint/unbound-method */
 
       onVendorDepsChanged(
         async (wp) => {

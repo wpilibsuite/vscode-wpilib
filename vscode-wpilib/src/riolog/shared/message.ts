@@ -78,7 +78,6 @@ export class ErrorMessage implements IMessage {
     count += tmp.byteLength;
     tmp = this.getSizedString(data, count);
     this.callStack = tmp.data;
-    count += tmp.byteLength;
     this.messageType = (this.flags & 1) !== 0 ? MessageType.Error : MessageType.Warning;
   }
 

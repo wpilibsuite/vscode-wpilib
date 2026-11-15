@@ -183,7 +183,7 @@ export class Gradle2025Import extends WebViewBase {
     // Detect C++ or Java project
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
-    let cpp = true;
+    let cpp: boolean;
     try {
       const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
@@ -282,7 +282,7 @@ export class Gradle2025Import extends WebViewBase {
       vendordeps.push('commandsv2');
     }
 
-    let success = false;
+    let success: boolean;
     if (cpp) {
       const gradlePath = path.join(
         gradleBasePath,
