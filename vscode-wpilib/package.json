@@ -146,13 +146,6 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
-                "command": "wpilibcore.startTool",
-                "title": "%wpilibcore.startTool.title%",
-                "category": "WPILib",
-                "icon": "resources/wpilib-icon.svg",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
                 "command": "wpilibcore.buildCode",
                 "title": "%wpilibcore.buildCode.title%",
                 "category": "WPILib",
@@ -268,12 +261,6 @@
                 "enablement": "isWorkspaceTrusted"
             },
             {
-                "command": "wpilibcore.installGradleTools",
-                "title": "%wpilibcore.installGradleTools.title%",
-                "category": "WPILib",
-                "enablement": "isWorkspaceTrusted"
-            },
-            {
                 "command": "wpilibcore.showLogFolder",
                 "title": "%wpilibcore.showLogFolder.title%",
                 "category": "WPILib"
@@ -384,10 +371,6 @@
                     "when": "isWPILibProject",
                     "command": "wpilibcore.simulateHwCode",
                     "group": "wpilib@5"
-                },
-                {
-                    "command": "wpilibcore.startTool",
-                    "group": "wpilib@6"
                 }
             ],
             "explorer/context": [

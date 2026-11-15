@@ -9,9 +9,8 @@ import { localize as i18n } from './locale';
 import { logger } from './logger';
 import { requestTeamNumber } from './preferences';
 import { setDesktopEnabled } from './shared/generator';
-import { ToolAPI } from './toolapi';
-import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
 import { getWPILibHomeDir } from './shared/utilitiesapi';
+import { getDesktopEnabled, gradleRun, javaHome } from './utilities';
 import { getUpdatePersistentState } from './wpilibupdates';
 
 // Most of our commands are created here.
@@ -48,12 +47,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
         return;
       }
       await preferences.setTeamNumber(teamNumber);
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.startTool', async () => {
-      await externalApi.getToolAPI().startTool();
     })
   );
 
@@ -212,20 +205,6 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       await vscode.window.showInformationMessage(
         i18n('message', 'Successfully set java.jdt.ls.java.home')
       );
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('wpilibcore.installGradleTools', async () => {
-      const preferencesApi = externalApi.getPreferencesAPI();
-      const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (!workspace || !preferencesApi.getPreferences(workspace).getIsWPILibProject()) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Cannot install gradle tools since this is not a WPILib project')
-        );
-        return;
-      }
-      await ToolAPI.InstallToolsFromGradle(workspace, externalApi);
     })
   );
 
