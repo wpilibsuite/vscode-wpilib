@@ -799,6 +799,7 @@
       { "from": "DriverStation::IsDSAttached\\(\\)", "to": "RobotState::IsDSAttached()" },
       { "from": "TestInit\\(\\)", "to": "UtilityInit()" },
       { "from": "TestPeriodic\\(\\)", "to": "UtilityPeriodic()" },
+      { "from": "TestExit\\(\\)", "to": "UtilityExit()" },
       { "from": "SmartDashboard::PutNumber", "to": "telemetry::Log" },
       { "from": "SmartDashboard::PutString", "to": "telemetry::Log" },
       { "from": "SmartDashboard::PutBoolean", "to": "telemetry::Log" }
