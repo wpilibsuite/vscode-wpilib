@@ -587,7 +587,46 @@
       {
         "from": "org.wpilib.smartdashboard.SmartDashboard;",
         "to": "org.wpilib.telemetry.Telemetry;\nimport org.wpilib.tunable.Tunable;\nimport org.wpilib.tunable.Selectable;"
-      }
+      },
+      { "from": "org.wpilib.math.util.Units", "to": "org.wpilib.math.util.UnitConversions" },
+      { "from": "Units\\.metersToFeet\\(", "to": "UnitConversions.metersToFeet(" },
+      { "from": "Units\\.feetToMeters\\(", "to": "UnitConversions.feetToMeters(" },
+      { "from": "Units\\.metersToInches\\(", "to": "UnitConversions.metersToInches(" },
+      { "from": "Units\\.inchesToMeters\\(", "to": "UnitConversions.inchesToMeters(" },
+      { "from": "Units\\.degreesToRadians\\(", "to": "UnitConversions.degreesToRadians(" },
+      { "from": "Units\\.radiansToDegrees\\(", "to": "UnitConversions.radiansToDegrees(" },
+      { "from": "Units\\.radiansToRotations\\(", "to": "UnitConversions.radiansToRotations(" },
+      { "from": "Units\\.degreesToRotations\\(", "to": "UnitConversions.degreesToRotations(" },
+      { "from": "Units\\.rotationsToDegrees\\(", "to": "UnitConversions.rotationsToDegrees(" },
+      { "from": "Units\\.rotationsToRadians\\(", "to": "UnitConversions.rotationsToRadians(" },
+      {
+        "from": "Units\\.rotationsPerMinuteToRadiansPerSecond\\(",
+        "to": "UnitConversions.rotationsPerMinuteToRadiansPerSecond("
+      },
+      {
+        "from": "Units\\.radiansPerSecondToRotationsPerMinute\\(",
+        "to": "UnitConversions.radiansPerSecondToRotationsPerMinute("
+      },
+      {
+        "from": "Units\\.milesPerHourToMetersPerSecond\\(",
+        "to": "UnitConversions.milesPerHourToMetersPerSecond("
+      },
+      {
+        "from": "Units\\.metersPerSecondToMilesPerHour\\(",
+        "to": "UnitConversions.metersPerSecondToMilesPerHour("
+      },
+      {
+        "from": "Units\\.millisecondsToSeconds\\(",
+        "to": "UnitConversions.millisecondsToSeconds("
+      },
+      {
+        "from": "Units\\.secondsToMilliseconds\\(",
+        "to": "UnitConversions.secondsToMilliseconds("
+      },
+      { "from": "Units\\.kilogramsToLbs\\(", "to": "UnitConversions.kilogramsToLbs(" },
+      { "from": "Units\\.lbsToKilograms\\(", "to": "UnitConversions.lbsToKilograms(" },
+      { "from": "SysIdRoutine.Direction.kForward", "to": "SysIdRoutine.Direction.FORWARD" },
+      { "from": "SysIdRoutine.Direction.kReverse", "to": "SysIdRoutine.Direction.REVERSE" }
     ]
   }
 ]

@@ -184,12 +184,12 @@
       { "from": "HALSimXRP.h", "to": "wpi/halsim/xrp/HALSimXRP.hpp" },
       { "from": "HALSimXRPClient.h", "to": "wpi/halsim/xrp/HALSimXRPClient.hpp" },
       { "from": "XRP.h", "to": "wpi/halsim/xrp/XRP.hpp" },
-      { "from": "frc2/command/([\\w/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
-      { "from": "frc/controller/([\\w/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
-      { "from": "units/([\\w/]*)\\.h", "to": "wpi/units/$1.hpp" },
-      { "from": "hal/([\\w/]*)\\.h", "to": "wpi/hal/$1.h" },
-      { "from": "cameraserver/([\\w/]*)\\.h", "to": "wpi/cameraserver/$1.hpp" },
-      { "from": "frc/([\\w/]*)\\.h", "to": "wpi/$1.hpp" },
+      { "from": "frc2/command/([\\w\/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
+      { "from": "frc/controller/([\\w\/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
+      { "from": "units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
+      { "from": "(?<!wpi/)hal/([\\w\\/]*)\\.h", "to": "wpi/hal/$1.h" },
+      { "from": "(?<!wpi/)cameraserver/([\\w\/]*)\\.h", "to": "wpi/cameraserver/$1.hpp" },
+      { "from": "frc/([\\w\/]*)\\.h", "to": "wpi/$1.hpp" },
       {
         "from": "(\"|\\<)wpi/driverstation/DriverStation.hpp(\"|\\>)",
         "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\""
@@ -750,6 +750,7 @@
       { "from": " cs::", "to": " wpi::cs::" },
       { "from": "([ {])nt::", "to": "$1wpi::nt::" },
       { "from": "frc::ObjectToRobotPose", "to": "wpi::math::ObjectToRobotPose" },
+      { "from": "frc2::cmd::", "to": "wpi::cmd::" },
       { "from": "frc2::", "to": "wpi::cmd::" },
       { "from": "frc::", "to": "wpi::" },
       { "from": "hal::", "to": "wpi::hal::" },
@@ -758,9 +759,9 @@
       { "from": "GradientType::kDiscrete", "to": "GradientType::DISCRETE" },
       { "from": "CTREPCM", "to": "CTRE_PCM" },
       { "from": "REVPH", "to": "REV_PH" },
-      { "from": "DoubleSolenoid::kOff", "to": "DoubleSolenoid::OFF" },
-      { "from": "DoubleSolenoid::kForward", "to": "DoubleSolenoid::FORWARD" },
-      { "from": "DoubleSolenoid::kReverse", "to": "DoubleSolenoid::REVERSE" },
+      { "from": "DoubleSolenoid::Value::kOff", "to": "DoubleSolenoid::Value::OFF" },
+      { "from": "DoubleSolenoid::Value::kForward", "to": "DoubleSolenoid::Value::FORWARD" },
+      { "from": "DoubleSolenoid::Value::kReverse", "to": "DoubleSolenoid::Value::REVERSE" },
       { "from": "ColorOrder::kRGB", "to": "ColorOrder::RGB" },
       { "from": "ColorOrder::kBGR", "to": "ColorOrder::BGR" },
       { "from": "ColorOrder::kGRB", "to": "ColorOrder::GRB" },
@@ -802,7 +803,9 @@
       { "from": "TestExit\\(\\)", "to": "UtilityExit()" },
       { "from": "SmartDashboard::PutNumber", "to": "telemetry::Log" },
       { "from": "SmartDashboard::PutString", "to": "telemetry::Log" },
-      { "from": "SmartDashboard::PutBoolean", "to": "telemetry::Log" }
+      { "from": "SmartDashboard::PutBoolean", "to": "telemetry::Log" },
+      { "from": "sysid::Direction::kForward", "to": "sysid::Direction::FORWARD" },
+      { "from": "sysid::Direction::kReverse", "to": "sysid::Direction::REVERSE" }
     ]
   }
 ]
