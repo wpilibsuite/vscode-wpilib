@@ -80,7 +80,7 @@
       { "from": "edu.wpi.first.wpilibj.UtilityClassTest", "to": "org.wpilib.UtilityClassTest" },
       {
         "from": "edu.wpi.first.wpilibj.DriverStation",
-        "to": "org.wpilib.driverstation.DriverStation"
+        "to": "org.wpilib.driverstation.MatchState;\nimport org.wpilib.driverstation.RobotState;\nimport org.wpilib.driverstation.Alliance;\nimport org.wpilib.driverstation.MatchType;\nimport org.wpilib.driverstation.DriverStationErrors;\norg.wpilib.driverstation.DriverStation;"
       },
       { "from": "edu.wpi.first.wpilibj.GenericHID", "to": "org.wpilib.driverstation.GenericHID" },
       { "from": "edu.wpi.first.wpilibj.Joystick", "to": "org.wpilib.driverstation.Joystick" },
@@ -404,10 +404,6 @@
       { "from": "DriverStation.isTestEnabled\\(\\)", "to": "RobotState.isUtilityEnabled()" },
       { "from": "DriverStation.isFMSAttached\\(\\)", "to": "RobotState.isFMSAttached()" },
       { "from": "DriverStation.isDSAttached\\(\\)", "to": "RobotState.isDSAttached()" },
-      {
-        "from": "org.wpilib.driverstation.DriverStation;",
-        "to": "org.wpilib.driverstation.MatchState;\nimport org.wpilib.driverstation.RobotState;\nimport org.wpilib.driverstation.Alliance;\nimport org.wpilib.driverstation.MatchType;\nimport org.wpilib.driverstation.DriverStationErrors;"
-      },
       { "from": "testInit\\(\\)", "to": "utilityInit()" },
       { "from": "testPeriodic\\(\\)", "to": "utilityPeriodic()" },
       { "from": "testExit\\(\\)", "to": "utilityExit()" },
