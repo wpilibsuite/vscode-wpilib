@@ -8,7 +8,7 @@
       { "from": "(?<!wpi/[^\\s]*)ntcore_c.h", "to": "wpi/nt/ntcore_c.h" },
       { "from": "(?<!wpi/[^\\s]*)ntcore_cpp.h", "to": "wpi/nt/ntcore_cpp.hpp" },
       { "from": "(?<!wpi/)hal/UsageReporting.h", "to": "wpi/hal/UsageReporting.h" },
-      { "from": "fields/fields.h", "to": "wpi/fields/fields.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)fields/fields.h", "to": "wpi/fields/fields.hpp" },
       { "from": "(?<!wpi/[^\\s]*)ntcore_c_types.h", "to": "wpi/nt/ntcore_c_types.h" },
       { "from": "(?<!wpi/[^\\s]*)ntcore_cpp_types.h", "to": "wpi/nt/ntcore_cpp_types.hpp" },
       { "from": "wpimath/MathShared.h", "to": "wpi/math/util/MathShared.hpp" },
@@ -29,11 +29,14 @@
       { "from": "(?<!wpi/[^\\s]*)cscore_c.h", "to": "wpi/cs/cscore_c.h" },
       { "from": "(?<!wpi/[^\\s]*)cscore_oo.h", "to": "wpi/cs/cscore_oo.hpp" },
       { "from": "(?<!wpi/[^\\s]*)cscore_runloop.h", "to": "wpi/cs/cscore_runloop.hpp" },
-      { "from": "wpigui_openurl.h", "to": "wpi/gui/wpigui_openurl.hpp" },
-      { "from": "(?<!wpi/[^\\s]*)portable-file-dialogs.h", "to": "wpi/gui/portable-file-dialogs.h" },
-      { "from": "wpigui_internal.h", "to": "wpi/gui/wpigui_internal.hpp" },
-      { "from": "wpigui.h", "to": "wpi/gui/wpigui.hpp" },
-      { "from": "WPILibVersion.h", "to": "wpi/system/WPILibVersion.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)wpigui_openurl.h", "to": "wpi/gui/wpigui_openurl.hpp" },
+      {
+        "from": "(?<!wpi/[^\\s]*)portable-file-dialogs.h",
+        "to": "wpi/gui/portable-file-dialogs.h"
+      },
+      { "from": "(?<!wpi/[^\\s]*)wpigui_internal.h", "to": "wpi/gui/wpigui_internal.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)wpigui.h", "to": "wpi/gui/wpigui.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)WPILibVersion.h", "to": "wpi/system/WPILibVersion.hpp" },
       { "from": "frc/DriverStation.h", "to": "wpi/driverstation/DriverStation.hpp" },
       { "from": "frc/GenericHID.h", "to": "wpi/driverstation/GenericHID.hpp" },
       { "from": "frc/Joystick.h", "to": "wpi/driverstation/Joystick.hpp" },
@@ -139,51 +142,87 @@
       { "from": "frc/motorcontrol/PWMTalonSRX.h", "to": "wpi/hardware/motor/PWMTalonSRX.hpp" },
       { "from": "frc/motorcontrol/PWMTalonFX.h", "to": "wpi/hardware/motor/PWMTalonFX.hpp" },
       { "from": "frc/motorcontrol/PWMSparkMax.h", "to": "wpi/hardware/motor/PWMSparkMax.hpp" },
-      { "from": "DSCommJoystickPacket.h", "to": "wpi/halsim/ds_socket/DSCommJoystickPacket.hpp" },
-      { "from": "DSCommPacket.h", "to": "wpi/halsim/ds_socket/DSCommPacket.hpp" },
-      { "from": "HALDataSource.h", "to": "wpi/halsim/gui/HALDataSource.hpp" },
-      { "from": "HALProvider.h", "to": "wpi/halsim/gui/HALProvider.hpp" },
-      { "from": "HALSimGui.h", "to": "wpi/halsim/gui/HALSimGui.hpp" },
-      { "from": "HALSimGuiExt.h", "to": "wpi/halsim/gui/HALSimGuiExt.hpp" },
-      { "from": "SimDeviceGui.h", "to": "wpi/halsim/gui/SimDeviceGui.hpp" },
-      { "from": "HALSimWS.h", "to": "wpi/halsim/ws_client/HALSimWS.hpp" },
-      { "from": "HALSimWSClient.h", "to": "wpi/halsim/ws_client/HALSimWSClient.hpp" },
       {
-        "from": "HALSimWSClientConnection.h",
+        "from": "(?<!wpi/[^\\s]*)DSCommJoystickPacket.h",
+        "to": "wpi/halsim/ds_socket/DSCommJoystickPacket.hpp"
+      },
+      { "from": "(?<!wpi/[^\\s]*)DSCommPacket.h", "to": "wpi/halsim/ds_socket/DSCommPacket.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALDataSource.h", "to": "wpi/halsim/gui/HALDataSource.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALProvider.h", "to": "wpi/halsim/gui/HALProvider.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALSimGui.h", "to": "wpi/halsim/gui/HALSimGui.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALSimGuiExt.h", "to": "wpi/halsim/gui/HALSimGuiExt.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)SimDeviceGui.h", "to": "wpi/halsim/gui/SimDeviceGui.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALSimWS.h", "to": "wpi/halsim/ws_client/HALSimWS.hpp" },
+      {
+        "from": "(?<!wpi/[^\\s]*)HALSimWSClient.h",
+        "to": "wpi/halsim/ws_client/HALSimWSClient.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)HALSimWSClientConnection.h",
         "to": "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
       },
       {
-        "from": "HALSimBaseWebSocketConnection.h",
+        "from": "(?<!wpi/[^\\s]*)HALSimBaseWebSocketConnection.h",
         "to": "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
       },
-      { "from": "WSBaseProvider.h", "to": "wpi/halsim/ws_core/WSBaseProvider.hpp" },
-      { "from": "WSHalProviders.h", "to": "wpi/halsim/ws_core/WSHalProviders.hpp" },
-      { "from": "WSProviderContainer.h", "to": "wpi/halsim/ws_core/WSProviderContainer.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)WSBaseProvider.h", "to": "wpi/halsim/ws_core/WSBaseProvider.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)WSHalProviders.h", "to": "wpi/halsim/ws_core/WSHalProviders.hpp" },
       {
-        "from": "WSProvider_AddressableLED.h",
+        "from": "(?<!wpi/[^\\s]*)WSProviderContainer.h",
+        "to": "wpi/halsim/ws_core/WSProviderContainer.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_AddressableLED.h",
         "to": "wpi/halsim/ws_core/WSProvider_AddressableLED.hpp"
       },
-      { "from": "WSProvider_Analog.h", "to": "wpi/halsim/ws_core/WSProvider_Analog.hpp" },
-      { "from": "WSProvider_DIO.h", "to": "wpi/halsim/ws_core/WSProvider_DIO.hpp" },
       {
-        "from": "WSProvider_DriverStation.h",
+        "from": "(?<!wpi/[^\\s]*)WSProvider_Analog.h",
+        "to": "wpi/halsim/ws_core/WSProvider_Analog.hpp"
+      },
+      { "from": "(?<!wpi/[^\\s]*)WSProvider_DIO.h", "to": "wpi/halsim/ws_core/WSProvider_DIO.hpp" },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_DriverStation.h",
         "to": "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
       },
-      { "from": "WSProvider_Encoder.h", "to": "wpi/halsim/ws_core/WSProvider_Encoder.hpp" },
-      { "from": "WSProvider_HAL.h", "to": "wpi/halsim/ws_core/WSProvider_HAL.hpp" },
-      { "from": "WSProvider_Joystick.h", "to": "wpi/halsim/ws_core/WSProvider_Joystick.hpp" },
-      { "from": "WSProvider_PCM.h", "to": "wpi/halsim/ws_core/WSProvider_PCM.hpp" },
-      { "from": "WSProvider_PWM.h", "to": "wpi/halsim/ws_core/WSProvider_PWM.hpp" },
-      { "from": "WSProvider_RoboRIO.h", "to": "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp" },
-      { "from": "WSProvider_SimDevice.h", "to": "wpi/halsim/ws_core/WSProvider_SimDevice.hpp" },
-      { "from": "WSProvider_Solenoid.h", "to": "wpi/halsim/ws_core/WSProvider_Solenoid.hpp" },
-      { "from": "WSProvider_dPWM.h", "to": "wpi/halsim/ws_core/WSProvider_dPWM.hpp" },
-      { "from": "HALSimHttpConnection.h", "to": "wpi/halsim/ws_server/HALSimHttpConnection.hpp" },
-      { "from": "HALSimWSServer.h", "to": "wpi/halsim/ws_server/HALSimWSServer.hpp" },
-      { "from": "HALSimWeb.h", "to": "wpi/halsim/ws_server/HALSimWeb.hpp" },
-      { "from": "HALSimXRP.h", "to": "wpi/halsim/xrp/HALSimXRP.hpp" },
-      { "from": "HALSimXRPClient.h", "to": "wpi/halsim/xrp/HALSimXRPClient.hpp" },
-      { "from": "XRP.h", "to": "wpi/halsim/xrp/XRP.hpp" },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_Encoder.h",
+        "to": "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
+      },
+      { "from": "(?<!wpi/[^\\s]*)WSProvider_HAL.h", "to": "wpi/halsim/ws_core/WSProvider_HAL.hpp" },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_Joystick.h",
+        "to": "wpi/halsim/ws_core/WSProvider_Joystick.hpp"
+      },
+      { "from": "(?<!wpi/[^\\s]*)WSProvider_PCM.h", "to": "wpi/halsim/ws_core/WSProvider_PCM.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)WSProvider_PWM.h", "to": "wpi/halsim/ws_core/WSProvider_PWM.hpp" },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_RoboRIO.h",
+        "to": "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_SimDevice.h",
+        "to": "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_Solenoid.h",
+        "to": "wpi/halsim/ws_core/WSProvider_Solenoid.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)WSProvider_dPWM.h",
+        "to": "wpi/halsim/ws_core/WSProvider_dPWM.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)HALSimHttpConnection.h",
+        "to": "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
+      },
+      {
+        "from": "(?<!wpi/[^\\s]*)HALSimWSServer.h",
+        "to": "wpi/halsim/ws_server/HALSimWSServer.hpp"
+      },
+      { "from": "(?<!wpi/[^\\s]*)HALSimWeb.h", "to": "wpi/halsim/ws_server/HALSimWeb.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALSimXRP.h", "to": "wpi/halsim/xrp/HALSimXRP.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)HALSimXRPClient.h", "to": "wpi/halsim/xrp/HALSimXRPClient.hpp" },
+      { "from": "(?<!wpi/[^\\s]*)XRP.h", "to": "wpi/halsim/xrp/XRP.hpp" },
       { "from": "frc2/command/([\\w\/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
       { "from": "frc/controller/([\\w\/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
       { "from": "(?<!wpi/)units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
