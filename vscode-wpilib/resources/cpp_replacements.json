@@ -779,7 +779,7 @@
       { "from": "^TravelingSalesman(\\b)", "to": "$1wpi::math::TravelingSalesman" },
       { "from": "wpi::math::wpi::math::", "to": "wpi::math::" },
       { "from": "wpi::math::wpi::math::", "to": "wpi::math::" },
-      { "from": "(\\b)units::", "to": "$1wpi::units::" },
+      { "from": "(?<!wpi::)(\\b)units::", "to": "$1wpi::units::" },
       { "from": "^units::", "to": "wpi::units::" },
       { "from": "wpi::wpi::units::", "to": "wpi::units::" },
       { "from": "frc::OnBoardIO", "to": "wpi::romi::OnBoardIO" },
