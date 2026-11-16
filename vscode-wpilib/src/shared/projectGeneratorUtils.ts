@@ -1,13 +1,13 @@
 'use strict';
 
-import { cp, mkdir, readFile, writeFile } from 'fs/promises';
-import { glob } from 'glob';
+import { cp, glob, mkdir, readFile, writeFile } from 'fs/promises';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
+import { Dirent } from 'fs';
 
 /**
  * Common patterns used in text replacements
@@ -45,13 +45,14 @@ function gradleCopyFilter(sourcePath: string, fromGradleFolder: string): boolean
 /**
  * Find all files matching pattern
  */
-export async function findMatchingFiles(
+export function findMatchingFiles(
   baseDir: string,
   pattern: string = '**/*{.java,.gradle}'
-): Promise<string[]> {
-  return await glob(pattern, {
+): NodeJS.AsyncIterator<Dirent> {
+  return glob(pattern, {
     cwd: baseDir,
-    nodir: true,
+    exclude: (f) => !f.isFile(),
+    withFileTypes: true,
   });
 }
 
