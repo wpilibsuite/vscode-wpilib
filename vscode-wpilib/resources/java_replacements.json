@@ -87,11 +87,11 @@
       { "from": "edu.wpi.first.wpilibj.Gamepad", "to": "org.wpilib.driverstation.Gamepad" },
       {
         "from": "edu.wpi.first.wpilibj.PS4Controller",
-        "to": "org.wpilib.driverstation.PS4Controller"
+        "to": "org.wpilib.driverstation.DualShock4Controller"
       },
       {
         "from": "edu.wpi.first.wpilibj.PS5Controller",
-        "to": "org.wpilib.driverstation.PS5Controller"
+        "to": "org.wpilib.driverstation.DualSenseController"
       },
       {
         "from": "edu.wpi.first.wpilibj.StadiaController",
@@ -622,7 +622,17 @@
       { "from": "Units\\.kilogramsToLbs\\(", "to": "UnitConversions.kilogramsToLbs(" },
       { "from": "Units\\.lbsToKilograms\\(", "to": "UnitConversions.lbsToKilograms(" },
       { "from": "SysIdRoutine.Direction.kForward", "to": "SysIdRoutine.Direction.FORWARD" },
-      { "from": "SysIdRoutine.Direction.kReverse", "to": "SysIdRoutine.Direction.REVERSE" }
+      { "from": "SysIdRoutine.Direction.kReverse", "to": "SysIdRoutine.Direction.REVERSE" },
+      {
+        "from": "edu.wpi.first.wpilibj2.command.button.CommandPS4Controller",
+        "to": "org.wpilib.command2.button.CommandDualShock4Controller"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj2.command.button.CommandPS5Controller",
+        "to": "org.wpilib.command2.button.CommandDualSenseController"
+      },
+      { "from": "CommandPS4Controller", "to": "CommandDualShock4Controller" },
+      { "from": "CommandPS5Controller", "to": "CommandDualSenseController" }
     ]
   }
 ]

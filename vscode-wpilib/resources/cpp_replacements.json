@@ -124,8 +124,8 @@
       { "from": "frc/Alert.h", "to": "wpi/util/Alert.hpp" },
       { "from": "frc/Preferences.h", "to": "wpi/util/Preferences.hpp" },
       { "from": "frc/StadiaController.h", "to": "wpi/driverstation/StadiaController.hpp" },
-      { "from": "frc/PS4Controller.h", "to": "wpi/driverstation/PS4Controller.hpp" },
-      { "from": "frc/PS5Controller.h", "to": "wpi/driverstation/PS5Controller.hpp" },
+      { "from": "frc/PS4Controller.h", "to": "wpi/driverstation/DualShock4Controller.hpp" },
+      { "from": "frc/PS5Controller.h", "to": "wpi/driverstation/DualSenseController.hpp" },
       { "from": "frc/XboxController.h", "to": "wpi/driverstation/XboxController.hpp" },
       { "from": "frc/motorcontrol/PWMSparkFlex.h", "to": "wpi/hardware/motor/PWMSparkFlex.hpp" },
       { "from": "frc/motorcontrol/SparkMini.h", "to": "wpi/hardware/motor/SparkMini.hpp" },
@@ -223,6 +223,14 @@
       { "from": "(?<!wpi/[^\\s]*)HALSimXRP.h", "to": "wpi/halsim/xrp/HALSimXRP.hpp" },
       { "from": "(?<!wpi/[^\\s]*)HALSimXRPClient.h", "to": "wpi/halsim/xrp/HALSimXRPClient.hpp" },
       { "from": "(?<!wpi/[^\\s]*)XRP.h", "to": "wpi/halsim/xrp/XRP.hpp" },
+      {
+        "from": "frc2/command/button/CommandPS4Controller.h",
+        "to": "wpi/commands2/button/CommandDualShock4Controller.hpp"
+      },
+      {
+        "from": "frc2/command/button/CommandPS5Controller.h",
+        "to": "wpi/commands2/button/CommandDualSenseController.hpp"
+      },
       { "from": "frc2/command/([\\w\/]*)\\.h", "to": "wpi/commands2/$1.hpp" },
       { "from": "frc/controller/([\\w\/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
       { "from": "(?<!wpi/)units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
@@ -789,6 +797,8 @@
       { "from": " cs::", "to": " wpi::cs::" },
       { "from": "([ {])nt::", "to": "$1wpi::nt::" },
       { "from": "frc::ObjectToRobotPose", "to": "wpi::math::ObjectToRobotPose" },
+      { "from": "frc2::CommandPS4Controller", "to": "wpi::cmd::CommandDualShock4Controller" },
+      { "from": "frc2::CommandPS5Controller", "to": "wpi::cmd::CommandDualSenseController" },
       { "from": "frc2::cmd::", "to": "wpi::cmd::" },
       { "from": "frc2::", "to": "wpi::cmd::" },
       { "from": "frc::", "to": "wpi::" },
