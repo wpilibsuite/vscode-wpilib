@@ -1825,6 +1825,14 @@ frc2::CommandPS5Controller;
 Object y = frc2::CommandPS5Controller;
 
 // context
+frc::Color8Bit;
+Object y = frc::Color8Bit;
+
+// context
+frc::Color;
+Object y = frc::Color;
+
+// context
 frc2::cmd::;
 Object y = frc2::cmd::;
 
@@ -1895,6 +1903,578 @@ Object y = ColorOrder::kRBG;
 // context
 ColorOrder::kGBR;
 Object y = ColorOrder::kGBR;
+
+// context
+Color::kLightGoldenrodYellow;
+Object y = Color::kLightGoldenrodYellow;
+
+// context
+Color::kMediumSpringGreen;
+Object y = Color::kMediumSpringGreen;
+
+// context
+Color::kMediumAquamarine;
+Object y = Color::kMediumAquamarine;
+
+// context
+Color::kMediumSlateBlue;
+Object y = Color::kMediumSlateBlue;
+
+// context
+Color::kMediumTurquoise;
+Object y = Color::kMediumTurquoise;
+
+// context
+Color::kMediumVioletRed;
+Object y = Color::kMediumVioletRed;
+
+// context
+Color::kBlanchedAlmond;
+Object y = Color::kBlanchedAlmond;
+
+// context
+Color::kCornflowerBlue;
+Object y = Color::kCornflowerBlue;
+
+// context
+Color::kDarkOliveGreen;
+Object y = Color::kDarkOliveGreen;
+
+// context
+Color::kLightSlateGray;
+Object y = Color::kLightSlateGray;
+
+// context
+Color::kLightSteelBlue;
+Object y = Color::kLightSteelBlue;
+
+// context
+Color::kMediumSeaGreen;
+Object y = Color::kMediumSeaGreen;
+
+// context
+Color::kDarkGoldenrod;
+Object y = Color::kDarkGoldenrod;
+
+// context
+Color::kDarkSlateBlue;
+Object y = Color::kDarkSlateBlue;
+
+// context
+Color::kDarkSlateGray;
+Object y = Color::kDarkSlateGray;
+
+// context
+Color::kDarkTurquoise;
+Object y = Color::kDarkTurquoise;
+
+// context
+Color::kLavenderBlush;
+Object y = Color::kLavenderBlush;
+
+// context
+Color::kLightSeaGreen;
+Object y = Color::kLightSeaGreen;
+
+// context
+Color::kPaleGoldenrod;
+Object y = Color::kPaleGoldenrod;
+
+// context
+Color::kPaleTurquoise;
+Object y = Color::kPaleTurquoise;
+
+// context
+Color::kPaleVioletRed;
+Object y = Color::kPaleVioletRed;
+
+// context
+Color::kAntiqueWhite;
+Object y = Color::kAntiqueWhite;
+
+// context
+Color::kDarkSeaGreen;
+Object y = Color::kDarkSeaGreen;
+
+// context
+Color::kLemonChiffon;
+Object y = Color::kLemonChiffon;
+
+// context
+Color::kLightSkyBlue;
+Object y = Color::kLightSkyBlue;
+
+// context
+Color::kMediumOrchid;
+Object y = Color::kMediumOrchid;
+
+// context
+Color::kMediumPurple;
+Object y = Color::kMediumPurple;
+
+// context
+Color::kMidnightBlue;
+Object y = Color::kMidnightBlue;
+
+// context
+Color::kDarkMagenta;
+Object y = Color::kDarkMagenta;
+
+// context
+Color::kDeepSkyBlue;
+Object y = Color::kDeepSkyBlue;
+
+// context
+Color::kFloralWhite;
+Object y = Color::kFloralWhite;
+
+// context
+Color::kForestGreen;
+Object y = Color::kForestGreen;
+
+// context
+Color::kGreenYellow;
+Object y = Color::kGreenYellow;
+
+// context
+Color::kLightSalmon;
+Object y = Color::kLightSalmon;
+
+// context
+Color::kLightYellow;
+Object y = Color::kLightYellow;
+
+// context
+Color::kNavajoWhite;
+Object y = Color::kNavajoWhite;
+
+// context
+Color::kSaddleBrown;
+Object y = Color::kSaddleBrown;
+
+// context
+Color::kSpringGreen;
+Object y = Color::kSpringGreen;
+
+// context
+Color::kYellowGreen;
+Object y = Color::kYellowGreen;
+
+// context
+Color::kAquamarine;
+Object y = Color::kAquamarine;
+
+// context
+Color::kBlueViolet;
+Object y = Color::kBlueViolet;
+
+// context
+Color::kChartreuse;
+Object y = Color::kChartreuse;
+
+// context
+Color::kDarkOrange;
+Object y = Color::kDarkOrange;
+
+// context
+Color::kDarkOrchid;
+Object y = Color::kDarkOrchid;
+
+// context
+Color::kDarkSalmon;
+Object y = Color::kDarkSalmon;
+
+// context
+Color::kDarkViolet;
+Object y = Color::kDarkViolet;
+
+// context
+Color::kDodgerBlue;
+Object y = Color::kDodgerBlue;
+
+// context
+Color::kGhostWhite;
+Object y = Color::kGhostWhite;
+
+// context
+Color::kLightCoral;
+Object y = Color::kLightCoral;
+
+// context
+Color::kLightGreen;
+Object y = Color::kLightGreen;
+
+// context
+Color::kMediumBlue;
+Object y = Color::kMediumBlue;
+
+// context
+Color::kPapayaWhip;
+Object y = Color::kPapayaWhip;
+
+// context
+Color::kPowderBlue;
+Object y = Color::kPowderBlue;
+
+// context
+Color::kSandyBrown;
+Object y = Color::kSandyBrown;
+
+// context
+Color::kWhiteSmoke;
+Object y = Color::kWhiteSmoke;
+
+// context
+Color::kAliceBlue;
+Object y = Color::kAliceBlue;
+
+// context
+Color::kBurlywood;
+Object y = Color::kBurlywood;
+
+// context
+Color::kCadetBlue;
+Object y = Color::kCadetBlue;
+
+// context
+Color::kChocolate;
+Object y = Color::kChocolate;
+
+// context
+Color::kDarkGreen;
+Object y = Color::kDarkGreen;
+
+// context
+Color::kDarkKhaki;
+Object y = Color::kDarkKhaki;
+
+// context
+Color::kFirebrick;
+Object y = Color::kFirebrick;
+
+// context
+Color::kFirstBlue;
+Object y = Color::kFirstBlue;
+
+// context
+Color::kGainsboro;
+Object y = Color::kGainsboro;
+
+// context
+Color::kGoldenrod;
+Object y = Color::kGoldenrod;
+
+// context
+Color::kIndianRed;
+Object y = Color::kIndianRed;
+
+// context
+Color::kLawnGreen;
+Object y = Color::kLawnGreen;
+
+// context
+Color::kLightBlue;
+Object y = Color::kLightBlue;
+
+// context
+Color::kLightCyan;
+Object y = Color::kLightCyan;
+
+// context
+Color::kLightGray;
+Object y = Color::kLightGray;
+
+// context
+Color::kLightPink;
+Object y = Color::kLightPink;
+
+// context
+Color::kLimeGreen;
+Object y = Color::kLimeGreen;
+
+// context
+Color::kMintcream;
+Object y = Color::kMintcream;
+
+// context
+Color::kMistyRose;
+Object y = Color::kMistyRose;
+
+// context
+Color::kOliveDrab;
+Object y = Color::kOliveDrab;
+
+// context
+Color::kOrangeRed;
+Object y = Color::kOrangeRed;
+
+// context
+Color::kPaleGreen;
+Object y = Color::kPaleGreen;
+
+// context
+Color::kPeachPuff;
+Object y = Color::kPeachPuff;
+
+// context
+Color::kRosyBrown;
+Object y = Color::kRosyBrown;
+
+// context
+Color::kRoyalBlue;
+Object y = Color::kRoyalBlue;
+
+// context
+Color::kSlateBlue;
+Object y = Color::kSlateBlue;
+
+// context
+Color::kSlateGray;
+Object y = Color::kSlateGray;
+
+// context
+Color::kSteelBlue;
+Object y = Color::kSteelBlue;
+
+// context
+Color::kTurquoise;
+Object y = Color::kTurquoise;
+
+// context
+Color::kCornsilk;
+Object y = Color::kCornsilk;
+
+// context
+Color::kDarkBlue;
+Object y = Color::kDarkBlue;
+
+// context
+Color::kDarkCyan;
+Object y = Color::kDarkCyan;
+
+// context
+Color::kDarkGray;
+Object y = Color::kDarkGray;
+
+// context
+Color::kDeepPink;
+Object y = Color::kDeepPink;
+
+// context
+Color::kFirstRed;
+Object y = Color::kFirstRed;
+
+// context
+Color::kHoneydew;
+Object y = Color::kHoneydew;
+
+// context
+Color::kLavender;
+Object y = Color::kLavender;
+
+// context
+Color::kMoccasin;
+Object y = Color::kMoccasin;
+
+// context
+Color::kSeaGreen;
+Object y = Color::kSeaGreen;
+
+// context
+Color::kSeashell;
+Object y = Color::kSeashell;
+
+// context
+Color::kCrimson;
+Object y = Color::kCrimson;
+
+// context
+Color::kDarkRed;
+Object y = Color::kDarkRed;
+
+// context
+Color::kDimGray;
+Object y = Color::kDimGray;
+
+// context
+Color::kFuchsia;
+Object y = Color::kFuchsia;
+
+// context
+Color::kHotPink;
+Object y = Color::kHotPink;
+
+// context
+Color::kMagenta;
+Object y = Color::kMagenta;
+
+// context
+Color::kOldLace;
+Object y = Color::kOldLace;
+
+// context
+Color::kSkyBlue;
+Object y = Color::kSkyBlue;
+
+// context
+Color::kThistle;
+Object y = Color::kThistle;
+
+// context
+Color::kBisque;
+Object y = Color::kBisque;
+
+// context
+Color::kIndigo;
+Object y = Color::kIndigo;
+
+// context
+Color::kMaroon;
+Object y = Color::kMaroon;
+
+// context
+Color::kOrange;
+Object y = Color::kOrange;
+
+// context
+Color::kOrchid;
+Object y = Color::kOrchid;
+
+// context
+Color::kPurple;
+Object y = Color::kPurple;
+
+// context
+Color::kSalmon;
+Object y = Color::kSalmon;
+
+// context
+Color::kSienna;
+Object y = Color::kSienna;
+
+// context
+Color::kSilver;
+Object y = Color::kSilver;
+
+// context
+Color::kTomato;
+Object y = Color::kTomato;
+
+// context
+Color::kViolet;
+Object y = Color::kViolet;
+
+// context
+Color::kYellow;
+Object y = Color::kYellow;
+
+// context
+Color::kAzure;
+Object y = Color::kAzure;
+
+// context
+Color::kBeige;
+Object y = Color::kBeige;
+
+// context
+Color::kBlack;
+Object y = Color::kBlack;
+
+// context
+Color::kBrown;
+Object y = Color::kBrown;
+
+// context
+Color::kCoral;
+Object y = Color::kCoral;
+
+// context
+Color::kDenim;
+Object y = Color::kDenim;
+
+// context
+Color::kGreen;
+Object y = Color::kGreen;
+
+// context
+Color::kIvory;
+Object y = Color::kIvory;
+
+// context
+Color::kKhaki;
+Object y = Color::kKhaki;
+
+// context
+Color::kLinen;
+Object y = Color::kLinen;
+
+// context
+Color::kOlive;
+Object y = Color::kOlive;
+
+// context
+Color::kWheat;
+Object y = Color::kWheat;
+
+// context
+Color::kWhite;
+Object y = Color::kWhite;
+
+// context
+Color::kAqua;
+Object y = Color::kAqua;
+
+// context
+Color::kBlue;
+Object y = Color::kBlue;
+
+// context
+Color::kCyan;
+Object y = Color::kCyan;
+
+// context
+Color::kGold;
+Object y = Color::kGold;
+
+// context
+Color::kGray;
+Object y = Color::kGray;
+
+// context
+Color::kLime;
+Object y = Color::kLime;
+
+// context
+Color::kNavy;
+Object y = Color::kNavy;
+
+// context
+Color::kPeru;
+Object y = Color::kPeru;
+
+// context
+Color::kPink;
+Object y = Color::kPink;
+
+// context
+Color::kPlum;
+Object y = Color::kPlum;
+
+// context
+Color::kSnow;
+Object y = Color::kSnow;
+
+// context
+Color::kTeal;
+Object y = Color::kTeal;
+
+// context
+Color::kRed;
+Object y = Color::kRed;
+
+// context
+Color::kTan;
+Object y = Color::kTan;
 
 // context
 OnboardIMU::kFlat;
