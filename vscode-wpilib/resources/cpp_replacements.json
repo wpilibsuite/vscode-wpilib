@@ -858,7 +858,10 @@
       { "from": "SmartDashboard::PutString", "to": "telemetry::Log" },
       { "from": "SmartDashboard::PutBoolean", "to": "telemetry::Log" },
       { "from": "sysid::Direction::kForward", "to": "sysid::Direction::FORWARD" },
-      { "from": "sysid::Direction::kReverse", "to": "sysid::Direction::REVERSE" }
+      { "from": "sysid::Direction::kReverse", "to": "sysid::Direction::REVERSE" },
+      { "from": "wpi::Encoder::k4X", "to": "wpi::Encoder::EncodingType::X4" },
+      { "from": "wpi::Encoder::k2X", "to": "wpi::Encoder::EncodingType::X2" },
+      { "from": "wpi::Encoder::k1X", "to": "wpi::Encoder::EncodingType::X1" }
     ]
   }
 ]

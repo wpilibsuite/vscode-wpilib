@@ -1224,3 +1224,15 @@ Object y = CommandPS4Controller;
 // context
 CommandPS5Controller;
 Object y = CommandPS5Controller;
+
+// context
+EncodingType.k4X;
+Object y = EncodingType.k4X;
+
+// context
+EncodingType.k2X;
+Object y = EncodingType.k2X;
+
+// context
+EncodingType.k1X;
+Object y = EncodingType.k1X;

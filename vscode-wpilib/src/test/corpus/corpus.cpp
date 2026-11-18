@@ -1991,3 +1991,15 @@ Object y = sysid::Direction::kForward;
 // context
 sysid::Direction::kReverse;
 Object y = sysid::Direction::kReverse;
+
+// context
+wpi::Encoder::k4X;
+Object y = wpi::Encoder::k4X;
+
+// context
+wpi::Encoder::k2X;
+Object y = wpi::Encoder::k2X;
+
+// context
+wpi::Encoder::k1X;
+Object y = wpi::Encoder::k1X;

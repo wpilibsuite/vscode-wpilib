@@ -632,7 +632,10 @@
         "to": "org.wpilib.command2.button.CommandDualSenseController"
       },
       { "from": "CommandPS4Controller", "to": "CommandDualShock4Controller" },
-      { "from": "CommandPS5Controller", "to": "CommandDualSenseController" }
+      { "from": "CommandPS5Controller", "to": "CommandDualSenseController" },
+      { "from": "EncodingType.k4X", "to": "EncodingType.X4" },
+      { "from": "EncodingType.k2X", "to": "EncodingType.X2" },
+      { "from": "EncodingType.k1X", "to": "EncodingType.X1" }
     ]
   }
 ]
