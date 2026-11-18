@@ -57,6 +57,8 @@ import edu.wpi.first.math.Nat;
 
 import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 
+import edu.wpi.first.math.system.plant.LinearSystemId;
+
 import edu.wpi.first.math.system.plant;
 
 import edu.wpi.first.wpilibj.ProtoTestBase;
@@ -1236,3 +1238,39 @@ Object y = EncodingType.k2X;
 // context
 EncodingType.k1X;
 Object y = EncodingType.k1X;
+
+// context
+LinearSystemId.createSingleJointedArmSystem;
+Object y = LinearSystemId.createSingleJointedArmSystem;
+
+// context
+LinearSystemId.createFlywheelSystem;
+Object y = LinearSystemId.createFlywheelSystem;
+
+// context
+LinearSystemId.createElevatorSystem;
+Object y = LinearSystemId.createElevatorSystem;
+
+// context
+Models.singleJointedArmFromPhysicalConstants;
+Object y = Models.singleJointedArmFromPhysicalConstants;
+
+// context
+Models.flywheelFromPhysicalConstants;
+Object y = Models.flywheelFromPhysicalConstants;
+
+// context
+Models.elevatorFromPhysicalConstants;
+Object y = Models.elevatorFromPhysicalConstants;
+
+// context
+Models.flywheelFromSysId;
+Object y = Models.flywheelFromSysId;
+
+// context
+Models.singleJointedArmFromSysId;
+Object y = Models.singleJointedArmFromSysId;
+
+// context
+Models.elevatorFromSysId;
+Object y = Models.elevatorFromSysId;

@@ -311,6 +311,14 @@
 
 #include "cameraserver/Example.h"
 
+#include "frc/system/plant/LinearSystemId.h"
+
+#include "frc/system/plant/DCMotor.h"
+
+#include "frc/estimator/Example.h"
+
+#include "frc/system/LinearSystemLoop.h"
+
 #include "frc/Example.h"
 
 "wpi/driverstation/MatchState.hpp"
@@ -1579,6 +1587,42 @@ Object x = wpi::math::LinearSystemId;
 // context
 LinearSystemId;
 Object y = LinearSystemId;
+
+// context
+LinearSystemId::SingleJointedArmSystem;
+Object y = LinearSystemId::SingleJointedArmSystem;
+
+// context
+LinearSystemId::FlywheelSystem;
+Object y = LinearSystemId::FlywheelSystem;
+
+// context
+LinearSystemId::ElevatorSystem;
+Object y = LinearSystemId::ElevatorSystem;
+
+// context
+Models::SingleJointedArmFromPhysicalConstants;
+Object y = Models::SingleJointedArmFromPhysicalConstants;
+
+// context
+Models::FlywheelFromPhysicalConstants;
+Object y = Models::FlywheelFromPhysicalConstants;
+
+// context
+Models::ElevatorFromPhysicalConstants;
+Object y = Models::ElevatorFromPhysicalConstants;
+
+// context
+Models::FlywheelFromSysId;
+Object y = Models::FlywheelFromSysId;
+
+// context
+Models::SingleJointedArmFromSysId;
+Object y = Models::SingleJointedArmFromSysId;
+
+// context
+Models::ElevatorFromSysId;
+Object y = Models::ElevatorFromSysId;
 
 // context
 frc::MedianFilter;

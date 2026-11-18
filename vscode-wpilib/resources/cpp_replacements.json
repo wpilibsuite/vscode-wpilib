@@ -240,6 +240,10 @@
       { "from": "(?<!wpi/)units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
       { "from": "(?<!wpi/)hal/([\\w\\/]*)\\.h", "to": "wpi/hal/$1.h" },
       { "from": "(?<!wpi/)cameraserver/([\\w\/]*)\\.h", "to": "wpi/cameraserver/$1.hpp" },
+      { "from": "frc/system/plant/LinearSystemId.h", "to": "wpi/math/system/Models.hpp" },
+      { "from": "frc/system/plant/DCMotor.h", "to": "wpi/math/system/DCMotor.hpp" },
+      { "from": "frc/estimator/([\\w\/]*)\\.h", "to": "wpi/math/estimator/$1.hpp" },
+      { "from": "frc/system/LinearSystemLoop.h", "to": "wpi/math/system/LinearSystemLoop.hpp" },
       { "from": "frc/([\\w\/]*)\\.h", "to": "wpi/$1.hpp" },
       {
         "from": "(\"|\\<)wpi/driverstation/DriverStation.hpp(\"|\\>)",
@@ -750,6 +754,27 @@
       { "from": "(\\b)frc::LinearSystemId(\\b)", "to": "$1wpi::math::LinearSystemId$2" },
       { "from": "([ \\b{<!\\(])LinearSystemId(\\b)", "to": "$1wpi::math::LinearSystemId$2" },
       { "from": "^LinearSystemId(\\b)", "to": "$1wpi::math::LinearSystemId" },
+      {
+        "from": "LinearSystemId::SingleJointedArmSystem",
+        "to": "Models::SingleJointedArmFromPhysicalConstants"
+      },
+      { "from": "LinearSystemId::FlywheelSystem", "to": "Models::FlywheelFromPhysicalConstants" },
+      { "from": "LinearSystemId::ElevatorSystem", "to": "Models::ElevatorFromPhysicalConstants" },
+      {
+        "from": "Models::SingleJointedArmFromPhysicalConstants",
+        "to": "Models::AngularPositionFromPhysicalConstants"
+      },
+      {
+        "from": "Models::FlywheelFromPhysicalConstants",
+        "to": "Models::AngularVelocityFromPhysicalConstants"
+      },
+      {
+        "from": "Models::ElevatorFromPhysicalConstants",
+        "to": "Models::LinearPositionFromPhysicalConstants"
+      },
+      { "from": "Models::FlywheelFromSysId", "to": "Models::AngularVelocityFromSysId" },
+      { "from": "Models::SingleJointedArmFromSysId", "to": "Models::AngularPositionFromSysId" },
+      { "from": "Models::ElevatorFromSysId", "to": "Models::LinearPositionFromSysId" },
       { "from": "(\\b)frc::MedianFilter(\\b)", "to": "$1wpi::math::MedianFilter$2" },
       { "from": "([ \\b{<!\\(])MedianFilter(\\b)", "to": "$1wpi::math::MedianFilter$2" },
       { "from": "^MedianFilter(\\b)", "to": "$1wpi::math::MedianFilter" },

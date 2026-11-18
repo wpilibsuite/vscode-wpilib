@@ -74,6 +74,10 @@
         "from": "edu.wpi.first.math.InterpolatingMatrixTreeMap",
         "to": "org.wpilib.math.interpolation.InterpolatingMatrixTreeMap"
       },
+      {
+        "from": "edu.wpi.first.math.system.plant.LinearSystemId",
+        "to": "org.wpilib.math.system.Models"
+      },
       { "from": "edu.wpi.first.math.system.plant", "to": "org.wpilib.math.system" },
       { "from": "edu.wpi.first.wpilibj.ProtoTestBase", "to": "org.wpilib.ProtoTestBase" },
       { "from": "edu.wpi.first.wpilibj.StructTestBase", "to": "org.wpilib.StructTestBase" },
@@ -635,7 +639,34 @@
       { "from": "CommandPS5Controller", "to": "CommandDualSenseController" },
       { "from": "EncodingType.k4X", "to": "EncodingType.X4" },
       { "from": "EncodingType.k2X", "to": "EncodingType.X2" },
-      { "from": "EncodingType.k1X", "to": "EncodingType.X1" }
+      { "from": "EncodingType.k1X", "to": "EncodingType.X1" },
+      {
+        "from": "LinearSystemId.createSingleJointedArmSystem",
+        "to": "Models.singleJointedArmFromPhysicalConstants"
+      },
+      {
+        "from": "LinearSystemId.createFlywheelSystem",
+        "to": "Models.flywheelFromPhysicalConstants"
+      },
+      {
+        "from": "LinearSystemId.createElevatorSystem",
+        "to": "Models.elevatorFromPhysicalConstants"
+      },
+      {
+        "from": "Models.singleJointedArmFromPhysicalConstants",
+        "to": "Models.angularPositionFromPhysicalConstants"
+      },
+      {
+        "from": "Models.flywheelFromPhysicalConstants",
+        "to": "Models.angularVelocityFromPhysicalConstants"
+      },
+      {
+        "from": "Models.elevatorFromPhysicalConstants",
+        "to": "Models.linearPositionFromPhysicalConstants"
+      },
+      { "from": "Models.flywheelFromSysId", "to": "Models.angularVelocityFromSysId" },
+      { "from": "Models.singleJointedArmFromSysId", "to": "Models.angularPositionFromSysId" },
+      { "from": "Models.elevatorFromSysId", "to": "Models.linearPositionFromSysId" }
     ]
   }
 ]
