@@ -418,6 +418,7 @@
         "webpack": "webpack --config-node-env production",
         "webpack-watch": "webpack --config-node-env development --watch",
         "test": "gulp clean && tsc -p . && vscode-test",
+        "generate-replacement-corpus": "tsc -p . && node out/scripts/generateReplacementCorpus.js",
         "gulp": "gulp",
         "updateActivation": "gulp update-activation",
         "vscePackage": "vsce package --no-dependencies"

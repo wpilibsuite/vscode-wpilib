@@ -1,155 +1,21 @@
 'use strict';
 
 import * as assert from 'assert';
-import { mkdtemp, readFile, rm, writeFile } from 'fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { ImportUpdate } from '../shared/importupdater';
-
-interface IReplaceGroup {
-  from: string;
-  to: string;
-}
-
-interface IToUpdate {
-  fileMatcher: string;
-  flags: string;
-  replacements: IReplaceGroup[];
-}
-
-interface ReplacementConfig {
-  label: string;
-  replacementsFile: string;
-  corpusFileName: string;
-  tempPrefix: string;
-}
-
-const configs: ReplacementConfig[] = [
-  {
-    label: 'C++',
-    replacementsFile: 'cpp_replacements.json',
-    corpusFileName: 'Corpus.cpp',
-    tempPrefix: 'wpilib-cpp-idempotent-',
-  },
-  {
-    label: 'Java',
-    replacementsFile: 'java_replacements.json',
-    corpusFileName: 'Corpus.java',
-    tempPrefix: 'wpilib-java-idempotent-',
-  },
-];
-
-function isCppHeaderReplacement(entry: IReplaceGroup): boolean {
-  return (
-    entry.to.includes('/') ||
-    entry.to.endsWith('.h') ||
-    entry.to.endsWith('.hpp') ||
-    entry.from.includes('.h') ||
-    entry.from.includes('\\.h')
-  );
-}
-
-function isJavaImportLike(text: string): boolean {
-  return /^(?:edu|org|java|com|javax|wpi)\./.test(text) || text.includes('import ');
-}
-
-function makeToContext(entry: IReplaceGroup): string {
-  const to = entry.to;
-
-  // Multi-line replacements or explicit include/import fragments.
-  if (to.includes('\n') || to.includes('#include') || to.includes('import ')) {
-    return to + '\n';
-  }
-
-  if (isCppHeaderReplacement(entry)) {
-    return `#include "${to}"\n`;
-  }
-
-  if (isJavaImportLike(to)) {
-    return `import ${to};\n`;
-  }
-
-  // Generic token/namespace replacement context.
-  return `// context\n${to};\nObject x = ${to};\n`;
-}
-
-function stripLookarounds(from: string): string {
-  // Remove lookbehind/lookahead groups like (?<!...) (?!...) (?<=...) (?=...)
-  let s = from;
-  for (let i = 0; i < 10; i++) {
-    const next = s.replace(/\(\?<(!|=)[^()]*\)/g, '').replace(/\(\?(?:!|=)[^()]*\)/g, '');
-    if (next === s) {
-      break;
-    }
-    s = next;
-  }
-  return s;
-}
-
-function generateFromSample(from: string): string | undefined {
-  let s = stripLookarounds(from);
-
-  s = s.replace(/^\^/, '').replace(/\$$/, '');
-
-  // Unescape common regex escapes to literals.
-  s = s
-    .replace(/\\\./g, '.')
-    .replace(/\\\//g, '/')
-    .replace(/\\\(/g, '(')
-    .replace(/\\\)/g, ')')
-    .replace(/\\</g, '<')
-    .replace(/\\>/g, '>')
-    .replace(/\\\{/g, '{')
-    .replace(/\\\}/g, '}')
-    .replace(/\\\[/g, '[')
-    .replace(/\\\]/g, ']');
-
-  // Replace character classes/patterns with representative text.
-  s = s
-    .replace(/\(\[\\w\\\/\]\*\)/g, 'Example')
-    .replace(/\[\\w\\\/\]\*/g, 'Example')
-    .replace(/\[\\w\]\*/g, 'Example')
-    .replace(/\[\\s\]\*/g, ' ');
-
-  // Common word-boundary/capture wrappers.
-  s = s.replace(/\(\\b\)/g, '').replace(/\\b/g, '');
-
-  // Collapse remaining simple groups used as captures in these rules.
-  s = s.replace(/\(([^()|]+)\)/g, '$1');
-
-  // Replace whitespace regex tokens.
-  s = s.replace(/\\s\*/g, ' ').replace(/\\s\+/g, ' ').replace(/\\s/g, ' ');
-
-  // Handle alternation by picking first option if simple.
-  if (s.includes('|')) {
-    s = s.split('|')[0];
-  }
-
-  // Remove leftover regex quantifiers/metacharacters that would make invalid sample text.
-  s = s.replace(/[?*+]/g, '');
-
-  // If it still looks too regex-y, skip.
-  if (/[()[\]{}\\^$]/.test(s)) {
-    return undefined;
-  }
-
-  s = s.trim();
-  return s.length > 0 ? s : undefined;
-}
-
-function makeFromContext(entry: IReplaceGroup): string | undefined {
-  const sample = generateFromSample(entry.from);
-  if (!sample) {
-    return undefined;
-  }
-  if (isCppHeaderReplacement(entry) || sample.includes('.h') || sample.includes('/')) {
-    return `#include "${sample}"\n`;
-  }
-  if (isJavaImportLike(sample)) {
-    return `import ${sample};\n`;
-  }
-  return `// context\n${sample};\nObject y = ${sample};\n`;
-}
+import {
+  configs,
+  generateCorpus,
+  getCorpusPath,
+  getExtensionPath,
+  IReplaceGroup,
+  IToUpdate,
+  loadGroups,
+  makeFromContext,
+  makeToContext,
+} from './replacementCorpus';
 
 function applyGroups(content: string, groupsToApply: IToUpdate[]): string {
   let updated = content;
@@ -167,15 +33,6 @@ function applyEntry(content: string, entry: IReplaceGroup, flags: string): strin
   return content.replace(pattern, entry.to);
 }
 
-async function loadGroups(replacementsFile: string): Promise<IToUpdate[]> {
-  const extensionPath = path.resolve(__dirname, '..', '..');
-  const replacementsPath = path.join(extensionPath, 'resources', replacementsFile);
-  const raw = await readFile(replacementsPath, 'utf8');
-  const groups = JSON.parse(raw) as IToUpdate[];
-  assert.ok(Array.isArray(groups) && groups.length > 0, `${replacementsFile} should load`);
-  return groups;
-}
-
 suite('Replacement idempotence', () => {
   for (const config of configs) {
     suite(config.label, () => {
@@ -185,37 +42,31 @@ suite('Replacement idempotence', () => {
         groups = await loadGroups(config.replacementsFile);
       });
 
+      test(`${config.corpusFileName} is up to date`, async () => {
+        const current = await readFile(getCorpusPath(config), 'utf8');
+        assert.strictEqual(
+          current.replace(/\r\n/g, '\n'),
+          generateCorpus(groups, config.label),
+          `${config.corpusFileName} is out of date. Run "npm run generate-replacement-corpus" and commit the updated file.`
+        );
+      });
+
       test(`running importer ${config.label} replacements twice does not change files on second run`, async function () {
         this.timeout(60000);
-        const tmp = await mkdtemp(path.join(tmpdir(), config.tempPrefix));
+        const corpus = await readFile(getCorpusPath(config), 'utf8');
+        const tmp = await mkdtemp(path.join(tmpdir(), 'wpilib-replacement-idempotence-'));
         try {
           const srcDir = path.join(tmp, 'src');
-          const { mkdir } = await import('fs/promises');
           await mkdir(srcDir, { recursive: true });
 
-          // Corpus with a synthesized "from" sample (or "to" fallback) for every statement.
-          const lines: string[] = [
-            `// generated corpus for ${config.label} replacement idempotence`,
-          ];
-          let sampleCount = 0;
-          for (const group of groups) {
-            for (const entry of group.replacements) {
-              const ctx = makeFromContext(entry);
-              if (ctx) {
-                lines.push(ctx);
-                sampleCount++;
-              } else {
-                lines.push(makeToContext(entry));
-              }
-            }
-          }
-          assert.ok(sampleCount > 0, 'Should generate at least some from-samples');
-
           const filePath = path.join(srcDir, config.corpusFileName);
-          await writeFile(filePath, lines.join('\n'), 'utf8');
+          await writeFile(filePath, corpus, 'utf8');
 
-          const extensionPath = path.resolve(__dirname, '..', '..');
-          const replacementsPath = path.join(extensionPath, 'resources', config.replacementsFile);
+          const replacementsPath = path.join(
+            getExtensionPath(),
+            'resources',
+            config.replacementsFile
+          );
 
           assert.ok(
             await ImportUpdate(srcDir, replacementsPath),
@@ -287,13 +138,7 @@ suite('Replacement idempotence', () => {
       });
 
       test(`applying all ${config.label} replacements twice is idempotent in-memory`, () => {
-        const lines: string[] = ['// generated corpus'];
-        for (const group of groups) {
-          for (const entry of group.replacements) {
-            lines.push(makeFromContext(entry) ?? makeToContext(entry));
-          }
-        }
-        const corpus = lines.join('\n');
+        const corpus = generateCorpus(groups, config.label);
         const once = applyGroups(corpus, groups);
         const twice = applyGroups(once, groups);
         assert.strictEqual(
