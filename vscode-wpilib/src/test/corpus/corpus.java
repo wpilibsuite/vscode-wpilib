@@ -366,36 +366,36 @@ DriverStation.MatchType;
 Object y = DriverStation.MatchType;
 
 // context
-MatchState.getAlliance();
-Object x = MatchState.getAlliance();
+DriverStation.getAlliance();
+Object y = DriverStation.getAlliance();
 
 // context
-MatchState.getMatchType();
-Object x = MatchState.getMatchType();
+DriverStation.getMatchType();
+Object y = DriverStation.getMatchType();
 
 // context
-MatchState.getMatchNumber();
-Object x = MatchState.getMatchNumber();
+DriverStation.getMatchNumber();
+Object y = DriverStation.getMatchNumber();
 
 // context
-MatchState.getEventName();
-Object x = MatchState.getEventName();
+DriverStation.getEventName();
+Object y = DriverStation.getEventName();
 
 // context
-MatchState.getReplayNumber();
-Object x = MatchState.getReplayNumber();
+DriverStation.getReplayNumber();
+Object y = DriverStation.getReplayNumber();
 
 // context
-MatchState.getLocation();
-Object x = MatchState.getLocation();
+DriverStation.getLocation();
+Object y = DriverStation.getLocation();
 
 // context
-MatchState.getMatchTime();
-Object x = MatchState.getMatchTime();
+DriverStation.getMatchTime();
+Object y = DriverStation.getMatchTime();
 
 // context
-MatchState.getGameData();
-Object x = MatchState.getGameData();
+DriverStation.getGameSpecificMessage();
+Object y = DriverStation.getGameSpecificMessage();
 
 // context
 Alliance.Red;
@@ -422,56 +422,56 @@ MatchType.Elimination;
 Object y = MatchType.Elimination;
 
 // context
-RobotState.isEnabled();
-Object x = RobotState.isEnabled();
+DriverStation.isEnabled();
+Object y = DriverStation.isEnabled();
 
 // context
-RobotState.isDisabled();
-Object x = RobotState.isDisabled();
+DriverStation.isDisabled();
+Object y = DriverStation.isDisabled();
 
 // context
-RobotState.isAutonomous();
-Object x = RobotState.isAutonomous();
+DriverStation.isAutonomous();
+Object y = DriverStation.isAutonomous();
 
 // context
-RobotState.isTeleop();
-Object x = RobotState.isTeleop();
+DriverStation.isTeleop();
+Object y = DriverStation.isTeleop();
 
 // context
-RobotState.isUtility();
-Object x = RobotState.isUtility();
+DriverStation.isTest();
+Object y = DriverStation.isTest();
 
 // context
-RobotState.isAutonomousEnabled();
-Object x = RobotState.isAutonomousEnabled();
+DriverStation.isAutonomousEnabled();
+Object y = DriverStation.isAutonomousEnabled();
 
 // context
-RobotState.isTeleopEnabled();
-Object x = RobotState.isTeleopEnabled();
+DriverStation.isTeleopEnabled();
+Object y = DriverStation.isTeleopEnabled();
 
 // context
-RobotState.isUtilityEnabled();
-Object x = RobotState.isUtilityEnabled();
+DriverStation.isTestEnabled();
+Object y = DriverStation.isTestEnabled();
 
 // context
-RobotState.isFMSAttached();
-Object x = RobotState.isFMSAttached();
+DriverStation.isFMSAttached();
+Object y = DriverStation.isFMSAttached();
 
 // context
-RobotState.isDSAttached();
-Object x = RobotState.isDSAttached();
+DriverStation.isDSAttached();
+Object y = DriverStation.isDSAttached();
 
 // context
-utilityInit();
-Object x = utilityInit();
+testInit();
+Object y = testInit();
 
 // context
-utilityPeriodic();
-Object x = utilityPeriodic();
+testPeriodic();
+Object y = testPeriodic();
 
 // context
-utilityExit();
-Object x = utilityExit();
+testExit();
+Object y = testExit();
 
 #include "org.wpilib.hardware.motor."
 
@@ -506,20 +506,20 @@ Object y = .omegaRadiansPerSecond;
 Object y = .speedMetersPerSecond;
 
 // context
-getVelocity();
-Object x = getVelocity();
+getVelocityRadPerSec();
+Object y = getVelocityRadPerSec();
 
 // context
-getAngularPosition();
-Object x = getAngularPosition();
+getAngularPositionRotations();
+Object y = getAngularPositionRotations();
 
 // context
-scrollAtRelativeVelocity(;
-Object x = scrollAtRelativeVelocity(;
+scrollAtRelativeSpeed(;
+Object y = scrollAtRelativeSpeed(;
 
 // context
-scrollAtAbsoluteVelocity(;
-Object x = scrollAtAbsoluteVelocity(;
+scrollAtAbsoluteSpeed(;
+Object y = scrollAtAbsoluteSpeed(;
 
 // context
 AlertType.kError;
@@ -1106,12 +1106,12 @@ Color.kYellowGreen;
 Object y = Color.kYellowGreen;
 
 // context
-Math.clamp(;
-Object x = Math.clamp(;
+MathUtil.clamp(;
+Object y = MathUtil.clamp(;
 
 // context
-Timer.getTimestamp();
-Object x = Timer.getTimestamp();
+Timer.getFPGATimestamp();
+Object y = Timer.getFPGATimestamp();
 
 import org.wpilib.driverstation.Alert;
 
@@ -1136,76 +1136,76 @@ import org.wpilib.smartdashboard.SmartDashboard;;
 import org.wpilib.math.util.Units;
 
 // context
-UnitConversions.metersToFeet(;
-Object x = UnitConversions.metersToFeet(;
+Units.metersToFeet(;
+Object y = Units.metersToFeet(;
 
 // context
-UnitConversions.feetToMeters(;
-Object x = UnitConversions.feetToMeters(;
+Units.feetToMeters(;
+Object y = Units.feetToMeters(;
 
 // context
-UnitConversions.metersToInches(;
-Object x = UnitConversions.metersToInches(;
+Units.metersToInches(;
+Object y = Units.metersToInches(;
 
 // context
-UnitConversions.inchesToMeters(;
-Object x = UnitConversions.inchesToMeters(;
+Units.inchesToMeters(;
+Object y = Units.inchesToMeters(;
 
 // context
-UnitConversions.degreesToRadians(;
-Object x = UnitConversions.degreesToRadians(;
+Units.degreesToRadians(;
+Object y = Units.degreesToRadians(;
 
 // context
-UnitConversions.radiansToDegrees(;
-Object x = UnitConversions.radiansToDegrees(;
+Units.radiansToDegrees(;
+Object y = Units.radiansToDegrees(;
 
 // context
-UnitConversions.radiansToRotations(;
-Object x = UnitConversions.radiansToRotations(;
+Units.radiansToRotations(;
+Object y = Units.radiansToRotations(;
 
 // context
-UnitConversions.degreesToRotations(;
-Object x = UnitConversions.degreesToRotations(;
+Units.degreesToRotations(;
+Object y = Units.degreesToRotations(;
 
 // context
-UnitConversions.rotationsToDegrees(;
-Object x = UnitConversions.rotationsToDegrees(;
+Units.rotationsToDegrees(;
+Object y = Units.rotationsToDegrees(;
 
 // context
-UnitConversions.rotationsToRadians(;
-Object x = UnitConversions.rotationsToRadians(;
+Units.rotationsToRadians(;
+Object y = Units.rotationsToRadians(;
 
 // context
-UnitConversions.rotationsPerMinuteToRadiansPerSecond(;
-Object x = UnitConversions.rotationsPerMinuteToRadiansPerSecond(;
+Units.rotationsPerMinuteToRadiansPerSecond(;
+Object y = Units.rotationsPerMinuteToRadiansPerSecond(;
 
 // context
-UnitConversions.radiansPerSecondToRotationsPerMinute(;
-Object x = UnitConversions.radiansPerSecondToRotationsPerMinute(;
+Units.radiansPerSecondToRotationsPerMinute(;
+Object y = Units.radiansPerSecondToRotationsPerMinute(;
 
 // context
-UnitConversions.milesPerHourToMetersPerSecond(;
-Object x = UnitConversions.milesPerHourToMetersPerSecond(;
+Units.milesPerHourToMetersPerSecond(;
+Object y = Units.milesPerHourToMetersPerSecond(;
 
 // context
-UnitConversions.metersPerSecondToMilesPerHour(;
-Object x = UnitConversions.metersPerSecondToMilesPerHour(;
+Units.metersPerSecondToMilesPerHour(;
+Object y = Units.metersPerSecondToMilesPerHour(;
 
 // context
-UnitConversions.millisecondsToSeconds(;
-Object x = UnitConversions.millisecondsToSeconds(;
+Units.millisecondsToSeconds(;
+Object y = Units.millisecondsToSeconds(;
 
 // context
-UnitConversions.secondsToMilliseconds(;
-Object x = UnitConversions.secondsToMilliseconds(;
+Units.secondsToMilliseconds(;
+Object y = Units.secondsToMilliseconds(;
 
 // context
-UnitConversions.kilogramsToLbs(;
-Object x = UnitConversions.kilogramsToLbs(;
+Units.kilogramsToLbs(;
+Object y = Units.kilogramsToLbs(;
 
 // context
-UnitConversions.lbsToKilograms(;
-Object x = UnitConversions.lbsToKilograms(;
+Units.lbsToKilograms(;
+Object y = Units.lbsToKilograms(;
 
 // context
 SysIdRoutine.Direction.kForward;

@@ -150,17 +150,22 @@ function stripLookarounds(from: string): string {
   return s;
 }
 
+const literalOpenParen = '\uE000';
+const literalCloseParen = '\uE001';
+
 function generateFromSample(from: string): string | undefined {
   let s = stripLookarounds(from);
 
   s = s.replace(/^\^/, '').replace(/\$$/, '');
 
-  // Unescape common regex escapes to literals.
+  // Unescape common regex escapes to literals. Keep escaped parentheses as
+  // placeholders so they are not mistaken for regex grouping while generating
+  // the sample.
   s = s
     .replace(/\\\./g, '.')
     .replace(/\\\//g, '/')
-    .replace(/\\\(/g, '(')
-    .replace(/\\\)/g, ')')
+    .replace(/\\\(/g, literalOpenParen)
+    .replace(/\\\)/g, literalCloseParen)
     .replace(/\\</g, '<')
     .replace(/\\>/g, '>')
     .replace(/\\\{/g, '{')
@@ -174,6 +179,14 @@ function generateFromSample(from: string): string | undefined {
     .replace(/\[\\w(?:\\?\/)?\]\*/g, 'Example')
     .replace(/\[\\w\]\*/g, 'Example')
     .replace(/\[\\s\]\*/g, ' ');
+
+  // A character class containing a literal parenthesis still matches a single
+  // sample character. Use the literal parenthesis for that character.
+  s = s.replace(/\[[^\]]*\]/g, (charClass) =>
+    charClass.includes(literalOpenParen) || charClass.includes(literalCloseParen)
+      ? literalOpenParen
+      : charClass
+  );
 
   // Common word-boundary/capture wrappers.
   s = s.replace(/\(\\b\)/g, '').replace(/\\b/g, '');
@@ -196,6 +209,9 @@ function generateFromSample(from: string): string | undefined {
   if (/[()[\]{}\\^$]/.test(s)) {
     return undefined;
   }
+
+  // Restore literal parentheses after the regex-syntax check.
+  s = s.split(literalOpenParen).join('(').split(literalCloseParen).join(')');
 
   s = s.trim();
   return s.length > 0 ? s : undefined;

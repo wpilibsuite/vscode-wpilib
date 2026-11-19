@@ -34,6 +34,26 @@ function applyEntry(content: string, entry: IReplaceGroup, flags: string): strin
 }
 
 suite('Replacement idempotence', () => {
+  test('literal parentheses are preserved in from-samples', () => {
+    const cases: Array<[IReplaceGroup, string]> = [
+      [
+        { from: 'DriverStation.getAlliance\\(\\)', to: 'MatchState.getAlliance()' },
+        'DriverStation.getAlliance()',
+      ],
+      [{ from: 'MathUtil.clamp\\(', to: 'Math.clamp(' }, 'MathUtil.clamp('],
+      [{ from: '([ \\b{<!\\(])Pose2d(\\b)', to: '$1wpi::math::Pose2d$2' }, '(Pose2d'],
+    ];
+
+    for (const [entry, expected] of cases) {
+      const context = makeFromContext(entry);
+      assert.ok(context, `${entry.from} should generate a from-sample`);
+      assert.ok(
+        context.includes(expected),
+        `${entry.from} should generate a sample containing ${expected}`
+      );
+    }
+  });
+
   for (const config of configs) {
     suite(config.label, () => {
       let groups: IToUpdate[];
