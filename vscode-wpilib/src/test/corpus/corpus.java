@@ -265,6 +265,18 @@ import edu.wpi.first.fields;
 
 import edu.wpi.first.units;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+
+import edu.wpi.first.apriltag.AprilTagFields.;
+
+import edu.wpi.first.apriltag.AprilTagFields;
+
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+
+import org.wpilib.vision.apriltag.AprilTagFields.;
+
+import org.wpilib.vision.apriltag.AprilTagFields;
+
 import edu.wpi.first.apriltag;
 
 import edu.wpi.first.epilogue.processor;
@@ -292,6 +304,54 @@ import edu.wpi.first.wpilibj.snippets;
 import edu.wpi.first.wpilibj.templates;
 
 import edu.wpi.first.wpilibj;
+
+// context
+AprilTagFieldLayout;
+Object y = AprilTagFieldLayout;
+
+// context
+AprilTagFields;
+Object y = AprilTagFields;
+
+// context
+Fields.k2022RapidReact;
+Object y = Fields.k2022RapidReact;
+
+// context
+Fields.k2023ChargedUp;
+Object y = Fields.k2023ChargedUp;
+
+// context
+Fields.k2024Crescendo;
+Object y = Fields.k2024Crescendo;
+
+// context
+Fields.k2025ReefscapeAndyMark;
+Object y = Fields.k2025ReefscapeAndyMark;
+
+// context
+Fields.k2025ReefscapeWelded;
+Object y = Fields.k2025ReefscapeWelded;
+
+// context
+Fields.k2026RebuiltAndymark;
+Object y = Fields.k2026RebuiltAndymark;
+
+// context
+Fields.k2026RebuiltAndyMark;
+Object y = Fields.k2026RebuiltAndyMark;
+
+// context
+Fields.k2026RebuiltWelded;
+Object y = Fields.k2026RebuiltWelded;
+
+// context
+Fields.kDefaultField;
+Object y = Fields.kDefaultField;
+
+// context
+Fields.kBaseResourceDir;
+Object y = Fields.kBaseResourceDir;
 
 // context
 GradientType.kContinuous;

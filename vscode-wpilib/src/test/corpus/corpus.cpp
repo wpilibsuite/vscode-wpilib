@@ -11,6 +11,14 @@
 
 #include "fields/fields.h"
 
+#include "frc/apriltag/AprilTagFieldLayout.h"
+
+#include "frc/apriltag/AprilTagFields.h"
+
+#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+
+#include "wpi/apriltag/AprilTagFields.hpp"
+
 #include "ntcore_c_types.h"
 
 #include "ntcore_cpp_types.h"
@@ -1799,6 +1807,58 @@ Object y = frc::XRP;
 // context
 frc::Romi;
 Object y = frc::Romi;
+
+// context
+frc::AprilTagFieldLayout;
+Object y = frc::AprilTagFieldLayout;
+
+// context
+wpi::apriltag::AprilTagFieldLayout;
+Object y = wpi::apriltag::AprilTagFieldLayout;
+
+// context
+frc::AprilTagField;
+Object y = frc::AprilTagField;
+
+// context
+wpi::apriltag::AprilTagField;
+Object y = wpi::apriltag::AprilTagField;
+
+// context
+wpi::fields::Field::LoadField;
+Object y = wpi::fields::Field::LoadField;
+
+// context
+FieldId::k2022RapidReact;
+Object y = FieldId::k2022RapidReact;
+
+// context
+FieldId::k2023ChargedUp;
+Object y = FieldId::k2023ChargedUp;
+
+// context
+FieldId::k2024Crescendo;
+Object y = FieldId::k2024Crescendo;
+
+// context
+FieldId::k2025ReefscapeAndyMark;
+Object y = FieldId::k2025ReefscapeAndyMark;
+
+// context
+FieldId::k2025ReefscapeWelded;
+Object y = FieldId::k2025ReefscapeWelded;
+
+// context
+FieldId::k2026RebuiltAndyMark;
+Object y = FieldId::k2026RebuiltAndyMark;
+
+// context
+FieldId::k2026RebuiltWelded;
+Object y = FieldId::k2026RebuiltWelded;
+
+// context
+FieldId::kDefaultField;
+Object y = FieldId::kDefaultField;
 
 // context
 frc::April;

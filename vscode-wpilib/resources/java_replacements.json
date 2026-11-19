@@ -349,6 +349,27 @@
       { "from": "edu.wpi.first.fields", "to": "org.wpilib.fields" },
       { "from": "edu.wpi.first.hal", "to": "org.wpilib.hardware.hal" },
       { "from": "edu.wpi.first.units", "to": "org.wpilib.units" },
+      {
+        "from": "edu.wpi.first.apriltag.AprilTagFieldLayout",
+        "to": "org.wpilib.fields.Field"
+      },
+      {
+        "from": "edu.wpi.first.apriltag.AprilTagFields\\.",
+        "to": "org.wpilib.fields.Fields."
+      },
+      { "from": "edu.wpi.first.apriltag.AprilTagFields", "to": "org.wpilib.fields.Fields" },
+      {
+        "from": "org.wpilib.vision.apriltag.AprilTagFieldLayout",
+        "to": "org.wpilib.fields.Field"
+      },
+      {
+        "from": "org.wpilib.vision.apriltag.AprilTagFields\\.",
+        "to": "org.wpilib.fields.Fields."
+      },
+      {
+        "from": "org.wpilib.vision.apriltag.AprilTagFields",
+        "to": "org.wpilib.fields.Fields"
+      },
       { "from": "edu.wpi.first.apriltag", "to": "org.wpilib.vision.apriltag" },
       { "from": "edu.wpi.first.epilogue.processor", "to": "org.wpilib.epilogue.processor" },
       { "from": "edu.wpi.first.epilogue", "to": "org.wpilib.epilogue" },
@@ -363,6 +384,21 @@
       { "from": "edu.wpi.first.wpilibj.snippets", "to": "org.wpilib.snippets" },
       { "from": "edu.wpi.first.wpilibj.templates", "to": "org.wpilib.templates" },
       { "from": "edu.wpi.first.wpilibj", "to": "org.wpilib" },
+      { "from": "AprilTagFieldLayout", "to": "Field" },
+      { "from": "AprilTagFields", "to": "Fields" },
+      { "from": "Fields.k2022RapidReact", "to": "Fields.FRC_2022_RAPID_REACT" },
+      { "from": "Fields.k2023ChargedUp", "to": "Fields.FRC_2023_CHARGED_UP" },
+      { "from": "Fields.k2024Crescendo", "to": "Fields.FRC_2024_CRESCENDO" },
+      {
+        "from": "Fields.k2025ReefscapeAndyMark",
+        "to": "Fields.FRC_2025_REEFSCAPE_ANDY_MARK"
+      },
+      { "from": "Fields.k2025ReefscapeWelded", "to": "Fields.FRC_2025_REEFSCAPE_WELDED" },
+      { "from": "Fields.k2026RebuiltAndymark", "to": "Fields.FRC_2026_REBUILT_ANDY_MARK" },
+      { "from": "Fields.k2026RebuiltAndyMark", "to": "Fields.FRC_2026_REBUILT_ANDY_MARK" },
+      { "from": "Fields.k2026RebuiltWelded", "to": "Fields.FRC_2026_REBUILT_WELDED" },
+      { "from": "Fields.kDefaultField", "to": "Fields.DEFAULT_FIELD" },
+      { "from": "Fields.kBaseResourceDir", "to": "Fields.BASE_RESOURCE_DIR" },
       { "from": "GradientType.kContinuous", "to": "GradientType.CONTINUOUS" },
       { "from": "GradientType.kDiscrete", "to": "GradientType.DISCRETE" },
       { "from": "CTREPCM", "to": "CTRE_PCM" },

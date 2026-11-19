@@ -9,6 +9,13 @@
       { "from": "(?<!wpi/[^\\s]*)ntcore_cpp.h", "to": "wpi/nt/ntcore_cpp.hpp" },
       { "from": "(?<!wpi/)hal/UsageReporting.h", "to": "wpi/hal/UsageReporting.h" },
       { "from": "(?<!wpi/[^\\s]*)fields/fields.h", "to": "wpi/fields/fields.hpp" },
+      { "from": "frc/apriltag/AprilTagFieldLayout.h", "to": "wpi/fields/Field.hpp" },
+      { "from": "frc/apriltag/AprilTagFields.h", "to": "wpi/fields/fields.hpp" },
+      {
+        "from": "wpi/apriltag/AprilTagFieldLayout.hpp",
+        "to": "wpi/fields/Field.hpp"
+      },
+      { "from": "wpi/apriltag/AprilTagFields.hpp", "to": "wpi/fields/fields.hpp" },
       { "from": "(?<!wpi/[^\\s]*)ntcore_c_types.h", "to": "wpi/nt/ntcore_c_types.h" },
       { "from": "(?<!wpi/[^\\s]*)ntcore_cpp_types.h", "to": "wpi/nt/ntcore_cpp_types.hpp" },
       { "from": "wpimath/MathShared.h", "to": "wpi/math/util/MathShared.hpp" },
@@ -822,6 +829,31 @@
       { "from": "frc::OnBoardIO", "to": "wpi::romi::OnBoardIO" },
       { "from": "frc::XRP", "to": "wpi::xrp::XRP" },
       { "from": "frc::Romi", "to": "wpi::romi::Romi" },
+      { "from": "frc::AprilTagFieldLayout", "to": "wpi::fields::Field" },
+      { "from": "wpi::apriltag::AprilTagFieldLayout", "to": "wpi::fields::Field" },
+      { "from": "frc::AprilTagField", "to": "wpi::fields::FieldId" },
+      { "from": "wpi::apriltag::AprilTagField", "to": "wpi::fields::FieldId" },
+      { "from": "wpi::fields::Field::LoadField", "to": "wpi::fields::GetField" },
+      { "from": "FieldId::k2022RapidReact", "to": "FieldId::FRC_2022_RAPID_REACT" },
+      { "from": "FieldId::k2023ChargedUp", "to": "FieldId::FRC_2023_CHARGED_UP" },
+      { "from": "FieldId::k2024Crescendo", "to": "FieldId::FRC_2024_CRESCENDO" },
+      {
+        "from": "FieldId::k2025ReefscapeAndyMark",
+        "to": "FieldId::FRC_2025_REEFSCAPE_ANDY_MARK"
+      },
+      {
+        "from": "FieldId::k2025ReefscapeWelded",
+        "to": "FieldId::FRC_2025_REEFSCAPE_WELDED"
+      },
+      {
+        "from": "FieldId::k2026RebuiltAndyMark",
+        "to": "FieldId::FRC_2026_REBUILT_ANDY_MARK"
+      },
+      {
+        "from": "FieldId::k2026RebuiltWelded",
+        "to": "FieldId::FRC_2026_REBUILT_WELDED"
+      },
+      { "from": "FieldId::kDefaultField", "to": "FieldId::DEFAULT_FIELD" },
       { "from": "frc::April", "to": "wpi::apriltag::April" },
       { "from": " cs::", "to": " wpi::cs::" },
       { "from": "([ {])nt::", "to": "$1wpi::nt::" },
