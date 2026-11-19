@@ -123,7 +123,11 @@ export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolea
   return true;
 }
 
-export async function cpWithWritePermsissions(source: string | URL, destination: string, opts?: CopyOptions): Promise<void> {
+export async function cpWithWritePermsissions(
+  source: string | URL,
+  destination: string,
+  opts?: CopyOptions
+): Promise<void> {
   await cp(source, destination, opts);
   await setWritableRecursive(destination);
 }

@@ -20,7 +20,7 @@ export async function setWritableRecursive(path: string): Promise<void> {
     await chmod(path, fileStat.mode | constants.S_IWUSR);
     return;
   }
-  
+
   const entries = await readdir(path, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = join(path, entry.name);
