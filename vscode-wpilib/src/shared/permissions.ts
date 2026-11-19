@@ -5,7 +5,7 @@ import { chmod, stat, constants, readdir } from 'fs/promises';
 import { join } from 'path';
 
 /**
- * Recursively ensures all files and directories under `dir` are
+ * Recursively ensures all files and directories under `path` are
  * owner-writable. This is needed when copying from read-only
  * filesystems (e.g. the Nix store) where copied files preserve
  * the source's read-only permissions.
