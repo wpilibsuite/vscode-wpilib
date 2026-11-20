@@ -362,6 +362,10 @@ GradientType.kDiscrete;
 Object y = GradientType.kDiscrete;
 
 // context
+Pose2d.kZero;
+Object y = Pose2d.kZero;
+
+// context
 CTREPCM;
 Object y = CTREPCM;
 
