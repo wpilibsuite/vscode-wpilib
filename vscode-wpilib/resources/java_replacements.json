@@ -74,24 +74,28 @@
         "from": "edu.wpi.first.math.InterpolatingMatrixTreeMap",
         "to": "org.wpilib.math.interpolation.InterpolatingMatrixTreeMap"
       },
+      {
+        "from": "edu.wpi.first.math.system.plant.LinearSystemId",
+        "to": "org.wpilib.math.system.Models"
+      },
       { "from": "edu.wpi.first.math.system.plant", "to": "org.wpilib.math.system" },
       { "from": "edu.wpi.first.wpilibj.ProtoTestBase", "to": "org.wpilib.ProtoTestBase" },
       { "from": "edu.wpi.first.wpilibj.StructTestBase", "to": "org.wpilib.StructTestBase" },
       { "from": "edu.wpi.first.wpilibj.UtilityClassTest", "to": "org.wpilib.UtilityClassTest" },
       {
         "from": "edu.wpi.first.wpilibj.DriverStation",
-        "to": "org.wpilib.driverstation.DriverStation"
+        "to": "org.wpilib.driverstation.MatchState;\nimport org.wpilib.driverstation.RobotState;\nimport org.wpilib.driverstation.Alliance;\nimport org.wpilib.driverstation.MatchType;\nimport org.wpilib.driverstation.DriverStationErrors;\nimport org.wpilib.driverstation.DriverStation"
       },
       { "from": "edu.wpi.first.wpilibj.GenericHID", "to": "org.wpilib.driverstation.GenericHID" },
       { "from": "edu.wpi.first.wpilibj.Joystick", "to": "org.wpilib.driverstation.Joystick" },
       { "from": "edu.wpi.first.wpilibj.Gamepad", "to": "org.wpilib.driverstation.Gamepad" },
       {
         "from": "edu.wpi.first.wpilibj.PS4Controller",
-        "to": "org.wpilib.driverstation.PS4Controller"
+        "to": "org.wpilib.driverstation.DualShock4Controller"
       },
       {
         "from": "edu.wpi.first.wpilibj.PS5Controller",
-        "to": "org.wpilib.driverstation.PS5Controller"
+        "to": "org.wpilib.driverstation.DualSenseController"
       },
       {
         "from": "edu.wpi.first.wpilibj.StadiaController",
@@ -345,6 +349,27 @@
       { "from": "edu.wpi.first.fields", "to": "org.wpilib.fields" },
       { "from": "edu.wpi.first.hal", "to": "org.wpilib.hardware.hal" },
       { "from": "edu.wpi.first.units", "to": "org.wpilib.units" },
+      {
+        "from": "edu.wpi.first.apriltag.AprilTagFieldLayout",
+        "to": "org.wpilib.fields.Field"
+      },
+      {
+        "from": "edu.wpi.first.apriltag.AprilTagFields\\.",
+        "to": "org.wpilib.fields.Fields."
+      },
+      { "from": "edu.wpi.first.apriltag.AprilTagFields", "to": "org.wpilib.fields.Fields" },
+      {
+        "from": "org.wpilib.vision.apriltag.AprilTagFieldLayout",
+        "to": "org.wpilib.fields.Field"
+      },
+      {
+        "from": "org.wpilib.vision.apriltag.AprilTagFields\\.",
+        "to": "org.wpilib.fields.Fields."
+      },
+      {
+        "from": "org.wpilib.vision.apriltag.AprilTagFields",
+        "to": "org.wpilib.fields.Fields"
+      },
       { "from": "edu.wpi.first.apriltag", "to": "org.wpilib.vision.apriltag" },
       { "from": "edu.wpi.first.epilogue.processor", "to": "org.wpilib.epilogue.processor" },
       { "from": "edu.wpi.first.epilogue", "to": "org.wpilib.epilogue" },
@@ -359,8 +384,28 @@
       { "from": "edu.wpi.first.wpilibj.snippets", "to": "org.wpilib.snippets" },
       { "from": "edu.wpi.first.wpilibj.templates", "to": "org.wpilib.templates" },
       { "from": "edu.wpi.first.wpilibj", "to": "org.wpilib" },
+      { "from": "AprilTagFieldLayout", "to": "Field" },
+      { "from": "AprilTagFields", "to": "Fields" },
+      { "from": "Fields.k2022RapidReact", "to": "Fields.FRC_2022_RAPID_REACT" },
+      { "from": "Fields.k2023ChargedUp", "to": "Fields.FRC_2023_CHARGED_UP" },
+      { "from": "Fields.k2024Crescendo", "to": "Fields.FRC_2024_CRESCENDO" },
+      {
+        "from": "Fields.k2025ReefscapeAndyMark",
+        "to": "Fields.FRC_2025_REEFSCAPE_ANDY_MARK"
+      },
+      { "from": "Fields.k2025ReefscapeWelded", "to": "Fields.FRC_2025_REEFSCAPE_WELDED" },
+      { "from": "Fields.k2026RebuiltAndymark", "to": "Fields.FRC_2026_REBUILT_ANDY_MARK" },
+      { "from": "Fields.k2026RebuiltAndyMark", "to": "Fields.FRC_2026_REBUILT_ANDY_MARK" },
+      { "from": "Fields.k2026RebuiltWelded", "to": "Fields.FRC_2026_REBUILT_WELDED" },
+      { "from": "Fields.kDefaultField", "to": "Fields.DEFAULT_FIELD" },
+      { "from": "Fields.kBaseResourceDir", "to": "Fields.BASE_RESOURCE_DIR" },
       { "from": "GradientType.kContinuous", "to": "GradientType.CONTINUOUS" },
       { "from": "GradientType.kDiscrete", "to": "GradientType.DISCRETE" },
+      { "from": "Pose2d.kZero", "to": "Pose2d.ZERO" },
+      {
+        "from": "DifferentialDriveWheelSpeeds",
+        "to": "DifferentialDriveWheelVelocities"
+      },
       { "from": "CTREPCM", "to": "CTRE_PCM" },
       { "from": "REVPH", "to": "REV_PH" },
       { "from": "DoubleSolenoid.Value.kOff", "to": "DoubleSolenoid.Value.OFF" },
@@ -404,10 +449,6 @@
       { "from": "DriverStation.isTestEnabled\\(\\)", "to": "RobotState.isUtilityEnabled()" },
       { "from": "DriverStation.isFMSAttached\\(\\)", "to": "RobotState.isFMSAttached()" },
       { "from": "DriverStation.isDSAttached\\(\\)", "to": "RobotState.isDSAttached()" },
-      {
-        "from": "org.wpilib.driverstation.DriverStation;",
-        "to": "org.wpilib.driverstation.MatchState;\nimport org.wpilib.driverstation.RobotState;\nimport org.wpilib.driverstation.Alliance;\nimport org.wpilib.driverstation.MatchType;\nimport org.wpilib.driverstation.DriverStationErrors;"
-      },
       { "from": "testInit\\(\\)", "to": "utilityInit()" },
       { "from": "testPeriodic\\(\\)", "to": "utilityPeriodic()" },
       { "from": "testExit\\(\\)", "to": "utilityExit()" },
@@ -587,7 +628,86 @@
       {
         "from": "org.wpilib.smartdashboard.SmartDashboard;",
         "to": "org.wpilib.telemetry.Telemetry;\nimport org.wpilib.tunable.Tunable;\nimport org.wpilib.tunable.Selectable;"
-      }
+      },
+      { "from": "org.wpilib.math.util.Units", "to": "org.wpilib.math.util.UnitConversions" },
+      { "from": "Units\\.metersToFeet\\(", "to": "UnitConversions.metersToFeet(" },
+      { "from": "Units\\.feetToMeters\\(", "to": "UnitConversions.feetToMeters(" },
+      { "from": "Units\\.metersToInches\\(", "to": "UnitConversions.metersToInches(" },
+      { "from": "Units\\.inchesToMeters\\(", "to": "UnitConversions.inchesToMeters(" },
+      { "from": "Units\\.degreesToRadians\\(", "to": "UnitConversions.degreesToRadians(" },
+      { "from": "Units\\.radiansToDegrees\\(", "to": "UnitConversions.radiansToDegrees(" },
+      { "from": "Units\\.radiansToRotations\\(", "to": "UnitConversions.radiansToRotations(" },
+      { "from": "Units\\.degreesToRotations\\(", "to": "UnitConversions.degreesToRotations(" },
+      { "from": "Units\\.rotationsToDegrees\\(", "to": "UnitConversions.rotationsToDegrees(" },
+      { "from": "Units\\.rotationsToRadians\\(", "to": "UnitConversions.rotationsToRadians(" },
+      {
+        "from": "Units\\.rotationsPerMinuteToRadiansPerSecond\\(",
+        "to": "UnitConversions.rotationsPerMinuteToRadiansPerSecond("
+      },
+      {
+        "from": "Units\\.radiansPerSecondToRotationsPerMinute\\(",
+        "to": "UnitConversions.radiansPerSecondToRotationsPerMinute("
+      },
+      {
+        "from": "Units\\.milesPerHourToMetersPerSecond\\(",
+        "to": "UnitConversions.milesPerHourToMetersPerSecond("
+      },
+      {
+        "from": "Units\\.metersPerSecondToMilesPerHour\\(",
+        "to": "UnitConversions.metersPerSecondToMilesPerHour("
+      },
+      {
+        "from": "Units\\.millisecondsToSeconds\\(",
+        "to": "UnitConversions.millisecondsToSeconds("
+      },
+      {
+        "from": "Units\\.secondsToMilliseconds\\(",
+        "to": "UnitConversions.secondsToMilliseconds("
+      },
+      { "from": "Units\\.kilogramsToLbs\\(", "to": "UnitConversions.kilogramsToLbs(" },
+      { "from": "Units\\.lbsToKilograms\\(", "to": "UnitConversions.lbsToKilograms(" },
+      { "from": "SysIdRoutine.Direction.kForward", "to": "SysIdRoutine.Direction.FORWARD" },
+      { "from": "SysIdRoutine.Direction.kReverse", "to": "SysIdRoutine.Direction.REVERSE" },
+      {
+        "from": "edu.wpi.first.wpilibj2.command.button.CommandPS4Controller",
+        "to": "org.wpilib.command2.button.CommandDualShock4Controller"
+      },
+      {
+        "from": "edu.wpi.first.wpilibj2.command.button.CommandPS5Controller",
+        "to": "org.wpilib.command2.button.CommandDualSenseController"
+      },
+      { "from": "CommandPS4Controller", "to": "CommandDualShock4Controller" },
+      { "from": "CommandPS5Controller", "to": "CommandDualSenseController" },
+      { "from": "EncodingType.k4X", "to": "EncodingType.X4" },
+      { "from": "EncodingType.k2X", "to": "EncodingType.X2" },
+      { "from": "EncodingType.k1X", "to": "EncodingType.X1" },
+      {
+        "from": "LinearSystemId.createSingleJointedArmSystem",
+        "to": "Models.singleJointedArmFromPhysicalConstants"
+      },
+      {
+        "from": "LinearSystemId.createFlywheelSystem",
+        "to": "Models.flywheelFromPhysicalConstants"
+      },
+      {
+        "from": "LinearSystemId.createElevatorSystem",
+        "to": "Models.elevatorFromPhysicalConstants"
+      },
+      {
+        "from": "Models.singleJointedArmFromPhysicalConstants",
+        "to": "Models.angularPositionFromPhysicalConstants"
+      },
+      {
+        "from": "Models.flywheelFromPhysicalConstants",
+        "to": "Models.angularVelocityFromPhysicalConstants"
+      },
+      {
+        "from": "Models.elevatorFromPhysicalConstants",
+        "to": "Models.linearPositionFromPhysicalConstants"
+      },
+      { "from": "Models.flywheelFromSysId", "to": "Models.angularVelocityFromSysId" },
+      { "from": "Models.singleJointedArmFromSysId", "to": "Models.angularPositionFromSysId" },
+      { "from": "Models.elevatorFromSysId", "to": "Models.linearPositionFromSysId" }
     ]
   }
 ]
