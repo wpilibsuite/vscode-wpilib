@@ -402,6 +402,10 @@
       { "from": "GradientType.kContinuous", "to": "GradientType.CONTINUOUS" },
       { "from": "GradientType.kDiscrete", "to": "GradientType.DISCRETE" },
       { "from": "Pose2d.kZero", "to": "Pose2d.ZERO" },
+      {
+        "from": "DifferentialDriveWheelSpeeds",
+        "to": "DifferentialDriveWheelVelocities"
+      },
       { "from": "CTREPCM", "to": "CTRE_PCM" },
       { "from": "REVPH", "to": "REV_PH" },
       { "from": "DoubleSolenoid.Value.kOff", "to": "DoubleSolenoid.Value.OFF" },

@@ -242,6 +242,10 @@
       { "from": "frc/controller/([\\w\/]*)\\.h", "to": "wpi/math/controller/$1.hpp" },
       { "from": "frc/filter/([\\w\/]*)\\.h", "to": "wpi/math/filter/$1.hpp" },
       { "from": "frc/geometry/([\\w\/]*)\\.h", "to": "wpi/math/geometry/$1.hpp" },
+      {
+        "from": "frc/kinematics/DifferentialDriveWheelSpeeds.h",
+        "to": "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
+      },
       { "from": "frc/kinematics/([\\w\/]*)\\.h", "to": "wpi/math/kinematics/$1.hpp" },
       { "from": "frc/trajectory/([\\w\/]*)\\.h", "to": "wpi/math/trajectory/$1.hpp" },
       { "from": "(?<!wpi/)units/([\\w\/]*)\\.h", "to": "wpi/units/$1.hpp" },
@@ -568,15 +572,15 @@
       },
       {
         "from": "(\\b)frc::DifferentialDriveWheelSpeeds(\\b)",
-        "to": "$1wpi::math::DifferentialDriveWheelSpeeds$2"
+        "to": "$1wpi::math::DifferentialDriveWheelVelocities$2"
       },
       {
         "from": "([ \\b{<!\\(])DifferentialDriveWheelSpeeds(\\b)",
-        "to": "$1wpi::math::DifferentialDriveWheelSpeeds$2"
+        "to": "$1wpi::math::DifferentialDriveWheelVelocities$2"
       },
       {
         "from": "^DifferentialDriveWheelSpeeds(\\b)",
-        "to": "$1wpi::math::DifferentialDriveWheelSpeeds"
+        "to": "$1wpi::math::DifferentialDriveWheelVelocities"
       },
       {
         "from": "(\\b)frc::DifferentialDriveOdometry(\\b)",
