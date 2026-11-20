@@ -23,17 +23,9 @@ export async function setWritableRecursive(path: string): Promise<void> {
 
   const entries = await readdir(path, { withFileTypes: true });
   for (const entry of entries) {
-    const fullPath = join(path, entry.name);
-    if (entry.isDirectory()) {
-      await setWritableRecursive(fullPath);
-    }
-
-    if (!entry.isFile()) {
-      return;
-    }
-    const fileStat = await stat(fullPath);
-    await chmod(fullPath, fileStat.mode | constants.S_IWUSR);
+    await setWritableRecursive(join(path, entry.name));
   }
+  await chmod(path, fileStat.mode | constants.S_IWUSR);
 }
 
 export async function setExecutePermissions(file: string): Promise<void> {
