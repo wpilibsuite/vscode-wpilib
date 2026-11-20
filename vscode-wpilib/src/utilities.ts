@@ -1,12 +1,11 @@
 'use strict';
-import { readFile } from 'fs/promises';
+import { CopyOptions } from 'fs';
+import { readFile, cp } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from './api';
 import { localize as i18n } from './locale';
 import { setExecutePermissions, setWritableRecursive } from './shared/permissions';
-import { CopyOptions } from 'fs';
-import { cp } from 'fs/promises';
 
 // General utilities usable by multiple classes
 
