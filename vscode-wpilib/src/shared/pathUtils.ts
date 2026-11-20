@@ -3,6 +3,7 @@
 import { copyFile, readdir } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
+import { setWritableRecursive } from './permissions';
 
 /**
  * Creates source and test paths based on project type and import mode
@@ -48,6 +49,7 @@ export async function copyVendorDep(
     const sourcePath = path.join(path.dirname(resourcesFolder), 'vendordeps', vendorDepName);
     const targetPath = path.join(targetDir, vendorDepName);
     await copyFile(sourcePath, targetPath);
+    await setWritableRecursive(targetPath);
     return true;
   } catch (err) {
     logger.error(`Failed to copy vendor dependency: ${vendorDepName}`, err);
