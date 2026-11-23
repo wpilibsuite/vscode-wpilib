@@ -338,7 +338,8 @@
         "from": "org.wpilib.driverstation.Alert.AlertType",
         "to": "org.wpilib.driverstation.Alert.Level"
       },
-      { "from": "edu.wpi.first.wpilibj.Preferences", "to": "org.wpilib.util.Preferences" },
+      { "from": "edu.wpi.first.wpilibj.Preferences", "to": "org.wpilib.preferences.Preferences" },
+      { "from": "org.wpilib.util.Preferences", "to": "org.wpilib.preferences.Preferences" },
       { "from": "edu.wpi.first.util", "to": "org.wpilib.util" },
       { "from": "edu.wpi.first.math", "to": "org.wpilib.math" },
       { "from": "edu.wpi.first.net", "to": "org.wpilib.net" },
