@@ -505,6 +505,8 @@
       { "from": "(\\b)frc::DCMotor(\\b)", "to": "$1wpi::math::DCMotor$2" },
       { "from": "([ \\b{<!\\(])DCMotor(\\b)", "to": "$1wpi::math::DCMotor$2" },
       { "from": "^DCMotor(\\b)", "to": "$1wpi::math::DCMotor" },
+      { "from": "DCMotor::NEO550\\(", "to": "DCMotor::Neo550(" },
+      { "from": "DCMotor::NEO\\(", "to": "DCMotor::Neo(" },
       { "from": "(\\b)frc::Matrixd(\\b)", "to": "$1wpi::math::Matrixd$2" },
       { "from": "([ \\b{<!\\(])Matrixd(\\b)", "to": "$1wpi::math::Matrixd$2" },
       { "from": "^Matrixd(\\b)", "to": "$1wpi::math::Matrixd" },

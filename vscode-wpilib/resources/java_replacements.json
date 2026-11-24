@@ -467,6 +467,8 @@
       { "from": "\\.speedMetersPerSecond", "to": ".velocity" },
       { "from": "getVelocityRadPerSec\\(\\)", "to": "getVelocity()" },
       { "from": "getAngularPositionRotations\\(\\)", "to": "getAngularPosition()" },
+      { "from": "getNEO550\\(", "to": "getNeo550(" },
+      { "from": "getNEO\\(", "to": "getNeo(" },
       { "from": "scrollAtRelativeSpeed\\(", "to": "scrollAtRelativeVelocity(" },
       { "from": "scrollAtAbsoluteSpeed\\(", "to": "scrollAtAbsoluteVelocity(" },
       { "from": "AlertType.kError", "to": "Level.HIGH" },
