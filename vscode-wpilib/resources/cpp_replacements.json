@@ -44,7 +44,10 @@
       { "from": "(?<!wpi/[^\\s]*)wpigui_internal.h", "to": "wpi/gui/wpigui_internal.hpp" },
       { "from": "(?<!wpi/[^\\s]*)wpigui.h", "to": "wpi/gui/wpigui.hpp" },
       { "from": "(?<!wpi/[^\\s]*)WPILibVersion.h", "to": "wpi/system/WPILibVersion.hpp" },
-      { "from": "frc/DriverStation.h", "to": "wpi/driverstation/DriverStation.hpp" },
+      {
+        "from": "frc/DriverStation.h",
+        "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\"\n#include \"wpi/driverstation/DriverStation.hpp\""
+      },
       { "from": "frc/GenericHID.h", "to": "wpi/driverstation/GenericHID.hpp" },
       { "from": "frc/Joystick.h", "to": "wpi/driverstation/Joystick.hpp" },
       { "from": "frc/Gamepad.h", "to": "wpi/driverstation/Gamepad.hpp" },
@@ -257,10 +260,6 @@
       { "from": "frc/estimator/([\\w\/]*)\\.h", "to": "wpi/math/estimator/$1.hpp" },
       { "from": "frc/system/LinearSystemLoop.h", "to": "wpi/math/system/LinearSystemLoop.hpp" },
       { "from": "frc/([\\w\/]*)\\.h", "to": "wpi/$1.hpp" },
-      {
-        "from": "(\"|\\<)wpi/driverstation/DriverStation.hpp(\"|\\>)",
-        "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\""
-      },
       { "from": "wpi/hardware/motor/", "to": "wpi/drivers/motor/" },
       {
         "from": "(\"|\\<)frc/smartdashboard/SmartDashboard.h(\"|\\>)",
@@ -1063,9 +1062,17 @@
       { "from": "DriverStation::IsTestEnabled\\(\\)", "to": "RobotState::IsUtilityEnabled()" },
       { "from": "DriverStation::IsFMSAttached\\(\\)", "to": "RobotState::IsFMSAttached()" },
       { "from": "DriverStation::IsDSAttached\\(\\)", "to": "RobotState::IsDSAttached()" },
-      { "from": "TestInit\\(\\)", "to": "UtilityInit()" },
+      { "from": "TestInit\\(\\)", "to": "UtilityStart()" },
       { "from": "TestPeriodic\\(\\)", "to": "UtilityPeriodic()" },
-      { "from": "TestExit\\(\\)", "to": "UtilityExit()" },
+      { "from": "TestExit\\(\\)", "to": "UtilityEnd()" },
+      { "from": "DisabledInit\\(\\)", "to": "DisabledStart()" },
+      { "from": "DisabledExit\\(\\)", "to": "DisabledEnd()" },
+      { "from": "AutonomousInit\\(\\)", "to": "AutonomousStart()" },
+      { "from": "AutonomousExit\\(\\)", "to": "AutonomousEnd()" },
+      { "from": "TeleopInit\\(\\)", "to": "TeleopStart()" },
+      { "from": "TeleopExit\\(\\)", "to": "TeleopEnd()" },
+      { "from": "UtilityInit\\(\\)", "to": "UtilityStart()" },
+      { "from": "UtilityExit\\(\\)", "to": "UtilityEnd()" },
       { "from": "SmartDashboard::PutNumber", "to": "telemetry::Log" },
       { "from": "SmartDashboard::PutString", "to": "telemetry::Log" },
       { "from": "SmartDashboard::PutBoolean", "to": "telemetry::Log" },
