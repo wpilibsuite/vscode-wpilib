@@ -24,7 +24,7 @@
       { "from": "frc/EigenCore.h", "to": "wpi/math/linalg/EigenCore.hpp" },
       { "from": "frc/proto/MatrixProto.h", "to": "wpi/math/linalg/proto/MatrixProto.hpp" },
       { "from": "frc/proto/VectorProto.h", "to": "wpi/math/linalg/proto/VectorProto.hpp" },
-      { "from": "frc/struct/MatrixStruct.h", "to": "wpi/math/linalg/struct/StructProto.hpp" },
+      { "from": "frc/struct/MatrixStruct.h", "to": "wpi/math/linalg/struct/MatrixStruct.hpp" },
       { "from": "frc/struct/VectorStruct.h", "to": "wpi/math/linalg/struct/VectorStruct.hpp" },
       { "from": "frc/ComputerVisionUtil.h", "to": "wpi/math/util/ComputerVisionUtil.hpp" },
       { "from": "frc/MathUtil.h", "to": "wpi/math/util/MathUtil.hpp" },
