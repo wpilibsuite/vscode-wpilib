@@ -49,13 +49,10 @@ function navigateToStep(step: number) {
   if (step === 2) {
     // Reset language dropdown to default state if needed
     const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
-    if (languageSelect.selectedIndex !== 0) {
+    if (languageSelect.selectedIndex <= 0) {
       languageSelect.selectedIndex = 0;
       language = '';
     }
-
-    // Reset base dropdown
-    resetBaseDropdown();
   }
 
   // Update summary when navigating to the final step
@@ -172,6 +169,9 @@ function selectProjectType(type: ProjectType) {
   }
 
   // Reset language and base since they depend on project type
+  const lanagageSelect = document.getElementById('language-select') as HTMLSelectElement;
+  lanagageSelect.selectedIndex = 0;
+  resetBaseDropdown();
   language = '';
   base = '';
 

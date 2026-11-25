@@ -23,7 +23,7 @@ export class ExecuteAPI implements IExecuteAPI {
   constructor() {
     vscode.tasks.onDidEndTaskProcess((e) => {
       for (let i = 0; i < this.runners.length; i++) {
-        if (this.runners[i].execution === undefined) {
+        if (!this.runners[i].execution) {
           continue;
         }
         if (e.execution === this.runners[i].execution) {
@@ -56,7 +56,7 @@ export class ExecuteAPI implements IExecuteAPI {
         command = command.substring(2);
       }
       shell.commandLine = command;
-      if (shell.options !== undefined) {
+      if (shell.options) {
         shell.options.executable = 'cmd.exe';
         shell.options.shellArgs = ['/d', '/c'];
       }
@@ -92,7 +92,7 @@ export class ExecuteAPI implements IExecuteAPI {
       canPickMany: true,
       placeHolder: i18n('message', 'Select tasks to cancel'),
     });
-    if (result === undefined) {
+    if (!result) {
       return 0;
     }
     for (const r of result) {

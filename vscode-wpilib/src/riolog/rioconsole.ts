@@ -83,7 +83,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
 
   private async connect(teamNumber: number): Promise<net.Socket | undefined> {
     const socket = await connectToRobot(1741, teamNumber, 2000);
-    if (socket === undefined) {
+    if (!socket) {
       return undefined;
     }
     socket.setNoDelay(true);
@@ -127,14 +127,13 @@ export class RioConsole extends EventEmitter implements IRioConsole {
     }
 
     let count = 0;
-    let len = 0;
+    let len: number;
     do {
       len = data.readUInt16BE(count);
       count += 2;
     } while (len === 0);
 
     const tag = data.readUInt8(count);
-    count++;
 
     const outputBuffer = data.slice(3, len + 2);
 
@@ -150,7 +149,7 @@ export class RioConsole extends EventEmitter implements IRioConsole {
 
   private async runFunction(teamNumber: number): Promise<void> {
     const socket = await this.connect(teamNumber);
-    if (socket === undefined) {
+    if (!socket) {
       logger.info('bad socket');
       return;
     }

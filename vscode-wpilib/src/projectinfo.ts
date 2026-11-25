@@ -9,27 +9,45 @@ import { findJdkPath, getJavaVersion } from './jdkdetector';
 import { logger } from './logger';
 import { extensionContext } from './utilities';
 import { VendorLibraries } from './vendorlibraries';
-import { WPILibUpdates } from './wpilibupdates';
+import { getGradleRIOVersion } from './wpilibupdates';
 
 export interface IVendorLibraryPair {
   name: string;
   version: string;
 }
 
+export interface IVscodeExtension {
+  id: string;
+  version: string;
+}
+
 export interface IProjectInfo {
   wpilibProjectVersion: string;
   wpilibExtensionVersion: string;
-  javaDebugExtensionVersion: string;
-  javaExtensionVersion: string;
-  javaDependenciesExtensionVersion: string;
-  cppExtensionVersion: string;
   vendorLibraries: IVendorLibraryPair[];
+  vscodeExtensions: IVscodeExtension[];
+  mavenRepositories: Set<string>;
   wpilibProjectYear: string;
   wpilibLanguage: string;
 }
 
-async function extensionVersion(extension: vscode.Extension<unknown> | undefined): Promise<string> {
-  if (extension === undefined) {
+const wpilibExtensionIds = {
+  cpp: 'ms-vscode.cpptools',
+  java: 'redhat.java',
+  javaDebug: 'vscjava.vscode-java-debug',
+  javaDependencies: 'vscjava.vscode-java-dependency',
+  wpilib: 'wpilibsuite.vscode-wpilib',
+};
+
+const excludedExtensionIds: ReadonlySet<string> = new Set(Object.values(wpilibExtensionIds));
+const builtInRepositories = new Set([
+  'https://plugins.gradle.org/',
+  'https://frcmaven.wpi.edu/artifactory',
+]);
+
+function extensionVersion(id: string): string {
+  const extension = vscode.extensions.getExtension(id);
+  if (!extension) {
     return 'Not Installed';
   }
   return extension.packageJSON.version;
@@ -37,18 +55,12 @@ async function extensionVersion(extension: vscode.Extension<unknown> | undefined
 
 export class ProjectInfoGatherer {
   private vendorLibraries: VendorLibraries;
-  private wpilibUpdates: WPILibUpdates;
   private externalApi: IExternalAPI;
   private disposables: vscode.Disposable[] = [];
   private statusBar: vscode.StatusBarItem;
 
-  public constructor(
-    vendorLibraries: VendorLibraries,
-    wpilibUpdates: WPILibUpdates,
-    externalApi: IExternalAPI
-  ) {
+  public constructor(vendorLibraries: VendorLibraries, externalApi: IExternalAPI) {
     this.vendorLibraries = vendorLibraries;
-    this.wpilibUpdates = wpilibUpdates;
     this.externalApi = externalApi;
 
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
@@ -58,7 +70,7 @@ export class ProjectInfoGatherer {
     this.disposables.push(this.statusBar);
 
     const workspaces = vscode.workspace.workspaceFolders;
-    if (workspaces !== undefined) {
+    if (workspaces) {
       for (const wp of workspaces) {
         const prefs = this.externalApi.getPreferencesAPI().getPreferences(wp);
         if (prefs.getIsWPILibProject()) {
@@ -83,51 +95,77 @@ export class ProjectInfoGatherer {
 
   public async displayProjectInfo(): Promise<void> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       logger.warn('no workspace');
       return;
     }
     const projectInfo = await this.getProjectInfo(wp);
     const jdkLoc = await findJdkPath(this.externalApi);
-    const jdkVer = jdkLoc === undefined ? 'unknown' : await getJavaVersion(jdkLoc);
-    let infoString = `WPILib Information:
+    const jdkVer = !jdkLoc ? 'unknown' : (await getJavaVersion(jdkLoc)).full;
+    const debugExt = extensionVersion(wpilibExtensionIds.javaDebug);
+    const depViewer = extensionVersion(wpilibExtensionIds.javaDependencies);
+    const javaExt = extensionVersion(wpilibExtensionIds.java);
+    const cppExt = extensionVersion(wpilibExtensionIds.cpp);
+    let vendorLibs = '\n';
+    let extensionList = '\n';
+    for (const lib of projectInfo.vendorLibraries) {
+      vendorLibs += `    ${lib.name} (${lib.version})\n`;
+    }
+    for (const extension of projectInfo.vscodeExtensions) {
+      if (excludedExtensionIds.has(extension.id) || extension.id.startsWith('vscode.')) {
+        continue;
+      }
+      extensionList += `    ${extension.id} (${extension.version})\n`;
+    }
+
+    const infoString = `WPILib Information:
 Project Version: ${projectInfo.wpilibProjectVersion}
 VS Code Version: ${vscode.version}
 WPILib Extension Version: ${projectInfo.wpilibExtensionVersion}
 Project Year: ${projectInfo.wpilibProjectYear}
 Language: ${projectInfo.wpilibLanguage}
-C++ Extension Version: ${projectInfo.cppExtensionVersion}
-Java Extension Version: ${projectInfo.javaExtensionVersion}
-Java Debug Extension Version: ${projectInfo.javaDebugExtensionVersion}
-Java Dependencies Extension Version ${projectInfo.javaDependenciesExtensionVersion}
+C++ Extension Version: ${cppExt}
+Java Extension Version: ${javaExt}
+Java Debug Extension Version: ${debugExt}
+Java Dependencies Extension Version: ${depViewer}
 Java Version: ${jdkVer}
 Java Location: ${jdkLoc}
-Vendor Libraries:
+Vendor Libraries: ${vendorLibs}
+VS Code Extensions: ${extensionList}
 `;
 
-    for (const lib of projectInfo.vendorLibraries) {
-      infoString += `    ${lib.name} (${lib.version})
-`;
-    }
+    const action = await vscode.window.showInformationMessage(
+      infoString,
+      {
+        modal: true,
+      },
+      'Show Dependency URLs',
+      'Copy'
+    );
 
-    vscode.window
-      .showInformationMessage(
-        infoString,
+    if (action === 'Copy') {
+      await vscode.env.clipboard.writeText(infoString);
+    } else if (action === 'Show Dependency URLs') {
+      const repositories = Array.from(
+        new Set([...builtInRepositories, ...projectInfo.mavenRepositories])
+      ).join('\n');
+      const repositoryAction = await vscode.window.showInformationMessage(
+        `Dependency URLs used by project:\n${repositories}\n
+Note: URLs are based on standard WPILib build.gradle and vendordeps used in the project. Non-standard changes to build.gradle files will not be reflected in this list.`,
         {
           modal: true,
         },
         'Copy'
-      )
-      .then((action) => {
-        if (action === 'Copy') {
-          vscode.env.clipboard.writeText(infoString);
-        }
-      });
+      );
+      if (repositoryAction === 'Copy') {
+        await vscode.env.clipboard.writeText(repositories);
+      }
+    }
   }
 
   public async getViewInfo(): Promise<IProjectInfo | undefined> {
     const wp = await this.externalApi.getPreferencesAPI().getFirstOrSelectedWorkspace();
-    if (wp === undefined) {
+    if (!wp) {
       return wp;
     }
     return this.getProjectInfo(wp);
@@ -137,33 +175,28 @@ Vendor Libraries:
     const vendorLibs = await this.vendorLibraries.getCurrentlyInstalledLibraries(workspace);
     const prefs = this.externalApi.getPreferencesAPI().getPreferences(workspace);
 
-    let currentGradleVersion = await this.wpilibUpdates.getGradleRIOVersion(workspace);
+    let currentGradleVersion = await getGradleRIOVersion(workspace);
 
-    if (currentGradleVersion === undefined) {
+    if (!currentGradleVersion) {
       currentGradleVersion = 'unknown';
     }
 
-    const debugExt = await extensionVersion(
-      vscode.extensions.getExtension('vscjava.vscode-java-debug')
-    );
-    const depViewer = await extensionVersion(
-      vscode.extensions.getExtension('vscjava.vscode-java-dependency')
-    );
-    const javaExt = await extensionVersion(vscode.extensions.getExtension('redhat.java'));
-    const cpp = await extensionVersion(vscode.extensions.getExtension('ms-vscode.cpptools'));
-
     const extensionPackageJson = path.join(extensionContext.extensionPath, 'package.json');
     const packageJson = await readFile(extensionPackageJson, 'utf8');
-    const currentVsCodeVersion: string = json.parse(packageJson).version;
+    const currentVsCodeVersion: string = json.parse(packageJson).version as string;
     const currentProjectYear: string = prefs.getProjectYear();
     const currentLanguage: string = prefs.getCurrentLanguage();
+    const vscodeExtensions = vscode.extensions.all
+      .map((extension) => ({
+        id: extension.id,
+        version: extension.packageJSON.version as string,
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
 
     const projectInfo: IProjectInfo = {
-      cppExtensionVersion: cpp,
-      javaDebugExtensionVersion: debugExt,
-      javaDependenciesExtensionVersion: depViewer,
-      javaExtensionVersion: javaExt,
       vendorLibraries: [],
+      vscodeExtensions,
+      mavenRepositories: new Set(vendorLibs.flatMap((lib) => lib.mavenUrls ?? [])),
       wpilibExtensionVersion: currentVsCodeVersion,
       wpilibProjectVersion: currentGradleVersion,
       wpilibProjectYear: currentProjectYear,

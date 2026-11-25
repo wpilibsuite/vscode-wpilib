@@ -10,6 +10,7 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 eslint.config.mjs
+.vscode-test.mjs
 **/*.map
 **/*.ts
 **/.vscode-test.*

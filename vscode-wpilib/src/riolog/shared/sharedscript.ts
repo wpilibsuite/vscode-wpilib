@@ -409,7 +409,7 @@ function insertMessage(ts: number, line: string, li: HTMLElement, color?: string
   // Create the content container
   const contentSpan = document.createElement('span');
   contentSpan.className = 'message-content';
-  if (color !== undefined) {
+  if (color) {
     contentSpan.style.color = color;
   }
 
@@ -422,7 +422,7 @@ function insertMessage(ts: number, line: string, li: HTMLElement, color?: string
       continue;
     }
 
-    if (first === false) {
+    if (!first) {
       contentSpan.appendChild(document.createElement('br'));
     }
     first = false;
@@ -454,14 +454,14 @@ function insertStackTrace(st: string, container: HTMLElement, color?: string) {
     if (item.trim() === '') {
       continue;
     }
-    if (first === false) {
+    if (!first) {
       div.appendChild(document.createElement('br'));
     }
     first = false;
     const tNode = document.createTextNode('\u00a0\u00a0\u00a0\u00a0 at: ' + item);
     div.appendChild(tNode);
   }
-  if (color !== undefined) {
+  if (color) {
     div.style.color = color;
   }
   container.appendChild(div);
@@ -477,14 +477,14 @@ function insertLocation(loc: string, container: HTMLElement, color?: string) {
     if (item.trim() === '') {
       continue;
     }
-    if (first === false) {
+    if (!first) {
       div.appendChild(document.createElement('br'));
     }
     first = false;
     const tNode = document.createTextNode('\u00a0\u00a0 from: ' + item);
     div.appendChild(tNode);
   }
-  if (color !== undefined) {
+  if (color) {
     div.style.color = color;
   }
   container.appendChild(div);

@@ -1,10 +1,11 @@
 'use strict';
-import { readFile } from 'fs/promises';
+import { CopyOptions } from 'fs';
+import { readFile, cp } from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { IExecuteAPI, IPreferences } from './api';
 import { localize as i18n } from './locale';
-import { setExecutePermissions } from './shared/permissions';
+import { setExecutePermissions, setWritableRecursive } from './shared/permissions';
 
 // General utilities usable by multiple classes
 
@@ -14,6 +15,10 @@ export function getIsWindows(): boolean {
 
 export function getIsMac(): boolean {
   return process.platform === 'darwin';
+}
+
+export function getIsLinux(): boolean {
+  return process.platform === 'linux';
 }
 
 export async function getClassName(): Promise<string | undefined> {
@@ -68,7 +73,7 @@ export async function gradleRun(
 
   let varCommands;
 
-  if (javaHome !== undefined && javaHome !== '') {
+  if (javaHome) {
     command += ` -Dorg.gradle.java.home="${javaHome}"`;
     varCommands = {
       ['JAVA_HOME']: javaHome,
@@ -107,14 +112,21 @@ export async function promptForProjectOpen(toFolder: vscode.Uri): Promise<boolea
     { title: i18n('ui', 'Yes (New Window)') },
     { title: i18n('ui', 'No'), isCloseAffordance: true }
   );
-  if (openSelection === undefined) {
+  if (!openSelection) {
     return true;
   } else if (openSelection.title === i18n('ui', 'Yes (Current Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, false);
   } else if (openSelection.title === i18n('ui', 'Yes (New Window)')) {
     await vscode.commands.executeCommand('vscode.openFolder', toFolder, true);
-  } else {
-    return true;
   }
   return true;
+}
+
+export async function cpWithWritePermsissions(
+  source: string | URL,
+  destination: string,
+  opts?: CopyOptions
+): Promise<void> {
+  await cp(source, destination, opts);
+  await setWritableRecursive(destination);
 }

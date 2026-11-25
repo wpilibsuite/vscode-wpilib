@@ -24,7 +24,7 @@ export class CommandAPI implements ICommandAPI {
       }
     }
 
-    if (lp === undefined) {
+    if (!lp) {
       // Not found
       lp = {
         creators: [],
@@ -63,7 +63,7 @@ export class CommandAPI implements ICommandAPI {
             break;
           }
         }
-        if (lp === undefined) {
+        if (!lp) {
           // Not found
           lp = {
             creators: [],
@@ -88,7 +88,7 @@ export class CommandAPI implements ICommandAPI {
       const lSelect = await vscode.window.showQuickPick(validLanguages, {
         placeHolder: i18n('ui', 'Pick a language'),
       });
-      if (lSelect === undefined) {
+      if (!lSelect) {
         vscode.window.showInformationMessage(i18n('message', 'Selection exited. Cancelling'));
         return false;
       }
@@ -98,7 +98,7 @@ export class CommandAPI implements ICommandAPI {
     const selection = await vscode.window.showQuickPick(langSelection.creators, {
       placeHolder: i18n('ui', 'Pick a command'),
     });
-    if (selection === undefined) {
+    if (!selection) {
       vscode.window.showInformationMessage(i18n('message', 'Invalid selection'));
       return false;
     }

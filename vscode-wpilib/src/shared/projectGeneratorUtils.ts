@@ -1,6 +1,6 @@
 'use strict';
 
-import { cp, mkdir, readFile, writeFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import { glob } from 'glob';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
@@ -8,6 +8,7 @@ import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
 import * as pathUtils from './pathUtils';
 import { setExecutePermissions } from './permissions';
+import { cpWithWritePermsissions } from '../utilities';
 
 /**
  * Common patterns used in text replacements
@@ -27,6 +28,8 @@ export const VendorDepFiles = {
   XRP: 'XRPVendordep.json',
   COMMANDSV3: 'CommandsV3.json',
   COMMANDSV2_OLD: 'WPILibNewCommands.json',
+  APRILTAG: 'AprilTag.json',
+  CAMERASERVER: 'CameraServer.json',
 };
 
 /**
@@ -66,13 +69,13 @@ export async function setupProjectStructure(
 ): Promise<boolean> {
   try {
     // Copy gradle files
-    await cp(fromGradleFolder, toFolder, {
+    await cpWithWritePermsissions(fromGradleFolder, toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
       recursive: true,
     });
 
     // Copy shared gradle files
-    await cp(path.join(grRoot, 'shared'), toFolder, {
+    await cpWithWritePermsissions(path.join(grRoot, 'shared'), toFolder, {
       filter: (cf) => gradleCopyFilter(cf, fromGradleFolder),
       recursive: true,
     });
@@ -123,12 +126,12 @@ export async function setupDeployDirectory(
 
     const hintKey = isJava ? 'generateJavaDeployHint' : 'generateCppDeployHint';
     const hintText = isJava
-      ? `Files placed in this directory will be deployed to the RoboRIO into the
+      ? `Files placed in this directory will be deployed to the Systemcore into the
 'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
 to get a proper path relative to the deploy directory.`
-      : `Files placed in this directory will be deployed to the RoboRIO into the
-'deploy' directory in the home folder. Use the 'frc::filesystem::GetDeployDirectory'
-function from the 'frc/Filesystem.h' header to get a proper path relative to the deploy
+      : `Files placed in this directory will be deployed to the Systemcore into the
+'deploy' directory in the home folder. Use the 'wpi::filesystem::GetDeployDirectory'
+function from the 'wpi/system/Filesystem.hpp' header to get a proper path relative to the deploy
 directory.`;
 
     await writeFile(path.join(deployDir, 'example.txt'), i18n('generator', [hintKey, hintText]));
@@ -162,6 +165,10 @@ export async function setupVendorDeps(
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV2, vendorDir);
       } else if (vendordep === 'commandsv3') {
         await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.COMMANDSV3, vendorDir);
+      } else if (vendordep === 'aprilTag') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.APRILTAG, vendorDir);
+      } else if (vendordep === 'cameraServer') {
+        await pathUtils.copyVendorDep(resourcesFolder, VendorDepFiles.CAMERASERVER, vendorDir);
       }
     }
 

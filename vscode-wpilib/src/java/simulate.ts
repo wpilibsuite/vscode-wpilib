@@ -27,7 +27,7 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     env.LD_LIBRARY_PATH = commands.librarydir;
   }
 
-  if (commands.environment !== undefined) {
+  if (commands.environment) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
       env[envVar] = value;
@@ -50,7 +50,13 @@ export async function startSimulation(commands: ISimulateCommands): Promise<void
     config.vmArgs += ' -XstartOnFirstThread';
   }
 
-  logger.log('Java Simulation: ', config);
+  config.vmArgs += ' --add-opens';
+  config.vmArgs += ' java.base/jdk.internal.vm=ALL-UNNAMED';
+  config.vmArgs += ' --add-opens';
+  config.vmArgs += ' java.base/java.lang=ALL-UNNAMED';
+  config.vmArgs += ' --enable-native-access=ALL-UNNAMED';
+
+  logger.log('Java Simulation config: ' + JSON.stringify(config, null, 2));
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

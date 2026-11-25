@@ -54,7 +54,7 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
     });
   }
 
-  if (commands.environment !== undefined) {
+  if (commands.environment) {
     for (const envVar of Object.keys(commands.environment)) {
       const value = commands.environment[envVar];
       config.environment.push({
@@ -64,7 +64,7 @@ export async function startUnixSimulation(commands: IUnixSimulateCommands): Prom
     }
   }
 
-  logger.log('C++ Unix Simulation: ', config);
+  logger.log('C++ Unix Simulation: ' + JSON.stringify(config, null, 2));
 
   await vscode.debug.startDebugging(commands.workspace, config);
 }

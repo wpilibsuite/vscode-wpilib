@@ -38,12 +38,12 @@ export class Gradle2025Import extends WebViewBase {
   }
 
   public async startWithProject(projectRoot: vscode.Uri) {
-    await this.startWebpage();
+    this.startWebpage();
     const project = vscode.Uri.file(path.join(projectRoot.fsPath, 'build.gradle'));
     return this.handleProject(project, true);
   }
 
-  private async startWebpage() {
+  private startWebpage() {
     this.displayWebView(vscode.ViewColumn.Active, true, {
       enableScripts: true,
       retainContextWhenHidden: true,
@@ -144,7 +144,7 @@ export class Gradle2025Import extends WebViewBase {
       openLabel: 'Select a Project',
     });
 
-    if (oldProject === undefined || oldProject.length !== 1) {
+    if (!oldProject || oldProject.length !== 1) {
       return;
     }
 
@@ -161,7 +161,7 @@ export class Gradle2025Import extends WebViewBase {
     };
     const result = await vscode.window.showOpenDialog(open);
 
-    if (result === undefined) {
+    if (!result) {
       return;
     }
 
@@ -183,7 +183,7 @@ export class Gradle2025Import extends WebViewBase {
     // Detect C++ or Java project
     const wpilibJsonFile = path.join(oldProjectPath, '.wpilib', 'wpilib_preferences.json');
 
-    let cpp = true;
+    let cpp: boolean;
     try {
       const wpilibJsonFileContents = await readFile(wpilibJsonFile, 'utf8');
       const wpilibJsonFileParsed = JSON.parse(wpilibJsonFileContents) as IPreferencesJson;
@@ -195,7 +195,7 @@ export class Gradle2025Import extends WebViewBase {
         await vscode.window.showErrorMessage(
           i18n(
             'message',
-            'Failed to detect project type. Did you select the build.gradle file of a wpilib project?'
+            'Failed to detect project language. Check the .wpilib/wpilib_preferences.json file and be sure that the currentLanguage field is set to either "java" or "cpp".'
           ),
           {
             modal: true,
@@ -231,19 +231,20 @@ export class Gradle2025Import extends WebViewBase {
       } catch {
         // File doesn't exist
       }
-    }
-    if (javaRobotPackage === '') {
-      const res = await vscode.window.showInformationMessage(
-        i18n('message', 'Failed to determine robot class. Enter it manually?'),
-        {
-          modal: true,
-        },
-        { title: 'Yes' },
-        { title: 'No', isCloseAffordance: true }
-      );
-      if (res?.title !== 'Yes') {
-        await vscode.window.showErrorMessage('Project Import Failed');
-        return;
+
+      if (javaRobotPackage === '') {
+        const res = await vscode.window.showInformationMessage(
+          i18n('message', 'Failed to determine robot class. Enter it manually?'),
+          {
+            modal: true,
+          },
+          { title: 'Yes' },
+          { title: 'No', isCloseAffordance: true }
+        );
+        if (res?.title !== 'Yes') {
+          await vscode.window.showErrorMessage('Project Import Failed');
+          return;
+        }
       }
     }
 
@@ -281,7 +282,7 @@ export class Gradle2025Import extends WebViewBase {
       vendordeps.push('commandsv2');
     }
 
-    let success = false;
+    let success: boolean;
     if (cpp) {
       const gradlePath = path.join(
         gradleBasePath,
@@ -307,6 +308,7 @@ export class Gradle2025Import extends WebViewBase {
         undefined,
         gradlePath,
         toFolder,
+        undefined,
         javaRobotPackage,
         '',
         true,

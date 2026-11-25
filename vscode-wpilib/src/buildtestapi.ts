@@ -98,7 +98,7 @@ export class BuildTestAPI implements IBuildTestAPI {
       const selection = await vscode.window.showQuickPick(validBuilders, {
         placeHolder: i18n('ui', 'Pick a language'),
       });
-      if (selection === undefined) {
+      if (!selection) {
         vscode.window.showInformationMessage(i18n('message', 'Selection exited. Cancelling'));
         return false;
       }

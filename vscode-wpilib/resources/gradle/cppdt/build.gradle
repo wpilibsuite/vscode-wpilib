@@ -1,7 +1,7 @@
 plugins {
     id "cpp"
     id "google-test-test-suite"
-    id "edu.wpi.first.GradleRIO2027" version "###GRADLERIOREPLACE###"
+    id "org.wpilib.GradleRIO" version "###GRADLERIOREPLACE###"
 }
 
 model {
@@ -24,7 +24,7 @@ model {
         }
     }
     testSuites {
-        desktopProgramTest(GoogleTestTestSuiteSpec) {
+        wpilibUserProgramCatch2Test(GoogleTestTestSuiteSpec) {
             testing $.components.desktopProgram
 
             sources.cpp {
@@ -35,7 +35,7 @@ model {
             }
 
             wpi.cpp.deps.wpilibStatic(it)
-            wpi.cpp.deps.googleTest(it)
+            wpi.cpp.deps.catch2(it)
         }
     }
 }

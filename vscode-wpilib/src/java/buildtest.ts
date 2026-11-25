@@ -1,5 +1,6 @@
 'use strict';
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { ICodeBuilder, IExecuteAPI, IExternalAPI, IPreferencesAPI } from '../api';
 import { logger } from '../logger';
@@ -34,6 +35,10 @@ class CodeBuilder implements ICodeBuilder {
       'Java Build',
       this.executeApi,
       prefs
+    );
+    vscode.commands.executeCommand(
+      'java.projectConfiguration.update',
+      vscode.Uri.file(path.join(workspace.uri.fsPath, 'build.gradle'))
     );
     logger.log(result.toString());
     return true;
@@ -78,7 +83,10 @@ class CodeTester implements ICodeBuilder {
       this.executeApi,
       prefs
     );
-
+    vscode.commands.executeCommand(
+      'java.projectConfiguration.update',
+      vscode.Uri.file(path.join(workspace.uri.fsPath, 'build.gradle'))
+    );
     logger.log(result.toString());
     return true;
   }
@@ -92,23 +100,11 @@ class CodeTester implements ICodeBuilder {
   }
 }
 
-export class BuildTest {
-  private build: CodeBuilder;
-  private test: CodeTester;
+export function registerCodeBuilderAndTester(externalApi: IExternalAPI) {
+  const buildTestApi = externalApi.getBuildTestAPI();
 
-  constructor(externalApi: IExternalAPI) {
-    const buildTestApi = externalApi.getBuildTestAPI();
+  buildTestApi.addLanguageChoice('java');
 
-    buildTestApi.addLanguageChoice('java');
-
-    this.build = new CodeBuilder(externalApi);
-    this.test = new CodeTester(externalApi);
-
-    buildTestApi.registerCodeBuild(this.build);
-    buildTestApi.registerCodeTest(this.test);
-  }
-
-  public dispose() {
-    //
-  }
+  buildTestApi.registerCodeBuild(new CodeBuilder(externalApi));
+  buildTestApi.registerCodeTest(new CodeTester(externalApi));
 }
