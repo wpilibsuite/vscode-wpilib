@@ -149,6 +149,17 @@ function resetBaseDropdown() {
   }
 }
 
+function updateDesktopSupport(languageValue: string, baseValue: string) {
+  const desktopRow = document.getElementById('desktopRow') as HTMLElement;
+  const desktopCb = document.getElementById('desktopCB') as HTMLInputElement;
+  const showDesktopSupport = languageValue === 'cpp' && !/romi|xrp/i.test(baseValue);
+
+  desktopRow.style.display = showDesktopSupport ? '' : 'none';
+  if (!showDesktopSupport) {
+    desktopCb.checked = false;
+  }
+}
+
 function selectProjectType(type: ProjectType) {
   projectType = type;
 
@@ -169,11 +180,12 @@ function selectProjectType(type: ProjectType) {
   }
 
   // Reset language and base since they depend on project type
-  const lanagageSelect = document.getElementById('language-select') as HTMLSelectElement;
-  lanagageSelect.selectedIndex = 0;
+  const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+  languageSelect.selectedIndex = 0;
   resetBaseDropdown();
   language = '';
   base = '';
+  updateDesktopSupport('', '');
 
   // Request languages for this project type
   vscode.postMessage({
@@ -296,6 +308,7 @@ function setupEventListeners() {
 
     // Reset base dropdown when language changes
     resetBaseDropdown();
+    updateDesktopSupport(language, base);
 
     // Request project bases for this language
     vscode.postMessage({
@@ -311,13 +324,12 @@ function setupEventListeners() {
       },
       type: 'base',
     });
-
-    validateStep2();
   });
 
   const baseSelect = document.getElementById('base-select') as HTMLSelectElement;
   baseSelect.addEventListener('change', () => {
     base = baseSelect.value;
+    updateDesktopSupport(language, base);
 
     // Enable next button if both selections are made
     const nextButton = document.getElementById('next-to-step-3');
@@ -415,5 +427,6 @@ window.addEventListener('message', (event) => {
 
 window.addEventListener('load', (_: Event) => {
   setupEventListeners();
+  updateDesktopSupport(language, base);
   navigateToStep(1); // Start at first step
 });
