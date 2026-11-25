@@ -407,6 +407,10 @@
         "from": "DifferentialDriveWheelSpeeds",
         "to": "DifferentialDriveWheelVelocities"
       },
+      {
+        "from": "MecanumDriveWheelSpeeds",
+        "to": "MecanumDriveWheelVelocities"
+      },
       { "from": "CTREPCM", "to": "CTRE_PCM" },
       { "from": "REVPH", "to": "REV_PH" },
       { "from": "DoubleSolenoid.Value.kOff", "to": "DoubleSolenoid.Value.OFF" },
