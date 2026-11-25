@@ -260,7 +260,15 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
     vscode.commands.registerCommand('wpilibcore.changeDesktop', async () => {
       const preferencesApi = externalApi.getPreferencesAPI();
       const workspace = await preferencesApi.getFirstOrSelectedWorkspace();
-      if (!workspace || !preferencesApi.getPreferences(workspace).getIsWPILibProject()) {
+      if (!workspace) {
+        vscode.window.showInformationMessage(
+          i18n('message', 'Cannot change desktop since this is not a WPILib project')
+        );
+        return;
+      }
+
+      const preferences = preferencesApi.getPreferences(workspace);
+      if (!preferences.getIsWPILibProject()) {
         vscode.window.showInformationMessage(
           i18n('message', 'Cannot change desktop since this is not a WPILib project')
         );
@@ -279,9 +287,16 @@ export function createVsCommands(context: vscode.ExtensionContext, externalApi: 
       const isEnabled = await getDesktopEnabled(buildgradle);
 
       if (isEnabled === undefined) {
-        vscode.window.showInformationMessage(
-          i18n('message', 'Invalid project format to add or remove desktop support.')
-        );
+        if (preferences.getCurrentLanguage() === 'cpp') {
+          logger.log('Desktop support setting not found in C++ project: ', buildgradle);
+          vscode.window.showInformationMessage(
+            i18n('message', 'Could not determine the current desktop support setting.')
+          );
+        } else {
+          vscode.window.showInformationMessage(
+            i18n('message', 'Desktop support can only be changed for C++ projects.')
+          );
+        }
         return;
       }
 

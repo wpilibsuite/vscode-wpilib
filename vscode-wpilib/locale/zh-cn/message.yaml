@@ -30,7 +30,8 @@ No dependencies installed: 没有安装任何依赖
 # No languages available to set
 # Successfully set java.home
 # Enable Desktop Support for Project? Currently ${isEnabled}
-# Invalid project format to add or remove desktop support.
+# Could not determine the current desktop support setting.
+# Desktop support can only be changed for C++ projects.
 # Command ({0}) returned code: {1}
 # Enter Gradle command to run
 # Failed to install {0}
