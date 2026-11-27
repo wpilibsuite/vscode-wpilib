@@ -45,8 +45,8 @@
       { "from": "(?<!wpi/[^\\s]*)wpigui.h", "to": "wpi/gui/wpigui.hpp" },
       { "from": "(?<!wpi/[^\\s]*)WPILibVersion.h", "to": "wpi/system/WPILibVersion.hpp" },
       {
-        "from": "frc/DriverStation.h",
-        "to": "\"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\"\n#include \"wpi/driverstation/DriverStation.hpp\""
+        "from": "#include [<\"]frc/DriverStation\\.h[>\"]",
+        "to": "#include \"wpi/driverstation/MatchState.hpp\"\n#include \"wpi/driverstation/RobotState.hpp\"\n#include \"wpi/driverstation/Alliance.hpp\"\n#include \"wpi/driverstation/MatchType.hpp\"\n#include \"wpi/driverstation/DriverStation.hpp\""
       },
       { "from": "frc/GenericHID.h", "to": "wpi/driverstation/GenericHID.hpp" },
       { "from": "frc/Joystick.h", "to": "wpi/driverstation/Joystick.hpp" },
