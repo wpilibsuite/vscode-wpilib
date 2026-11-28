@@ -7,6 +7,8 @@ import * as vscode from 'vscode';
 import { IExternalAPI } from './api';
 import { logger } from './logger';
 
+const expectedJavaVersion = 25;
+
 function parseVersion(content: string): string {
   const regexp = /version "(.*)"/g;
   const match = regexp.exec(content);
@@ -42,7 +44,7 @@ async function checkJavaPath(path: string | undefined, source: string) {
   if (path) {
     try {
       const javaVersion = await getJavaVersion(path);
-      if (javaVersion.major >= 25) {
+      if (javaVersion.major >= expectedJavaVersion) {
         logger.log(`Found ${source} Version: ${javaVersion} at ${path}`);
         return true;
       } else {
@@ -66,10 +68,15 @@ export async function findJdkPath(api: IExternalAPI): Promise<string | undefined
   if (await checkJavaPath(vscodeOldJavaHome, 'java.home')) {
     return vscodeOldJavaHome;
   }
-  // Then check the WPILib home directory for the WPILib jdk
+  // Then check the WPILib home directory for the WPILib jdk after it's versioned (2027)
   const wpilibHome = api.getUtilitiesAPI().getWPILibHomeDir();
+  const wpilibHomeJavaVersioned = path.join(wpilibHome, 'jdk', expectedJavaVersion.toString());
+  if (await checkJavaPath(wpilibHomeJavaVersioned, 'WPILib Home JDK')) {
+    return wpilibHomeJavaVersioned;
+  }
+  // Then check the WPILib home directory for the WPILib jdk (before 2027)
   const wpilibHomeJava = path.join(wpilibHome, 'jdk');
-  if (await checkJavaPath(wpilibHomeJava, 'WPILib Home JDK')) {
+  if (await checkJavaPath(wpilibHomeJava, 'WPILib Home JDK (legacy)')) {
     return wpilibHomeJava;
   }
   // Check for java home
