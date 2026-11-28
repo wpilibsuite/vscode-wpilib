@@ -631,6 +631,8 @@
       { "from": "Color.kYellow", "to": "Color.YELLOW" },
       { "from": "Color.kYellowGreen", "to": "Color.YELLOW_GREEN" },
       { "from": "MathUtil.clamp\\(", "to": "Math.clamp(" },
+      { "from": "MathUtil.interpolate\\(", "to": "MathUtil.lerp(" },
+      { "from": "MathUtil.inverseInterpolate\\(", "to": "MathUtil.inverseLerp(" },
       { "from": "Timer.getFPGATimestamp\\(\\)", "to": "Timer.getTimestamp()" },
       { "from": "org.wpilib.driverstation.Alert", "to": "org.wpilib.util.Alert" },
       { "from": "org.wpilib.driverstation.Alert.Level", "to": "org.wpilib.util.Alert.Level" },
