@@ -1,5 +1,6 @@
 'use strict';
 
+import { glob } from 'fs/promises';
 import * as path from 'path';
 import { logger } from '../logger';
 import * as fileUtils from './fileUtils';
@@ -119,9 +120,6 @@ export async function generateCopyJava(
       await cpWithWritePermsissions(fromTemplateTestFolder, testPath, { recursive: true });
     }
 
-    // Find files that need template processing
-    const files = await genUtils.findMatchingFiles(codePath);
-
     // Create replacements map
     const replacements = new Map<RegExp, string>();
     replacements.set(
@@ -133,18 +131,15 @@ export async function generateCopyJava(
     }
 
     // Process template files
-    await Promise.all(
-      files.map((file) => fileUtils.processFile(path.join(codePath, file), replacements))
-    );
+    for await (const file of glob('**/*.{java,gradle}', { cwd: codePath })) {
+      await fileUtils.processFile(path.join(codePath, file), replacements);
+    }
 
     // Process test files if they exist
     if (fromTemplateTestFolder !== undefined) {
-      const testFiles = await genUtils.findMatchingFiles(testPath);
-      await Promise.all(
-        testFiles.map((testFile) =>
-          fileUtils.processFile(path.join(testPath, testFile), replacements)
-        )
-      );
+      for await (const testFile of glob('**/*.{java,gradle}', { cwd: testPath })) {
+        await fileUtils.processFile(path.join(testPath, testFile), replacements);
+      }
     }
 
     // Setup project structure

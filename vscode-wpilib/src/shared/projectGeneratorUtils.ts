@@ -1,7 +1,6 @@
 'use strict';
 
 import { mkdir, readFile, writeFile } from 'fs/promises';
-import { glob } from 'glob';
 import * as path from 'path';
 import { localize as i18n } from '../locale';
 import { logger } from '../logger';
@@ -41,19 +40,6 @@ function gradleCopyFilter(sourcePath: string, fromGradleFolder: string): boolean
     return false;
   }
   return true;
-}
-
-/**
- * Find all files matching pattern
- */
-export async function findMatchingFiles(
-  baseDir: string,
-  pattern: string = '**/*{.java,.gradle}'
-): Promise<string[]> {
-  return await glob(pattern, {
-    cwd: baseDir,
-    nodir: true,
-  });
 }
 
 /**
